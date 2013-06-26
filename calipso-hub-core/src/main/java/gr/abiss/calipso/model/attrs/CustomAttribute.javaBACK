@@ -1,0 +1,34 @@
+package gr.abiss.calipso.model.attrs;
+
+
+import gr.abiss.calipso.model.base.AbstractAuditable;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+
+@MappedSuperclass
+public abstract class CustomAttribute<T extends Serializable> extends
+		AbstractAuditable {
+
+	@Column(name = "name", nullable = false, updatable = false)
+	private String name;
+
+	@ManyToOne
+	private BaseCustomAttributesEntity subject;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public abstract T getValue();
+
+	public abstract void setValue(T value);
+
+}

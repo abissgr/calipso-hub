@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>calipso-hub</name>
+
+    <groupId>gr.abiss.calipso</groupId>
+    <artifactId>calipso-hub</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+    	<project.parent.basedir>${project.basedir}</project.parent.basedir>
+    	
+        <resthub.spring.stack.version>2.1.1</resthub.spring.stack.version>
+        <jetty.version>8.1.10.v20130312</jetty.version>
+        <jetty.port>8080</jetty.port>
+        
+        
+        <spring.version>3.2.2.RELEASE</spring.version>
+        <spring-security.version>3.1.4.RELEASE</spring-security.version>
+        <thymeleaf.version>2.0.16</thymeleaf.version>
+        <joda-time.version>2.1</joda-time.version>
+        <handlebars-maven-plugin.version>0.2.0</handlebars-maven-plugin.version>
+        <commons-lang3.version>3.1</commons-lang3.version>
+        <commons-configuration.version>1.9</commons-configuration.version>
+        <jackson.version>2.1.4</jackson.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.resthub</groupId>
+                <artifactId>resthub-jpa</artifactId>
+                <version>${resthub.spring.stack.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.resthub</groupId>
+                <artifactId>resthub-web-server</artifactId>
+                <version>${resthub.spring.stack.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.0.1</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+	    <filters>
+	      <filter>${project.parent.basedir}/dev.properties</filter>
+	    </filters>
+	    <resources>
+	      <resource>
+	        <directory>src/main/resources</directory>
+	        <filtering>true</filtering>
+	      </resource>
+	    </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+                        
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
+                <configuration>
+                    <!-- We use non NIO connector in order to avoid read only static files under windows -->
+                    <connectors>
+                        <connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
+                            <port>${jetty.port}</port>
+                            <maxIdleTime>60000</maxIdleTime>
+                        </connector>
+                    </connectors>
+                    <!-- To run the optimized version of the webapp -->
+                    <!-- do a 'mvn package -Poptimize' and uncomment the following line -->
+                    <!-- webAppSourceDirectory>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/target/resthub-jpa-backbonejs-multi-archetype-2.1.1</webAppSourceDirectory -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+    <repository>
+        <id>snapshot</id>
+         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+  <modules>
+    <module>calipso-hub-contract</module>
+    <module>calipso-hub-jpasearch</module>
+    <module>calipso-hub-core</module>
+    <module>calipso-hub-webapp</module>
+  </modules>
+</project>

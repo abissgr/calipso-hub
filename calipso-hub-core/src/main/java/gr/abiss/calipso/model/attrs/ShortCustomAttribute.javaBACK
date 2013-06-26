@@ -1,0 +1,25 @@
+package gr.abiss.calipso.model.attrs;
+
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "custom_attribute_short")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class ShortCustomAttribute extends CustomAttribute<Short> {
+
+	private Short value;
+
+	@Override
+	public Short getValue() {
+		return value;
+	}
+
+	@Override
+	public void setValue(Short value) {
+		this.value = value;
+	}
+
+}

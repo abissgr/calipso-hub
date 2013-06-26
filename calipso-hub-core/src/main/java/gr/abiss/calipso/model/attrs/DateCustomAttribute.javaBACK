@@ -1,0 +1,29 @@
+package gr.abiss.calipso.model.attrs;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "custom_attribute_date")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class DateCustomAttribute extends CustomAttribute<Date> {
+
+	@Column(name = "value", nullable = false)
+	private Date value;
+
+	@Override
+	public Date getValue() {
+		return value;
+	}
+
+	@Override
+	public void setValue(Date value) {
+		this.value = value;
+	}
+
+}
