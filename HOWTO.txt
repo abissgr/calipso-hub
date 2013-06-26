@@ -1,11 +1,12 @@
 #
 # ----------------------------------------------
-# Balipso build README
+# Calipso build README
 # ----------------------------------------------
 #
 # BUILD HOWTO
 # ----------------------------------------------
-# 1: Edit this file and rename it to dev.properties
+# 0: Optional: Eclipse users run: mvn eclipse:eclipse 
+# 1: RENAME this file to dev.properties to 
 # 2: Run in this directory: mvn clean install
 # 3: cd calipso-hub-webapp
 # 4: Run in the calipso-hub-webapp directory: mvn clean install jetty:run
