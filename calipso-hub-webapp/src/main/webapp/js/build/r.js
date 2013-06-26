@@ -1,9 +1,3 @@
-/**
- * @license r.js 2.1.5 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/jrburke/requirejs for details
- */
-
 /*
  * This is a bootstrap script to allow running RequireJS in the command line
  * in either a Java/Rhino or Node environment. It is modified by the top-level

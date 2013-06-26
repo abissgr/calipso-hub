@@ -1,8 +1,3 @@
-/**
- * @license RequireJS i18n 2.0.2 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/requirejs/i18n for details
- */
 /*jslint regexp: true */
 /*global require: false, navigator: false, define: false */
 
