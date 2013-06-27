@@ -31,5 +31,7 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
 	public T saveAndRefresh(T entity);
 
 	public void refresh(T entity);
+	
+	public Class<T> getDomainClass();
 
 }

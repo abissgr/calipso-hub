@@ -51,8 +51,9 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 		this.domainClass = domainClass;
 	}
 
-	protected Class<T> getDomainClass() {
-		return domainClass;
+	@Override
+	public Class<T> getDomainClass() {
+		return this.domainClass;
 	}
 
 	@Override
