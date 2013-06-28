@@ -9,11 +9,11 @@ To use your components should just extend the following classes without implemen
 
 Search is available at
 
-/api/<entity, e.g. user>?params
+/api/[entity, e.g. user]?params
 
 Form schemata is available at 
 
-/api/<entity, e.g. user>/form-schema?mode=<one of create, update, search>
+/api/[entity, e.g. user]/form-schema?mode=[one of create, update, search]
 
 controller: AbstractServiceBasedRestController
 repo: BaseRepository(Impl), see also "1.3.2 Adding custom behavior to all repositories" [2].
