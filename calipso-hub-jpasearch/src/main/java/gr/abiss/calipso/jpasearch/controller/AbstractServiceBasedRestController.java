@@ -26,7 +26,6 @@ import gr.abiss.calipso.jpasearch.service.GenericService;
 import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.resthub.common.exception.NotFoundException;
 import org.resthub.common.service.CrudService;
@@ -75,17 +74,22 @@ public abstract class AbstractServiceBasedRestController<T, ID extends Serializa
         }
     }
 
-	// TODO: refactor to OPTIONS on base path
-	@RequestMapping(value = "formschema", produces = { "application/json" }, method = RequestMethod.GET)
+	// TODO: refactor to OPTIONS on base path?
+	@RequestMapping(value = "search-schema", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody
-	public FormSchema getSchema(HttpServletRequest request,
-			HttpServletResponse response) {
+	public FormSchema getSchema(
+			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
+		Assert.isTrue(mode == null 
+				|| mode.equalsIgnoreCase("SEARCH") 
+				|| mode.equalsIgnoreCase("CREATE") 
+				|| mode.equalsIgnoreCase("UPDATE"));
+		mode = mode.toUpperCase();
 		try {
 			FormSchema schema = new FormSchema();
 			schema.setDomainClass(
 					((GenericService<Persistable<ID>, ID>) this.service)
 							.getDomainClass());
-			schema.setType(FormSchema.Type.SEARCH);
+			schema.setType(FormSchema.Type.valueOf(mode));
 			return schema;
 		} catch (Exception e) {
 			throw new NotFoundException();
