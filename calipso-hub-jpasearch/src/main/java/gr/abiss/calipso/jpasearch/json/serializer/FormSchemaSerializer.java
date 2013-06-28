@@ -18,7 +18,8 @@
  */
 package gr.abiss.calipso.jpasearch.json.serializer;
 
-import gr.abiss.calipso.jpasearch.annotation.FieldFormFieldAsJasonConfig;
+import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
+import gr.abiss.calipso.jpasearch.model.FormSchema;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
@@ -26,59 +27,84 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-public class ClassToFormSerializer extends JsonSerializer<Class> {
+public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FormSchemaSerializer.class);
 
 	private static final HashMap<String, String> CONFIG_CACHE = new HashMap<String, String>();
 
 	@Override
-	public void serialize(Class value, JsonGenerator jgen,
+	public void serialize(FormSchema schema, JsonGenerator jgen,
 			SerializerProvider provider) throws IOException,
 			JsonGenerationException {
+		Class domainClass = schema.getDomainClass();
 
-		if (null == value) {
+		if (null == domainClass) {
 			// write the word 'null' if there's no value available
 			jgen.writeNull();
 		} else {
 
-			jgen.writeStartObject();
 			PropertyDescriptor[] descriptors = new PropertyUtilsBean()
-					.getPropertyDescriptors(value);
+					.getPropertyDescriptors(domainClass);
+
+			StringBuffer buf = new StringBuffer("{\n");
+
 			for (int i = 0; i < descriptors.length; i++) {
 				PropertyDescriptor descriptor = descriptors[i];
 				String name = descriptor.getName();
-				jgen.writeFieldName(name);
-				jgen.writeRawValue(getFormFieldConfig(value, name));
+				String fieldValue = getFormFieldConfig(domainClass, name,
+						schema.getType());
+				if (fieldValue != null && !fieldValue.equalsIgnoreCase("skip")) {
+					if (i > 0) {
+						buf.append(",");
+					}
+					buf.append("\n   \"").append(name).append("\": ")
+							.append(fieldValue);
+				}
 			}
-			jgen.writeEndObject();
+			buf.append("}");
+			jgen.writeRaw(buf.toString());
 		}
 	}
 
-	private static String getFormFieldConfig(Class<?> clazz, String fieldName) {
+	private static String getFormFieldConfig(Class domainClass,
+			String fieldName, FormSchema.Type type) {
 		Field field = null;
 		String formConfig = null;
-		String key = clazz.getName() + "#" + fieldName;
+		String key = domainClass.getName() + "#" + fieldName;
 		formConfig = CONFIG_CACHE.get(key);
 
 		if (formConfig == null) {
-			Class<?> tmpClass = clazz;
+			Class tmpClass = domainClass;
 			do {
 				for (Field tmpField : tmpClass.getDeclaredFields()) {
 					String candidateName = tmpField.getName();
 					if (candidateName.equals(fieldName)) {
 
 						field = tmpField;
-						if (field
-								.isAnnotationPresent(FieldFormFieldAsJasonConfig.class)) {
-							FieldFormFieldAsJasonConfig jsonConfig = field
-									.getAnnotation(FieldFormFieldAsJasonConfig.class);
-
-							formConfig = jsonConfig.search();
+						FormSchemaEntry jsonConfig = null;
+						if (field.isAnnotationPresent(FormSchemaEntry.class)) {
+							jsonConfig = field.getAnnotation(FormSchemaEntry.class);
+							if (FormSchema.Type.CREATE.equals(type)) {
+								formConfig = jsonConfig.search();
+							} else if (FormSchema.Type.UPDATE.equals(type)) {
+								formConfig = jsonConfig.update();
+							} else {
+								formConfig = jsonConfig.search();
+							}
+							// skip if flagged as such
+							formConfig = formConfig.equalsIgnoreCase("skip") ? null : formConfig;
+						}
+						else{
+							formConfig = "\"Text\"";
 						}
 						break;
 					}
@@ -86,13 +112,10 @@ public class ClassToFormSerializer extends JsonSerializer<Class> {
 				tmpClass = tmpClass.getSuperclass();
 			} while (tmpClass != null && field == null);
 		}
-		if (field == null) {
-			// LOGGER.warn("Field '" + fieldName + "' not found on class "
-			// + clazz);
-			// HashMap handles null values so we can use containsKey to cach
-			// invalid fields and hence skip the reflection scan
-			CONFIG_CACHE.put(key, "'Text'");
-		}
+
+		// HashMap handles null values so we can use containsKey to cach
+		// invalid fields and hence skip the reflection scan
+		CONFIG_CACHE.put(key, formConfig);
 		return formConfig;
 	}
 }

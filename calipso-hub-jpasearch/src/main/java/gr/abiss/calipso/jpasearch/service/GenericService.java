@@ -16,12 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.jpasearch.annotation;
+package gr.abiss.calipso.jpasearch.service;
 
-public @interface FieldFormFieldAsJasonConfig {
-	String create() default "'Text'";
+import java.io.Serializable;
 
-	String update() default "'Text'";
+import org.resthub.common.service.CrudService;
+import org.springframework.data.domain.Persistable;
 
-	String search() default "'Text'";
+/**
+ * CRUD Service interface.
+ * 
+ * @param <T>
+ *            Your resource POJO to manage, maybe an entity or DTO class
+ * @param <ID>
+ *            Resource id type, usually Long or String
+ */
+public interface GenericService<T extends Persistable<ID>, ID extends Serializable>
+		extends
+		CrudService<T, ID> {
+	public Class<T> getDomainClass();
 }

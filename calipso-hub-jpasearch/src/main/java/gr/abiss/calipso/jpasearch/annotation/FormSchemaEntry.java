@@ -16,13 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service;
+package gr.abiss.calipso.jpasearch.annotation;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
-import gr.abiss.calipso.model.User;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface UserService extends GenericService<User, String> {
+@Target(value = ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FormSchemaEntry {
+	String create() default "'Text'";
 
-	User findByCredentials(String userNameOrEmail, String password);
+	String update() default "'Text'";
+
+	String search() default "'Text'";
 
 }

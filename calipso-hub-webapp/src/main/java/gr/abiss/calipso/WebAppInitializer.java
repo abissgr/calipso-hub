@@ -36,6 +36,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 
 /**
  * This class replaces the "old" web.xml and is automatically scanned at the application startup
@@ -73,14 +74,13 @@ public class WebAppInitializer implements WebApplicationInitializer {
 		encodingFilter.addMappingForUrlPatterns(
 				(EnumSet.of(DispatcherType.REQUEST)), true, "/*");
 
-		// // only using URL rewriting in manager/* for now
-		// FilterRegistration.Dynamic urlrewriteFilter =
-		// servletContext.addFilter(
-		// "UrlRewriteFilter", UrlRewriteFilter.class);
-		// urlrewriteFilter.addMappingForUrlPatterns(
-		// (EnumSet.of(DispatcherType.REQUEST)), true, "/*");
-		// // urlrewriteFilter.setInitParameter("logLevel", "DEBUG");
-		//
+		// URL rewrite filter
+		FilterRegistration.Dynamic urlrewriteFilter = servletContext.addFilter(
+				"UrlRewriteFilter", UrlRewriteFilter.class);
+		urlrewriteFilter.addMappingForUrlPatterns(
+				(EnumSet.of(DispatcherType.REQUEST)), true, "/*");
+		// urlrewriteFilter.setInitParameter("logLevel", "DEBUG");
+
 		// // Convert JSONP requests (i.e. HTTP GETs) to proper REST methods
 		// FilterRegistration.Dynamic jsonpToRestFilter = servletContext
 		// .addFilter("JSONP View Filter", RestToJsonpFilter.class);

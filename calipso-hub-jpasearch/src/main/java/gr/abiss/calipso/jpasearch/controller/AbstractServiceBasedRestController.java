@@ -18,11 +18,12 @@
  */
 package gr.abiss.calipso.jpasearch.controller;
 
+
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.jpasearch.model.FormSchema;
+import gr.abiss.calipso.jpasearch.service.GenericService;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,8 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,59 +46,49 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
-public abstract class AbstractServiceBasedRestController<T, ID extends Serializable, S extends CrudService> extends
+public abstract class AbstractServiceBasedRestController<T, ID extends Serializable, S extends CrudService<T, ID>>
+		extends
 		ServiceBasedRestController<T, ID, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceBasedRestController.class);
 
 	@Autowired
 	private HttpServletRequest request;
-
-
-	/**
-	 * Find all resources matching the given criteria and return a paginated
-	 * collection<br/>
-	 * REST webservice published : GET
-	 * /search?page=0&size=20&sort=propertyName&direction=asc
-	 * 
-	 * @param page
-	 *            Page number starting from 0. default to 0
-	 * @param size
-	 *            Number of resources by pages. default to 10
-	 * @return OK http status code if the request has been correctly processed,
-	 *         with the a paginated collection of all resource enclosed in the
-	 *         body.
-	 */
-
-	// TODO: refactor to use base path
-	@Override
-	@RequestMapping(value = "search", method = RequestMethod.GET)
-	@ResponseBody
-	public Page<T> findPaginated(
-			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
-			@RequestParam(value = "sort", required = false, defaultValue = "id") String sort,
-			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
-
-		Assert.isTrue(page > 0, "Page index must be greater than 0");
-
-		Order order = new Order(
-				direction.equalsIgnoreCase("ASC") ? Sort.Direction.ASC
-						: Sort.Direction.DESC, sort);
-		List<Order> orders = new ArrayList<Order>(1);
-		orders.add(order);
-		return this.service.findAll(new ParameterMapBackedPageRequest(request
-				.getParameterMap(), page - 1, size, new Sort(orders)));
-	}
+	
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<T> findPaginated(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(value = "direction", required = false, defaultValue = "") String direction,
+            @RequestParam(value = "properties", required = false) String properties) {
+        Assert.isTrue(page > 0, "Page index must be greater than 0");
+        Assert.isTrue(direction.isEmpty() || direction.equalsIgnoreCase(Sort.Direction.ASC.toString()) || direction.equalsIgnoreCase(Sort.Direction.DESC.toString()), "Direction should be ASC or DESC");
+        if(direction.isEmpty()) {
+            return this.service.findAll(new ParameterMapBackedPageRequest(request
+    				.getParameterMap(), page - 1, size));
+        } else {
+            Assert.notNull(properties);
+            return this.service.findAll(new ParameterMapBackedPageRequest(request
+    				.getParameterMap(), page - 1, size, new Sort(Sort.Direction.fromString(direction.toUpperCase()), properties.split(","))));
+        }
+    }
 
 	// TODO: refactor to OPTIONS on base path
-	@RequestMapping(value = "formschema", method = RequestMethod.GET)
+	@RequestMapping(value = "formschema", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody
-	Class getSchema(HttpServletRequest request, HttpServletResponse response) {
-		String name = this.getClass().getSimpleName();
+	public FormSchema getSchema(HttpServletRequest request,
+			HttpServletResponse response) {
 		try {
-			return Class.forName(name.substring(0, name.indexOf("Service")));
-		} catch (ClassNotFoundException e) {
+			FormSchema schema = new FormSchema();
+			schema.setDomainClass(
+					((GenericService<Persistable<ID>, ID>) this.service)
+							.getDomainClass());
+			schema.setType(FormSchema.Type.SEARCH);
+			return schema;
+		} catch (Exception e) {
 			throw new NotFoundException();
 		}
+	}
 }

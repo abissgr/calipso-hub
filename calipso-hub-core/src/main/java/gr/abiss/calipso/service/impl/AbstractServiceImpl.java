@@ -18,6 +18,8 @@
  */
 package gr.abiss.calipso.service.impl;
 
+import gr.abiss.calipso.jpasearch.repository.BaseRepository;
+import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.repository.UserRepository;
 
@@ -26,15 +28,14 @@ import java.io.Serializable;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 
-public abstract class AbstractServiceImpl<T, ID extends Serializable, R extends PagingAndSortingRepository<T, ID>> extends
-		CrudServiceImpl<T, ID, R> {
+public abstract class AbstractServiceImpl<T, ID extends Serializable, R extends BaseRepository<T, ID>>
+		extends
+ GenericServiceImpl<T, ID, R> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceImpl.class);
 
 

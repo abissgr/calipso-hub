@@ -1,28 +1,17 @@
-<!--
-
-    Copyright (c) 2007 - 2013 www.Abiss.gr
-
-    This file is part of Calipso, a software platform by www.Abiss.gr.
-
-    Calipso is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Calipso is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
-
--->
+<!-- Copyright (c) 2007 - 2013 www.Abiss.gr This file is part of Calipso, 
+	a software platform by www.Abiss.gr. Calipso is free software: you can redistribute 
+	it and/or modify it under the terms of the GNU Affero General Public License 
+	as published by the Free Software Foundation, either version 3 of the License, 
+	or (at your option) any later version. Calipso is distributed in the hope 
+	that it will be useful, but WITHOUT ANY WARRANTY; without even the implied 
+	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+	GNU Affero General Public License for more details. You should have received 
+	a copy of the GNU General Public License along with Calipso. If not, see 
+	http://www.gnu.org/licenses/agpl.html -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:sec="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         
@@ -39,38 +28,55 @@
         http://www.springframework.org/schema/util/spring-util.xsd
         
         http://www.springframework.org/schema/task
-        http://www.springframework.org/schema/task/spring-task.xsd">
-                           
+        http://www.springframework.org/schema/task/spring-task.xsd
+        
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
 	<bean class="gr.abiss.calipso.spring.LoggingHandlerExceptionResolver" />
-	
-    <!--  Executor for the methods marked wiht @async annotations --> 
-	<task:executor id="asyncExecutor" pool-size="25" /> 
-	<!--  Configuration for the Runtime --> 
-	<task:annotation-driven executor="asyncExecutor" /> 
-   	
+
+	<!-- Executor for the methods marked wiht @async annotations -->
+	<task:executor id="asyncExecutor" pool-size="25" />
+	<!-- Configuration for the Runtime -->
+	<task:annotation-driven executor="asyncExecutor" />
+
 	<!-- Do not create sessions -->
 	<bean id="securityContextPersistenceFilter"
 		class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
 		<property name='securityContextRepository'>
-		<bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
-		  <property name='allowSessionCreation' value='false' />
-		</bean>
+			<bean
+				class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
+				<property name='allowSessionCreation' value='false' />
+			</bean>
 		</property>
 	</bean>
-	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"  use-expressions="true">
+	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"
+		use-expressions="true">
 		<sec:http-basic />
-		<sec:intercept-url pattern="/api/rest/rating/**" method="PUT" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/rating/**" method="POST" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/comment/**" method="PUT" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/comment/**" method="POST" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/topic/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/topic/**" method="POST" access="permitAll" />
-		<sec:intercept-url pattern="/api/rest/user/**" method="POST" access="permitAll" />
-		<sec:intercept-url pattern="/api/rest/user/**" method="PUT" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/**" method="DELETE" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="OPTIONS" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="POST" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/rating/**"
+			method="PUT" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/api/rest/rating/**"
+			method="POST" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/api/rest/comment/**"
+			method="PUT" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/api/rest/comment/**"
+			method="POST" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/api/rest/topic/**"
+			method="PUT" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/topic/**"
+			method="POST" access="permitAll" />
+		<sec:intercept-url pattern="/api/rest/user/**"
+			method="POST" access="permitAll" />
+		<sec:intercept-url pattern="/api/rest/user/**"
+			method="PUT" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/api/rest/**" method="DELETE"
+			access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/**" method="OPTIONS"
+			access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/**" method="POST"
+			access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/**" method="PUT"
+			access="hasRole('ROLE_ADMIN')" />
 		<sec:logout />
 	</sec:http>
 
@@ -78,30 +84,33 @@
 		<sec:authentication-provider
 			user-service-ref='userDetailsService' />
 	</sec:authentication-manager>
-	<sec:global-method-security secured-annotations="enabled" />
+	<sec:global-method-security
+		secured-annotations="enabled" />
 	<!-- Fixes? parsing of path variables containing dots -->
-	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-        <property name="useDefaultSuffixPattern" value="false" />
-    </bean>
-    <context:property-placeholder location="classpath:calipso.defaults.properties"/>
-    <!-- Configuration Properties 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	  <property name="location" value="classpath:configuration.properties"/>
-	</bean>-->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="useDefaultSuffixPattern" value="false" />
+	</bean>
+	<context:property-placeholder location="classpath:calipso.defaults.properties" />
+	<!-- Configuration Properties <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
+		<property name="location" value="classpath:configuration.properties"/> </bean> -->
 
-    <!-- Message externalization/internationalization -->
-    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-      <property name="basename" value="Messages" />
-    </bean>
+	<!-- Message externalization/internationalization -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="Messages" />
+	</bean>
 	<!-- Email Sender -->
-    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-	    <property name="host" value="${mail.server.host}" />
-	    <property name="port" value="${mail.server.port}" />
-	    <property name="protocol" value="${mail.server.protocol}" />
-	    <!--property name="username" value="${mail.server.username}" />
-	    <property name="password" value="${mail.server.password}" /-->
-	    <property name="javaMailProperties">
-	        <util:properties location="classpath:javamail.properties" />
-	    </property>
-	</bean> 
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.server.host}" />
+		<property name="port" value="${mail.server.port}" />
+		<property name="protocol" value="${mail.server.protocol}" />
+		<!--property name="username" value="${mail.server.username}" /> <property 
+			name="password" value="${mail.server.password}" / -->
+		<property name="javaMailProperties">
+			<util:properties location="classpath:javamail.properties" />
+		</property>
+	</bean>
+
+
 </beans>

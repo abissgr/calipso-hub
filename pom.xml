@@ -26,6 +26,7 @@
 		<commons-lang3.version>3.1</commons-lang3.version>
 		<commons-configuration.version>1.9</commons-configuration.version>
 		<jackson.version>2.1.4</jackson.version>
+		<urlrewritefilter.version>4.0.3</urlrewritefilter.version>
 	</properties>
 
 	<dependencyManagement>
@@ -79,6 +80,8 @@
 					<failIfMissing>true</failIfMissing>
 					<aggregate>true</aggregate>
 					<excludes>
+						<exclude>**/.gitignore</exclude>
+						<exclude>**/*BACK</exclude>
 						<exclude>dev.properties</exclude>
 						<exclude>HOWTO.txt</exclude>
 						<exclude>LICENSE.txt</exclude>

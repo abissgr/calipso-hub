@@ -19,7 +19,7 @@
 package gr.abiss.calipso.model;
 
 
-import gr.abiss.calipso.jpasearch.annotation.FieldFormFieldAsJasonConfig;
+import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
 import gr.abiss.calipso.model.acl.AbstractAccount;
 import gr.abiss.calipso.utils.MD5Utils;
 
@@ -55,8 +55,11 @@ public class User extends AbstractAccount {
 	
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
-	
 
+	@FormSchemaEntry(
+			create = "\"Password\"", 
+			update = "skip", 
+			search = "skip")
 	@Column(name = "user_password")
 	private String userPassword;
 
@@ -67,10 +70,10 @@ public class User extends AbstractAccount {
 	@Column(name = "confirmation_token")
 	private String confirmationToken;
 	
-	@FieldFormFieldAsJasonConfig(
-			create = "{ validators: ['required', 'email'] }", 
-			update = "{ validators: ['required', 'email'] }", 
-			search = "{ validators: ['email'] }" 
+	@FormSchemaEntry(
+			create = "{ \"validators\": [\"required\", \"email\"] }", 
+			update = "{ \"validators\": [\"required\", \"email\"] }", 
+			search = "{ \"validators\": [\"email\"] }" 
 	)
 	@Column(name = "email", unique = true, nullable = false)
 	private String email;
@@ -78,7 +81,7 @@ public class User extends AbstractAccount {
 	@Column(name = "email_hash", nullable = false)
 	private String emailHash;
 
-
+	@FormSchemaEntry(create = "{ \"type\": \"Date\", \"validators\": [\"required\"] }", update = "{ \"type\": \"Date\", \"validators\": [\"required\"] }", search = "{ \"validators\": [\"Date\"] }")
 	@Column(name = "birthday")
 	private Date birthDay;
 

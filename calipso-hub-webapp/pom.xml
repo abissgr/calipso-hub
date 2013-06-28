@@ -35,6 +35,14 @@
             <artifactId>resthub-jpa</artifactId>
             <version>${resthub.spring.stack.version}</version>
         </dependency>
+        
+        <!-- URL Rewrite Filter -->
+        
+		<dependency>
+			<groupId>org.tuckey</groupId>
+			<artifactId>urlrewritefilter</artifactId>
+			<version>${urlrewritefilter.version}</version>
+		</dependency>
     </dependencies>
 
     <profiles>

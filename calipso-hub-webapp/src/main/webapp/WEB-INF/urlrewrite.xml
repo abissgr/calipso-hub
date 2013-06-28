@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
+        "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
+<!--
+
+    Configuration file for UrlRewriteFilter
+    http://www.tuckey.org/urlrewrite/
+
+-->
+<urlrewrite>
+
+	<rule>
+		<note>Set the P3P HTTP response header for all requests</note>
+        <from>.*</from>
+        <set type="response-header" name="P3P">CP='IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'</set>
+    </rule>
+    <rule>
+        <from>^/api/(.*)$</from>
+        <set type="request" name="Accept">application/json</set>
+    </rule>
+</urlrewrite>
+

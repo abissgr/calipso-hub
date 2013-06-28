@@ -16,13 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service;
+package gr.abiss.calipso.jpasearch.service.impl;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
-import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 
-public interface UserService extends GenericService<User, String> {
+import java.io.Serializable;
 
-	User findByCredentials(String userNameOrEmail, String password);
+import org.resthub.common.service.CrudServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+public abstract class GenericServiceImpl<T, ID extends Serializable, R extends BaseRepository<T, ID>>
+		extends CrudServiceImpl<T, ID, R> {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(GenericServiceImpl.class);
+
+	/**
+	 * Get the entity Class corresponding to the generic T
+	 * @return the corresponding entity Class
+	 */
+	public Class<T> getDomainClass() {
+		return this.repository.getDomainClass();
+	}
+	
 }
