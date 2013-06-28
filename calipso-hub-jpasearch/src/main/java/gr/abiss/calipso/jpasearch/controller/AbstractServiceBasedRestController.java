@@ -75,7 +75,7 @@ public abstract class AbstractServiceBasedRestController<T, ID extends Serializa
     }
 
 	// TODO: refactor to OPTIONS on base path?
-	@RequestMapping(value = "search-schema", produces = { "application/json" }, method = RequestMethod.GET)
+	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody
 	public FormSchema getSchema(
 			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {

@@ -13,7 +13,7 @@ Search is available at
 
 Form schemata is available at 
 
-/api/<entity, e.g. user>/form-schema?mode=<one of create, updat, search>
+/api/<entity, e.g. user>/form-schema?mode=<one of create, update, search>
 
 controller: AbstractServiceBasedRestController
 repo: BaseRepository(Impl), see also "1.3.2 Adding custom behavior to all repositories" [2].
