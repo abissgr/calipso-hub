@@ -31,6 +31,6 @@ Calipso is build using Apache Maven.
 
 6) Fire up your browser: 
 
-    $ mvn clean install
+    http://localhost:8080/
 
 
