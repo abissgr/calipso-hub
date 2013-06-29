@@ -18,6 +18,7 @@
  */
 package gr.abiss.calipso.model.attrs;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -28,6 +29,9 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class ShortCustomAttribute extends CustomAttribute<Short> {
 
+	private static final long serialVersionUID = -2502062165638085607L;
+
+	@Column(name = "value", nullable = false)
 	private Short value;
 
 	@Override

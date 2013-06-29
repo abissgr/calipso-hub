@@ -20,27 +20,38 @@ package gr.abiss.calipso.model.attrs;
 
 import gr.abiss.calipso.model.base.AbstractAuditable;
 
-import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
+import java.util.Map;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Abstract base class for custom attribute implementations
  */
-@MappedSuperclass
+@Entity
+@Table(name = "base_custom_attributes_entity")
 public abstract class BaseCustomAttributesEntity extends AbstractAuditable {
 
 	private static final long serialVersionUID = -1036398460892888717L;
 
-	// @OneToMany(mappedBy = "subject")
-	// @MapKey(name = "name")
-	// private Map<String, ? extends CustomAttribute> customAttributes;
+	@JsonIgnore
+	@OneToMany(mappedBy = "subject", targetEntity = CustomAttribute.class, fetch = FetchType.LAZY)
+	@MapKey(name = "name")
+	private Map<String, CustomAttribute<? extends Serializable>> customAttributes;
 
-	// PUBLIC MAP<STRING, ? EXTENDS CUSTOMATTRIBUTE> GETCUSTOMATTRIBUTES() {
-	// RETURN CUSTOMATTRIBUTES;
-	// }
-	//
-	// PUBLIC VOID SETCUSTOMATTRIBUTES(
-	// MAP<STRING, ? EXTENDS CUSTOMATTRIBUTE> CUSTOMATTRIBUTES) {
-	// THIS.CUSTOMATTRIBUTES = CUSTOMATTRIBUTES;
-	// }
+	public Map<String, CustomAttribute<? extends Serializable>> getCustomAttributes() {
+		return customAttributes;
+	}
+
+	public void setCustomAttributes(
+			Map<String, CustomAttribute<? extends Serializable>> customAttributes) {
+		this.customAttributes = customAttributes;
+	}
 
 }

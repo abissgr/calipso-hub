@@ -24,9 +24,16 @@ import gr.abiss.calipso.model.base.AbstractAuditable;
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-@MappedSuperclass
+@Entity
+@Table(name = "custom_attribute")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CustomAttribute<T extends Serializable> extends
 		AbstractAuditable {
 
@@ -35,8 +42,9 @@ public abstract class CustomAttribute<T extends Serializable> extends
 	@Column(name = "name", nullable = false, updatable = false)
 	private String name;
 
-	// @ManyToOne
-	// private BaseCustomAttributesEntity subject;
+	@ManyToOne
+	@JoinColumn(name = "subject", referencedColumnName = "id", nullable = false)
+	private BaseCustomAttributesEntity subject;
 
 	public String getName() {
 		return name;
@@ -50,12 +58,12 @@ public abstract class CustomAttribute<T extends Serializable> extends
 
 	public abstract void setValue(T value);
 
-	// public BaseCustomAttributesEntity getSubject() {
-	// return subject;
-	// }
-	//
-	// public void setSubject(BaseCustomAttributesEntity subject) {
-	// this.subject = subject;
-	// }
+	public BaseCustomAttributesEntity getSubject() {
+		return subject;
+	}
+
+	public void setSubject(BaseCustomAttributesEntity subject) {
+		this.subject = subject;
+	}
 
 }

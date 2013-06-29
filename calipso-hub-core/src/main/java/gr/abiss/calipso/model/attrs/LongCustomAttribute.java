@@ -18,6 +18,7 @@
  */
 package gr.abiss.calipso.model.attrs;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -30,6 +31,7 @@ public class LongCustomAttribute extends CustomAttribute<Long> {
 
 	private static final long serialVersionUID = 808705172204599477L;
 
+	@Column(name = "value", nullable = false)
 	private Long value;
 
 	@Override
