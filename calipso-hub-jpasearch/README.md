@@ -71,17 +71,22 @@ public class UserController
 ```
 
 ## Access the search
-Search is available at
+Search is available at 
 
-/api/[entity, e.g. user]?params
+	http://localhost:8080/api/[entity, e.g. user]?[params]
+	
+e.g.:
+
+	http://localhost:8080/api/user?firstName=Manos
 
 ## Dynamic form schemas
 
 Form schemata is available at 
 
-	/api/[entity, e.g. user]/form-schema?mode=[one of create, update, search]
+	http://localhost:8080/api/[entity, e.g. user]/form-schema?mode=[one of create, update, search]
 
-The form schemas produced are annotation based (see gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry) and according to the format described at [2].
+The form schemas produced are annotation based (see gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry) 
+and follow the format described at [2].
 
 [1] https://github.com/powmedia/backbone-forms
 [2] http://static.springsource.org/spring-data/commons/docs/current/reference/html/repositories.html
