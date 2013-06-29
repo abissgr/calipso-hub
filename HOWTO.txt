@@ -28,7 +28,7 @@ mail.server.from=YOU@YOU.YOU
 mail.server.username=USERNAME
 mail.server.password=PASSWORD
 
-# DB
+# H2 Database
 # RESThub JPA default properties are:
 dataSource.driverClassName=org.h2.Driver
 dataSource.url=jdbc:h2:mem:resthub;DB_CLOSE_DELAY=-1;MVCC=TRUE
@@ -38,16 +38,6 @@ dataSource.poolPreparedStatements=true
 dataSource.username=sa
 dataSource.password =
 dataSource.validationQuery=SELECT 1
-#dataSource.driverClassName=com.mysql.jdbc.Driver
-#dataSource.url =jdbc:mysql://localhost:3306/YOURS?characterEncoding=UTF-8
-#dataSource.maxActive=50
-#dataSource.maxWait=1000
-#dataSource.poolPreparedStatements=true
-#dataSource.username=root
-#dataSource.password=YOURS
-#dataSource.validationQuery=SELECT 1
-
-
 hibernate.dialect=org.hibernate.dialect.H2Dialect
 hibernate.show_sql=false
 hibernate.format_sql=true
@@ -56,6 +46,16 @@ hibernate.cache.use_second_level_cache=true
 hibernate.cache.provider_class=net.sf.ehcache.hibernate.SingletonEhCacheProvider
 hibernate.id.new_generator_mappings=true
 
+
+# MySQL Database (it needs to be created first!)
+#dataSource.driverClassName=com.mysql.jdbc.Driver
+#dataSource.url =jdbc:mysql://localhost:3306/YOURS?characterEncoding=UTF-8
+#dataSource.maxActive=50
+#dataSource.maxWait=1000
+#dataSource.poolPreparedStatements=true
+#dataSource.username=root
+#dataSource.password=YOURS
+#dataSource.validationQuery=SELECT 1
 #hibernate.dialect =org.hibernate.dialect.MySQL5InnoDBDialect
 #hibernate.show_sql=false
 #hibernate.format_sql=true
