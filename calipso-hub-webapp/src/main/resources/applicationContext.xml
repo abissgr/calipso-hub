@@ -53,30 +53,10 @@
 	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"
 		use-expressions="true">
 		<sec:http-basic />
-		<sec:intercept-url pattern="/api/rest/rating/**"
-			method="PUT" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/rating/**"
-			method="POST" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/comment/**"
-			method="PUT" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/comment/**"
-			method="POST" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/topic/**"
-			method="PUT" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/topic/**"
+		<!-- sec:intercept-url pattern="/api/user/**"
 			method="POST" access="permitAll" />
-		<sec:intercept-url pattern="/api/rest/user/**"
-			method="POST" access="permitAll" />
-		<sec:intercept-url pattern="/api/rest/user/**"
-			method="PUT" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/**" method="DELETE"
-			access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="OPTIONS"
-			access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="POST"
-			access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="PUT"
-			access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/user/**"
+			method="PUT" access="hasRole('ROLE_USER')" /-->
 		<sec:logout />
 	</sec:http>
 
