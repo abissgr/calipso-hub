@@ -86,6 +86,7 @@
 						<exclude>HOWTO.txt</exclude>
 						<exclude>LICENSE.txt</exclude>
 						<exclude>README.md</exclude>
+						<exclude>**/etc/**</exclude>
 						<exclude>**/src/main/webapp/**</exclude>
 						<exclude>**/src/test/resources/**</exclude>
 						<exclude>**/src/test/data/**</exclude>
