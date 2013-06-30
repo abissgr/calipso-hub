@@ -44,7 +44,11 @@ public abstract class CustomAttribute<T extends Serializable> extends
 
 	@ManyToOne
 	@JoinColumn(name = "subject", referencedColumnName = "id", nullable = false)
-	private BaseCustomAttributesEntity subject;
+	private BaseCustomAttributesSubject subject;
+
+	@ManyToOne
+	@JoinColumn(name = "definition", referencedColumnName = "id", nullable = false)
+	private CustomAttributeDefinition definition;
 
 	public String getName() {
 		return name;
@@ -58,11 +62,11 @@ public abstract class CustomAttribute<T extends Serializable> extends
 
 	public abstract void setValue(T value);
 
-	public BaseCustomAttributesEntity getSubject() {
+	public BaseCustomAttributesSubject getSubject() {
 		return subject;
 	}
 
-	public void setSubject(BaseCustomAttributesEntity subject) {
+	public void setSubject(BaseCustomAttributesSubject subject) {
 		this.subject = subject;
 	}
 

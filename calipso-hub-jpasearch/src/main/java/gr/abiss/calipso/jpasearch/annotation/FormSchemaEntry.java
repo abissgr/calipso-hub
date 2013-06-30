@@ -23,6 +23,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Provides form schema fragments for a specific field, e.g:
+ * 
+ * <pre>
+ * &#064;FormSchemaEntry(
+ * 	create = &quot;{ \&quot;validators\&quot;: [\&quot;required\&quot;, \&quot;email\&quot;] }&quot;, 
+ * 	update = &quot;{ \&quot;validators\&quot;: [\&quot;required\&quot;, \&quot;email\&quot;] }&quot;, 
+ * 	search = &quot;{ \&quot;validators\&quot;: [\&quot;email\&quot;] }&quot;
+ * )
+ * private String email;
+ * </pre>
+ * 
+ * Documentation of the schema format can be found at <a
+ * href="https://github.com/powmedia/backbone-forms‎"> powmedia/backbone-forms
+ * </a>
+ */
 @Target(value = ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FormSchemaEntry {

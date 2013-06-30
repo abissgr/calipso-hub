@@ -71,7 +71,7 @@ public class UserController
 ```
 
 ## Access the search
-Search is available at 
+Search is available at the usual RESTHub path:
 
 	http://localhost:8080/api/[entity, e.g. user]?[params]
 	
