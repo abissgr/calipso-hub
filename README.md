@@ -28,13 +28,13 @@ To build Calipso you need a Java Development Kit and Apache Maven installed.
 
     $ mvn clean install
     
-## Access Calipso
+## Browse Calipso
 
 After you complete the steps above, you can access Calipso using your web browser: 
 
     http://localhost:8080/
     
-## Access the in-memory database 
+## Browse the Database Console 
 
 By default, Calipso uses H2, an in-memory database that works great for development.
 A fresh copy is created with test data each time you start Jetty using mvn:run. 
