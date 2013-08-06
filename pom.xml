@@ -2,7 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	<parent>
+	    <groupId>org.sonatype.oss</groupId>
+	    <artifactId>oss-parent</artifactId>
+	    <version>7</version>
+	</parent>
 	<name>calipso-hub</name>
 
 	<groupId>gr.abiss.calipso</groupId>
@@ -28,7 +32,11 @@
 		<jackson.version>2.1.4</jackson.version>
 		<urlrewritefilter.version>4.0.3</urlrewritefilter.version>
 	</properties>
-
+	<scm>
+		<connection>scm:git:git@github.com:abiss.g/calipso-hub.git</connection>
+		<url>scm:git:git@github.com:abiss.g/calipso-hub.git</url>
+		<developerConnection>scm:git:git@github.com:abiss.g/calipso-hub.git</developerConnection>
+	  </scm>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -90,6 +98,7 @@
 						<exclude>**/src/main/webapp/**</exclude>
 						<exclude>**/src/test/resources/**</exclude>
 						<exclude>**/src/test/data/**</exclude>
+						<exclude>calipso-hub-jpasearch/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -140,7 +149,13 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<distributionManagement>
+    <repository>
+        <id>github</id>
+        <name>GitHub ${project.artifactId} Repository</name>
+        <url>https://raw.github.com/abissgr/calipso-hub/mvn-repo</url>
+    </repository>
+</distributionManagement>
 	<repositories>
 		<repository>
 			<id>snapshot</id>

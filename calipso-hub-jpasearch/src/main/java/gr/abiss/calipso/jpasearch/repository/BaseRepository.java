@@ -4,7 +4,7 @@
  * This file is part of Calipso, a software platform by www.Abiss.gr.
  *
  * Calipso is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -13,8 +13,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
+ * You should have received a copy of the GNU Lesser Public License
+ * along with Calipso. If not, see http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 package gr.abiss.calipso.jpasearch.repository;
 
