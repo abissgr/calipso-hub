@@ -8,7 +8,7 @@ are Boolean, Date, enum, ManyToOne (for members extending Spring's AbstractPersi
 
 To use this module in your RESTHub project you need to do the following:
 
-1) Include the dependency in your project's Maven POM (TODO: point to repo):
+0) Include the dependency in your project's Maven POM (TODO: point to repo):
 
 ```xml
 <dependency>
@@ -16,6 +16,17 @@ To use this module in your RESTHub project you need to do the following:
     <artifactId>calipso-hub-jpasearch</artifactId>
 	<version>${project.version}</version>
 </dependency>
+```
+
+1) Have your entities implement org.springframework.data.domain.Persistable
+
+```java
+import org.springframework.data.domain.Persistable;
+
+@Entity
+@Table(name = "users")
+public class User implements Persistable<String> {
+//...
 ```
 
 2) Add Calipso's custom repository factory in your Spring config:
