@@ -26,7 +26,7 @@ To build Calipso you need a Java Development Kit and Apache Maven installed.
 
 5) Start the Jetty server 
 
-    $ mvn clean install
+    $ mvn clean install jetty:run
     
 ## Browse Calipso
 
