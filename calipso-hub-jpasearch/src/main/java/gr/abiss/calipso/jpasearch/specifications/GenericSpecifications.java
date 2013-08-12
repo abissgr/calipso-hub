@@ -46,7 +46,7 @@ public class GenericSpecifications {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GenericSpecifications.class);
 
 	private static final HashMap<String, Field> FIELD_CACHE = new HashMap<String, Field>();
-	private static final String SEARCH_MODE = "calipso.searchmode";
+	private static final String SEARCH_MODE = "_searchmode";
 
 	private static final ManyToOnePredicateFactory manyToOnePredicateFactory = new ManyToOnePredicateFactory();
 
@@ -126,6 +126,8 @@ public class GenericSpecifications {
 	 */
 	public static Specification matchAll(final Class clazz, final Map<String, String[]> searchTerms) {
 
+		LOGGER.info("matchAll, entity: " + clazz.getSimpleName()
+				+ ", searchTerms: " + searchTerms);
 		return new Specification<Persistable>() {
 			@Override
 			public Predicate toPredicate(Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -133,14 +135,11 @@ public class GenericSpecifications {
 				Predicate predicate;
 				if (!CollectionUtils.isEmpty(searchTerms)) {
 					Set<String> propertyNames = searchTerms.keySet();
-					LOGGER.info("matchAll, entity: " + clazz.getSimpleName() + ", propertyNames: " + propertyNames);
 					for (String propertyName : propertyNames) {
 						Field field = GenericSpecifications.getField(clazz, propertyName);
 						if (field != null) {
 							Class fieldType = field.getType();
 							String[] propertyValues = searchTerms.get(propertyName);
-							LOGGER.info("matchAll, property name: " + propertyName + ", property type: " + fieldType + ", propertyValues: "
-									+ propertyValues);
 							IPredicateFactory predicateFactory = getPredicateFactoryForClass(fieldType);
 							if (predicateFactory != null) {
 								predicates.add(predicateFactory.getPredicate(root, cb, propertyName, fieldType, propertyValues));

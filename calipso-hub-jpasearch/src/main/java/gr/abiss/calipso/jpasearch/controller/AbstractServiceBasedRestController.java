@@ -24,6 +24,8 @@ import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.service.GenericService;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -36,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -94,5 +97,12 @@ public abstract class AbstractServiceBasedRestController<T, ID extends Serializa
 		} catch (Exception e) {
 			throw new NotFoundException();
 		}
+	}
+
+	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
+	@ResponseBody
+	public FormSchema getSchemas(
+			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
+		return this.getSchema(mode);
 	}
 }

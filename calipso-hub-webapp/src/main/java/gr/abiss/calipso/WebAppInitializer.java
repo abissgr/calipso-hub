@@ -101,7 +101,10 @@ public class WebAppInitializer implements WebApplicationInitializer {
         String[] locations = { "classpath*:resthubContext.xml", "classpath*:applicationContext.xml" };
         appContext.setConfigLocations(locations);
 
-        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(appContext));
+		DispatcherServlet dispatcherServlet = new DispatcherServlet(appContext);
+		dispatcherServlet.setDispatchOptionsRequest(true);
+		ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
+				"dispatcher", dispatcherServlet);
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/*");
 

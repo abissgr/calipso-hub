@@ -25,8 +25,9 @@ import org.springframework.data.domain.Persistable;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * A simple wrapper used when we want to serialize classes as form schemas
- * without using the Class type to associate with a proper JSON serializer.
+ * A simple wrapper for domain entities, used for serializing those to JSON form
+ * schemas without the need to associate the domain entity Class with a proper
+ * JSON serializer.
  * 
  * The wrapper also carries the schema mode i.e. which one of CREATE, UPDATE,
  * SEARCH
