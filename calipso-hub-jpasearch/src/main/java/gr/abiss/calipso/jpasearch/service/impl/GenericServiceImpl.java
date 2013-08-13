@@ -25,6 +25,7 @@ import java.io.Serializable;
 import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 
 public abstract class GenericServiceImpl<T, ID extends Serializable, R extends BaseRepository<T, ID>>
@@ -39,6 +40,48 @@ public abstract class GenericServiceImpl<T, ID extends Serializable, R extends B
 	 */
 	public Class<T> getDomainClass() {
 		return this.repository.getDomainClass();
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public T create(T resource) {
+		// TODO Auto-generated method stub
+		return super.create(resource);
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public T update(T resource) {
+		// TODO Auto-generated method stub
+		return super.update(resource);
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void delete(T resource) {
+		// TODO Auto-generated method stub
+		super.delete(resource);
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void delete(ID id) {
+		// TODO Auto-generated method stub
+		super.delete(id);
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void deleteAll() {
+		// TODO Auto-generated method stub
+		super.deleteAll();
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void deleteAllWithCascade() {
+		// TODO Auto-generated method stub
+		super.deleteAllWithCascade();
 	}
 	
 }

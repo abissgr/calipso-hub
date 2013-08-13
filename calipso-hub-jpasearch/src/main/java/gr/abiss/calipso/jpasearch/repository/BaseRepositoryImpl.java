@@ -77,23 +77,10 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {
-		Sort sort = pageable.getSort();
-		LOGGER.info("sort: " + sort);
 		if (pageable instanceof ParameterMapBackedPageRequest) {
-			LOGGER.info("building JPA specs...");
 			Specification<T> spec = GenericSpecifications.matchAll(getDomainClass(), ((ParameterMapBackedPageRequest) pageable).getParameterMap());
-
-			LOGGER.info("built JPA specs");
-			LOGGER.info("pageable is ParameterMapBackedPageRequest, sort orders: ");
-			for (Order order : sort) {
-
-				LOGGER.info("order" + order.getProperty() + ", "
-						+ order.getDirection());
-			}
 			return super.findAll(spec, pageable);
 		} else {
-			LOGGER.info("pageable is NOT ParameterMapBackedPageRequest, sort: "
-					+ pageable.getSort());
 			return super.findAll(pageable);
 		}
 	}
