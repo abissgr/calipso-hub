@@ -45,42 +45,36 @@ public abstract class GenericServiceImpl<T, ID extends Serializable, R extends B
 	@Override
 	@Transactional(readOnly = false)
 	public T create(T resource) {
-		// TODO Auto-generated method stub
 		return super.create(resource);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public T update(T resource) {
-		// TODO Auto-generated method stub
 		return super.update(resource);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void delete(T resource) {
-		// TODO Auto-generated method stub
 		super.delete(resource);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void delete(ID id) {
-		// TODO Auto-generated method stub
 		super.delete(id);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void deleteAll() {
-		// TODO Auto-generated method stub
 		super.deleteAll();
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void deleteAllWithCascade() {
-		// TODO Auto-generated method stub
 		super.deleteAllWithCascade();
 	}
 	
