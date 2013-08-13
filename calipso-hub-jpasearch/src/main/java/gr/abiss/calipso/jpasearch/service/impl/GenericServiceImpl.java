@@ -27,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-
+/**
+ * Provides access to domain class type and transactional write support
+ */
 public abstract class GenericServiceImpl<T, ID extends Serializable, R extends BaseRepository<T, ID>>
 		extends CrudServiceImpl<T, ID, R> {
 
