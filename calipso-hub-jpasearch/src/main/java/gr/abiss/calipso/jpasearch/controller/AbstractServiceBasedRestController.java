@@ -47,8 +47,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+// @Transactional(readOnly = true)
 @RequestMapping(produces = { "application/json", "application/xml" })
-public abstract class AbstractServiceBasedRestController<T, ID extends Serializable, S extends CrudService<T, ID>>
+public class AbstractServiceBasedRestController<T, ID extends Serializable, S extends CrudService<T, ID>>
 		extends
 		ServiceBasedRestController<T, ID, S> {
 
@@ -56,27 +57,76 @@ public abstract class AbstractServiceBasedRestController<T, ID extends Serializa
 
 	@Autowired
 	private HttpServletRequest request;
-	
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Page<T> findPaginated(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
-            @RequestParam(value = "direction", required = false, defaultValue = "") String direction,
-            @RequestParam(value = "properties", required = false) String properties) {
-        Assert.isTrue(page > 0, "Page index must be greater than 0");
-        Assert.isTrue(direction.isEmpty() || direction.equalsIgnoreCase(Sort.Direction.ASC.toString()) || direction.equalsIgnoreCase(Sort.Direction.DESC.toString()), "Direction should be ASC or DESC");
-        if(direction.isEmpty()) {
-            return this.service.findAll(new ParameterMapBackedPageRequest(request
-    				.getParameterMap(), page - 1, size));
-        } else {
-            Assert.notNull(properties);
-            return this.service.findAll(new ParameterMapBackedPageRequest(request
-    				.getParameterMap(), page - 1, size, new Sort(Sort.Direction.fromString(direction.toUpperCase()), properties.split(","))));
-        }
-    }
 
+	public AbstractServiceBasedRestController() {
+		super();
+	}
+
+	/**
+	 * Find all resources matching the given criteria and return a paginated
+	 * collection<br/>
+	 * REST webservice published : GET
+	 * /search?page=0&size=20&properties=sortPropertyName&direction=asc
+	 * 
+	 * @param page
+	 *            Page number starting from 0 (default)
+	 * @param size
+	 *            Number of resources by pages. default to 10
+	 * @return OK http status code if the request has been correctly processed,
+	 *         with the a paginated collection of all resource enclosed in the
+	 *         body.
+	 */
+	@Override
+	@RequestMapping(method = RequestMethod.GET)
+	@ResponseBody
+	public Page<T> findPaginated(
+			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
+			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
+
+		Assert.isTrue(page > 0, "Page index must be greater than 0");
+
+		Order order = new Order(
+				direction.equalsIgnoreCase("ASC") ? Sort.Direction.ASC
+						: Sort.Direction.DESC, sort);
+		List<Order> orders = new ArrayList<Order>(1);
+		orders.add(order);
+		return this.service.findAll(new ParameterMapBackedPageRequest(request
+				.getParameterMap(), page - 1, size, new Sort(orders)));
+	}
+    
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @Override
+	 * @RequestMapping(method = RequestMethod.GET)
+	 * @ResponseBody public Page<T> findPaginated(@RequestParam(value = "page",
+	 *               required = false, defaultValue = "1") Integer page,
+	 * @RequestParam(value = "size", required = false, defaultValue = "10")
+	 *                     Integer size,
+	 * @RequestParam(value = "direction", required = false, defaultValue =
+	 *                     "ASC") String direction,
+	 * @RequestParam(value = "properties", required = false, defaultValue =
+	 *                     "id") String properties) {
+	 * 
+	 *                     Assert.isTrue(page > 0,
+	 *                     "Page index must be greater than 0");
+	 *                     Assert.isTrue(direction
+	 *                     .equalsIgnoreCase(Sort.Direction.ASC.toString()) ||
+	 *                     direction
+	 *                     .equalsIgnoreCase(Sort.Direction.DESC.toString()),
+	 *                     "Direction should be ASC or DESC");
+	 *                     Assert.notNull(properties);
+	 * 
+	 *                     Page<T> resultPage = this.service .findAll(new
+	 *                     ParameterMapBackedPageRequest( request
+	 *                     .getParameterMap(), page - 1, size, new
+	 *                     Sort(Sort.Direction
+	 *                     .fromString(direction.toUpperCase()),
+	 *                     properties.split(",")))); LOGGER.info("resultPage: "
+	 *                     + resultPage.getClass()); return resultPage; }
+	 */
 	// TODO: refactor to OPTIONS on base path?
 	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody

@@ -11,7 +11,6 @@
     </parent>
 
     <name>calipso-hub-core</name>
-    <groupId>gr.abiss.calipso</groupId>
     <artifactId>calipso-hub-core</artifactId>
 
     <properties>
@@ -22,9 +21,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
 		</dependency>
-		
         <dependency>
             <groupId>gr.abiss.calipso</groupId>
             <artifactId>calipso-hub-jpasearch</artifactId>
@@ -36,12 +33,10 @@
         <dependency>
             <groupId>org.resthub</groupId>
             <artifactId>resthub-jpa</artifactId>
-            <version>${resthub.spring.stack.version}</version>
         </dependency>
         <dependency>
             <groupId>org.resthub</groupId>
             <artifactId>resthub-web-server</artifactId>
-            <version>${resthub.spring.stack.version}</version>
         </dependency>
     	<!--  Commons -->
     	<dependency>

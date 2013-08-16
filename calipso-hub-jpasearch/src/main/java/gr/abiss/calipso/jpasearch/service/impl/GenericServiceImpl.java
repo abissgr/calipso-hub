@@ -25,11 +25,13 @@ import java.io.Serializable;
 import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Provides access to domain class type and transactional write support
  */
+@Transactional(readOnly = true)
 public abstract class GenericServiceImpl<T, ID extends Serializable, R extends BaseRepository<T, ID>>
 		extends CrudServiceImpl<T, ID, R> {
 
@@ -40,6 +42,7 @@ public abstract class GenericServiceImpl<T, ID extends Serializable, R extends B
 	 * Get the entity Class corresponding to the generic T
 	 * @return the corresponding entity Class
 	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Class<T> getDomainClass() {
 		return this.repository.getDomainClass();
 	}

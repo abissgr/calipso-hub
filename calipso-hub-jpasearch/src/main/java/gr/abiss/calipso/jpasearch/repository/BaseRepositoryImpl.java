@@ -29,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
@@ -40,8 +38,8 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseRepositoryImpl.class);
 
-	private final EntityManager entityManager;
-	private final Class<T> domainClass;
+	private EntityManager entityManager;
+	private Class<T> domainClass;
 
 	// There are two constructors to choose from, either can be used.
 	public BaseRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {

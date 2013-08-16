@@ -31,7 +31,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:sec="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:task="http://www.springframework.org/schema/task" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xmlns:tx="http://www.springframework.org/schema/tx" 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         
@@ -51,7 +52,10 @@
         http://www.springframework.org/schema/task/spring-task.xsd
         
         http://www.springframework.org/schema/mvc
-        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<bean class="gr.abiss.calipso.spring.LoggingHandlerExceptionResolver" />
 
@@ -59,7 +63,8 @@
 	<task:executor id="asyncExecutor" pool-size="25" />
 	<!-- Configuration for the Runtime -->
 	<task:annotation-driven executor="asyncExecutor" />
-
+	<!--tx:annotation-driven transaction-manager="transactionManager"/-->
+	
 	<!-- Do not create sessions -->
 	<bean id="securityContextPersistenceFilter"
 		class="org.springframework.security.web.context.SecurityContextPersistenceFilter">

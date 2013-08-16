@@ -38,7 +38,7 @@ public class RepositoryFactoryBean<R extends JpaRepository<T, I>, T, I extends S
 
 	private static class RepositoryFactory<T, I extends Serializable> extends JpaRepositoryFactory {
 
-		private final EntityManager entityManager;
+		private EntityManager entityManager;
 
 		public RepositoryFactory(EntityManager entityManager) {
 			super(entityManager);
@@ -50,7 +50,8 @@ public class RepositoryFactoryBean<R extends JpaRepository<T, I>, T, I extends S
 		protected Object getTargetRepository(RepositoryMetadata metadata) {
 			// return new BaseRepositoryImpl<T, I>((Class<T>)
 			// metadata.getDomainClass(), entityManager);
-			return new BaseRepositoryImpl<T, I>((Class<T>) metadata.getDomainType(), entityManager);
+			return new BaseRepositoryImpl<T, I>(
+					(Class<T>) metadata.getDomainType(), entityManager);
 		}
 
 		@Override
