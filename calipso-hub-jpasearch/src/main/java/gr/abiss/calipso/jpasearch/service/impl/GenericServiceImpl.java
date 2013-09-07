@@ -39,44 +39,61 @@ public abstract class GenericServiceImpl<T, ID extends Serializable, R extends B
 			.getLogger(GenericServiceImpl.class);
 
 	/**
-	 * Get the entity Class corresponding to the generic T
-	 * @return the corresponding entity Class
+	 * {@inheritDoc}
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Class<T> getDomainClass() {
 		return this.repository.getDomainClass();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = false)
 	public T create(T resource) {
 		return super.create(resource);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = false)
 	public T update(T resource) {
 		return super.update(resource);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = false)
 	public void delete(T resource) {
 		super.delete(resource);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = false)
 	public void delete(ID id) {
 		super.delete(id);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = false)
 	public void deleteAll() {
 		super.deleteAll();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = false)
 	public void deleteAllWithCascade() {

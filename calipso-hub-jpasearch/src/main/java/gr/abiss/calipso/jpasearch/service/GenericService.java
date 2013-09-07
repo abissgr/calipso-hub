@@ -34,5 +34,11 @@ import org.springframework.data.domain.Persistable;
 public interface GenericService<T extends Persistable<ID>, ID extends Serializable>
 		extends
 		CrudService<T, ID> {
+
+	/**
+	 * Get the entity Class corresponding to the generic T
+	 * 
+	 * @return the corresponding entity Class
+	 */
 	public Class<T> getDomainClass();
 }

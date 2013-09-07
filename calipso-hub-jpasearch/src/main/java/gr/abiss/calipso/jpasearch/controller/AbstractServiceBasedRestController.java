@@ -20,7 +20,9 @@ package gr.abiss.calipso.jpasearch.controller;
 
 
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
+import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.jpasearch.service.GenericService;
 
 import java.io.Serializable;
@@ -41,6 +43,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -94,6 +97,26 @@ public class AbstractServiceBasedRestController<T, ID extends Serializable, S ex
 		orders.add(order);
 		return this.service.findAll(new ParameterMapBackedPageRequest(request
 				.getParameterMap(), page - 1, size, new Sort(orders)));
+	}
+
+	/**
+	 * Find all resources matching the given criteria and return a paginated
+	 * collection<br/>
+	 * REST webservice published : GET
+	 * /search?page=0&size=20&properties=sortPropertyName&direction=asc
+	 * 
+	 * @param restriction
+	 *            the structured query as a Restriction instance
+	 * @return OK http status code if the request has been correctly processed,
+	 *         with the a paginated collection of all resource enclosed in the
+	 *         body.
+	 */
+	@RequestMapping(value = "query", produces = { "application/json" }, method = RequestMethod.POST)
+	@ResponseBody
+	public Page<T> findPaginatedWithRestrictions(
+			@RequestBody Restriction restriction) {
+
+		return this.service.findAll(new RestrictionBackedPageRequest(restriction));
 	}
     
 	/**

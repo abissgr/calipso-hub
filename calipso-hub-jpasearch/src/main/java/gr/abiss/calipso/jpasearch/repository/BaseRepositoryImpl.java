@@ -19,6 +19,7 @@
 package gr.abiss.calipso.jpasearch.repository;
 
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
 
 import java.io.Serializable;
@@ -77,6 +78,10 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	public Page<T> findAll(Pageable pageable) {
 		if (pageable instanceof ParameterMapBackedPageRequest) {
 			Specification<T> spec = GenericSpecifications.matchAll(getDomainClass(), ((ParameterMapBackedPageRequest) pageable).getParameterMap());
+			return super.findAll(spec, pageable);
+		} 
+		else if (pageable instanceof RestrictionBackedPageRequest) {
+			Specification<T> spec = GenericSpecifications.matchAll(getDomainClass(), ((RestrictionBackedPageRequest) pageable).getRestriction());
 			return super.findAll(spec, pageable);
 		} else {
 			return super.findAll(pageable);

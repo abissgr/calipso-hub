@@ -90,6 +90,19 @@ e.g.:
 
 	http://localhost:8080/api/user?firstName=Manos
 
+Params are validated (name, type) at runtime using reflection; invalid params (basically the ones not corresponding to any Entity member) are ignored and just log a warning.
+The following predefined parms can be used:
+
+* page: the page number, required = false, defaultValue = 1
+* size: the page size, required = false, defaultValue = 10
+* properties: the sorting properties, required = false, defaultValue = "id"
+* direction: used to sort, required = false, defaultValue = "ASC"
+* _searchmode: AND or OR, , required = false, defaultValue = "AND"
+
+Nested AND/OR junctions are supported using junctionMode:junctionKey:paramName as parmeter names, e.g.:
+
+	http://localhost:8080/api/user?and:1:firstName=Manos&and:1:lastName=Batsis
+
 ## Dynamic form schemas
 
 Form schemata is available at 
