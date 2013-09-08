@@ -53,7 +53,7 @@ public class StringPredicateFactory implements IPredicateFactory<String> {
 			if (val.contains("%")) {
 				predicate = cb.like(cb.lower(root.<String> get(propertyName)), val.toLowerCase());
 			} else {
-				predicate = cb.equal(root.<String> get(propertyName), val);
+				predicate = cb.equal(cb.lower(root.<String> get(propertyName)), val.toLowerCase());
 			}
 		} else {// if (propertyValues.length == 2) {
 			predicate = cb.between(root.<String> get(propertyName), propertyValues[0], propertyValues[1]);
