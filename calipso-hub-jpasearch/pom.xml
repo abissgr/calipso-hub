@@ -18,15 +18,9 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.3</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
+		<!-- MODULES -->
+
+		
 		<!-- RESTHub -->
 		<dependency>
 			<groupId>org.resthub</groupId>
@@ -36,29 +30,34 @@
 			<groupId>org.resthub</groupId>
 			<artifactId>resthub-web-server</artifactId>
 		</dependency>
-		<!-- Only used for annotation, so we definie this dependency as optional -->
-		<dependency>
-			<groupId>org.resthub</groupId>
-			<artifactId>resthub-jpa</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>gr.abiss.calipso</groupId>
-			<artifactId>calipso-hub-contract</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
-		<!-- Spring security -->
+		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>${spring-security.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>${spring-security.version}</version>
 		</dependency>
+		
+		<!-- JAVAX -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+		
+		
+		<!-- COMMONS -->
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		
 	</dependencies>
 
 	<build>

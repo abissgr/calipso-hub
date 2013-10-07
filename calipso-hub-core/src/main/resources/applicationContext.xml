@@ -32,9 +32,9 @@
 					       http://www.springframework.org/schema/tx 
 					       http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <context:component-scan base-package="com, gr, org" />
+    <context:component-scan base-package="gr.abiss, org.resthub" />
 	<!-- Dynamic JPA Search -->
-    <jpa:repositories base-package="com, gr, org" 
+    <jpa:repositories base-package="gr.abiss, org.resthub" 
     	factory-class="gr.abiss.calipso.jpasearch.repository.RepositoryFactoryBean" />
     	
    	<!-- THYMELEAF: Template Resolver for email templates -->
