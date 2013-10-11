@@ -57,7 +57,7 @@ public class AbstractServiceBasedRestController<T, ID extends Serializable, S ex
 		ServiceBasedRestController<T, ID, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceBasedRestController.class);
-
+ 
 	@Autowired
 	private HttpServletRequest request;
 
@@ -95,7 +95,8 @@ public class AbstractServiceBasedRestController<T, ID extends Serializable, S ex
 						: Sort.Direction.DESC, sort);
 		List<Order> orders = new ArrayList<Order>(1);
 		orders.add(order);
-		return this.service.findAll(new ParameterMapBackedPageRequest(request
+		return this.service.findAll(
+				new ParameterMapBackedPageRequest(request
 				.getParameterMap(), page - 1, size, new Sort(orders)));
 	}
 
