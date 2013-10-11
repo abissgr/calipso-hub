@@ -106,7 +106,7 @@ public class WebAppInitializer implements WebApplicationInitializer {
 		ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
 				"dispatcher", dispatcherServlet);
         dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/*");
+		dispatcher.addMapping("/api/*");
 
         servletContext.addListener(new ContextLoaderListener(appContext));
 
