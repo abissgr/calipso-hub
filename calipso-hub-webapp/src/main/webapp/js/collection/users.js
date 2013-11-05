@@ -4,7 +4,7 @@ define(['backbone', 'model/user'], function (Backbone, User) {
 
         // Reference to this collection's model.
         model: User,
-        url:'api/user'
+        url:'api/user' // was api/user
 
     });
     return Users;

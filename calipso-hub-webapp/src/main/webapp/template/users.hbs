@@ -1,5 +1,8 @@
-<ul>
+<ul id="users-list">
     {{#each collection}}
-        <li>{{firstName}}</li>
+        <li>{{firstName}} {{lastName}}</li>
     {{/each}}
 </ul>
+<p>
+  <button id="createUser" class="btn btn-primary" type="button">Add New User</button>
+</p>
