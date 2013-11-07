@@ -24,6 +24,7 @@ function (Backbone, Resthub, Users, User, UserFormView, usersTemplate) {
           },
           
           edit: function() {
+        	  console.log("this.$el = "+this.$el.html());
               var userFormView = new UserFormView({root: this.$el, model: this.model});
               userFormView.render();
             },
