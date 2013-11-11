@@ -1,17 +1,21 @@
+<div class="user">
 <div class="control-group">
 
 <p>
-  <input class="userName" type="text" placeholder="User Name" value="{{userName}}" /> <!--  -->
-  <input class="userPassword" type="text" placeholder="Password" value="{{userPassword}}" />
+  <input class="userName" placeholder="User Name" type="text"  value="{{model.userName}}" /> <!--  -->
+  <input class="userPassword" type="password" placeholder="Password" value="{{model.userPassword}}" />
 </p>
+
 <p>
-  <input class="email" type="text" placeholder="Email" value="{{email}}" />  
+  <input class="email" type="text" placeholder="Email" value="{{model.email}}" />  
 </p>
+
 <p>
-  <input class="firstName" type="text" placeholder="First Name" value="{{firstName}}" />
-  <input class="lastName" type="text" placeholder="Last Name" value="{{lastName}}" />
+  <input class="firstName" type="text" placeholder="First Name" value="{{model.firstName}}" />
+  <input class="lastName" type="text" placeholder="Last Name" value="{{model.lastName}}" />
 </p>
 
 </div>
 
 <input type="submit" class="btn btn-success" value="Save" />
+</div>
