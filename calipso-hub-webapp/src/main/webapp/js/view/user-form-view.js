@@ -2,8 +2,14 @@ define([ 'backbone', 'resthub', 'hbs!template/userform' ], function(Backbone,
 		Resthub, userFormTemplate) {
 
 	var UserFormView = Backbone.View.extend({ // Resthub
+		
+		 initialize: function() {
+			 this.listenTo(this.model, 'invalid', this.invalid);
+			 Backbone.Validation.bind(this);
+		 },
+		 
 		 template : userFormTemplate,
-	//	template : Handlebars.compile(userFormTemplate),
+
 		tagName : 'form',
 
 		events: {
@@ -11,13 +17,12 @@ define([ 'backbone', 'resthub', 'hbs!template/userform' ], function(Backbone,
 		},
 		
 	    render: function() {
-	    	 console.log("RENDER");
-	    	console.log("in user-form-view MODEL = "+JSON.stringify(this.model));
 	        this.$el.html(userFormTemplate(this.model.toJSON()));
 	        return this;
 	      },
 		
 		save : function() {	
+			this.model.validate(); // shouldn't be needed
 			this.model.save( {
 				"userName" : this.$('.userName').val(),
 				"userPassword" : this.$('.userPassword').val(),
@@ -34,10 +39,7 @@ define([ 'backbone', 'resthub', 'hbs!template/userform' ], function(Backbone,
 								console.log("error", resp);
 					}
 		});
-			//this.model.save();
-		//	console.log("saved. (maybe)");
-		//	console.log("modelfirstName="+this.model.get("firstName"));
-			return false;//
+			return false;
 		}	
 	});
 

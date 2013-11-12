@@ -1,6 +1,7 @@
+<h3>Users</h3>
 <ul id="users-list">
     {{#each collection}}
-        <li><div id="{{userName}}">{{firstName}} {{lastName}}</div></li>
+        <li class="user-link"><div id="{{userName}}">{{userName}} ({{firstName}} {{lastName}})</div></li>
     {{/each}}
 </ul>
 <p>
