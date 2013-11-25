@@ -18,9 +18,7 @@
  */
 package gr.abiss.calipso;
 
-import gr.abiss.calipso.model.Sample;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.repository.SampleRepository;
 import gr.abiss.calipso.service.UserService;
 
 import java.util.Date;
@@ -34,19 +32,11 @@ import org.resthub.common.util.PostInitialize;
 public class AppInitializer {
 
 	@Inject
-	@Named("sampleRepository")
-	private SampleRepository sampleRepository;
-
-	@Inject
 	@Named("userService")
 	private UserService userService;
 
 	@PostInitialize
 	public void init() {
-		sampleRepository.save(new Sample("testSample1"));
-		sampleRepository.save(new Sample("testSample2"));
-		sampleRepository.save(new Sample("testSample3"));
-
 		Date now = new Date();
 
 		User u0 = new User("info@ab1ss.gr");

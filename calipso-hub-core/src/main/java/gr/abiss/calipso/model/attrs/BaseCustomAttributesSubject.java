@@ -18,7 +18,8 @@
  */
 package gr.abiss.calipso.model.attrs;
 
-import gr.abiss.calipso.model.base.AbstractAuditable;
+import gr.abiss.calipso.ddd.core.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.User;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -36,7 +37,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "base_custom_attributes_entity")
-public abstract class BaseCustomAttributesSubject extends AbstractAuditable {
+public abstract class BaseCustomAttributesSubject extends
+		AbstractAuditable<User> {
 
 	private static final long serialVersionUID = -1036398460892888717L;
 

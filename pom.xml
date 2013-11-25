@@ -13,6 +13,35 @@
 	<artifactId>calipso-hub</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<organization>
+	    <name>abiss.gr</name>
+	    <url>http://abiss.gr</url>
+	  </organization>
+	<licenses>
+		<license>
+			<name>GNU AFFERO GENERAL PUBLIC LICENSE</name>
+			<url>http://www.gnu.org/licenses/why-affero-gpl.html</url>
+			<distribution>repo</distribution>
+			<comments>Although Calipso is distributes as a whole under the Affero GPL, 
+			some modules are also available under the more permissive Apache License, see 
+			more bellow.</comments>
+		</license>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license. Optionally applies to the jpasearch and userdetails modules</comments>
+		</license>
+	</licenses>
+	
+	<modules>
+		<module>calipso-hub-utilities</module>
+		<module>calipso-hub-ddd-core</module>
+		<module>calipso-hub-jpasearch</module>
+		<module>calipso-hub-userdetails</module>
+		<module>calipso-hub-core</module>
+		<module>calipso-hub-webapp</module>
+	</modules>
 
 	<properties>
 		<project.parent.basedir>${project.basedir}</project.parent.basedir>
@@ -23,7 +52,16 @@
 
 
 		<spring.version>3.2.3.RELEASE</spring.version>
-		<spring-security.version>3.1.4.RELEASE</spring-security.version>
+		<spring-boot.version>0.5.0.M2</spring-boot.version>
+		<spring.security.version>3.1.4.RELEASE</spring.security.version>
+		<spring-social.version>1.1.0.M4</spring-social.version>
+		<spring-social-web-version>1.1.0.M4</spring-social-web-version>
+		<spring-social-facebook-version>1.1.0.M4</spring-social-facebook-version>
+		<spring-social-linkedin-version>1.0.0.BUILD-SNAPSHOT</spring-social-linkedin-version>
+		<spring-social-github-version>1.0.0.M4</spring-social-github-version>
+		<spring-social-twitter-version>1.1.0.M4</spring-social-twitter-version>
+		<spring-data-jpa.version>1.3.4.RELEASE</spring-data-jpa.version>
+
 		<!-- spring-data-jpa.version>1.3.4.RELEASE</spring-data-jpa.version -->
 		<javax.servlet-api.version>3.0.1</javax.servlet-api.version>
 
@@ -47,7 +85,22 @@
 			<!-- MODULES -->
 			<dependency>
 				<groupId>gr.abiss.calipso</groupId>
+				<artifactId>calipso-hub-ddd-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>gr.abiss.calipso</groupId>
+				<artifactId>calipso-hub-utilities</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>gr.abiss.calipso</groupId>
 				<artifactId>calipso-hub-jpasearch</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>gr.abiss.calipso</groupId>
+				<artifactId>calipso-hub-userdetails</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -71,8 +124,9 @@
 				<artifactId>resthub-web-server</artifactId>
 				<version>${resthub.spring.stack.version}</version>
 			</dependency>
-			
+
 			<!-- Spring -->
+
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-core</artifactId>
@@ -84,16 +138,123 @@
 				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-web</artifactId>
-				<version>${spring-security.version}</version>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>${spring.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-jpa</artifactId>
+				<version>${spring-data-jpa.version}</version>
+			</dependency> 
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${spring.version}</version>
+				<type>jar</type>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-oxm</artifactId>
+				<version>${spring.version}</version>
+				<type>jar</type>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-tx</artifactId>
+				<version>${spring.version}</version>
+				<type>jar</type>
+				<scope>compile</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-core</artifactId>
+				<version>${spring-social.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-security</artifactId>
+				<version>${spring-social.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-web</artifactId>
+				<version>${spring-social.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-linkedin</artifactId>
+				<version>${spring-social-linkedin-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-github</artifactId>
+				<version>${spring-social-github-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-twitter</artifactId>
+				<version>${spring-social-twitter-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-facebook</artifactId>
+				<version>${spring-social-facebook-version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-config</artifactId>
-				<version>${spring-security.version}</version>
+				<version>${spring.security.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>spring-aop</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+				</exclusions>
 			</dependency>
-			
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-core</artifactId>
+				<version>${spring.security.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>spring-aop</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-web</artifactId>
+				<version>${spring.security.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>spring-aop</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-taglibs</artifactId>
+				<version>${spring.security.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>spring-aop</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
 			<!-- JAVAX -->
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -111,7 +272,7 @@
 				<artifactId>activation</artifactId>
 				<version>1.1.1</version>
 			</dependency>
-			
+
 			<!-- COMMONS -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -128,7 +289,7 @@
 				<artifactId>commons-beanutils</artifactId>
 				<version>${commons-beanutils.version}</version>
 			</dependency>
-			
+
 			<!-- MISC -->
 			<dependency>
 				<groupId>joda-time</groupId>
@@ -152,9 +313,19 @@
 				<version>${thymeleaf.version}</version>
 				<scope>compile</scope>
 			</dependency>
-
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.3.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jodah</groupId>
+				<artifactId>typetools</artifactId>
+				<version>0.3.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	
 
 	<build>
 		<filters>
@@ -166,71 +337,105 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.5.1</version>
+					<configuration>
+						<encoding>UTF-8</encoding>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<!--inherited>false</inherited-->
+					<groupId>com.mycila.maven-license-plugin</groupId>
+					<artifactId>maven-license-plugin</artifactId>
+					<configuration>
+						<header>etc/header.txt</header>
+						<failIfMissing>false</failIfMissing>
+						<aggregate>true</aggregate>
+						<excludes>
+							<exclude>**/.gitignore</exclude>
+							<exclude>**/*BACK</exclude>
+							<exclude>dev.properties</exclude>
+							<exclude>HOWTO.txt</exclude>
+							<exclude>**/LICENSE.txt</exclude>
+							<exclude>README.md</exclude>
+							<exclude>**/etc/**</exclude>
+							<exclude>**/src/main/webapp/**</exclude>
+							<exclude>**/src/test/resources/**</exclude>
+							<exclude>**/src/test/data/**</exclude>
+							<exclude>calipso-hub-jpasearch/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>check-headers</id>
+							<phase>process-sources</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>remove-headers</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>remove</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>apply-headers</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>format</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+		
+		
 		<plugins>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<inherited>false</inherited>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<configuration>
-					<header>${project.parent.basedir}/etc/header.txt</header>
-					<failIfMissing>true</failIfMissing>
-					<aggregate>true</aggregate>
-					<excludes>
-						<exclude>**/.gitignore</exclude>
-						<exclude>**/*BACK</exclude>
-						<exclude>dev.properties</exclude>
-						<exclude>HOWTO.txt</exclude>
-						<exclude>**/LICENSE.txt</exclude>
-						<exclude>README.md</exclude>
-						<exclude>**/etc/**</exclude>
-						<exclude>**/src/main/webapp/**</exclude>
-						<exclude>**/src/test/resources/**</exclude>
-						<exclude>**/src/test/data/**</exclude>
-						<exclude>calipso-hub-jpasearch/**</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<id>check-headers</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
+			
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -260,6 +465,29 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>com.mycila.maven-license-plugin</groupId>
+						<artifactId>maven-license-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
 	<repositories>
 		<repository>
 			<id>snapshot</id>
@@ -275,10 +503,27 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+
+		<!-- Spring snapshots -->
+		<repository>
+			<id>org.springframework.maven.snapshot</id>
+			<name>Spring Maven Snapshot Repository</name>
+			<url>http://repo.springsource.org/libs-snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<!-- Spring milestones -->
+		<repository>
+			<id>org.springframework.maven.milestone</id>
+			<name>Spring Maven Milestone Repository</name>
+			<url>http://repo.springsource.org/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
-	<modules>
-		<module>calipso-hub-jpasearch</module>
-		<module>calipso-hub-core</module>
-		<module>calipso-hub-webapp</module>
-	</modules>
 </project>

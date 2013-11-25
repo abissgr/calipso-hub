@@ -30,10 +30,11 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 
-public abstract class AbstractServiceImpl<T, ID extends Serializable, R extends BaseRepository<T, ID>>
+public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends BaseRepository<T, ID>>
 		extends
  GenericServiceImpl<T, ID, R> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceImpl.class);

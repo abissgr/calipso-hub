@@ -18,15 +18,15 @@
  */
 package gr.abiss.calipso.model.acl;
 
-import gr.abiss.calipso.model.base.AbstractAuditable;
+import gr.abiss.calipso.ddd.core.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.User;
 
 import javax.persistence.MappedSuperclass;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @MappedSuperclass
-public abstract class Resource extends AbstractAuditable {
+public abstract class Resource extends AbstractAuditable<User> {
 
 	/**
 	 * Get a human and URL friendly id such as a username, a filename etc.
@@ -49,14 +49,18 @@ public abstract class Resource extends AbstractAuditable {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Resource) {
-			Resource other = (Resource) obj;
-			EqualsBuilder builder = new EqualsBuilder();
-			builder.appendSuper(super.equals(obj));
-			builder.append(getBusinessKey(), other.getBusinessKey());
-			return builder.isEquals();
+		if (null == obj) {
+			return false;
 		}
-		return false;
+
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Resource)) {
+			return false;
+		}
+		Resource that = (Resource) obj;
+		return null == this.getId() ? false : this.getId().equals(that.getId());
 	}
 
 	/**

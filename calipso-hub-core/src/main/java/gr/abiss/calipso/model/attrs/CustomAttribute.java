@@ -19,7 +19,7 @@
 package gr.abiss.calipso.model.attrs;
 
 
-import gr.abiss.calipso.model.base.AbstractAuditable;
+import gr.abiss.calipso.ddd.core.model.entities.AbstractAuditable;
 
 import java.io.Serializable;
 
@@ -49,6 +49,22 @@ public abstract class CustomAttribute<T extends Serializable> extends
 	@ManyToOne
 	@JoinColumn(name = "definition", referencedColumnName = "id", nullable = false)
 	private CustomAttributeDefinition definition;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (null == obj) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof CustomAttribute)) {
+			return false;
+		}
+		CustomAttribute that = (CustomAttribute) obj;
+		return null == this.getId() ? false : this.getId().equals(that.getId());
+	}
 
 	public String getName() {
 		return name;

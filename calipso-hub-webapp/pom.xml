@@ -17,6 +17,27 @@
     <properties>
     	<project.parent.basedir>../</project.parent.basedir>
     </properties>
+    <build>
+		<filters>
+			<filter>${project.parent.basedir}/dev.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+    	<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+    	</plugins>
+    </build>
     
     <dependencies>
         <dependency>

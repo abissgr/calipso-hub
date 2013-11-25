@@ -1,28 +1,31 @@
 /**
+ *
+ *
  * Copyright (c) 2007 - 2013 www.Abiss.gr
  *
- * This file is part of Calipso, a software platform by www.Abiss.gr.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Calipso is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Calipso is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser Public License
- * along with Calipso. If not, see http://www.gnu.org/licenses/lgpl-3.0.txt
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package gr.abiss.calipso.jpasearch.repository;
 
+import gr.abiss.calipso.ddd.core.model.dto.MetadatumDTO;
+import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
+import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -39,8 +42,8 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseRepositoryImpl.class);
 
-	private EntityManager entityManager;
-	private Class<T> domainClass;
+	private final EntityManager entityManager;
+	private final Class<T> domainClass;
 
 	// There are two constructors to choose from, either can be used.
 	public BaseRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {
@@ -60,6 +63,99 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	@Override
 	public T merge(T entity) {
 		return this.entityManager.merge(entity);
+	}
+
+	@Override
+	public void addMetadatum(ID subjectId, MetadatumDTO dto) {
+		ensureMetadataIsSupported();
+		LOGGER.info("addMetadatum subjectId: " + subjectId + ", dto: " + dto);
+		Metadatum metadatum = this.findMetadatum(subjectId, dto.getPredicate());
+		LOGGER.info("addMetadatum metadatum: " + metadatum);
+		if(metadatum == null){
+			T entity = this.findOne(subjectId);
+//			Class<?> metadatumClass = ((MetadataSubject) entity)
+//				.getMetadataDomainClass();
+			MetadataSubject subject = (MetadataSubject) entity;
+			metadatum = this.createMetadatum(subject, dto.getPredicate(), dto.getObject());
+		} else {
+			// if exists, only update the value
+			metadatum.setObject(dto.getObject());
+		}
+		
+		// subject.addMetadatum(dto.getPredicate(), dto.getObject());
+		// this.entityManager.merge(entity);
+		this.entityManager.merge(metadatum);
+	}
+
+	@SuppressWarnings("unchecked")
+	private Metadatum createMetadatum(MetadataSubject subject,
+			String predicate,
+			String object) {
+		Class<?> metadatumClass = subject
+				.getMetadataDomainClass();
+		Metadatum metadatum = null;
+		try {
+			metadatum = (Metadatum) metadatumClass.getConstructor(
+					this.getDomainClass(), String.class, String.class)
+					.newInstance(subject, predicate, object);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed adding metadatum", e);
+		}
+		return metadatum;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void removeMetadatum(ID subjectId, String predicate) {
+		ensureMetadataIsSupported();
+		T subjectEntity = this.findOne(subjectId);
+		Class<?> metadatumClass = ((MetadataSubject) subjectEntity)
+				.getMetadataDomainClass();
+		// TODO: refactor to criteria
+		Metadatum metadatum = findMetadatum(subjectId, predicate,
+				metadatumClass);
+		this.entityManager.remove(metadatum);
+		// CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+		// CriteriaQuery criteria = builder.createQuery(metadatumClass);
+		// Root root = criteria.from(metadatumClass);
+		// criteria.where( builder.equal(root.get("predicate"), predicate));
+		
+		
+		
+//		T entity = this.findOne(subjectId);
+//		MetadataSubject subject = (MetadataSubject) entity;
+//		if (subject.getMetadata() != null) {
+//			subject.getMetadata().remove(predicate);
+//			this.merge(entity);
+//		}
+	}
+
+	@Override
+	public Metadatum findMetadatum(ID subjectId, String predicate) {
+		T subjectEntity = this.findOne(subjectId);
+		Class<?> metadatumClass = ((MetadataSubject) subjectEntity)
+				.getMetadataDomainClass();
+		return this.findMetadatum(subjectId, predicate, metadatumClass);
+		
+	}
+	
+	protected Metadatum findMetadatum(ID subjectId, String predicate,
+			Class<?> metadatumClass) {
+		List<Metadatum> results = this.entityManager
+				.createQuery(
+				"from " + metadatumClass.getSimpleName()
+						+ " m where m.predicate = ?1 and m.subject.id = ?2")
+						.setParameter(1, predicate)
+						.setParameter(2, subjectId)
+				.getResultList();
+		Metadatum metadatum = results.isEmpty() ? null : results.get(0);
+		return metadatum;
+	}
+
+	protected void ensureMetadataIsSupported() {
+		if (!MetadataSubject.class.isAssignableFrom(getDomainClass())) {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override

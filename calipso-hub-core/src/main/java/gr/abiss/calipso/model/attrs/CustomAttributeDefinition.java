@@ -19,7 +19,8 @@
 package gr.abiss.calipso.model.attrs;
 
 
-import gr.abiss.calipso.model.base.AbstractAuditable;
+import gr.abiss.calipso.ddd.core.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,7 +34,7 @@ import javax.persistence.Table;
 @Table(name = "custom_attribute")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CustomAttributeDefinition extends
-		AbstractAuditable {
+ AbstractAuditable<User> {
 
 	private static final long serialVersionUID = 4008152148196369725L;
 

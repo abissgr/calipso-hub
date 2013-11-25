@@ -1,5 +1,5 @@
-define([ 'backbone', 'resthub', 'collection/users', 'hbs!template/users' ],
-function (Backbone, Resthub, Users, usersTemplate) {
+define([ 'backbone', 'resthub', 'collection/users', 'model/user', 'view/userform', 'hbs!template/users' ],
+function (Backbone, Resthub, Users, User, UserFormView, usersTemplate) {
     
     var UsersView = Resthub.View.extend({
         
@@ -15,8 +15,29 @@ function (Backbone, Resthub, Users, usersTemplate) {
             
             // Request unpaginated URL
             this.collection.fetch({ data: { page: 'no'} });
-        }
+        },
+     
+        events: {
+        	/* click: 'toggleDetails', */
+        	'click #createUser': 'create',
+            dblclick: 'edit'
+          },
+          
+          edit: function() {
+        	  console.log("this.$el = "+this.$el.html());
+              var userFormView = new UserFormView({root: this.$el, model: this.model});
+              userFormView.render();
+            },
+
+        create: function() {
+        	console.log("Create clicked");
+        	var user = new User();
+        	console.log("user = "+user);
+            var userFormView = new UserFormView({root: this.$('#users-list'), model: user});
+            userFormView.render();
+          }
 
     });
     return UsersView;
 });
+

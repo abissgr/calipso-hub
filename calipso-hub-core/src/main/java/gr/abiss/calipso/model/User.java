@@ -19,8 +19,8 @@
 package gr.abiss.calipso.model;
 
 
+import gr.abiss.calipso.ddd.core.model.entities.AbstractAuditable;
 import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
-import gr.abiss.calipso.model.acl.AbstractAccount;
 import gr.abiss.calipso.utils.MD5Utils;
 
 import java.util.Collection;
@@ -46,9 +46,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends AbstractAccount {
+public class User extends AbstractAuditable<User> {
 
 	private static final long serialVersionUID = -7443491878604398347L;
+
+	@Column(name = "user_name", nullable = false)
+	private String userName;
 
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
@@ -104,6 +107,21 @@ public class User extends AbstractAccount {
 		this.email = email;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (null == obj) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof User)) {
+			return false;
+		}
+		User that = (User) obj;
+		return null == this.getId() ? false : this.getId().equals(that.getId());
+	}
 
 	@Override
 	public String toString() {
@@ -123,6 +141,14 @@ public class User extends AbstractAccount {
 		this.setEmail(this.getEmail().trim());
 		// update the hash
 		this.setEmailHash(MD5Utils.md5Hex(this.getEmail()));
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public String getFirstName() {
@@ -221,21 +247,22 @@ public class User extends AbstractAccount {
 		this.dateFormat = dateFormat;
 	}
 
-	/**
-	 * Returns the username as the business key
-	 * 
-	 * @see gr.abiss.calipso.model.acl.Resource#getBusinessKey()
-	 */
-	@Override
-	public String getBusinessKey() {
-		return this.getUserName();
-	}
-
-	@Override
-	public String getApiBasePath() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	//
+	// /**
+	// * Returns the username as the business key
+	// *
+	// * @see gr.abiss.calipso.model.acl.Resource#getBusinessKey()
+	// */
+	// @Override
+	// public String getBusinessKey() {
+	// return this.getUserName();
+	// }
+	//
+	// @Override
+	// public String getApiBasePath() {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
 	public Collection<? extends GrantedAuthority> getRoles() {
 		// TODO Auto-generated method stub
