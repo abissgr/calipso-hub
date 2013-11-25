@@ -9,7 +9,7 @@ function (Backbone, Resthub, Users, User, UserFormView, usersTemplate) {
         initialize:function () {
             // Initialize the collection
             this.collection = new Users();
-            
+          
             // Render the view when the collection is retreived from the server
             this.listenTo(this.collection, 'sync', this.render);
             
@@ -18,21 +18,25 @@ function (Backbone, Resthub, Users, User, UserFormView, usersTemplate) {
         },
      
         events: {
-        	/* click: 'toggleDetails', */
         	'click #createUser': 'create',
             dblclick: 'edit'
           },
           
-          edit: function() {
-        	  console.log("this.$el = "+this.$el.html());
+          edit: function(event) {
+        	
+        	  // userName is used as id of element
+        	  var target = $(event.target).attr("id");
+        	  
+        	// get model for target user
+        	  this.model = this.collection.findWhere({"userName" : target});
+        	  
               var userFormView = new UserFormView({root: this.$el, model: this.model});
               userFormView.render();
             },
 
         create: function() {
-        	console.log("Create clicked");
+        	  $("#createUser").hide();
         	var user = new User();
-        	console.log("user = "+user);
             var userFormView = new UserFormView({root: this.$('#users-list'), model: user});
             userFormView.render();
           }
