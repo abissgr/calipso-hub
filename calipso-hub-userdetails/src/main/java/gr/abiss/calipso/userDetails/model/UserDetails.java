@@ -17,12 +17,15 @@
  */
 package gr.abiss.calipso.userDetails.model;
 
+import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
+import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 import gr.abiss.calipso.ddd.core.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -36,7 +39,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 @XmlRootElement(name = "loggedInUserDetails")
-public class UserDetails implements SocialUserDetails, LocalUser {
+public class UserDetails implements SocialUserDetails, LocalUser,
+		MetadataSubject<Metadatum> {
 	
 	private static final long serialVersionUID = 5206010308112791343L;
 
@@ -78,11 +82,15 @@ public class UserDetails implements SocialUserDetails, LocalUser {
 	private Collection<? extends GrantedAuthority> authorities;
 	private String confirmationToken;
 	private String resetPasswordToken;
+	private Map<String, Metadatum> metadata;
 
 	public static UserDetails fromUser(LocalUser user) {
 		Assert.notNull(user);
-		return new UserDetails(user.getId(), user.getUserName(), user.getUserPassword(), user.getEmail(), user.getActive(),
+		UserDetails details = new UserDetails(user.getId(), user.getUserName(),
+				user.getUserPassword(), user.getEmail(), user.getActive(),
 				user.getRoles());
+		// details.setMetadata(user.getMetadata());
+		return details;
 	}
 
 	public UserDetails(Serializable id, String userName, String userPassword, String email, Boolean active,
@@ -348,6 +356,35 @@ public class UserDetails implements SocialUserDetails, LocalUser {
 	@Override
 	public Collection<? extends GrantedAuthority> getRoles() {
 		return this.getAuthorities();
+	}
+
+	@Override
+	public Map<String, Metadatum> getMetadata() {
+		// TODO Auto-generated method stub
+		return this.metadata;
+	}
+
+	@Override
+	public void setMetadata(Map<String, Metadatum> metadata) {
+		this.metadata = metadata;
+	}
+
+	@Override
+	public Metadatum addMetadatum(Metadatum metadatum) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Metadatum addMetadatum(String predicate, String object) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Class getMetadataDomainClass() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
