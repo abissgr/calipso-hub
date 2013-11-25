@@ -1,3 +1,15 @@
 /**
 *  Your specific application stylesheet
 **/
+
+label, input {
+	display: inline
+}
+
+label {
+	font-weight:bold;
+}
+
+.form-block {
+	  display:block; 
+}

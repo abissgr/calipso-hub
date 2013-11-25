@@ -1,0 +1,39 @@
+/**
+*  Your specific application stylesheet
+**/
+
+
+label {
+	font-weight:bold;
+}
+
+.form-cell {
+	  display:table-cell; 
+	  padding: 5px
+}
+
+.form-row {
+	  display:table-row; 
+}
+
+.user {
+	margin: 20px 6px 6px 0px;
+/*	float: left */
+}
+
+.control-group {
+	border-style:solid;
+	border-color:#eee;
+	border-width: 1px
+}
+
+.user-link {
+	cursor: pointer;
+	font-weight:bold;
+	color: #00e;
+}
+
+#createUser {
+	cursor: pointer;
+	margin: 12px 6px 6px 0px
+}
