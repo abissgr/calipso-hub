@@ -1,0 +1,12 @@
+<flows>
+	<flow>
+		<roles>
+			<role name="owner" />
+			<role name="moderator" />
+		</roles>
+		<states>
+			<state name="unpublished"></state>
+			<state name="published"></state>
+		</states>
+	</flow>
+</flows>
