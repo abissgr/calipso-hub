@@ -28,9 +28,9 @@ import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,8 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.codec.Base64;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.social.connect.Connection;
@@ -81,21 +81,26 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		this.localUserService = localUserService;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
+	 */
 	@Override
 	public UserDetails loadUserByUsername(
 			String findByUserNameOrEmail) throws UsernameNotFoundException {
 		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
 
-		// LOGGER.info("loadUserByUsername using: " + findByUserNameOrEmail);
+		LOGGER.info("loadUserByUsername using: " + findByUserNameOrEmail);
 		LocalUser user = this.localUserService.findByUserNameOrEmail(findByUserNameOrEmail);
 
-		// LOGGER.info("loadUserByUsername user: " + user);
+		LOGGER.info("loadUserByUsername user: " + user);
 
 		userDetails = gr.abiss.calipso.userDetails.model.UserDetails
 				.fromUser(user);
 
-		// LOGGER.info("loadUserByUsername returns userDetails: " + userDetails
-		// + ",	 with roles: " + userDetails.getAuthorities());
+		LOGGER.info("loadUserByUsername returns userDetails: " + userDetails
+				+ ",	 with roles: " + userDetails.getAuthorities());
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + findByUserNameOrEmail);
 		}
@@ -104,39 +109,45 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Transactional(readOnly = false)
 	@Override
-	public gr.abiss.calipso.userDetails.model.UserDetails create(gr.abiss.calipso.userDetails.model.UserDetails loggedInUserDetails) {
-		String userNameOrEmail = loggedInUserDetails.getUserName();
+	public UserDetails create(final UserDetails tryUserDetails) {
+		UserDetails userDetails = null;
+		String userNameOrEmail = tryUserDetails.getUsername();
 		if (StringUtils.isBlank(userNameOrEmail)) {
-			userNameOrEmail = loggedInUserDetails.getEmail();
+			userNameOrEmail = tryUserDetails.getEmail();
+		}
+		String password = tryUserDetails.getPassword();
+		Map<String, String> metadata = tryUserDetails.getMetadata();
+
+
+		// make sure we have credentials to send
+		if (StringUtils.isNotBlank(userNameOrEmail)
+				&& StringUtils.isNotBlank(password)) {
+
+			// ask for the corresponding persisted user
+			LocalUser localUser = this.localUserService.findByCredentials(
+					userNameOrEmail, password, metadata);
+
+			// convert to UserDetals if not null
+			userDetails = UserDetails.fromUser(localUser);
+
+			LOGGER.info("create principal: " + localUser
+					+ ", returning  UserDetails: " + userDetails);
 		}
 
-		// LOGGER.info("create loggedInUserDetails: " + loggedInUserDetails);
-		LocalUser orincipal = this.localUserService.findByCredentials(
-				userNameOrEmail, loggedInUserDetails.getUserPassword(),
-				loggedInUserDetails.getMetadata());
-
-		// LOGGER.info("create principal: " + orincipal +
-		// ", loggedInUserDetails: " + loggedInUserDetails);
-
-		loggedInUserDetails = UserDetails.fromUser(orincipal);
-
-		// LOGGER.info("create returning loggedInUserDetails: " +
-		// loggedInUserDetails);
-		return loggedInUserDetails;
+		return userDetails;
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public gr.abiss.calipso.userDetails.model.UserDetails confirmPrincipal(String confirmationToken) {
 		Assert.notNull(confirmationToken);
-		gr.abiss.calipso.userDetails.model.UserDetails loggedInUserDetails = null;
+		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
 		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
+		// convert to UserDetals if not null
+		userDetails = UserDetails.fromUser(localUser);
 
-		loggedInUserDetails = UserDetails.fromUser(localUser);
-
-		// LOGGER.info("create returning loggedInUserDetails: " +
-		// loggedInUserDetails);
-		return loggedInUserDetails;
+		LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
+		return userDetails;
 	}
 
 	@Override
@@ -147,52 +158,47 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Override
 	@Transactional(readOnly = false)
-	public gr.abiss.calipso.userDetails.model.UserDetails resetPasswordAndLogin(String userNameOrEmail, String token, String newPassword) {
+	public gr.abiss.calipso.userDetails.model.UserDetails resetPassword(String userNameOrEmail, String token, String newPassword) {
 		Assert.notNull(userNameOrEmail);
-		gr.abiss.calipso.userDetails.model.UserDetails loggedInUserDetails = null;
-		LocalUser user = this.localUserService.handlePasswordResetToken(userNameOrEmail, token, newPassword);
-		if (user == null) {
+		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
+		LocalUser localUser = this.localUserService.handlePasswordResetToken(
+				userNameOrEmail, token, newPassword);
+		if (localUser == null) {
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
-		user.setConfirmationToken(null);
-		user.setUserPassword(newPassword);
-		loggedInUserDetails = gr.abiss.calipso.userDetails.model.UserDetails.fromUser(user);
-
+		localUser.setConfirmationToken(null);
+		localUser.setUserPassword(newPassword);
+		userDetails = UserDetails.fromUser(localUser);
 		// LOGGER.info("create returning loggedInUserDetails: " +
 		// loggedInUserDetails);
-		return loggedInUserDetails;
+		return userDetails;
 	}
 
 	@Override
-	public gr.abiss.calipso.userDetails.model.UserDetails getRemembered(HttpServletRequest request) {
-		gr.abiss.calipso.userDetails.model.UserDetails resource = null;
+	public UserDetails getPrincipal() {
+		Object principal = null;
+		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
+			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		}
+		LOGGER.debug("getPrincipal, principal: " + principal);
+		return (UserDetails) principal;
+	}
 
-		Cookie tokenCookie = null;
-		Cookie[] cookies = request.getCookies();
-
-		for (int i = 0; i < cookies.length; i++) {
-			tokenCookie = cookies[i];
-			if (tokenCookie.getName().equals(this.userDetailsConfig.getCookiesBasicAuthTokenName())) {
-				String token = tokenCookie.getValue();
-				if (StringUtils.isNotBlank(token)) {
-					token = new String(Base64.decode(token.getBytes()));
-					// LOGGER.info("Request contained token: " + token);
-					if (token.indexOf(':') > 0) {
-						String[] parts = token.split(":");
-						// resource.setUserName(parts[0]);
-						// resource.setUserPassword(parts[1]);
-						LocalUser localUser = this.localUserService
-								.findByCredentials(parts[0], parts[1], null);
-						resource = UserDetails.fromUser(localUser);
-						// TODO
-					} else {
-						LOGGER.warn("Invalid token received: " + token);
-					}
-				}
-				break;
+	@Override
+	public LocalUser getPrincipalLocalUser() {
+		UserDetails principal = getPrincipal();
+		LocalUser user = null;
+		if (principal != null) {
+			String username = principal.getUsername();
+			if(StringUtils.isBlank(username)){
+				username = principal.getEmail();
+			}
+			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
+				user = this.localUserService.findByUserNameOrEmail(username);
 			}
 		}
-		return resource != null ? resource : new UserDetails();
+		LOGGER.debug("getPrincipalUser, user: " + user);
+		return user;
 	}
 
 	@Override

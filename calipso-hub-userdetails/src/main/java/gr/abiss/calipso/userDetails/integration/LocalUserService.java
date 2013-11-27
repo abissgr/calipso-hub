@@ -36,8 +36,12 @@ public interface LocalUserService<ID extends Serializable, T extends LocalUser> 
 	 * and possibly persisting the given metadata for the match, if any.
 	 * 
 	 * @param userNameOrEmail
+	 *            the username or email
 	 * @param userPassword
+	 *            the user password
 	 * @param metadata
+	 *            the metadata to add to the the matching user. May be
+	 *            <code>null</code>.
 	 * @return the local user or null if no match was found for the given
 	 *         credentials
 	 */

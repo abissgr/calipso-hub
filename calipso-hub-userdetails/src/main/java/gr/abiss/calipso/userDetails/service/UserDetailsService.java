@@ -21,16 +21,12 @@ import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.resthub.common.service.CrudService;
 
 
 public interface UserDetailsService extends CrudService<UserDetails, String> {
 
-	UserDetails getRemembered(HttpServletRequest request);
-
-	UserDetails resetPasswordAndLogin(String userNameOrEmail, String token, String newPassword);
+	UserDetails resetPassword(String userNameOrEmail, String token, String newPassword);
 
 	void handlePasswordResetRequest(String userNameOrEmail);
 
@@ -38,4 +34,8 @@ public interface UserDetailsService extends CrudService<UserDetails, String> {
 
 	UserDetails createForImplicitSignup(LocalUser user)
 			throws DuplicateEmailException;
+
+	UserDetails getPrincipal();
+
+	LocalUser getPrincipalLocalUser();
 }

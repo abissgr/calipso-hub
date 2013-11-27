@@ -21,7 +21,6 @@ import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 import gr.abiss.calipso.ddd.core.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,9 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
@@ -53,11 +52,67 @@ public class UserDetails implements SocialUserDetails/*
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(UserDetails.class);
 
+
+
+	private String id;
+	@JsonProperty(value = "userName")
+	private String username;
+
+	@JsonSerialize(using = SkipPropertySerializer.class)
+	@JsonProperty(value = "userPassword")
+	private String password;
+	private Date lastPassWordChangeDate;
+
+	private String email;
+	private String emailHash;
+
+	private String firstName;
+	private String lastName;
+
+	private String avatarUrl;
+	private String locale = "en";
+	private String dateFormat;
+
+	private Date birthDay;
+	private Date lastVisit;
+	private Date lastPost;
+	private Short loginAttempts = 0;
+
+	private String redirectUrl = null;
+
+	@JsonSerialize(using = SkipPropertySerializer.class)
+	private Boolean active = true;
+
+	@JsonSerialize(using = SkipPropertySerializer.class)
+	private String inactivationReason;
+
+	private Date inactivationDate;
+	private boolean isAdmin = false;
+	private boolean isModerator = false;
+
+	@JsonProperty(value = "roles")
+	private Collection<? extends GrantedAuthority> authorities;
+	private Map<String, String> metadata;
+	
+	@JsonSerialize(using = SkipPropertySerializer.class)
+	private String confirmationToken;
+	@JsonSerialize(using = SkipPropertySerializer.class)
+	private String resetPasswordToken;
+
 	public static UserDetails fromUser(LocalUser user) {
 		UserDetails details = null;
 		if (user != null) {
 			details = new UserDetails();
 			BeanUtils.copyProperties(user, details);
+			details.setId(user.getId().toString());
+			details.setUsername(user.getUserName());
+			details.setPassword(user.getUserPassword());
+			details.setEmail(user.getEmail());
+			details.setFirstName(user.getFirstName());
+			details.setLastName(user.getLastName());
+			details.setActive(user.getActive());
+			details.setAuthorities(user.getRoles());
+
 			// init metadata
 			if (!CollectionUtils.isEmpty(user.getMetadata())) {
 				for (Metadatum metadatum : user.getMetadata().values()) {
@@ -67,7 +122,6 @@ public class UserDetails implements SocialUserDetails/*
 			}
 			// init global roles
 			if (!CollectionUtils.isEmpty(user.getRoles())) {
-				details.setAuthorities(user.getRoles());
 				for (GrantedAuthority authority : user.getRoles()) {
 					if (authority.getAuthority().equals("ROLE_ADMIN")) {
 						details.isAdmin = true;
@@ -81,61 +135,21 @@ public class UserDetails implements SocialUserDetails/*
 		return details;
 	}
 
-	private String id;
-	private String firstName;
-	private String lastName;
-	private String userName;
-	private String redirectUrl = null;
-
-	@JsonSerialize(using = SkipPropertySerializer.class)
-	private String userPassword;
-	private Date lastPassWordChangeDate;
-	private String email;
-	private String emailHash;
-	private String avatarUrl;
-	private Date birthDay;
-	private Date lastVisit;
-	private Date lastPost;
-	private Short loginAttempts = 0;
-	private Boolean active = true;
-	private String inactivationReason;
-	private Date inactivationDate;
-	private String locale = "en";
-	private String dateFormat;
-	private boolean isAdmin = false;
-	private boolean isModerator = false;
-	private Collection<? extends GrantedAuthority> authorities;
-	private String confirmationToken;
-	private String resetPasswordToken;
-	private Map<String, String> metadata;
-
-
-	private UserDetails(Serializable id, String userName, String userPassword,
-			String email, Boolean active,
-			Collection<? extends GrantedAuthority> roles) {
-		Assert.notNull(id);
-		Assert.notNull(userName);
-		Assert.notNull(userPassword);
-		Assert.notNull(email);
-		Assert.notNull(active);
-		Assert.notNull(roles);
-
-		this.id = id.toString();
-		this.userName = userName;
-		this.userPassword = userPassword;
-		this.email = email;
-		this.active = active;
-		this.authorities = roles;
-	}
-
+	/**
+	 * Default constructor
+	 */
 	public UserDetails() {
+
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("id", this.id).append("userName", userName).append("userPassword", userPassword)
-.append("email", email)
-				.append("metadata", metadata).toString();
+		return new ToStringBuilder(this)
+			.append("id", id)
+			.append("username", username)
+			.append("email", email)
+			.append("metadata", metadata)
+			.toString();
 	}
 
 	public String getId() {
@@ -160,22 +174,6 @@ public class UserDetails implements SocialUserDetails/*
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserPassword() {
-		return userPassword;
-	}
-
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
 	}
 
 	public Date getLastPassWordChangeDate() {
@@ -306,51 +304,6 @@ public class UserDetails implements SocialUserDetails/*
 		return this.redirectUrl;
 	}
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.authorities;
-	}
-
-	public void setAuthorities(
-			Collection<? extends GrantedAuthority> authorities) {
-		this.authorities = authorities;
-	}
-
-	@Override
-	public String getPassword() {
-		return this.getUserPassword();
-	}
-
-	@Override
-	public String getUsername() {
-		return this.getUserName();
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return this.getActive();
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return this.getActive();
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return this.getActive();
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return this.getActive();
-	}
-
-	@Override
-	public String getUserId() {
-		return this.getId();
-	}
-
 	public void setConfirmationToken(String confirmationToken) {
 		this.confirmationToken = confirmationToken;
 	}
@@ -358,10 +311,6 @@ public class UserDetails implements SocialUserDetails/*
 	public void setResetPasswordToken(String resetPasswordToken) {
 		this.resetPasswordToken = resetPasswordToken;
 
-	}
-
-	public Collection<? extends GrantedAuthority> getRoles() {
-		return this.getAuthorities();
 	}
 
 	public Map<String, String> getMetadata() {
@@ -381,4 +330,66 @@ public class UserDetails implements SocialUserDetails/*
 		this.metadata.put(predicate, object);
 	}
 
+	public String getConfirmationToken() {
+		return confirmationToken;
+	}
+
+	public String getResetPasswordToken() {
+		return resetPasswordToken;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setAuthorities(
+			Collection<? extends GrantedAuthority> authorities) {
+		this.authorities = authorities;
+	}
+
+	// SocialUserDetails
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return this.authorities;
+	}
+
+	@Override
+	public String getPassword() {
+		return this.password;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.username;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return this.active;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return this.active;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return this.active;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return this.active;
+	}
+
+	@Override
+	public String getUserId() {
+		return this.id;
+	}
 }

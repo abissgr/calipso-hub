@@ -64,9 +64,10 @@ public class SecurityUtil {
 	public static void login(HttpServletRequest request, HttpServletResponse response, UserDetails userDetails,
 			UserDetailsConfig userDetailsConfig) {
 		if (userDetails != null
-				&& StringUtils.isNotBlank(userDetails.getUserName()) 
-				&& StringUtils.isNotBlank(userDetails.getUserPassword())) {
-			String token = new String(Base64.encode((userDetails.getUserName() + ":" + userDetails.getUserPassword()).getBytes()));
+				&& StringUtils.isNotBlank(userDetails.getUsername())
+				&& StringUtils.isNotBlank(userDetails.getPassword())) {
+			String token = new String(Base64.encode((userDetails.getUsername()
+					+ ":" + userDetails.getPassword()).getBytes()));
 			addCookie(response, userDetailsConfig.getCookiesBasicAuthTokenName(), token, false, userDetailsConfig);
 		} else{
 			throw new BadCredentialsException("The provided user details are incomplete");
