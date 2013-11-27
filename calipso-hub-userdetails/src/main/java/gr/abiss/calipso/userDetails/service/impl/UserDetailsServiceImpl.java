@@ -26,6 +26,7 @@ import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -68,7 +68,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	private StringKeyGenerator keyGenerator = KeyGenerators.string();
 
-	private LocalUserService<? extends LocalUser> localUserService;
+	private LocalUserService<? extends Serializable, ? extends LocalUser> localUserService;
 	
 	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {
@@ -77,38 +77,32 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Autowired(required = true)
 	public void setLocalUserService(
-			LocalUserService<? extends LocalUser> localUserService) {
+			LocalUserService<? extends Serializable, ? extends LocalUser> localUserService) {
 		this.localUserService = localUserService;
 	}
-	//
-	// @Inject
-	// public void setKeyGenerator(StringKeyGenerator keyGenerator) {
-	// this.keyGenerator = keyGenerator;
-	// }
 
 	@Override
 	public UserDetails loadUserByUsername(
 			String findByUserNameOrEmail) throws UsernameNotFoundException {
 		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
 
-		LOGGER.info("loadUserByUsername using: " + findByUserNameOrEmail);
+		// LOGGER.info("loadUserByUsername using: " + findByUserNameOrEmail);
 		LocalUser user = this.localUserService.findByUserNameOrEmail(findByUserNameOrEmail);
 
-		LOGGER.info("loadUserByUsername user: " + user);
-		if (user != null) {
-			LOGGER.info("loadUserByUsername about to copy user.roles: " + user.getRoles());
-			// Role userRole = new Role(Role.ROLE_USER);
-			// user.addRole(userRole);
-			userDetails = gr.abiss.calipso.userDetails.model.UserDetails.fromUser(user);
-		}
+		// LOGGER.info("loadUserByUsername user: " + user);
 
-		LOGGER.info("loadUserByUsername returns userDetails: " + userDetails + ", with roles: " + userDetails.getAuthorities());
+		userDetails = gr.abiss.calipso.userDetails.model.UserDetails
+				.fromUser(user);
+
+		// LOGGER.info("loadUserByUsername returns userDetails: " + userDetails
+		// + ",	 with roles: " + userDetails.getAuthorities());
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + findByUserNameOrEmail);
 		}
 		return userDetails;
 	}
 
+	@Transactional(readOnly = false)
 	@Override
 	public gr.abiss.calipso.userDetails.model.UserDetails create(gr.abiss.calipso.userDetails.model.UserDetails loggedInUserDetails) {
 		String userNameOrEmail = loggedInUserDetails.getUserName();
@@ -116,17 +110,18 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			userNameOrEmail = loggedInUserDetails.getEmail();
 		}
 
-		LocalUser orincipal = this.localUserService.findByCredentials(userNameOrEmail, loggedInUserDetails.getUserPassword());
+		// LOGGER.info("create loggedInUserDetails: " + loggedInUserDetails);
+		LocalUser orincipal = this.localUserService.findByCredentials(
+				userNameOrEmail, loggedInUserDetails.getUserPassword(),
+				loggedInUserDetails.getMetadata());
 
-		LOGGER.info("create principal: " + orincipal + ", loggedInUserDetails: " + loggedInUserDetails);
-		if (orincipal != null) {
-			BeanUtils.copyProperties(orincipal, loggedInUserDetails);
-			gr.abiss.calipso.userDetails.model.UserDetails.initRoles(loggedInUserDetails, orincipal.getRoles());
-		} else {
-			loggedInUserDetails.setUserPassword(null);
-		}
+		// LOGGER.info("create principal: " + orincipal +
+		// ", loggedInUserDetails: " + loggedInUserDetails);
 
-		LOGGER.info("create returning loggedInUserDetails: " + loggedInUserDetails);
+		loggedInUserDetails = UserDetails.fromUser(orincipal);
+
+		// LOGGER.info("create returning loggedInUserDetails: " +
+		// loggedInUserDetails);
 		return loggedInUserDetails;
 	}
 
@@ -136,11 +131,11 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		Assert.notNull(confirmationToken);
 		gr.abiss.calipso.userDetails.model.UserDetails loggedInUserDetails = null;
 		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
-		if (localUser != null) {
-			BeanUtils.copyProperties(localUser, loggedInUserDetails);
-			gr.abiss.calipso.userDetails.model.UserDetails.initRoles(loggedInUserDetails, localUser.getRoles());
-		}
-		LOGGER.info("create returning loggedInUserDetails: " + loggedInUserDetails);
+
+		loggedInUserDetails = UserDetails.fromUser(localUser);
+
+		// LOGGER.info("create returning loggedInUserDetails: " +
+		// loggedInUserDetails);
 		return loggedInUserDetails;
 	}
 
@@ -163,13 +158,14 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		user.setUserPassword(newPassword);
 		loggedInUserDetails = gr.abiss.calipso.userDetails.model.UserDetails.fromUser(user);
 
-		LOGGER.info("create returning loggedInUserDetails: " + loggedInUserDetails);
+		// LOGGER.info("create returning loggedInUserDetails: " +
+		// loggedInUserDetails);
 		return loggedInUserDetails;
 	}
 
 	@Override
 	public gr.abiss.calipso.userDetails.model.UserDetails getRemembered(HttpServletRequest request) {
-		gr.abiss.calipso.userDetails.model.UserDetails resource = new gr.abiss.calipso.userDetails.model.UserDetails();
+		gr.abiss.calipso.userDetails.model.UserDetails resource = null;
 
 		Cookie tokenCookie = null;
 		Cookie[] cookies = request.getCookies();
@@ -180,21 +176,23 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				String token = tokenCookie.getValue();
 				if (StringUtils.isNotBlank(token)) {
 					token = new String(Base64.decode(token.getBytes()));
-					LOGGER.info("Request contained token: " + token);
+					// LOGGER.info("Request contained token: " + token);
 					if (token.indexOf(':') > 0) {
 						String[] parts = token.split(":");
-						resource.setUserName(parts[0]);
-						resource.setUserPassword(parts[1]);
+						// resource.setUserName(parts[0]);
+						// resource.setUserPassword(parts[1]);
+						LocalUser localUser = this.localUserService
+								.findByCredentials(parts[0], parts[1], null);
+						resource = UserDetails.fromUser(localUser);
+						// TODO
 					} else {
 						LOGGER.warn("Invalid token received: " + token);
 					}
 				}
 				break;
-			} else {
-				tokenCookie = null;
 			}
 		}
-		return resource;
+		return resource != null ? resource : new UserDetails();
 	}
 
 	@Override
@@ -224,7 +222,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Override
 	public gr.abiss.calipso.userDetails.model.UserDetails findById(String id) {
-		LOGGER.info("findById: " + id);
+		// LOGGER.info("findById: " + id);
 		throw new UnsupportedOperationException();
 	}
 
@@ -250,12 +248,13 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException, DataAccessException {
 		SocialUserDetails userDetails = null;
 
-		LOGGER.info("loadUserByUserId using: " + userId);
+		// LOGGER.info("loadUserByUserId using: " + userId);
 		LocalUser user = this.localUserService.findByUserNameOrEmail(userId);
 
-		LOGGER.info("loadUserByUserId user: " + user);
+		// LOGGER.info("loadUserByUserId user: " + user);
 		if (user != null) {
-			LOGGER.info("loadUserByUserId about to copy user.roles: " + user.getRoles());
+			// LOGGER.info("loadUserByUserId about to copy user.roles: " +
+			// user.getRoles());
 			// Role userRole = new Role(Role.ROLE_USER);
 			// user.addRole(userRole);
 			userDetails = gr.abiss.calipso.userDetails.model.UserDetails.fromUser(user);
@@ -273,7 +272,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	 */
 	@Override
     public String execute(Connection<?> connection) {
-		LOGGER.debug("ConnectionSignUp#execute");
+		// LOGGER.debug("ConnectionSignUp#execute");
 		String localUserName = null;
 		String accessToken = connection.createData().getAccessToken();
 		UserProfile profile = connection.fetchUserProfile();
@@ -309,26 +308,26 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		//		}
 
 		if (!StringUtils.isBlank(socialEmail)) {
-			LOGGER.debug("ConnectionSignUp#execute, Social email accessible, looking for local user match");
+			// LOGGER.debug("ConnectionSignUp#execute, Social email accessible, looking for local user match");
 
 			LocalUser user = localUserService.findByUserNameOrEmail(socialEmail);
 			// 
 
 			if (user != null) {
-				LOGGER.debug("Email matches existing local user, no need to create one");
+				// LOGGER.debug("Email matches existing local user, no need to create one");
 				localUserName = user.getUserName();
 			} else {
-				LOGGER.debug("Email did not match an local user, trying to create one");
+				// LOGGER.debug("Email did not match an local user, trying to create one");
 
 				if (localUserService.findByUserNameOrEmail(socialUsername) != null) {
-					LOGGER.debug("The social account username is taken, will generate one using increment suffix");
+					// LOGGER.debug("The social account username is taken, will generate one using increment suffix");
 					int increment = 1;
 					for (int i = 0; localUserService.findByUserNameOrEmail(socialUsername + i) != null; i++) {
 						increment++;
 					}
 					socialUsername = socialUsername + increment;
 				}
-				user = new gr.abiss.calipso.userDetails.model.UserDetails();
+				user = new gr.abiss.calipso.userDetails.model.SimpleLocalUser();
 				user.setActive(true);
 				user.setEmail(socialEmail);
 				user.setUserName(socialUsername);
@@ -363,8 +362,11 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Override
-	public gr.abiss.calipso.userDetails.model.UserDetails createForImplicitSignup(gr.abiss.calipso.userDetails.model.UserDetails loggedInUserDetails) throws DuplicateEmailException {
-		return gr.abiss.calipso.userDetails.model.UserDetails.fromUser(this.localUserService.createForImplicitSignup(loggedInUserDetails));
+	public gr.abiss.calipso.userDetails.model.UserDetails createForImplicitSignup(
+			LocalUser localUser) throws DuplicateEmailException {
+		return gr.abiss.calipso.userDetails.model.UserDetails
+				.fromUser(this.localUserService
+						.createForImplicitSignup(localUser));
 	}
 
 }

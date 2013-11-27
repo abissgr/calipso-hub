@@ -17,11 +17,14 @@
  */
 package gr.abiss.calipso.jpasearch.service.impl;
 
-import gr.abiss.calipso.ddd.core.model.dto.MetadatumDTO;
+import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
+import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.jpasearch.service.GenericService;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Map;
 
 import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Persistable;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Provides access to domain class type and transactional write support
@@ -55,7 +59,10 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	@Override
 	@Transactional(readOnly = false)
 	public T create(T resource) {
-		return super.create(resource);
+		Map<String, Metadatum> metadata = noteMetadata(resource);
+		T saved = super.create(resource);
+		persistNotedMetadata(metadata, saved);
+		return saved;
 	}
 
 	/**
@@ -64,53 +71,55 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	@Override
 	@Transactional(readOnly = false)
 	public T update(T resource) {
-		return super.update(resource);
+		Map<String, Metadatum> metadata = noteMetadata(resource);
+		T saved = super.update(resource);
+		persistNotedMetadata(metadata, saved);
+		return saved;
 	}
+
+
+	private void persistNotedMetadata(Map<String, Metadatum> metadata, T saved) {
+		if (!CollectionUtils.isEmpty(metadata)) {
+			MetadataSubject subject = (MetadataSubject) saved;
+			for (Metadatum metadatum : metadata.values()) {
+				subject.addMetadatum(this.repository.addMetadatum(
+						saved.getId(), metadatum.getPredicate(),
+						metadatum.getObject()));
+			}
+		}
+	}
+
+	private Map<String, Metadatum> noteMetadata(T resource) {
+		Map<String, Metadatum> metadata = null;
+		if (MetadataSubject.class.isAssignableFrom(this.getDomainClass())) {
+			metadata = ((MetadataSubject) resource).getMetadata();
+		}
+		return metadata;
+	}
+
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public void delete(T resource) {
-		super.delete(resource);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Transactional(readOnly = false)
-	public void delete(ID id) {
-		super.delete(id);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Transactional(readOnly = false)
-	public void deleteAll() {
-		super.deleteAll();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Transactional(readOnly = false)
-	public void deleteAllWithCascade() {
-		super.deleteAllWithCascade();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Transactional(readOnly = false)
-	public void addMetadatum(ID subjectId, MetadatumDTO dto) {
+	public void addMetadatum(ID subjectId, Metadatum dto) {
 		LOGGER.info("addMetadatum subjectId: "+subjectId + ", metadatum: "+dto);
-		this.repository.addMetadatum(subjectId, dto);
+		this.repository.addMetadatum(subjectId, dto.getPredicate(),
+				dto.getObject());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	public void addMetadata(ID subjectId, Collection<Metadatum> dtos) {
+		if (!CollectionUtils.isEmpty(dtos)) {
+			for (Metadatum dto : dtos) {
+				this.addMetadatum(subjectId, dto);
+			}
+		}
 	}
 
 	@Override

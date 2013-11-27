@@ -17,10 +17,11 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
-import gr.abiss.calipso.ddd.core.model.dto.MetadatumDTO;
 import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -36,10 +37,13 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
 	
 	public Class<T> getDomainClass();
 
-	void addMetadatum(ID subjectId, MetadatumDTO metadatum);
+	Metadatum addMetadatum(ID subjectId, String predicate, String object);
+
+	List<Metadatum> addMetadata(ID subjectId, Map<String, String> metadata);
 
 	void removeMetadatum(ID subjectId, String predicate);
 
 	Metadatum findMetadatum(ID subjectId, String predicate);
+
 
 }

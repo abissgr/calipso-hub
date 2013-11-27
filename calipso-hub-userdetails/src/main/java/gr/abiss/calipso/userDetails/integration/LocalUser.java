@@ -17,8 +17,11 @@
  */
 package gr.abiss.calipso.userDetails.integration;
 
+import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
+
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -57,5 +60,7 @@ public interface LocalUser {
 	String getRedirectUrl();
 
 	Collection<? extends GrantedAuthority> getRoles();
+
+	Map<String, ? extends Metadatum> getMetadata();
 
 }

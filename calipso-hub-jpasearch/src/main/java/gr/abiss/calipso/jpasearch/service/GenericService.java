@@ -17,9 +17,10 @@
  */
 package gr.abiss.calipso.jpasearch.service;
 
-import gr.abiss.calipso.ddd.core.model.dto.MetadatumDTO;
+import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.resthub.common.service.CrudService;
 import org.springframework.data.domain.Persistable;
@@ -43,7 +44,9 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 	 */
 	public Class<T> getDomainClass();
 
-	public void addMetadatum(ID subjectId, MetadatumDTO dto);
+	public void addMetadatum(ID subjectId, Metadatum dto);
+
+	public void addMetadata(ID subjectId, Collection<Metadatum> dtos);
 
 	public void removeMetadatum(ID subjectId, String predicate);
 }

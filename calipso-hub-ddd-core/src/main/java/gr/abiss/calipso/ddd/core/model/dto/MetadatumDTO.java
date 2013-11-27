@@ -24,16 +24,20 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class MetadatumDTO<S extends MetadataSubject> implements Metadatum {
+public class MetadatumDTO implements Metadatum {
 
 	private static final long serialVersionUID = -1468517690700208260L;
 
 	@JsonIgnore
-	private S subject;
+	private MetadataSubject subject;
 
 	private String predicate;
 
 	private String object;
+
+	public MetadatumDTO() {
+
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -53,11 +57,13 @@ public class MetadatumDTO<S extends MetadataSubject> implements Metadatum {
 				.append(this.getPredicate(), that.getPredicate()).isEquals();
 	}
 
-	public S getSubject() {
+	@Override
+	public MetadataSubject getSubject() {
 		return subject;
 	}
 
-	public void setSubject(S subject) {
+	@Override
+	public void setSubject(MetadataSubject subject) {
 		this.subject = subject;
 	}
 

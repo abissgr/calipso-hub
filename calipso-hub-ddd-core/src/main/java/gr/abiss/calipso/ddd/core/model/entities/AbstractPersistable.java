@@ -42,6 +42,10 @@ public abstract class AbstractPersistable implements Persistable<String> {
 	@Column(name = "id", unique = true)
 	private String id;
 
+	public AbstractPersistable() {
+		super();
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this).append("id", this.getId()).toString();

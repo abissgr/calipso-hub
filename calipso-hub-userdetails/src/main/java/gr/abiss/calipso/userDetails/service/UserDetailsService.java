@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.userDetails.service;
 
+import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
@@ -35,5 +36,6 @@ public interface UserDetailsService extends CrudService<UserDetails, String> {
 
 	UserDetails confirmPrincipal(String confirmationToken);
 
-	UserDetails createForImplicitSignup(UserDetails loggedInUserDetails) throws DuplicateEmailException;
+	UserDetails createForImplicitSignup(LocalUser user)
+			throws DuplicateEmailException;
 }

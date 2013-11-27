@@ -18,7 +18,11 @@
 package gr.abiss.calipso.ddd.core.model.interfaces;
 
 
-public interface Metadatum {
+public interface Metadatum<S extends MetadataSubject> {
+
+	public abstract S getSubject();
+
+	public abstract void setSubject(S subject);
 
 	public abstract String getPredicate();
 

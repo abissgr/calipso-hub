@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.ddd.core.model.entities;
 
+import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 
 import javax.persistence.Column;
@@ -34,8 +35,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * annotations
  */
 @MappedSuperclass
-public abstract class AbstractMetadatum<S extends AbstractMetadataSubject>
-		extends AbstractPersistable implements Metadatum {
+public abstract class AbstractMetadatum<S extends MetadataSubject>
+		extends AbstractPersistable implements Metadatum<S> {
 
 	private static final long serialVersionUID = -1468517690700208260L;
 
@@ -49,6 +50,10 @@ public abstract class AbstractMetadatum<S extends AbstractMetadataSubject>
 
 	@Column(name = "object")
 	private String object;
+
+	public AbstractMetadatum() {
+		super();
+	}
 
 	public AbstractMetadatum(S subject, String predicate, String object) {
 		super();
@@ -77,10 +82,12 @@ public abstract class AbstractMetadatum<S extends AbstractMetadataSubject>
 				.append(this.getPredicate(), that.getPredicate()).isEquals();
 	}
 	
+	@Override
 	public S getSubject() {
 		return subject;
 	}
 
+	@Override
 	public void setSubject(S subject) {
 		this.subject = subject;
 	}

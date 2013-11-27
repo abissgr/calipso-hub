@@ -137,7 +137,9 @@ public abstract class UserDetailsController extends
 	@RequestMapping(value = "userDetails", method = RequestMethod.POST)
 	@ResponseBody
 	public gr.abiss.calipso.userDetails.model.UserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody gr.abiss.calipso.userDetails.model.UserDetails resource) {
-		gr.abiss.calipso.userDetails.model.UserDetails userDetails = resource != null ? super.create(resource) : new gr.abiss.calipso.userDetails.model.UserDetails();
+		gr.abiss.calipso.userDetails.model.UserDetails userDetails = resource != null ? this.service
+				.create(resource)
+				: new gr.abiss.calipso.userDetails.model.UserDetails();
 
 		// if success
 		SecurityUtil.login(request, response, userDetails, userDetailsConfig);

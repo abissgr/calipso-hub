@@ -64,6 +64,10 @@ public abstract class AbstractAuditable<U> extends AbstractPersistable
 	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
 	private Date lastModifiedDate;
 
+	public AbstractAuditable() {
+		super();
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this).appendSuper(super.toString()).toString();

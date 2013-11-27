@@ -19,6 +19,7 @@ package gr.abiss.calipso.userDetails.controller;
 
 import gr.abiss.calipso.userDetails.controller.form.RegistrationForm;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
+import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
@@ -163,14 +164,14 @@ public class ProviderSignInController extends org.springframework.social.connect
 		UserDetails registered = null;
 
 		try {
-			UserDetails user = new UserDetails();
+			SimpleLocalUser user = new SimpleLocalUser();
 			user.setEmail(userAccountData.getEmail());
 			user.setFirstName(userAccountData.getFirstName());
 			user.setLastName(userAccountData.getLastName());
 			user.setUserName(userAccountData.getUserName());
 			user.setUserPassword(userAccountData.getPassword());
 
-			registered = UserDetails.fromUser(userService.createForImplicitSignup(user));
+			registered = userService.createForImplicitSignup(user);
 		} catch (DuplicateEmailException ex) {
 			LOGGER.debug("An email address: {} exists.", userAccountData.getEmail());
 			addFieldError(MODEL_NAME_REGISTRATION_DTO, RegistrationForm.FIELD_NAME_EMAIL, userAccountData.getEmail(),

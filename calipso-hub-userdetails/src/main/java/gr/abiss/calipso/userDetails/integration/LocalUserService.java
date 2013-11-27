@@ -19,20 +19,35 @@ package gr.abiss.calipso.userDetails.integration;
 
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
+import java.io.Serializable;
+import java.util.Map;
 
 
 
-public interface LocalUserService<T extends LocalUser> {
+
+public interface LocalUserService<ID extends Serializable, T extends LocalUser> {
 
 	public T findByUserNameOrEmail(String userNameOrEmail);
 
 	public T createForImplicitSignup(LocalUser user) throws DuplicateEmailException;
 
-	public T findByCredentials(String userNameOrEmail, String userPassword);
+	/**
+	 * Get a local application user matching the given credentials, after adding
+	 * and possibly persisting the given metadata for the match, if any.
+	 * 
+	 * @param userNameOrEmail
+	 * @param userPassword
+	 * @param metadata
+	 * @return the local user or null if no match was found for the given
+	 *         credentials
+	 */
+	public T findByCredentials(String userNameOrEmail, String userPassword,
+			Map<String, String> metadata);
 
 	public T confirmPrincipal(String confirmationToken);
 
 	public void handlePasswordResetRequest(String userNameOrEmail);
 
 	public T handlePasswordResetToken(String userNameOrEmail, String token, String newPassword);
+
 }

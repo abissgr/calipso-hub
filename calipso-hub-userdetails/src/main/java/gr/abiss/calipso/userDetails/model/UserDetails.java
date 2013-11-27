@@ -17,7 +17,6 @@
  */
 package gr.abiss.calipso.userDetails.model;
 
-import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 import gr.abiss.calipso.ddd.core.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
@@ -25,11 +24,15 @@ import gr.abiss.calipso.userDetails.integration.LocalUser;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.util.Assert;
@@ -39,23 +42,45 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 @XmlRootElement(name = "loggedInUserDetails")
-public class UserDetails implements SocialUserDetails, LocalUser,
-		MetadataSubject<Metadatum> {
+public class UserDetails implements SocialUserDetails/*
+													 * , LocalUser ,
+													 * MetadataSubject
+													 * <Metadatum>
+													 */{
 	
 	private static final long serialVersionUID = 5206010308112791343L;
 
-	// TODO: move to JS client Model
-	public static void initRoles(UserDetails userDetails, Collection<? extends GrantedAuthority> authorities) {
-		if (!CollectionUtils.isEmpty(authorities)) {
-			for (GrantedAuthority authority : authorities) {
-				if (authority.getAuthority().equals("ROLE_ADMIN")) {
-					userDetails.isAdmin = true;
-				} else if (authority.getAuthority().equals("ROLE_MODERATOR")) {
-					userDetails.isModerator = true;
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(UserDetails.class);
+
+	public static UserDetails fromUser(LocalUser user) {
+		UserDetails details = null;
+		if (user != null) {
+			details = new UserDetails();
+			BeanUtils.copyProperties(user, details);
+			// init metadata
+			if (!CollectionUtils.isEmpty(user.getMetadata())) {
+				for (Metadatum metadatum : user.getMetadata().values()) {
+					details.addMetadatum(metadatum.getPredicate(),
+							metadatum.getObject());
+				}
+			}
+			// init global roles
+			if (!CollectionUtils.isEmpty(user.getRoles())) {
+				details.setAuthorities(user.getRoles());
+				for (GrantedAuthority authority : user.getRoles()) {
+					if (authority.getAuthority().equals("ROLE_ADMIN")) {
+						details.isAdmin = true;
+					} else if (authority.getAuthority()
+							.equals("ROLE_MODERATOR")) {
+						details.isModerator = true;
+					}
 				}
 			}
 		}
+		return details;
 	}
+
 	private String id;
 	private String firstName;
 	private String lastName;
@@ -82,18 +107,11 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 	private Collection<? extends GrantedAuthority> authorities;
 	private String confirmationToken;
 	private String resetPasswordToken;
-	private Map<String, Metadatum> metadata;
+	private Map<String, String> metadata;
 
-	public static UserDetails fromUser(LocalUser user) {
-		Assert.notNull(user);
-		UserDetails details = new UserDetails(user.getId(), user.getUserName(),
-				user.getUserPassword(), user.getEmail(), user.getActive(),
-				user.getRoles());
-		// details.setMetadata(user.getMetadata());
-		return details;
-	}
 
-	public UserDetails(Serializable id, String userName, String userPassword, String email, Boolean active,
+	private UserDetails(Serializable id, String userName, String userPassword,
+			String email, Boolean active,
 			Collection<? extends GrantedAuthority> roles) {
 		Assert.notNull(id);
 		Assert.notNull(userName);
@@ -108,7 +126,6 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 		this.email = email;
 		this.active = active;
 		this.authorities = roles;
-		UserDetails.initRoles(this, roles);
 	}
 
 	public UserDetails() {
@@ -117,10 +134,10 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this).append("id", this.id).append("userName", userName).append("userPassword", userPassword)
-				.append("email", email).toString();
+.append("email", email)
+				.append("metadata", metadata).toString();
 	}
 
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -129,42 +146,34 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 		this.id = id;
 	}
 
-	@Override
 	public String getFirstName() {
 		return firstName;
 	}
 
-	@Override
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
-	@Override
 	public String getLastName() {
 		return lastName;
 	}
 
-	@Override
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
 
-	@Override
 	public String getUserName() {
 		return userName;
 	}
 
-	@Override
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
 
-	@Override
 	public String getUserPassword() {
 		return userPassword;
 	}
 
-	@Override
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}
@@ -177,12 +186,10 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 		this.lastPassWordChangeDate = lastPassWordChangeDate;
 	}
 
-	@Override
 	public String getEmail() {
 		return email;
 	}
 
-	@Override
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -235,12 +242,10 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 		this.loginAttempts = loginAttempts;
 	}
 
-	@Override
 	public Boolean getActive() {
 		return active;
 	}
 
-	@Override
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
@@ -297,7 +302,6 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 		this.redirectUrl = redirectUrl;
 	}
 
-	@Override
 	public String getRedirectUrl() {
 		return this.redirectUrl;
 	}
@@ -305,6 +309,11 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return this.authorities;
+	}
+
+	public void setAuthorities(
+			Collection<? extends GrantedAuthority> authorities) {
+		this.authorities = authorities;
 	}
 
 	@Override
@@ -342,49 +351,34 @@ public class UserDetails implements SocialUserDetails, LocalUser,
 		return this.getId();
 	}
 
-	@Override
 	public void setConfirmationToken(String confirmationToken) {
 		this.confirmationToken = confirmationToken;
 	}
 
-	@Override
 	public void setResetPasswordToken(String resetPasswordToken) {
 		this.resetPasswordToken = resetPasswordToken;
 
 	}
 
-	@Override
 	public Collection<? extends GrantedAuthority> getRoles() {
 		return this.getAuthorities();
 	}
 
-	@Override
-	public Map<String, Metadatum> getMetadata() {
-		// TODO Auto-generated method stub
+	public Map<String, String> getMetadata() {
 		return this.metadata;
 	}
 
-	@Override
-	public void setMetadata(Map<String, Metadatum> metadata) {
+	public void setMetadata(Map<String, String> metadata) {
 		this.metadata = metadata;
 	}
 
-	@Override
-	public Metadatum addMetadatum(Metadatum metadatum) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Metadatum addMetadatum(String predicate, String object) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Class getMetadataDomainClass() {
-		// TODO Auto-generated method stub
-		return null;
+	public void addMetadatum(String predicate, String object) {
+		if (this.metadata == null) {
+			this.metadata = new HashMap<String, String>();
+		}
+		LOGGER.info("addMetadatum predicate: " + predicate + ", object: "
+				+ object);
+		this.metadata.put(predicate, object);
 	}
 
 }

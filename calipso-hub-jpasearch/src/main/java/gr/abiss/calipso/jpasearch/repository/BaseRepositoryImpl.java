@@ -17,7 +17,6 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
-import gr.abiss.calipso.ddd.core.model.dto.MetadatumDTO;
 import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
@@ -25,7 +24,10 @@ import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -35,6 +37,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 public class BaseRepositoryImpl<T, ID extends Serializable>
  extends SimpleJpaRepository<T, ID> implements
@@ -66,29 +70,56 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	}
 
 	@Override
-	public void addMetadatum(ID subjectId, MetadatumDTO dto) {
-		ensureMetadataIsSupported();
-		LOGGER.info("addMetadatum subjectId: " + subjectId + ", dto: " + dto);
-		Metadatum metadatum = this.findMetadatum(subjectId, dto.getPredicate());
-		LOGGER.info("addMetadatum metadatum: " + metadatum);
-		if(metadatum == null){
-			T entity = this.findOne(subjectId);
-//			Class<?> metadatumClass = ((MetadataSubject) entity)
-//				.getMetadataDomainClass();
-			MetadataSubject subject = (MetadataSubject) entity;
-			metadatum = this.createMetadatum(subject, dto.getPredicate(), dto.getObject());
+	public Metadatum addMetadatum(ID subjectId, String predicate, String object) {
+		Map<String, String> metadata = new HashMap<String, String>();
+		metadata.put(predicate, object);
+		List<Metadatum> saved = addMetadata(subjectId, metadata);
+		if (!CollectionUtils.isEmpty(metadata)) {
+			return saved.get(0);
 		} else {
-			// if exists, only update the value
-			metadatum.setObject(dto.getObject());
+			return null;
 		}
-		
-		// subject.addMetadatum(dto.getPredicate(), dto.getObject());
-		// this.entityManager.merge(entity);
-		this.entityManager.merge(metadatum);
+	}
+
+	@Override
+	public List<Metadatum> addMetadata(ID subjectId, Map<String, String> metadata) {
+		ensureMetadataIsSupported();
+		List<Metadatum> saved;
+		if (!CollectionUtils.isEmpty(metadata)) {
+			saved = new ArrayList<Metadatum>(metadata.size());
+			for (String predicate : metadata.keySet()) {
+				LOGGER.info("addMetadatum subjectId: " + subjectId + ", predicate: "
+						+ predicate);
+				Metadatum metadatum = this.findMetadatum(subjectId, predicate);
+				LOGGER.info("addMetadatum metadatum: " + metadatum);
+				if (metadatum == null) {
+					T entity = this.findOne(subjectId);
+					// Class<?> metadatumClass = ((MetadataSubject) entity)
+					// .getMetadataDomainClass();
+					MetadataSubject subject = (MetadataSubject) entity;
+					metadatum = this.buildMetadatum(subject, predicate,
+							metadata.get(predicate));
+					this.entityManager.persist(metadatum);
+				} else {
+					// if exists, only update the value
+					metadatum.setObject(metadata.get(predicate));
+					metadatum = this.entityManager.merge(metadatum);
+				}
+
+				// subject.addMetadatum(dto.getPredicate(), dto.getObject());
+				// this.entityManager.merge(entity);
+				LOGGER.info("addMetadatum saved metadatum: " + metadatum);
+				saved.add(metadatum);
+			}
+		} else {
+			saved = new ArrayList<Metadatum>(0);
+		}
+		LOGGER.info("addMetadatum returns: " + saved);
+		return saved;
 	}
 
 	@SuppressWarnings("unchecked")
-	private Metadatum createMetadatum(MetadataSubject subject,
+	private Metadatum buildMetadatum(MetadataSubject subject,
 			String predicate,
 			String object) {
 		Class<?> metadatumClass = subject
@@ -107,6 +138,8 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	@SuppressWarnings("unchecked")
 	@Override
 	public void removeMetadatum(ID subjectId, String predicate) {
+		Assert.notNull(subjectId);
+		Assert.notNull(predicate);
 		ensureMetadataIsSupported();
 		T subjectEntity = this.findOne(subjectId);
 		Class<?> metadatumClass = ((MetadataSubject) subjectEntity)
@@ -114,7 +147,9 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 		// TODO: refactor to criteria
 		Metadatum metadatum = findMetadatum(subjectId, predicate,
 				metadatumClass);
-		this.entityManager.remove(metadatum);
+		if (metadatum != null) {
+			this.entityManager.remove(metadatum);
+		}
 		// CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
 		// CriteriaQuery criteria = builder.createQuery(metadatumClass);
 		// Root root = criteria.from(metadatumClass);

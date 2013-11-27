@@ -19,7 +19,10 @@ package gr.abiss.calipso.ddd.core.model.entities;
 
 import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
+import gr.abiss.calipso.ddd.core.model.serializers.MetadataMapDeserializer;
+import gr.abiss.calipso.ddd.core.model.serializers.MetadatumToStringValueSerializer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +32,11 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
 import org.jodah.typetools.TypeResolver;
+import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Abstract base persistent class for auditable metadata bearing classes.
@@ -36,17 +44,24 @@ import org.jodah.typetools.TypeResolver;
  * javax.persistence.AssociationOverride annotations
  */
 @MappedSuperclass
-public abstract class AbstractAuditableMetadataSubject<M extends AbstractAuditabeMetadatum, U>
+public abstract class AbstractAuditableMetadataSubject<M extends Metadatum, U>
 		extends AbstractAuditable<U> implements MetadataSubject<M> {
 
 	private static final long serialVersionUID = -1468517690700208260L;
 	
 	@OneToMany(mappedBy = "subject", fetch = FetchType.EAGER)
 	@MapKey(name = "predicate")
+	@JsonDeserialize(using = MetadataMapDeserializer.class)
+	@JsonSerialize(contentUsing = MetadatumToStringValueSerializer.class)
 	private Map<String, M> metadata;
 
+	public AbstractAuditableMetadataSubject() {
+		super();
+	}
+
+	@JsonIgnore
 	@Override
-	public abstract Class<? extends Metadatum> getMetadataDomainClass();
+	public abstract Class<M> getMetadataDomainClass();
 
 	@Override
 	public Map<String, M> getMetadata() {
@@ -65,6 +80,15 @@ public abstract class AbstractAuditableMetadataSubject<M extends AbstractAuditab
 		}
 		metadatum.setSubject(this);
 		return this.getMetadata().put(metadatum.getPredicate(), metadatum);
+	}
+
+	@Override
+	public void addMetadata(Collection<M> metadata) {
+		if (!CollectionUtils.isEmpty(metadata)) {
+			for (M metadatum : metadata) {
+				this.addMetadatum(metadatum);
+			}
+		}
 	}
 
 	@Override
