@@ -17,6 +17,9 @@
  */
 package gr.abiss.calipso.jpasearch.specifications;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -55,7 +58,8 @@ public class StringPredicateFactory implements IPredicateFactory<String> {
 				predicate = cb.equal(cb.lower(root.<String> get(propertyName)), val.toLowerCase());
 			}
 		} else {// if (propertyValues.length == 2) {
-			predicate = cb.between(root.<String> get(propertyName), propertyValues[0], propertyValues[1]);
+			List<String> wordList = Arrays.asList(propertyValues);
+			predicate = cb.isTrue(root.<String> get(propertyName).in(wordList));
 		}
 		return predicate;
 	}
