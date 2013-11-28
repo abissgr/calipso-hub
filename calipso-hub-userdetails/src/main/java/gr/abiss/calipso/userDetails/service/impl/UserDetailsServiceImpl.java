@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +178,13 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		}
 		LOGGER.debug("getPrincipal, principal: " + principal);
-		return (UserDetails) principal;
+		if (principal != null
+				&& UserDetails.class.isAssignableFrom(principal.getClass())) {
+			return (UserDetails) principal;
+		} else {
+			return null;
+		}
+
 	}
 
 	@Override
