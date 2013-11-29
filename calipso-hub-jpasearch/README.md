@@ -4,80 +4,94 @@ Provides generic, reflection based search services and form schemas [1] for arbi
 Property types supported by the provided Spring specifications
 are Boolean, Date, enum, ManyToOne (for members extending Spring's AbstractPersistable) and String.
 
-## Howto
-
 To use this module in your RESTHub project you need to do the following:
 
 0) Include the dependency in your project's Maven POM (TODO: point to repo):
 
 ```xml
-<dependency>
-    <groupId>gr.abiss.calipso</groupId>
-    <artifactId>calipso-hub-jpasearch</artifactId>
-	<version>${project.version}</version>
-</dependency>
+    <!-- dependency -->
+    <dependency>
+        <groupId>gr.abiss.calipso</groupId>
+        <artifactId>calipso-hub-jpasearch</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+
+
+    <!-- repositories -->
+    <repository>
+        <id>sonatype-snapshot</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+    <repository>
+        <id>sonatype-release</id>
+        <url>https://oss.sonatype.org/content/repositories/releases</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
 ```
 
 1) Have your entities implement org.springframework.data.domain.Persistable
 
 ```java
-import org.springframework.data.domain.Persistable;
+    import org.springframework.data.domain.Persistable;
 
-@Entity
-@Table(name = "users")
-public class User implements Persistable<String> {
+    @Entity
+    @Table(name = "users")
+    public class User implements Persistable<String> {
 //...
 ```
 
 2) Add Calipso's custom repository factory in your Spring config:
 
 ```xml
-<!-- Dynamic JPA Search -->
-<jpa:repositories base-package="my.package" 
-	factory-class="gr.abiss.calipso.jpasearch.repository.RepositoryFactoryBean" />
+    <!-- Dynamic JPA Search -->
+    <jpa:repositories base-package="my.package" 
+        factory-class="gr.abiss.calipso.jpasearch.repository.RepositoryFactoryBean" />
 ```
 see also "1.3.2 Adding custom behavior to all repositories" [2].
 
 3) Have your repository interfaces extend BaseRepository:
 
 ```java
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
+    import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 
-public interface UserRepository extends BaseRepository<User, String> {
-}
+    public interface UserRepository extends BaseRepository<User, String> {
+    // ...
+    }
 ```
 
 4) Have your service interfaces extend GenericService instead of RESTHub's CrudService:
 
 ```java
-import gr.abiss.calipso.jpasearch.service.GenericService;
+    import gr.abiss.calipso.jpasearch.service.GenericService;
 
-public interface UserService extends GenericService<User, String> {
-}
+    public interface UserService extends GenericService<User, String> {
+    }
 ```
 
 5) Similarly, have your service implementations extend GenericServiceImpl:
 
 ```java
-import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
+    import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
 
-@Named("userService")
-public class UserServiceImpl 
-	extends GenericServiceImpl<User, String, UserRepository> 
-	implements UserService {
-}
+    @Named("userService")
+    public class UserServiceImpl extends GenericServiceImpl<User, String, UserRepository> implements UserService {
+    }
 ```
 
 6) Have the appropriate controllers extend gr.abiss.calipso.jpasearch.controller.AbstractServiceBasedRestController
 instead of RESTHub's ServiceBasedRestController:
 
 ```java
-import gr.abiss.calipso.jpasearch.controller.AbstractServiceBasedRestController;
+    import gr.abiss.calipso.jpasearch.controller.AbstractServiceBasedRestController;
 
-@Controller
-@RequestMapping(value = "/api/user", produces = { "application/json", "application/xml" })
-public class UserController 
-	extends AbstractServiceBasedRestController<User, String, UserService> {
+    @Controller
+    @RequestMapping(value = "/api/user", produces = { "application/json", "application/xml" })
+    public class UserController extends AbstractServiceBasedRestController<User, String, UserService> {
 }
 ```
 
