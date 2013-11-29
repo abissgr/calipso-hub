@@ -31,8 +31,8 @@ import javax.persistence.MapKey;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
-import org.jodah.typetools.TypeResolver;
 import org.springframework.util.CollectionUtils;
+import org.jodah.typetools.TypeResolver;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

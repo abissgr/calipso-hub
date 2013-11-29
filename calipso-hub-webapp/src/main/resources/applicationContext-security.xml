@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:http="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	
+	<!-- Calipso UserDetailsService implementation -->
+    <bean id="userDetailsService" 
+    	class="gr.abiss.calipso.userDetails.service.impl.UserDetailsServiceImpl" 
+    	autowire="byType" />
+	<!-- and an alias for the LovalUser service -->
+	
+	<!-- Do not create sessions -->
+	<bean id="securityContextPersistenceFilter"
+		class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+		<property name='securityContextRepository'>
+		<bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
+		  <property name='allowSessionCreation' value='false' />
+		</bean>
+		</property>
+	</bean>
+	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"  use-expressions="true"
+		disable-url-rewriting="true">
+		<!-- Enables Spring Security CSRF protection
+        <sec:csrf/>
+         -->
+		<sec:http-basic />
+		
+		<!-- REST client login -->
+		<sec:intercept-url pattern="/apiauth/**" access="permitAll"/>
+		<!-- for spring social login/signup -->
+		<sec:intercept-url pattern="/auth/**" access="permitAll"/>
+        <sec:intercept-url pattern="/login" access="permitAll"/>
+        <sec:intercept-url pattern="/signin/**" access="permitAll"/>
+        <sec:intercept-url pattern="/signup/**" access="permitAll"/>
+        <sec:intercept-url pattern="/user/register/**" access="permitAll"/>
+		
+		<sec:intercept-url pattern="/api/rest/user/**" method="POST" access="permitAll" />
+		<sec:intercept-url pattern="/api/rest/user/**" method="PUT" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/api/rest/**" method="DELETE" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/**" method="OPTIONS" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/**" method="POST" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/api/rest/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
+		
+		<sec:logout invalidate-session="true" />
+		
+        <!-- Adds social authentication filter to the Spring Security filter chain. 
+        <sec:custom-filter ref="socialAuthenticationFilter" before="PRE_AUTH_FILTER" />-->
+	</sec:http>
+
+	<!-- Declare an authentication-manager to use custom userDetailsService implementations -->
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider user-service-ref='userDetailsService' />
+		<sec:authentication-provider ref="socialAuthenticationProvider"/>
+	</sec:authentication-manager>
+	
+	<!-- To enable Method Security Expressions and custom PermissionEvaluator
+		we need to add the following 
+	<sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled">
+		<sec:expression-handler ref="expressionHandler" />
+	</sec:global-method-security>
+	-->
+	<sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" />
+	
+	<!-- To use hasPermission() expressions, we have to configure a PermissionEvaluator -->
+	<!-- See 15.3.2 Built-In Expression 
+			@http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator 
+	<bean id="expressionHandler"
+		class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+		<property name="permissionEvaluator" ref="customPermissionEvaluator" />
+		<property name = "roleHierarchy" ref="roleHierarchy"/>
+	</bean>
+	-->
+	
+	<!-- Declare a custom PermissionEvaluator interface 
+	<bean class="my.CustomPermissionEvaluator" id="customPermissionEvaluator"/>
+	-->
+  
+	<!-- http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/access/hierarchicalroles/RoleHierarchyImpl.html 
+	<bean id="roleHierarchy"  class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
+	    <property name="hierarchy">
+	        <value>
+	            ROLE_ADMIN > ROLE_MODERATOR
+	            ROLE_MODERATOR > ROLE_USER
+	            ROLE_USER > ROLE_VISITOR
+	        </value>
+	    </property>
+	</bean>
+	-->
+	
+	<!--
+	Configures the social authentication filter which integrates Spring Social
+	with Spring Security.
+    <bean id="socialAuthenticationFilter" class="org.springframework.social.security.SocialAuthenticationFilter">
+        <constructor-arg index="0" ref="authenticationManager"/>
+        <constructor-arg index="1" ref="userIdSource"/>
+        <constructor-arg index="2" ref="usersConnectionRepository"/>
+        <constructor-arg index="3" ref="connectionFactoryLocator"/>
+
+	    <property name="signupUrl" value="/register" />
+        <property name="postLoginUrl" value="/manager/"/>
+        
+        
+    </bean>	
+	-->
+
+ 
+
+	
+    <!--
+	This bean encrypts the authorization details of the connection. In
+	our example, the authorization details are stored as plain text.
+	DO NOT USE THIS IN PRODUCTION.
+	-->
+    <bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" factory-method="noOpText" />
+
+
+</beans>

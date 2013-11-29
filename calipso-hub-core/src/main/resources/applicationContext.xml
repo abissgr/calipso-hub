@@ -17,26 +17,44 @@
     You should have received a copy of the GNU Affero General Public License
     along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
 
--->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+--><beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task" 
        xmlns:tx="http://www.springframework.org/schema/tx" 
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/context
-                           http://www.springframework.org/schema/context/spring-context.xsd
-                           http://www.springframework.org/schema/data/jpa
-                           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-					       http://www.springframework.org/schema/tx 
-					       http://www.springframework.org/schema/tx/spring-tx.xsd">
-
-    <context:component-scan base-package="gr.abiss, org.resthub" />
-	<!-- Dynamic JPA Search -->
-    <jpa:repositories base-package="gr.abiss, org.resthub" 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd        
+        http://www.springframework.org/schema/data/jpa
+        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+    
+    <context:component-scan base-package="
+    	gr.abiss.calipso.controller, 
+    	gr.abiss.calipso.model, 
+    	gr.abiss.calipso.repository, 
+    	gr.abiss.calipso.service, 
+    	gr.abiss.calipso.jpasearch, 
+    	gr.abiss.calipso.userDetails, 
+    	gr.abiss.calipso.spring, 
+    	gr.abiss.calipso.utils, 
+    	org.resthub" />
+    <jpa:repositories base-package="
+    	gr.abiss.calipso.controller, 
+    	gr.abiss.calipso.model, 
+    	gr.abiss.calipso.repository, 
+    	gr.abiss.calipso.service, 
+    	gr.abiss.calipso.jpasearch, 
+    	gr.abiss.calipso.userDetails, 
+    	gr.abiss.calipso.spring, 
+    	gr.abiss.calipso.utils, 
+    	org.resthub" 
     	factory-class="gr.abiss.calipso.jpasearch.repository.RepositoryFactoryBean" />
-    	
+    
    	<!-- THYMELEAF: Template Resolver for email templates -->
 	<bean id="emailTemplateResolver" class="org.thymeleaf.templateresolver.ClassLoaderTemplateResolver">
 	  <property name="prefix" value="mail/" />
@@ -44,8 +62,14 @@
 	  <property name="characterEncoding" value="UTF-8" />
 	  <property name="order" value="1" />
 	</bean> 
-
+	<!--bean id="webTemplateResolver" class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
+        <property name="prefix" value="/WEB-INF/templates/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML5" />
+	  	<property name="characterEncoding" value="UTF-8" />
+    </bean-->
 	<!-- THYMELEAF: Template Engine (Spring3-specific version) -->
+	
 	<bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
 	  <property name="templateResolvers">
 	    <set>
@@ -53,5 +77,5 @@
 	      <!-- ref bean="webTemplateResolver" /-->
 	    </set>
 	  </property>
-	</bean> 
+	</bean>
 </beans>

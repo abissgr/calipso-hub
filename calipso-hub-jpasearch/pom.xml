@@ -49,44 +49,27 @@
             <groupId>gr.abiss.calipso</groupId>
             <artifactId>calipso-hub-ddd-core</artifactId>
         </dependency>
-    	
-		
-		<!-- RESTHub -->
-		<dependency>
-			<groupId>org.resthub</groupId>
-			<artifactId>resthub-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.resthub</groupId>
-			<artifactId>resthub-web-server</artifactId>
-		</dependency>
-
-		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-		</dependency>
-		
-		<!-- JAVAX -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
-		
-		
-		<!-- COMMONS -->
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>gr.abiss.calipso</groupId>
+            <artifactId>calipso-hub-userdetails</artifactId>
+        </dependency>
+        <!-- javax servlet stuff -->
+			<dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+            </dependency>
+	        <dependency>
+	            <groupId>javax.servlet.jsp</groupId>
+	            <artifactId>jsp-api</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>javax.servlet</groupId>
+	            <artifactId>jstl</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>taglibs</groupId>
+	            <artifactId>standard</artifactId>
+	        </dependency>
 	</dependencies>
 
 </project>

@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * javax.persistence.AssociationOverride annotations
  */
 @MappedSuperclass
-public abstract class AbstractAuditableMetadataSubject<M extends Metadatum, U>
+public abstract class AbstractAuditableMetadataSubject<M extends Metadatum, U extends AbstractPersistable>
 		extends AbstractAuditable<U> implements MetadataSubject<M> {
 
 	private static final long serialVersionUID = -1468517690700208260L;

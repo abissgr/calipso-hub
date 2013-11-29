@@ -5,7 +5,7 @@
 
     <parent>
         <artifactId>calipso-hub</artifactId>
-        <groupId>gr.abiss.calipso</groupId>
+        <groupId>gr.abiss.calipso</groupId>	
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -54,36 +54,27 @@
             <groupId>gr.abiss.calipso</groupId>
             <artifactId>calipso-hub-userdetails</artifactId>
         </dependency>
-        
-    	<!-- RESTHub -->
         <dependency>
-            <groupId>org.resthub</groupId>
-            <artifactId>resthub-jpa</artifactId>
+            <groupId>gr.abiss.calipso</groupId>
+            <artifactId>calipso-hub-ddd-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.resthub</groupId>
-            <artifactId>resthub-web-server</artifactId>
-        </dependency>
-        
-        <!--  Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-		</dependency>
-        
-        
+        <!-- javax servlet stuff -->
+			<dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+            </dependency>
+	        <dependency>
+	            <groupId>javax.servlet.jsp</groupId>
+	            <artifactId>jsp-api</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>javax.servlet</groupId>
+	            <artifactId>jstl</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>taglibs</groupId>
+	            <artifactId>standard</artifactId>
+	        </dependency>
     </dependencies>
 
 </project>

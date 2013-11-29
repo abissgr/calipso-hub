@@ -1,6 +1,6 @@
 define(['backbone'], function(Backbone) {
     var UserModel = Backbone.Model.extend({
-    	url : "/api/user",
+    	url : "/api/rest/user",
         defaults: {
           //  firstName: "empty name"
         },

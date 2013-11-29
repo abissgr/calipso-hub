@@ -13,7 +13,7 @@
     <name>calipso-hub-webapp</name>
     <groupId>gr.abiss.calipso</groupId>
     <artifactId>calipso-hub-webapp</artifactId>
-
+	<packaging>war</packaging>
     <properties>
     	<project.parent.basedir>../</project.parent.basedir>
     </properties>
@@ -36,7 +36,32 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 			</plugin>
+			<plugin>
+	                <groupId>org.mortbay.jetty</groupId>
+	                <artifactId>jetty-maven-plugin</artifactId>
+	                <version>${jetty.version}</version>
+	                <configuration>
+	                    <!-- We use non NIO connector in order to avoid read only static files under windows -->
+	                    <connectors>
+	                        <connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
+	                            <port>${jetty.port}</port>
+	                            <maxIdleTime>60000</maxIdleTime>
+	                            <requestBufferSize>30000</requestBufferSize>
+	                            <requestHeaderSize>30000</requestHeaderSize>
+	                        </connector>
+	                    </connectors>
+	                    <webAppConfig>
+	                    	<!--extraClasspath>${basedir}/target/classes/;${basedir}/etc/jetty/classes/</extraClasspath-->
+	                    	<unpackOverlays>true</unpackOverlays>
+	                    </webAppConfig>
+	                    <!--webAppSourceDirectory>${project.build.directory}/${project.name}${project.version}</webAppSourceDirectory-->
+	                    <!-- To run the optimized version of the webapp -->
+	                    <!-- do a 'mvn package -Poptimize' and uncomment the following line -->
+	                    <!-- webAppSourceDirectory>D:\\Workspaces\\resthub\\resthub-archetypes\\resthub-jpa-backbonejs-multi-archetype/target/resthub-jpa-backbonejs-multi-archetype-2.0-rc4</webAppSourceDirectory -->
+	                </configuration>
+	            </plugin>
     	</plugins>
+    	
     </build>
     
     <dependencies>
@@ -45,11 +70,6 @@
             <artifactId>calipso-hub-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-		</dependency>
         
         <dependency>
             <groupId>org.resthub</groupId>
@@ -64,6 +84,35 @@
 			<artifactId>urlrewritefilter</artifactId>
 			<version>${urlrewritefilter.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.googlecode.flyway</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>${flyway-core.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		
+		<!-- javax servlet stuff -->
+			<dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+            </dependency>
+	        <dependency>
+	            <groupId>javax.servlet.jsp</groupId>
+	            <artifactId>jsp-api</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>javax.servlet</groupId>
+	            <artifactId>jstl</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>taglibs</groupId>
+	            <artifactId>standard</artifactId>
+	        </dependency>
     </dependencies>
 
     <profiles>

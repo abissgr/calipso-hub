@@ -1,0 +1,110 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:twitter="http://www.springframework.org/schema/social/twitter"
+       xmlns:github="http://www.springframework.org/schema/social/github"
+       xmlns:linkedin="http://www.springframework.org/schema/social/linkedin"
+       xmlns:social="http://www.springframework.org/schema/social"
+       xmlns:facebook="http://www.springframework.org/schema/social/facebook"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+http://www.springframework.org/schema/social http://www.springframework.org/schema/social/spring-social-1.1.xsd
+http://www.springframework.org/schema/social/twitter http://www.springframework.org/schema/social/spring-social-twitter.xsd
+http://www.springframework.org/schema/social/linkedin http://www.springframework.org/schema/social/spring-social-linkedin.xsd 
+http://www.springframework.org/schema/social/github http://www.springframework.org/schema/social/spring-social-github.xsd 
+http://www.springframework.org/schema/social/facebook http://www.springframework.org/schema/social/spring-social-facebook.xsd
+http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!-- Configuration Properties  -->
+    <context:property-placeholder location="classpath:calipso.defaults.properties"/>
+    <context:property-placeholder location="classpath:calipso.properties"/>
+    
+     <!--
+	Configures the social authentication provider which processes authentication requests
+	made by using supported social authentication services (FB, Twitter and so on).
+	-->
+    <bean id="socialAuthenticationProvider" class="org.springframework.social.security.SocialAuthenticationProvider">
+        <constructor-arg index="0" ref="usersConnectionRepository"/>
+        <constructor-arg index="1" ref="userDetailsService"/>
+    </bean>
+
+    <!--
+	This bean determines the account ID of the user. The example application
+	uses the username as the account ID.
+	-->
+    <bean id="userIdSource" class="org.springframework.social.security.AuthenticationNameUserIdSource"/>
+    
+
+	<!-- Configures FB and Twitter support.
+	<facebook:config app-id="${facebook.clientId}"      app-secret="${facebook.clientSecret}"  />
+	<twitter:config  app-id="${twitter.consumerKey}"    app-secret="${twitter.consumerSecret}" />
+    <linkedin:config app-id="${linkedin.consumerKey}"   app-secret="${linkedin.consumerSecret}" />
+	 -->
+	<!--bean id="connectionFactoryLocator" class="org.springframework.social.security.SocialAuthenticationServiceRegistry"-->
+	<bean id="connectionFactoryLocator" class="org.springframework.social.connect.support.ConnectionFactoryRegistry">
+	    <!--property name="authenticationServices"-->
+	    <!--aop:scoped-proxy proxy-target-class="false" /-->
+	    <property name="connectionFactories">
+	        <list>
+	            <bean class="org.springframework.social.facebook.connect.FacebookConnectionFactory">
+	                <constructor-arg value="${facebook.clientId}" />
+	                <constructor-arg value="${facebook.clientSecret}" />
+	                <!--property name="defaultScope" value="email" /-->
+	                <property name="scope" value="email" />
+	            </bean>
+				 <bean class="org.springframework.social.github.connect.GitHubConnectionFactory">
+				 	<constructor-arg value="${github.clientId}" />
+				 	<constructor-arg value="${github.clientSecret}" />
+	                <property name="scope" value="user, user:email" />
+				 </bean>
+				<bean class="org.springframework.social.twitter.connect.TwitterConnectionFactory">
+	                <constructor-arg value="${twitter.consumerKey}" />
+	                <constructor-arg value="${twitter.consumerSecret}" />				
+	            </bean>
+				<bean class="org.springframework.social.linkedin.connect.LinkedInConnectionFactory">
+					<constructor-arg value="${linkedin.consumerKey}" />
+					<constructor-arg value="${linkedin.consumerSecret}" />
+				</bean>
+	        </list>
+	    </property>
+	</bean>
+	<!--twitter:config  app-id="${twitter.consumer.key}" app-secret="${twitter.consumer.secret}" /-->
+
+	<!-- Configures the connection repository. This application uses JDBC connection 
+		repository which saves connection details to database. This repository uses 
+		the data source bean for obtaining database connection. -->
+	<social:jdbc-connection-repository connection-signup-ref="userDetailsService" />
+	<!--bean id="usersConnectionRepository"
+        class="org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository">
+        <aop:scoped-proxy proxy-target-class="false" />
+        <constructor-arg ref="dataSource" />
+        <constructor-arg ref="connectionFactoryLocator" />
+        <constructor-arg ref="textEncryptor" />
+	        <property name="connectionSignUp" ref="userDetailsService" /> 
+	</bean>
+	<bean id="connectionRepository" factory-method="createConnectionRepository" factory-bean="usersConnectionRepository" scope="request">
+        <constructor-arg value="#{request.userPrincipal.principal.id}" />
+        <aop:scoped-proxy proxy-target-class="false" />
+    </bean-->
+
+	<!-- This bean manages the connection flow between the account provider 
+		and the example application. -->
+	<bean id="connectController"
+		class="org.springframework.social.connect.web.ConnectController"
+		autowire="constructor" />
+		<!-- public ProviderSignInController(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository, SignInAdapter signInAdapter) {-->
+	
+	<bean class="gr.abiss.calipso.userDetails.controller.ProviderSignInController">
+		<constructor-arg ref="dataSource" />
+	    <property name="signUpUrl" value="/signin/popup/register" />
+	    <property name="postSignInUrl" value="/signin/popup/remember" />
+	    <property name="applicationUrl" value="${calipso.baseurl}" />
+	    <property name="signInInterceptors">
+	        <list>
+	            <bean class="gr.abiss.calipso.userDetails.util.FacebookConnectInterceptor" />
+	        </list>
+	    </property>
+	</bean>
+</beans>

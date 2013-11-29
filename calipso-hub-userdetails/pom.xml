@@ -49,95 +49,22 @@
             <artifactId>calipso-hub-ddd-core</artifactId>
         </dependency>
 
-		
-		<!-- RESTHub -->
-		<dependency>
-			<groupId>org.resthub</groupId>
-			<artifactId>resthub-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.resthub</groupId>
-			<artifactId>resthub-web-server</artifactId>
-		</dependency>
-
-		<!-- Spring -->
-		
-        <!--  Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-aop</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-			<!-- dependency>
-			 <groupId>org.springframework.data</groupId>
-			 <artifactId>spring-data-jpa</artifactId>
-			 <version>${spring-data-jpa.version}</version>
-			</dependency--> 
-        <!-- Spring security -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-autoconfigure</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<!-- spring social -->
-		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-core</artifactId>
-		</dependency> 
-		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-security</artifactId>
-		</dependency> 
-		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-web</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-facebook</artifactId>
-		</dependency>
+		<!-- javax servlet stuff -->
 			<dependency>
-			    <groupId>org.springframework.social</groupId>
-			    <artifactId>spring-social-github</artifactId>
-			</dependency>
-		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		</dependency>
-		
-		<!-- JAVAX -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
-		
-		
-		<!-- COMMONS -->
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+            </dependency>
+	        <dependency>
+	            <groupId>javax.servlet.jsp</groupId>
+	            <artifactId>jsp-api</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>javax.servlet</groupId>
+	            <artifactId>jstl</artifactId>
+	        </dependency>
+	        <dependency>
+	            <groupId>taglibs</groupId>
+	            <artifactId>standard</artifactId>
+	        </dependency>
 	</dependencies>
 </project>

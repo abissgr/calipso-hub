@@ -12,6 +12,33 @@ provided in this module:
  - `org.springframework.social.connect.web.SignInAdapter`
 
 
+## <a name="maven"> Maven configuration
+
+```xml
+    <!-- dependency -->
+    <dependency>
+        <groupId>gr.abiss.calipso</groupId>
+        <artifactId>calipso-hub-userdetails</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+
+
+    <!-- repositories -->
+    <repository>
+        <id>sonatype-snapshot</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+    <repository>
+        <id>sonatype-release</id>
+        <url>https://oss.sonatype.org/content/repositories/releases</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
+```
 
 ## <a name="userDetailsConfig"> Get started: userDetailsConfig
 
@@ -21,9 +48,9 @@ implementation:
 
 ```xml
     <bean id="userDetailsConfig" class="gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig">
-	<constructor-arg value="${cookiesBasicAuthTokenName}" />
-	<constructor-arg value="${cookiesDomain}" />
-	<constructor-arg value="/" />
+        <constructor-arg value="${cookiesBasicAuthTokenName}" />
+        <constructor-arg value="${cookiesDomain}" />
+        <constructor-arg value="/" />
     </bean>
 ```
 

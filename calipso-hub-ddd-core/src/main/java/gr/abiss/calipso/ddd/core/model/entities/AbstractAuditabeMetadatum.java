@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * annotations
  */
 @MappedSuperclass
-public abstract class AbstractAuditabeMetadatum<S extends MetadataSubject, U>
+public abstract class AbstractAuditabeMetadatum<S extends MetadataSubject, U extends AbstractPersistable>
 		extends AbstractAuditable<U> implements Metadatum<S> {
 
 	private static final long serialVersionUID = -1468517690700208260L;

@@ -22,6 +22,12 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.userDetails.integration.LocalUserService;
+import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
+
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,9 +36,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
+import org.springframework.util.CollectionUtils;
 
 @Named("userService")
-public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepository> implements UserService {
+public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepository> 
+	implements UserService, LocalUserService<String, User> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -52,11 +60,74 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 	}
 
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public User findByCredentials(String userNameOrEmail, String password) {
-		return this.repository.findByCredentials(userNameOrEmail, password);
+		return this.findByCredentials(userNameOrEmail, password, null); 
+	}
+	
+
+	/**
+	 * {@inheritDoc}
+	 * @see gr.abiss.calipso.userDetails.integration.LocalUserService#findByCredentials(java.lang.String, java.lang.String, java.util.Map)
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public User findByCredentials(String userNameOrEmail, 	String password, Map metadata) {
+		User localUser = this.repository.findByCredentials(userNameOrEmail, password);
+		if (localUser != null && !CollectionUtils.isEmpty(metadata)) {
+			localUser.addMetadata((List) this.repository.addMetadata(localUser.getId(), metadata));
+		}
+		return localUser;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User findByUserNameOrEmail(String userNameOrEmail) {
+		return this.repository.findByUserNameOrEmail(userNameOrEmail);
 	}
 
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User createForImplicitSignup(LocalUser user)
+			throws DuplicateEmailException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User confirmPrincipal(String confirmationToken) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void handlePasswordResetRequest(String userNameOrEmail) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User handlePasswordResetToken(String userNameOrEmail,
+			String token, String newPassword) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

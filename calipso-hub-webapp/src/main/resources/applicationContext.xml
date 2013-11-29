@@ -1,121 +1,80 @@
-<!--
-
-    Copyright (c) 2007 - 2013 www.Abiss.gr
-
-    This file is part of Calipso, a software platform by www.Abiss.gr.
-
-    Calipso is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Calipso is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
-
--->
-<!-- Copyright (c) 2007 - 2013 www.Abiss.gr This file is part of Calipso, 
-	a software platform by www.Abiss.gr. Calipso is free software: you can redistribute 
-	it and/or modify it under the terms of the GNU Affero General Public License 
-	as published by the Free Software Foundation, either version 3 of the License, 
-	or (at your option) any later version. Calipso is distributed in the hope 
-	that it will be useful, but WITHOUT ANY WARRANTY; without even the implied 
-	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-	GNU Affero General Public License for more details. You should have received 
-	a copy of the GNU General Public License along with Calipso. If not, see 
-	http://www.gnu.org/licenses/agpl.html -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:sec="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:task="http://www.springframework.org/schema/task" xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task"
     xmlns:tx="http://www.springframework.org/schema/tx" 
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        
-        http://www.springframework.org/schema/security 
-        http://www.springframework.org/schema/security/spring-security.xsd
-        
-        http://www.springframework.org/schema/data/jpa
-        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-        
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context.xsd
-        
-        http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util.xsd
-        
-        http://www.springframework.org/schema/task
-        http://www.springframework.org/schema/task/spring-task.xsd
-        
-        http://www.springframework.org/schema/mvc
-        http://www.springframework.org/schema/mvc/spring-mvc.xsd
-        
-        http://www.springframework.org/schema/tx 
-        http://www.springframework.org/schema/tx/spring-tx.xsd">
+    xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans.xsd
+        hhttp://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+        http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util      http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/task      http://www.springframework.org/schema/task/spring-task.xsd
+        http://www.springframework.org/schema/tx        http://www.springframework.org/schema/tx/spring-tx.xs
+        http://www.springframework.org/schema/mvc       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<bean class="gr.abiss.calipso.spring.LoggingHandlerExceptionResolver" />
-
-	<!-- Executor for the methods marked wiht @async annotations -->
-	<task:executor id="asyncExecutor" pool-size="25" />
-	<!-- Configuration for the Runtime -->
-	<task:annotation-driven executor="asyncExecutor" />
-	<!--tx:annotation-driven transaction-manager="transactionManager"/-->
+	<bean class="org.resthub.web.LoggingHandlerExceptionResolver" />
+	<bean class="org.springframework.orm.hibernate4.HibernateExceptionTranslator"/>
+    <!--  Executor for the methods marked with @async annotations --> 
+	<task:executor id="asyncExecutor" pool-size="25" /> 
+	<!--  Configuration for the Runtime --> 
+	<task:annotation-driven executor="asyncExecutor" /> 
 	
-	<!-- Do not create sessions -->
-	<bean id="securityContextPersistenceFilter"
-		class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
-		<property name='securityContextRepository'>
-			<bean
-				class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
-				<property name='allowSessionCreation' value='false' />
-			</bean>
-		</property>
-	</bean>
-	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"
-		use-expressions="true">
-		<sec:http-basic />
-		<!-- sec:intercept-url pattern="/api/user/**"
-			method="POST" access="permitAll" />
-		<sec:intercept-url pattern="/api/user/**"
-			method="PUT" access="hasRole('ROLE_USER')" /-->
-		<sec:logout />
-	</sec:http>
+    <!-- Configuration Properties  -->
+    <context:property-placeholder location="classpath:calipso.defaults.properties"/>
+    <context:property-placeholder location="classpath:calipso.properties"/>
+    
+	
+	<!--mvc:annotation-driven/-->
 
-	<sec:authentication-manager alias="authenticationManager">
-		<sec:authentication-provider
-			user-service-ref='userDetailsService' />
-	</sec:authentication-manager>
-	<sec:global-method-security
-		secured-annotations="enabled" />
-	<!-- Fixes? parsing of path variables containing dots -->
-	<bean
-		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-		<property name="useDefaultSuffixPattern" value="false" />
-	</bean>
-	<context:property-placeholder location="classpath:calipso.defaults.properties" />
-	<!-- Configuration Properties <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
-		<property name="location" value="classpath:configuration.properties"/> </bean> -->
+    <mvc:resources mapping="/static/**" location="/static/"/>
+    
+    <!--mvc:default-servlet-handler/-->
 
-	<!-- Message externalization/internationalization -->
-	<bean id="messageSource"
-		class="org.springframework.context.support.ResourceBundleMessageSource">
-		<property name="basename" value="Messages" />
-	</bean>
+    <!-- Message externalization/internationalization -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="i18n/messages"/>
+        <property name="useCodeAsDefaultMessage" value="true"/>
+    </bean>
+    
 	<!-- Email Sender -->
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="host" value="${mail.server.host}" />
-		<property name="port" value="${mail.server.port}" />
-		<property name="protocol" value="${mail.server.protocol}" />
-		<!--property name="username" value="${mail.server.username}" /> <property 
-			name="password" value="${mail.server.password}" / -->
-		<property name="javaMailProperties">
-			<util:properties location="classpath:javamail.properties" />
-		</property>
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+	    <property name="host" value="${mail.server.host}" />
+	    <property name="port" value="${mail.server.port}" />
+	    <property name="protocol" value="${mail.server.protocol}" />
+	    <!--property name="username" value="${mail.server.username}" />
+	    <property name="password" value="${mail.server.password}" /-->
+	    <property name="javaMailProperties">
+	        <util:properties location="classpath:javamail.properties" />
+	    </property>
 	</bean>
+	
+	<!-- Flyway: automated databace migration
+	<bean id="flyway" class="com.googlecode.flyway.core.Flyway" init-method="migrate">
+	    <property name="dataSource" ref="dataSource"/>
+	    <property name="initOnMigrate" value="true"/>
+	</bean> -->
+	<!-- JSP views setup -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+    </bean>
+	
+	<!-- imports -->
+	<import resource="applicationContext-security.xml" />
+	<import resource="applicationContext-social.xml" />
+	
+	
 
-
+    <bean id="userDetailsConfig" class="gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig">
+	 	<constructor-arg value="calipso-sso" />
+	 	<constructor-arg value="${calipso.domain}" />
+	 	<constructor-arg value="/" />
+    </bean>
+    <alias name="userService" alias="localUserService"/>
 </beans>

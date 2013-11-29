@@ -41,13 +41,15 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * Abstract base class for all auditable persistent entities
  */
 @MappedSuperclass
-public abstract class AbstractAuditable<U> extends AbstractPersistable
+public abstract class AbstractAuditable<U extends AbstractPersistable> extends
+		AbstractPersistable
 		implements Auditable<U, String> {
+
+	private static final long serialVersionUID = 8809874829822002089L;
 
 	@JsonIgnore
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "created_by", referencedColumnName = "id", nullable = true)
-	// TODO: not null,
 	private U createdBy;
 
 	@Temporal(TemporalType.TIMESTAMP)
