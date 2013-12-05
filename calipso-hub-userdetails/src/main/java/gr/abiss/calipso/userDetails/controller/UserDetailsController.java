@@ -137,28 +137,30 @@ HttpServletRequest request,
 
 		Cookie tokenCookie = null;
 		Cookie[] cookies = request.getCookies();
+		if (cookies != null && cookies.length > 0) {
 
-		for (int i = 0; i < cookies.length; i++) {
-			tokenCookie = cookies[i];
-			if (tokenCookie.getName().equals(
-					this.userDetailsConfig.getCookiesBasicAuthTokenName())) {
-				String token = tokenCookie.getValue();
-				if (StringUtils.isNotBlank(token)) {
-					token = new String(Base64.decode(token.getBytes()));
-					LOGGER.info("Request contained token: " + token);
-					if (token.indexOf(':') > 0) {
-						String[] parts = token.split(":");
-						if (StringUtils.isNotBlank(parts[0])
-								&& StringUtils.isNotBlank(parts[1])) {
-							resource = new UserDetails();
-							resource.setUsername(parts[0]);
-							resource.setPassword(parts[1]);
+			for (int i = 0; i < cookies.length; i++) {
+				tokenCookie = cookies[i];
+				if (tokenCookie.getName().equals(
+						this.userDetailsConfig.getCookiesBasicAuthTokenName())) {
+					String token = tokenCookie.getValue();
+					if (StringUtils.isNotBlank(token)) {
+						token = new String(Base64.decode(token.getBytes()));
+						LOGGER.info("Request contained token: " + token);
+						if (token.indexOf(':') > 0) {
+							String[] parts = token.split(":");
+							if (StringUtils.isNotBlank(parts[0])
+									&& StringUtils.isNotBlank(parts[1])) {
+								resource = new UserDetails();
+								resource.setUsername(parts[0]);
+								resource.setPassword(parts[1]);
+							}
+						} else {
+							LOGGER.warn("Invalid token received: " + token);
 						}
-					} else {
-						LOGGER.warn("Invalid token received: " + token);
 					}
+					break;
 				}
-				break;
 			}
 		}
 		return this.create(request, response, resource);
