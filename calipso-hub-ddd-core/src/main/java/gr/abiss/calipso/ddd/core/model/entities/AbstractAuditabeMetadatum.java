@@ -68,7 +68,6 @@ public abstract class AbstractAuditabeMetadatum<S extends MetadataSubject, U ext
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
-		.append("subject", this.getSubject())
 		.append("predicate", this.getPredicate())
 		.append("object", this.getObject()).toString();
 	}

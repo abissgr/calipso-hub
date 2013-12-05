@@ -71,6 +71,7 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	@Override
 	@Transactional(readOnly = false)
 	public T update(T resource) {
+		LOGGER.info("update, resource: " + resource);
 		Map<String, Metadatum> metadata = noteMetadata(resource);
 		T saved = super.update(resource);
 		persistNotedMetadata(metadata, saved);
@@ -79,6 +80,8 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 
 
 	private void persistNotedMetadata(Map<String, Metadatum> metadata, T saved) {
+
+		LOGGER.info("persistNotedMetadata, noted: " + metadata);
 		if (!CollectionUtils.isEmpty(metadata)) {
 			MetadataSubject subject = (MetadataSubject) saved;
 			for (Metadatum metadatum : metadata.values()) {
@@ -93,6 +96,9 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 		Map<String, Metadatum> metadata = null;
 		if (MetadataSubject.class.isAssignableFrom(this.getDomainClass())) {
 			metadata = ((MetadataSubject) resource).getMetadata();
+			LOGGER.info("noteMetadata, noted: " + metadata);
+		} else {
+			LOGGER.info("noteMetadata, not a metadata subject");
 		}
 		return metadata;
 	}
