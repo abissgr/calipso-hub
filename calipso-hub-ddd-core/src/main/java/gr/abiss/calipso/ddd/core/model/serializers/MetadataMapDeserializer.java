@@ -21,21 +21,22 @@ import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public class MetadataMapDeserializer extends JsonDeserializer<Map<String, ?>>
 		implements ContextualDeserializer {
@@ -75,34 +76,24 @@ public class MetadataMapDeserializer extends JsonDeserializer<Map<String, ?>>
 		if (this.mapper == null) {
 			this.mapper = new ObjectMapper();
 		}
-//		TypeFactory typeFactory = mapper.getTypeFactory();
-//		TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
-//		};
-//		Map<String, String> stringValueMap = jp.readValueAsTree().readValueAs(typeRef);// mapper.readValue(jp,
-		TreeNode metadataTreeNode = jp.readValueAsTree();
-		Iterator<String> names = metadataTreeNode.fieldNames();
-		LOGGER.info("metadatum metadataTreeNode: " + metadataTreeNode
-				+ " field names: " + metadataTreeNode.size()
-				+ ", isContainerNode: " + metadataTreeNode.isContainerNode()
-				+ ", isObject: " + metadataTreeNode.isObject()
-				+ ", isValueNode: " + metadataTreeNode.isValueNode());
-		// LOGGER.info("deserialize stringValueMap: " + stringValueMap);
+		TypeFactory typeFactory = mapper.getTypeFactory();
+		MapType stringValueMapType = typeFactory.constructMapType(
+				HashMap.class, String.class, String.class);
+		HashMap<String, String> stringValueMap = mapper.readValue(jp,
+				stringValueMapType);
+		LOGGER.info("deserialize stringValueMap: " + stringValueMap);
 		Map<String, Metadatum> metadata = new HashMap<String, Metadatum>();
-		while (metadataTreeNode.fieldNames().hasNext()) {
-			String predicateName = names.next();
-			LOGGER.info("metadatum predicateName: " + predicateName);
-			try {
-				/*** read value from predicate name ***/
-				TreeNode predicateObject = metadataTreeNode.path(predicateName);
-
-				LOGGER.info("metadatum predicateObject: " + predicateObject);
-				Metadatum metadatum = (Metadatum) targetType.newInstance();
-				metadatum.setPredicate(predicateName);
-				metadatum.setObject(predicateObject.toString());
-				metadata.put(predicateName, metadatum);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		if (!CollectionUtils.isEmpty(stringValueMap)) {
+			for (String predicate : stringValueMap.keySet()) {
+				try {
+					Metadatum metadatum = (Metadatum) targetType.newInstance();
+					metadatum.setPredicate(predicate);
+					metadatum.setObject(stringValueMap.get(predicate));
+					metadata.put(predicate, metadatum);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		LOGGER.info("deserialize returning metadata: " + metadata);

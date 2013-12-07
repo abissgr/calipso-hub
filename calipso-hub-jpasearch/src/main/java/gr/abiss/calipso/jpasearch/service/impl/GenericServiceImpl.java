@@ -24,6 +24,7 @@ import gr.abiss.calipso.jpasearch.service.GenericService;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.resthub.common.service.CrudServiceImpl;
@@ -84,7 +85,10 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 		LOGGER.info("persistNotedMetadata, noted: " + metadata);
 		if (!CollectionUtils.isEmpty(metadata)) {
 			MetadataSubject subject = (MetadataSubject) saved;
-			for (Metadatum metadatum : metadata.values()) {
+			Metadatum[] metaArray = metadata.values().toArray(
+					new Metadatum[metadata.values().size()]);
+			for (int i = 0; i < metaArray.length; i++) {
+				Metadatum metadatum = metaArray[i];
 				subject.addMetadatum(this.repository.addMetadatum(
 						saved.getId(), metadatum.getPredicate(),
 						metadatum.getObject()));
@@ -96,6 +100,8 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 		Map<String, Metadatum> metadata = null;
 		if (MetadataSubject.class.isAssignableFrom(this.getDomainClass())) {
 			metadata = ((MetadataSubject) resource).getMetadata();
+			((MetadataSubject) resource)
+					.setMetadata(new HashMap<String, Metadatum>());
 			LOGGER.info("noteMetadata, noted: " + metadata);
 		} else {
 			LOGGER.info("noteMetadata, not a metadata subject");
