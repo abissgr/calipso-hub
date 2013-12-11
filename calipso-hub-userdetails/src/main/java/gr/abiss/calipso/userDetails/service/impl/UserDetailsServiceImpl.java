@@ -41,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
@@ -176,18 +175,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Override
 	public UserDetails getPrincipal() {
-		Object principal = null;
-		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
-			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		}
-		LOGGER.debug("getPrincipal, principal: " + principal);
-		if (principal != null
-				&& UserDetails.class.isAssignableFrom(principal.getClass())) {
-			return (UserDetails) principal;
-		} else {
-			return null;
-		}
-
+		return SecurityUtil.getPrincipal();
 	}
 
 	@Override

@@ -239,8 +239,7 @@ public class GenericSpecifications {
 	}
 
 	/**
-	 * Dynamically create a specification for the given class and search
-	 * parameters.
+	 * Dynamically create a specification for the given class and restriction
 	 * 
 	 * @param searchTerm
 	 * @return

@@ -113,6 +113,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	 */
 	@RequestMapping(value = "query", produces = { "application/json" }, method = RequestMethod.POST)
 	@ResponseBody
+	@Deprecated
 	public Page<T> findPaginatedWithRestrictions(
 			@RequestBody Restriction restriction) {
 

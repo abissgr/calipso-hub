@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.codec.Base64;
 
 
@@ -127,6 +128,22 @@ public class SecurityUtil {
 			cookie.setMaxAge(0);
 		}
 		response.addCookie(cookie);
+	}
+
+	public static UserDetails getPrincipal() {
+		Object principal = null;
+		if (SecurityContextHolder.getContext() != null
+				&& SecurityContextHolder.getContext().getAuthentication() != null) {
+			principal = SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+		}
+		LOGGER.debug("getPrincipal, principal: " + principal);
+		if (principal != null
+				&& UserDetails.class.isAssignableFrom(principal.getClass())) {
+			return (UserDetails) principal;
+		} else {
+			return null;
+		}
 	}
 
 }

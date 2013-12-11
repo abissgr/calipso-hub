@@ -24,6 +24,8 @@ import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -36,6 +38,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * annotations
  */
 @MappedSuperclass
+@Table(uniqueConstraints = { 
+		@UniqueConstraint(columnNames = { "subject", "predicate" }) 
+	})
 public abstract class AbstractAuditabeMetadatum<S extends MetadataSubject, U extends AbstractPersistable>
 		extends AbstractAuditable<U> implements Metadatum<S> {
 

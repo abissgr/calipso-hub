@@ -19,18 +19,29 @@ package gr.abiss.calipso.jpasearch.service.impl;
 
 import gr.abiss.calipso.ddd.core.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.ddd.core.model.interfaces.Metadatum;
+import gr.abiss.calipso.jpasearch.model.acl.AclClass;
+import gr.abiss.calipso.jpasearch.model.acl.AclObject;
+import gr.abiss.calipso.jpasearch.model.acl.AclObjectIdentity;
+import gr.abiss.calipso.jpasearch.model.acl.AclSid;
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
+import gr.abiss.calipso.jpasearch.repository.acl.AclClassRepository;
+import gr.abiss.calipso.jpasearch.repository.acl.AclObjectIdentityRepository;
+import gr.abiss.calipso.jpasearch.repository.acl.AclSidRepository;
 import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Persistable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +56,26 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(GenericServiceImpl.class);
 
+	private AclObjectIdentityRepository aclObjectIdentityRepository;
+	private AclClassRepository aclClassRepository;
+	private AclSidRepository aclSidRepository;
+
+	@Inject
+	public void setAclObjectIdentityRepository(
+			AclObjectIdentityRepository aclObjectIdentityRepository) {
+		this.aclObjectIdentityRepository = aclObjectIdentityRepository;
+	}
+
+	@Inject
+	public void setAclClassRepository(AclClassRepository aclClassRepository) {
+		this.aclClassRepository = aclClassRepository;
+	}
+
+	@Inject
+	public void setAclSidRepository(AclSidRepository aclSidRepository) {
+		this.aclSidRepository = aclSidRepository;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -57,13 +88,43 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = false)
 	public T create(T resource) {
 		Map<String, Metadatum> metadata = noteMetadata(resource);
 		T saved = super.create(resource);
+		createAclObjectIdentity(saved, this.getDomainClass());
 		persistNotedMetadata(metadata, saved);
 		return saved;
+	}
+
+	protected void createAclObjectIdentity(T saved, Class domainClass) {
+		if (AclObject.class.isAssignableFrom(domainClass)) {
+			AclObject<ID, ID> aclObject = (AclObject<ID, ID>) saved;
+			AclClass aclClass = this.aclClassRepository	.findByClassName(domainClass.getName());
+			
+			Serializable sid = aclObject.getOwner();
+			AclSid aclSid = null;
+			// use current principal as owner?
+			if(sid == null){
+				UserDetails userDetails = SecurityUtil.getPrincipal();
+				if (userDetails != null) {
+					sid = userDetails.getUsername();
+				}
+			}
+			
+			// add owner if any
+			if(sid != null){
+				aclSid = this.aclSidRepository.findBySid(sid.toString());
+			}
+				
+			// TODO: parent
+			this.aclObjectIdentityRepository.save(new AclObjectIdentity(
+					aclObject.getIdentity().toString(), aclClass, null, aclSid,
+					aclObject
+					.getEntriesInheriting()));
+		}
 	}
 
 	/**

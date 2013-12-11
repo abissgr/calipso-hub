@@ -32,6 +32,7 @@ import org.springframework.data.domain.Sort.Direction;
  * provided by 
  * {@link http://static.springsource.org/spring/docs/3.2.x/javadoc-api/org/springframework/web/context/request/WebRequest.html#getParameterMap()}
  */
+@Deprecated
 public class RestrictionBackedPageRequest extends PageRequest {
 
 	private static final long serialVersionUID = -752023352147402776L;

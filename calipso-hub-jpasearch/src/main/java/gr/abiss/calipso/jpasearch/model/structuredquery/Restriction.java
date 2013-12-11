@@ -23,6 +23,7 @@ import java.util.List;
 /**
  * Used as a simple JSON DTO for structured queries
  */
+@Deprecated
 public class Restriction {
 	public static enum Junction {
 		AND, OR;

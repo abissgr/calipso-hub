@@ -205,6 +205,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 		return entity;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Page<T> findAll(Pageable pageable) {
 		if (pageable instanceof ParameterMapBackedPageRequest) {
