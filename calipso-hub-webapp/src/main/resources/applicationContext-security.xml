@@ -57,63 +57,48 @@
 	</sec:authentication-manager>
 	
 	<!-- To enable Method Security Expressions and custom PermissionEvaluator
-		we need to add the following 
-	<sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled">
-		<sec:expression-handler ref="expressionHandler" />
-	</sec:global-method-security>
-	-->
-	<sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" />
-	
-	<!-- To use hasPermission() expressions, we have to configure a PermissionEvaluator -->
-	<!-- See 15.3.2 Built-In Expression 
-			@http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator 
-	<bean id="expressionHandler"
-		class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
-		<property name="permissionEvaluator" ref="customPermissionEvaluator" />
-		<property name = "roleHierarchy" ref="roleHierarchy"/>
-	</bean>
-	-->
-	
-	<!-- Declare a custom PermissionEvaluator interface 
-	<bean class="my.CustomPermissionEvaluator" id="customPermissionEvaluator"/>
-	-->
-  
-	<!-- http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/access/hierarchicalroles/RoleHierarchyImpl.html 
-	<bean id="roleHierarchy"  class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
-	    <property name="hierarchy">
-	        <value>
-	            ROLE_ADMIN > ROLE_MODERATOR
-	            ROLE_MODERATOR > ROLE_USER
-	            ROLE_USER > ROLE_VISITOR
-	        </value>
-	    </property>
-	</bean>
-	-->
-	
-	<!--
-	Configures the social authentication filter which integrates Spring Social
-	with Spring Security.
+        we need to add the following 
+    -->
+    <sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled">
+        <sec:expression-handler ref="expressionHandler" />
+    </sec:global-method-security>
+    <!--sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" /-->
+    
+    <!-- To use hasPermission() expressions, we have to configure a PermissionEvaluator -->
+    <!-- See 15.3.2 Built-In Expression 
+            @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator 
+    <bean id="expressionHandler"
+        class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+        <property name="permissionEvaluator" ref="customPermissionEvaluator" />
+        <property name = "roleHierarchy" ref="roleHierarchy"/>
+    </bean>
+    -->
+    
+    
+    <!--
+    Configures the social authentication filter which integrates Spring Social
+    with Spring Security.
     <bean id="socialAuthenticationFilter" class="org.springframework.social.security.SocialAuthenticationFilter">
         <constructor-arg index="0" ref="authenticationManager"/>
         <constructor-arg index="1" ref="userIdSource"/>
         <constructor-arg index="2" ref="usersConnectionRepository"/>
         <constructor-arg index="3" ref="connectionFactoryLocator"/>
 
-	    <property name="signupUrl" value="/register" />
+        <property name="signupUrl" value="/register" />
         <property name="postLoginUrl" value="/manager/"/>
         
         
-    </bean>	
-	-->
+    </bean> 
+    -->
 
  
 
-	
+    
     <!--
-	This bean encrypts the authorization details of the connection. In
-	our example, the authorization details are stored as plain text.
-	DO NOT USE THIS IN PRODUCTION.
-	-->
+    This bean encrypts the authorization details of the connection. In
+    our example, the authorization details are stored as plain text.
+    DO NOT USE THIS IN PRODUCTION.
+    -->
     <bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" factory-method="noOpText" />
 
 

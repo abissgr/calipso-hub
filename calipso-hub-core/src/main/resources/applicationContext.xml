@@ -34,24 +34,10 @@
         http://www.springframework.org/schema/tx/spring-tx.xsd">
     
     <context:component-scan base-package="
-    	gr.abiss.calipso.controller, 
-    	gr.abiss.calipso.model, 
-    	gr.abiss.calipso.repository, 
-    	gr.abiss.calipso.service, 
-    	gr.abiss.calipso.jpasearch, 
-    	gr.abiss.calipso.userDetails, 
-    	gr.abiss.calipso.spring, 
-    	gr.abiss.calipso.utils, 
+    	gr.abiss.calipso, 
     	org.resthub" />
     <jpa:repositories base-package="
-    	gr.abiss.calipso.controller, 
-    	gr.abiss.calipso.model, 
-    	gr.abiss.calipso.repository, 
-    	gr.abiss.calipso.service, 
-    	gr.abiss.calipso.jpasearch, 
-    	gr.abiss.calipso.userDetails, 
-    	gr.abiss.calipso.spring, 
-    	gr.abiss.calipso.utils, 
+    	gr.abiss.calipso, 
     	org.resthub" 
     	factory-class="gr.abiss.calipso.jpasearch.repository.RepositoryFactoryBean" />
     

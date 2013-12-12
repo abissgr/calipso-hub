@@ -67,6 +67,7 @@
 	
 	<!-- imports -->
 	<import resource="applicationContext-security.xml" />
+    <import resource="applicationContext-acl.xml" />
 	<import resource="applicationContext-social.xml" />
 	
 	

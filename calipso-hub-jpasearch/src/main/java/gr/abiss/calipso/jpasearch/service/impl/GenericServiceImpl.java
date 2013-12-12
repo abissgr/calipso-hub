@@ -102,28 +102,28 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	protected void createAclObjectIdentity(T saved, Class domainClass) {
 		if (AclObject.class.isAssignableFrom(domainClass)) {
 			AclObject<ID, ID> aclObject = (AclObject<ID, ID>) saved;
-			AclClass aclClass = this.aclClassRepository	.findByClassName(domainClass.getName());
-			
+			AclClass aclClass = this.aclClassRepository
+					.findByClassName(domainClass.getName());
+
 			Serializable sid = aclObject.getOwner();
 			AclSid aclSid = null;
 			// use current principal as owner?
-			if(sid == null){
+			if (sid == null) {
 				UserDetails userDetails = SecurityUtil.getPrincipal();
 				if (userDetails != null) {
 					sid = userDetails.getUsername();
 				}
 			}
-			
+
 			// add owner if any
-			if(sid != null){
+			if (sid != null) {
 				aclSid = this.aclSidRepository.findBySid(sid.toString());
 			}
-				
+
 			// TODO: parent
 			this.aclObjectIdentityRepository.save(new AclObjectIdentity(
 					aclObject.getIdentity().toString(), aclClass, null, aclSid,
-					aclObject
-					.getEntriesInheriting()));
+					aclObject.getEntriesInheriting()));
 		}
 	}
 
