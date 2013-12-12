@@ -34,9 +34,11 @@
     </bean>
     <bean id="aclEhCacheFactoryBean" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
         <property name="cacheManager" ref="aclCacheManager"/>
-        <property name="cacheName" value="aclCache" />
+        <property name="cacheName" value="calipsoAclCache" />
     </bean>
-    <bean id="aclCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
+    <bean id="aclCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="/WEB-INF/calipso-ehcache.xml" />
+    </bean>
     <bean id="aclAuthzStrategy" class="org.springframework.security.acls.domain.AclAuthorizationStrategyImpl">
         <constructor-arg ref="adminAuthority"/>
     </bean>
