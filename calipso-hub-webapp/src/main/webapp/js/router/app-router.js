@@ -1,4 +1,5 @@
-define(['backbone', 'view/about-view', 'view/samples-view', 'view/users-view'], function (Backbone, AboutView, SamplesView, UsersView) {
+define(['backbone', 'view/about-view', 'view/samples-view', 'view/users-view', 'collection/generic'], 
+function (Backbone, AboutView, SamplesView, UsersView, GenericCollection) {
     var AppRouter = Backbone.Router.extend({
 
         initialize: function() {
@@ -16,7 +17,8 @@ define(['backbone', 'view/about-view', 'view/samples-view', 'view/users-view'], 
             new SamplesView({root:$('#main')});
         },
         users:function () {
-            new UsersView({root:$('#main')});
+        	var userCollection = new GenericCollection();
+            new UsersView({root:$('#main'), collection:userCollection});
         },
         about:function () {
             new AboutView({root:$('#main')});

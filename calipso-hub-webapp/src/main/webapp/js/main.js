@@ -21,28 +21,30 @@ require.config({
             ],
             exports: 'Backbone'
         },
-        'backbone-datagrid': {
+        'backbone-pageable': {
             deps: [
                 'backbone'
             ],
-            exports: 'Backbone.Datagrid'
+            exports: 'Backbone.PageableCollection'
         },
-        'backbone-paginator': {
-            deps: [
-                'backbone'
-            ],
-            exports: 'Backbone.Paginator'
+        'backgrid': {
+            deps: ['jquery', 'backbone', 'underscore'/*, 'css!lib/backgrid/backgrid'*/],
+            exports: 'Backgrid'
+        },
+        'backgrid-paginator': {
+            deps: ['backgrid', 'backbone-pageable'],
+            exports: 'Backgrid.Extension.Paginator'
         },
         'bootstrap': {
             deps: [
                 'jquery'
             ]
         },
-        'backbone-relational': {
-            deps: [
-                'backbone'
-            ]
-        },
+//        'backbone-relational': {
+//            deps: [
+//                'backbone'
+//            ]
+//        },
         'keymaster': {
             exports: 'key'
         },
@@ -50,7 +52,11 @@ require.config({
             exports: 'async'
         }
     },
-
+//    map: {
+//        '*': {
+//            'css': 'plugins/requirecss/css'
+//        }
+//    },
     // Libraries
     paths: {
         jquery: 'lib/jquery',
@@ -68,16 +74,20 @@ require.config({
         'handlebars-orig': 'lib/handlebars',
         'handlebars': 'lib/resthub/handlebars-helpers',
         'backbone-queryparams': 'lib/backbone-queryparams',
-        'backbone-datagrid': 'lib/backbone-datagrid',
-        'backbone-paginator': 'lib/backbone-paginator',
-        'backbone-relational': 'lib/backbone-relational',
+//        'backbone-datagrid': 'lib/backbone-datagrid',
+//        'backbone-paginator': 'lib/backbone-paginator',
+//        'backbone-relational': 'lib/backbone-relational',
+        'backbone-pageable'  : 'lib/backbone-pageable',
         async: 'lib/async',
         keymaster: 'lib/keymaster',
         hbs: 'lib/resthub/require-handlebars',
         moment: 'lib/moment',
         template: '../template',
 		json2: 'lib/json2',
-        console: 'lib/resthub/console'
+        console: 'lib/resthub/console',
+        backgrid: 'lib/backgrid/backgrid',
+        //"backgrid/select-all":	'lib/backgrid/extensions/select-all/backgrid-select-all',
+        "backgrid-paginator":	'lib/backgrid/extensions/paginator/backgrid-paginator',
     }
 });
 

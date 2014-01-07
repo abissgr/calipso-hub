@@ -18,7 +18,7 @@
  */
 package gr.abiss.calipso.controller;
 
-import gr.abiss.calipso.jpasearch.controller.AbstractServiceBasedRestController;
+import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.service.UserService;
 

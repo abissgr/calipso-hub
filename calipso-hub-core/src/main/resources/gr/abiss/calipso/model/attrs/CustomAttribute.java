@@ -19,7 +19,7 @@
 package gr.abiss.calipso.model.attrs;
 
 
-import gr.abiss.calipso.ddd.core.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.entities.AbstractAuditable;
 
 import java.io.Serializable;
 

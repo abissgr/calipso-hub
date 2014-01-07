@@ -48,15 +48,7 @@
         </dependency>
         <dependency>
             <groupId>gr.abiss.calipso</groupId>
-            <artifactId>calipso-hub-jpasearch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>gr.abiss.calipso</groupId>
-            <artifactId>calipso-hub-userdetails</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>gr.abiss.calipso</groupId>
-            <artifactId>calipso-hub-ddd-core</artifactId>
+            <artifactId>calipso-hub-framework</artifactId>
         </dependency>
         <!-- javax servlet stuff -->
 			<dependency>

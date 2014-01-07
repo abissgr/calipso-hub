@@ -4,13 +4,23 @@ define(['backbone'], function(Backbone) {
         defaults: {
           //  firstName: "empty name"
         },
+        initialize: function() {
+            Backbone.Model.prototype.initialize.apply(this, arguments);
+            this.on("change", function(model, options) {
+                if (options && options.save === false){
+                    return;
+                }
+                console.log("Saving change");
+                model.save();
+            });
+        },
         validate: function(attrs) {
             if (/^\s*$/.test(attrs.userName)) {
               return 'User Name cannot be blank.';
             }
           },
      
-        validation: {
+        validation: {	
             userName: {
               required: true,
               msg: 'A User Name is required.'

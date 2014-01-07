@@ -1,6 +1,6 @@
 package gr.abiss.calipso.model.metadata;
 
-import gr.abiss.calipso.ddd.core.model.entities.AbstractAuditabeMetadatum;
+import gr.abiss.calipso.model.entities.AbstractAuditabeMetadatum;
 import gr.abiss.calipso.model.User;
 
 import javax.persistence.Entity;

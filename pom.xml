@@ -36,9 +36,7 @@
 
 	<modules>
 		<module>calipso-hub-utilities</module>
-		<module>calipso-hub-ddd-core</module>
-		<module>calipso-hub-jpasearch</module>
-		<module>calipso-hub-userdetails</module>
+		<module>calipso-hub-framework</module>
 		<module>calipso-hub-core</module>
 		<module>calipso-hub-webapp</module>
 	</modules>
@@ -97,17 +95,7 @@
 			</dependency>
 			<dependency>
 				<groupId>gr.abiss.calipso</groupId>
-				<artifactId>calipso-hub-ddd-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>gr.abiss.calipso</groupId>
-				<artifactId>calipso-hub-jpasearch</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>gr.abiss.calipso</groupId>
-				<artifactId>calipso-hub-userdetails</artifactId>
+				<artifactId>calipso-hub-framework</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
