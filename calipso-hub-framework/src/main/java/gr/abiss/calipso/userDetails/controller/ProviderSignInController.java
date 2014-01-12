@@ -30,8 +30,10 @@ import gr.abiss.calipso.userDetails.util.SocialMediaService;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.social.connect.Connection;
@@ -52,6 +54,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -60,6 +64,8 @@ import org.springframework.web.servlet.view.RedirectView;
 @SessionAttributes("user")
 @RequestMapping("/signin")
 public class ProviderSignInController extends org.springframework.social.connect.web.ProviderSignInController {
+
+	public static final String TOP_WINDOW_DOMAIN = "topWindowDomain";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProviderSignInController.class);
 
@@ -211,6 +217,19 @@ public class ProviderSignInController extends org.springframework.social.connect
 			ConnectionKey providerKey = connection.getKey();
 			dto.setSignInProvider(SocialMediaService.valueOf(providerKey.getProviderId().toUpperCase()));
 
+			HttpServletRequest curRequest = ((ServletRequestAttributes) RequestContextHolder
+					.currentRequestAttributes()).getRequest();
+			HttpSession session = curRequest.getSession(false);
+			if (session != null) {
+				String topWindowDomain = (String) session
+						.getAttribute(TOP_WINDOW_DOMAIN);
+				if (StringUtils.isNotBlank(topWindowDomain)) {
+					dto.setTopWindowDomain(topWindowDomain);
+				}
+			}
+
+			//
+
 			LOGGER.debug("createRegistrationDTO prepopulated form: " + dto);
 		} else {
 			LOGGER.debug("createRegistrationDTO: no connection was found");
@@ -223,7 +242,15 @@ public class ProviderSignInController extends org.springframework.social.connect
 	@Override
 	@RequestMapping(value = "/{providerId}", method = RequestMethod.POST)
 	public RedirectView signIn(@PathVariable String providerId, NativeWebRequest request) {
-		LOGGER.info("popupSignIn, providerId: " + providerId);
+		String topWindowDomain = request.getParameter(TOP_WINDOW_DOMAIN);
+		LOGGER.info("popupSignIn, providerId: " + providerId
+				+ ", topWindowDomain: " + topWindowDomain);
+		if (StringUtils.isNotBlank(topWindowDomain)) {
+			HttpServletRequest req = request
+					.getNativeRequest(HttpServletRequest.class);
+			HttpSession session = req.getSession(true);
+			session.setAttribute(TOP_WINDOW_DOMAIN, topWindowDomain);
+		}
 		//		HttpSession session = ((HttpServletRequest) request.getNativeRequest()).getSession();
 		//		if (session == null) {
 		//			session = ((HttpServletRequest) request.getNativeRequest()).getSession(true);

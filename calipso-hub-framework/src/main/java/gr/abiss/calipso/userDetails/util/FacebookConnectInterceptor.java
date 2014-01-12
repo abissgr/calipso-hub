@@ -17,6 +17,8 @@
  */
 package gr.abiss.calipso.userDetails.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.web.ProviderSignInInterceptor;
@@ -29,9 +31,22 @@ import org.springframework.web.context.request.WebRequest;
 */
 public class FacebookConnectInterceptor implements ProviderSignInInterceptor<Facebook> {
 
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FacebookConnectInterceptor.class);
+
 	@Override
 	public void preSignIn(ConnectionFactory<Facebook> connectionFactory, MultiValueMap<String, String> parameters, WebRequest request) {
 		parameters.set("display", "popup");
+		LOGGER.info("topWindowDomain: " + parameters.get("topWindowDomain"));
+		for (String key : parameters.keySet()) {
+			LOGGER.info("param " + key + ": " + parameters.get(key));
+		}
+		LOGGER.info("WebRequest params...");
+		for (String key : request.getParameterMap().keySet()) {
+
+			LOGGER.info("param " + key + ": "
+					+ request.getParameterMap().get(key));
+		}
 	}
 
 	@Override

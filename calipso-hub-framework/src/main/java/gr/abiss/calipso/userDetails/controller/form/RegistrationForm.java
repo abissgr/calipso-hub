@@ -58,6 +58,8 @@ public class RegistrationForm {
 
 	private SocialMediaService signInProvider;
 
+	private String topWindowDomain;
+
 	public RegistrationForm() {
 
 	}
@@ -139,5 +141,13 @@ public class RegistrationForm {
 		return new ToStringBuilder(this).append("userName", this.userName).append("email", email).append("firstName", firstName)
 				.append("lastName", lastName)
 				.append("signInProvider", signInProvider).toString();
+	}
+
+	public void setTopWindowDomain(String topWindowDomain) {
+		this.topWindowDomain = topWindowDomain;
+	}
+
+	public String getTopWindowDomain() {
+		return this.topWindowDomain;
 	}
 }
