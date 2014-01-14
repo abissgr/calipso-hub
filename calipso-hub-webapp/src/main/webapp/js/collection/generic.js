@@ -1,11 +1,17 @@
-define(['backbone', 'backbone-pageable', 'model/user'], function (Backbone, BackbonePageableCollection, User) {
+define(['backbone', 'backbone-pageable'], function (Backbone, BackbonePageableCollection) {
 	//Backbone.Collection = PageableCollection;
     var GenericCollection = Backbone.PageableCollection.extend({
 	
 
         // Reference to this collection's model.
-	        model: User,
-	        url:'api/rest/user', // was api/user
+	       
+	        gridColumns: {},
+	        setGridColumns: function(columns){
+	        	this.gridColumns = columns;
+	        },
+	        getGridColumns: function(){
+	        	return this.gridColumns;
+	        },
         	
     	// Initial pagination states
 //		state: {

@@ -1,7 +1,7 @@
 define([ 'backbone', 'resthub', 'backgrid', 'backgrid-paginator', 'model/user', 'view/userform', 'hbs!template/generic' , 'collection/generic'],
 function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, UserFormView, genericCollectionTemplate, GenericCollection) {
     //Backgrid.Extension.Paginator = Paginator;
-    var UsersView = Resthub.View.extend({
+    var GenericCollectionView = Resthub.View.extend({
         
         // Define view template
         template: genericCollectionTemplate,
@@ -14,47 +14,16 @@ function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, UserFor
             this.listenTo(this.collection, 'sync', this.render);
             this.listenTo(this.collection, 'change', this.render);
             
-            // Request unpaginated URL
             this.collection.fetch(/*{ data: { page: 'no'} }*/);
             
         },
         
 		render: function() {
-			UsersView.__super__.render.apply(this);
-			var gridColumns = [{
-				  name: "id", // The key of the model attribute
-				  label: "ID", // The name to display in the header
-				  editable: false, // By default every cell in a column is editable, but *ID* shouldn't be
-				  // Defines a cell type, and ID is displayed as an integer without the ',' separating 1000s.
-				  cell: Backgrid.StringCell.extend({
-				    orderSeparator: ''
-				  })
-				},{
-				  name: "userName",
-				  label: "username",
-				  cell: "string"
-				}, {
-				  name: "firstName",
-				  label: "firstName",
-				  editable: true,
-				  cell: "string" 
-				}, {
-				  name: "lastName",
-				  label: "lastName",
-				  editable: true,
-				  cell: "string" 
-				}, {
-				  name: "email",
-				  label: "email",
-				  cell: "email"
-				}, {
-				  name: "createdDate",
-				  label: "created",
-				  cell: "datetime"
-				}];
+			GenericCollectionView.__super__.render.apply(this);
+
 			var backgrid = new Backgrid.Grid({
 
-				  columns: gridColumns,
+				  columns: this.collection.getGridColumns(),
 				  collection: this.collection
 			});
 			
@@ -109,6 +78,6 @@ function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, UserFor
           */
 
     });
-    return UsersView;
+    return GenericCollectionView;
 });
 
