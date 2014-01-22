@@ -7,7 +7,7 @@
 
 ## Framework
 
-If you just want to use Calipso's framework in your own application, check out the [calipso-hub-framework](#calipso-hub-framework) module.
+If you just want to use Calipso's framework in your own application, check out the [calipso-hub-framework][calipso-hub-framework] module.
 
 ## Howto Build
 
