@@ -1,4 +1,13 @@
-# calipso-hub
+
+- [Framework](#framework)
+- [Howto Build](#howto-build)
+- [Browse Calipso](#browse-calipso)
+- [Browse the Database Console](#browse-the-database-console)
+- [Use a custom database](#use-a-custom-database)
+
+## Framework
+
+If you just want to use Calipso's framework in your own application, check out the [calipso-hub-framework](#calipso-hub-framework) module.
 
 ## Howto Build
 
@@ -49,4 +58,4 @@ You can use a database like MySQL by commenting out the H2 database section in y
 then uncommenting the MySQL section. Other databases can be also be used.  
     
 
-
+[calipso-hub-framework]:calipso-hub-framework

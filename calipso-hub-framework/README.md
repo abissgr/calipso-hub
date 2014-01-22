@@ -1,29 +1,36 @@
-# Calipso Hub: UserDetails Module
 
-Provides generic, stateless user detail services, including registration, authentication and authorization/ACL.
+- [About calipso-hub-framework](#about-calipso-hub-framework)
+- [Installation](#installation)
+- [UserDetails Module](#userdetails-module)
+	- [UserDetails Config](#userdetails-config)
+	- [UserDetails Service](#userdetails-service)
+		- [Adapter to local user persistence](#adapter-to-local-user-persistence)
+	- [UserDetails Controller](#userdetails-controller)
+		- [UserDetails Controller RequestMappings](#userdetails-controller-requestmappings)
+- [Dynamic JPA Search Module](#dynamic-jpa-search-module)
+	- [Access the search](#access-the-search)
+- [Dynamic form schemas for Backbone.js](#dynamic-form-schemas-for-backbonejs)
 
-For an overview of what the module provides, consider the interfaces implemented by the `userDetailsService` 
-provided in this module:
+## About calipso-hub-framework
 
- - `gr.abiss.calipso.userDetails.service.UserDetailsService` (own signature interface)
- - `org.springframework.security.core.userdetails.UserDetailsService`
- - `org.springframework.social.security.SocialUserDetailsService`
- - `org.springframework.social.connect.ConnectionSignUp`
- - `org.springframework.social.connect.web.SignInAdapter`
+The calipso-hub-framework is part of [calipso-hub][calipso-hub]. The module is available under the [Apache License, Version 2.0][license-asl] 
+and provides a number of enhancements for your [RESTHub][resthub]-based projects.
 
 
-## <a name="maven"> Maven configuration
+## Installation
+
+Include the dependency in your project's Maven POM
 
 ```xml
-    <!-- dependency -->
+    <!-- add in dependencies -->
     <dependency>
         <groupId>gr.abiss.calipso</groupId>
-        <artifactId>calipso-hub-userdetails</artifactId>
+        <artifactId>calipso-hub-framework</artifactId>
         <version>${project.version}</version>
     </dependency>
 
 
-    <!-- repositories -->
+    <!--  add in repositories -->
     <repository>
         <id>sonatype-snapshot</id>
         <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
@@ -40,7 +47,21 @@ provided in this module:
     </repository>
 ```
 
-## <a name="userDetailsConfig"> Get started: userDetailsConfig
+## UserDetails Module
+
+Provides generic, stateless user detail services, including registration, authenticationl, social signin and authorization/ACL.
+
+For an overview of what the module provides, consider the interfaces implemented by the `userDetailsService` 
+provided in this module:
+
+ - `gr.abiss.calipso.userDetails.service.UserDetailsService` (own signature interface)
+ - `org.springframework.security.core.userdetails.UserDetailsService`
+ - `org.springframework.social.security.SocialUserDetailsService`
+ - `org.springframework.social.connect.ConnectionSignUp`
+ - `org.springframework.social.connect.web.SignInAdapter`
+
+
+### UserDetails Config
 
 Configuration options can be accessed through a `userDetailsConfig` bean implementation of 
 `gr.abiss.calipso.userDetails.integration.UserDetailsConfig` interface, such as the included simple 
@@ -58,7 +79,7 @@ The arguments above correspond to header (or cookie, in case of JSONP) name, coo
 cookie path. Check out the javadoc for more options.
 
 
-## <a name="userDetailsService"> Main dish: userDetailsService
+### UserDetails Service
 
 One way to declare and adopt the default `userDetailsService` service provided with this module is by 
 subclassing it. A subclass will automatically get picked up by Spring classpath scanning, if that 
@@ -96,9 +117,9 @@ context during classpath scanning or must otherwise be provided in config:
  - [userDetailsConfig](#userDetailsConfig) (optional): an implementation of `gr.abiss.calipso.userDetails.integration.UserDetailsConfig`, see above
  - [localUserService](#localUserService) (required): An implementation of `gr.abiss.calipso.userDetails.integration.LocalUserService`, see bellow
 
-### <a name="localUserService"> Adapter to user persistence:  localUserService
+#### Adapter to local user persistence
 
-An implementation of this service adapter is required to integrate the declared `userDetailsService` bean with the service or repository 
+An implementation of the LocalUserService is required to integrate the declared `userDetailsService` bean with the service or repository 
 used by your application for user (or any account) entity persistence.
 
 You may find convinient implementing such `localUserService` on top of such a local user repository or service and simply provide an alias like
@@ -111,7 +132,7 @@ Hooking up a `localUserService` enables `userDetailsService` to handle requests 
 and password reset flows. The actual HTTP requests are intercepted by the controllers described bellow.
 
 
-## <a name="userDetailsController"> Map to HTTP requests: The UserDetailsController
+### UserDetails Controller
 
 The available options for your Spring application to register the provided `UserDetailsController` class are the same as the ones described 
 for the `userDetailsService` bean in the previous section above. More specifically you can A) subclass the controler and 
@@ -149,7 +170,7 @@ context during classpath scanning or must otherwise be provided in config:
  - [UserDetailsService](#UserDetailsService) (required): the `gr.abiss.calipso.userDetails.service.UserDetailsService`, see bellow
 
 
-### UserDetailsController RequestMappings
+#### UserDetails Controller RequestMappings
 
 In the custom `MyUserDetailsController` subclass example above the base URL mapping path is set to "/myapiauth", overriding the
 default "/apiauth" path prefix of the controller's method RequestMappin annotations. The remaining path components can be overriden 
@@ -178,41 +199,13 @@ logged in user, if any.
 
  - POST "/apiauth/userDetails/logout": Logs out the user completely.
 
-#calipso-hub-jpasearch
+## Dynamic JPA Search Module
 
-Provides generic, reflection based search services and form schemas [1] for arbitrary entity beans. 
+Provides generic, reflection based search services and Backbone.js form schemas for arbitrary entity beans. 
 Property types supported by the provided Spring specifications
 are Boolean, Date, enum, ManyToOne (for members extending Spring's AbstractPersistable) and String.
 
 To use this module in your RESTHub project you need to do the following:
-
-0) Include the dependency in your project's Maven POM (TODO: point to repo):
-
-```xml
-    <!-- dependency -->
-    <dependency>
-        <groupId>gr.abiss.calipso</groupId>
-        <artifactId>calipso-hub-jpasearch</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-
-
-    <!-- repositories -->
-    <repository>
-        <id>sonatype-snapshot</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
-    <repository>
-        <id>sonatype-release</id>
-        <url>https://oss.sonatype.org/content/repositories/releases</url>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-    </repository>
-```
 
 1) Have your entities implement org.springframework.data.domain.Persistable
 
@@ -275,7 +268,7 @@ instead of RESTHub's ServiceBasedRestController:
 }
 ```
 
-## Access the search
+### Access the search
 Search is available at the usual RESTHub path:
 
 	http://localhost:8080/api/[entity, e.g. user]?[params]
@@ -297,14 +290,16 @@ Nested AND/OR junctions are supported using junctionMode:junctionKey:paramName a
 
 	http://localhost:8080/api/user?and:1:firstName=Manos&and:1:lastName=Batsis
 
-## Dynamic form schemas
+## Dynamic form schemas for Backbone.js
 
-Form schemata is available at 
+If your entity controller extends <code>AbstractServiceBasedRestController</code>, you can access backbone.js 
+form schemata at 
 
 	http://localhost:8080/api/[entity, e.g. user]/form-schema?mode=[one of create, update, search]
 
-The form schemas produced are annotation based (see gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry) 
-and follow the format described at [2].
+The form schemas produced are annotation-based (see gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry) 
+and follow the format described at [https://github.com/powmedia/backbone-forms].
 
-[1] https://github.com/powmedia/backbone-forms
-[2] http://static.springsource.org/spring-data/commons/docs/current/reference/html/repositories.html
+[calipso-hub]:../
+[resthub]:http://resthub.org
+[license-asl]:LICENSE.txt
