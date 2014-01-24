@@ -32,6 +32,7 @@ import org.springframework.data.domain.Persistable;
 @MappedSuperclass
 // @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
 // property = "id")
+
 public abstract class AbstractPersistable implements Persistable<String> {
 
 	private static final long serialVersionUID = 2131186735039838008L;

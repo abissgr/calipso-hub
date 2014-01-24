@@ -139,7 +139,11 @@
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
 		</dependency>
-		
+		<!-- elastisearch -->
+		<dependency>
+		    <groupId>org.springframework.data</groupId>
+		    <artifactId>spring-data-elasticsearch</artifactId>
+		</dependency>
 		<!-- Thymeleaf Template Engine-->
 		
 	    <dependency>
