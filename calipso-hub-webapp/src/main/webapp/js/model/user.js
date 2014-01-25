@@ -4,12 +4,14 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', '
 //			console.log("UserModel#urlRoot");
 //	        return window.calipso.getBaseUrl() + "/api/rest/user";
 //	    },
-		schema: {
-	        userName:       'Text',
-	        firstName:       'Text',
-	        lastName:       'Text',
-	        email:      { validators: ['required', 'email'] },
-	    }
+		schema: function() {
+			return {
+		        userName:       'Text',
+		        firstName:       'Text',
+		        lastName:       'Text',
+		        email:      { validators: ['required', 'email'] },
+			};
+		}
 	});
 	
 	var EditCell = Backgrid.Cell.extend({
