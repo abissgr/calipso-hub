@@ -26,7 +26,7 @@ Include the dependency in your project's Maven POM
     <dependency>
         <groupId>gr.abiss.calipso</groupId>
         <artifactId>calipso-hub-framework</artifactId>
-        <version>${project.version}</version>
+        <version>1.0-SNAPSHOT</version>
     </dependency>
 
 
