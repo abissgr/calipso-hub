@@ -1,4 +1,8 @@
-#calipso-hub-utilities
+
+- [Installation](#installation)
+- [Elasticsearch integration](#elasticsearch-integration)
+    - [Spring configuration](#spring-configuration)
+    - [Servlet configuration](#servlet-configuration)
 
 Provides generic utilities such as configuration access, elasticsearch integration and more. 
 The calipso-hub-utilities module is part of [calipso-hub][calipso-hub]. 
