@@ -1,13 +1,16 @@
 
-- [Framework](#framework)
+- [Modules](#modules)
 - [Howto Build](#howto-build)
 - [Browse Calipso](#browse-calipso)
 - [Browse the Database Console](#browse-the-database-console)
 - [Use a custom database](#use-a-custom-database)
 
-## Framework
-
-If you just want to use Calipso's framework in your own application, check out the [calipso-hub-framework][calipso-hub-framework] module.
+## Modules
+- calipso-hub (this one)
+    - [calipso-hub-core]: application-specific components
+    - [calipso-hub-framework]: development framework components
+    - [calipso-hub-utilities]: utility components
+    - [calipso-hub-webapp]: WAR
 
 ## Howto Build
 
@@ -57,5 +60,7 @@ The database console is available at:
 You can use a database like MySQL by commenting out the H2 database section in your dev.properties, 
 then uncommenting the MySQL section. Other databases can be also be used.  
     
-
+[calipso-hub-core]:calipso-hub-core
 [calipso-hub-framework]:calipso-hub-framework
+[calipso-hub-utilities]:calipso-hub-utilities
+[calipso-hub-webapp]:calipso-hub-webapp
