@@ -50,15 +50,16 @@ Include the dependency in your project's Maven POM
 ## UserDetails Module
 
 Provides generic, stateless user detail services, including registration, authenticationl, social signin and authorization/ACL.
+It requires you to implement `LocalUserService` to integrate you your local User-ish entity storage.
 
 For an overview of what the module provides, consider the interfaces implemented by the `userDetailsService` 
 provided in this module:
 
- - `gr.abiss.calipso.userDetails.service.UserDetailsService` (own signature interface)
- - `org.springframework.security.core.userdetails.UserDetailsService`
- - `org.springframework.social.security.SocialUserDetailsService`
- - `org.springframework.social.connect.ConnectionSignUp`
- - `org.springframework.social.connect.web.SignInAdapter`
+ - `gr.abiss.calipso.userDetails.service.UserDetailsService` (provided, own signature interface)
+ - `gr.abiss.calipso.userDetails.integration.LocalUserService` (implement to integrate with local user store)
+ - `org.springframework.social.security.SocialUserDetailsService` (provided, used for social signin)
+ - `org.springframework.social.connect.ConnectionSignUp` (provided, used for social signin)
+ - `org.springframework.social.connect.web.SignInAdapter` (provided, used for social signin)
 
 
 ### UserDetails Config
