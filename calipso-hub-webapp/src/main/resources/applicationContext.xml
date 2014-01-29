@@ -25,10 +25,9 @@
 	<task:annotation-driven executor="asyncExecutor" /> 
 	
     <!-- Configuration Properties  -->
-    <context:property-placeholder location="classpath:calipso.defaults.properties"/>
+    <context:property-placeholder location="classpath:calipso.defaults.properties,classpath:swagger.properties"/>
     <context:property-placeholder location="classpath:calipso.properties"/>
     
-	
 	<!--mvc:annotation-driven/-->
 
     <mvc:resources mapping="/static/**" location="/static/"/>
@@ -78,4 +77,5 @@
 	 	<constructor-arg value="/" />
     </bean>
     <alias name="userService" alias="localUserService"/>
+    
 </beans>

@@ -19,6 +19,8 @@
 package gr.abiss.calipso.service.impl;
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.UserService;
@@ -76,11 +78,21 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public User findByCredentials(String userNameOrEmail, 	String password, Map metadata) {
-		User localUser = this.repository.findByCredentials(userNameOrEmail, password);
-		if (localUser != null && !CollectionUtils.isEmpty(metadata)) {
-			localUser.addMetadata((List) this.repository.addMetadata(localUser.getId(), metadata));
+		if(LOGGER.isDebugEnabled()) LOGGER.debug("findByCredentials, userNameOrEmail: " + userNameOrEmail + ", metadata: " + metadata);
+		User user = null;
+		try {
+			user = this.repository.findByCredentials(userNameOrEmail, password);
+			if (user != null && !CollectionUtils.isEmpty(metadata)) {
+				List<Metadatum> saved = this.repository.addMetadata(user.getId(), metadata);
+				for (Metadatum meta : saved) {
+					user.addMetadatum((UserMetadatum) meta);
+				}
+
+			}
+		} catch (RuntimeException e) {
+			LOGGER.error("failed finding user by credentials", e);
 		}
-		return localUser;
+		return user;
 	}
 
 	/**

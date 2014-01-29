@@ -172,16 +172,30 @@ HttpServletRequest request,
 	@RequestMapping(value = "userDetails", method = RequestMethod.POST)
 	@ResponseBody
 	public UserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
+		try {
+			UserDetails userDetails = resource != null ? this.service
+					.create(resource) : null;
 
-		UserDetails userDetails = resource != null ? this.service
-				.create(resource) : null;
-
-		if(userDetails != null){
-			SecurityUtil.login(request, response, userDetails, userDetailsConfig);
-			resource = userDetails;
+			LOGGER.info("create userDetails: " + userDetails);
+			if (userDetails != null) {
+				SecurityUtil.login(request, response, userDetails,
+						userDetailsConfig);
+				resource = userDetails;
+			} else {
+				resource = new UserDetails();
+			}
 		}
-		else{
-			resource = new UserDetails();
+		catch (Throwable e) {
+			StackTraceElement[] elems = e.getStackTrace();
+			LOGGER.error("printing stacktrace...");
+			for(int i=0;i<elems.length;i++){
+				StackTraceElement elem = elems[i];
+				LOGGER.error(elem.getFileName() + ", line "
+						+ elem.getLineNumber());
+			}
+			LOGGER.error(
+					"UserDetailsController failed creating new userDetails",
+					e);
 		}
 
 		return resource;

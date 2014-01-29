@@ -55,7 +55,7 @@ The following configuration creates a local elasticsearch Node and passes a clie
     <bean id="localElasticsearchNodeClient" class="gr.abiss.calipso.utils.elasticsearch.spring.LocalNodeClientFactoryBean" />
     
     <!-- spring-data-elasticsearch repositories -->
-    <elasticsearch:repositories base-package="com.civicuk.ffora">
+    <elasticsearch:repositories base-package="my.package">
         <repository:include-filter type="regex" expression=".*IndexRepository" />
     </elasticsearch:repositories>
     

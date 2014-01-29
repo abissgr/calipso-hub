@@ -44,12 +44,11 @@
     	<dependency>
     		<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>${commons-lang3.version}</version>
     	</dependency>
-    	<dependency>
+    	<!--dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-		</dependency>
+		</dependency-->
     	<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
@@ -68,12 +67,10 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -99,7 +96,6 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>${spring-security.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -153,14 +149,12 @@
 	    <dependency>
 	      <groupId>org.thymeleaf</groupId>
 	      <artifactId>thymeleaf</artifactId>
-	      <version>${thymeleaf.version}</version>
 	      <scope>compile</scope>
 	    </dependency>
 	    
 	    <dependency>
 	      <groupId>org.thymeleaf</groupId>
 	      <artifactId>thymeleaf-spring3</artifactId>
-	      <version>${thymeleaf.version}</version>
 	      <scope>compile</scope>
 	    </dependency>
     
@@ -168,7 +162,6 @@
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
-			<version>${joda-time.version}</version>
 		</dependency>
 		
 		<!-- generic type tools -->
@@ -183,7 +176,6 @@
     	<dependency>
 			<groupId>org.owasp</groupId>
 			<artifactId>antisamy</artifactId>
-			<version>1.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-httpclient</groupId>

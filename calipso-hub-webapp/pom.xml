@@ -28,6 +28,27 @@
 			</resource>
 		</resources>
     	<plugins>
+            <plugin>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>maven-enunciate-plugin</artifactId>
+                <version>1.8.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+			            <groupId>com.sun</groupId>
+			            <artifactId>tools</artifactId>
+			            <version>1.0</version>
+			            <scope>system</scope>
+			            <systemPath>/usr/lib/jvm/jdk1.7.0/lib/tools.jar</systemPath>
+                    </dependency>
+                </dependencies>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

@@ -20,12 +20,10 @@ package gr.abiss.calipso.jpasearch.json.serializer;
 import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +31,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+//import org.apache.commons.beanutils.PropertyUtilsBean;
 
 public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 
@@ -51,26 +50,26 @@ public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 			jgen.writeNull();
 		} else {
 
-			PropertyDescriptor[] descriptors = new PropertyUtilsBean()
-					.getPropertyDescriptors(domainClass);
-
-			StringBuffer buf = new StringBuffer("{\n");
-
-			for (int i = 0; i < descriptors.length; i++) {
-				PropertyDescriptor descriptor = descriptors[i];
-				String name = descriptor.getName();
-				String fieldValue = getFormFieldConfig(domainClass, name,
-						schema.getType());
-				if (fieldValue != null && !fieldValue.equalsIgnoreCase("skip")) {
-					if (i > 0) {
-						buf.append(",");
-					}
-					buf.append("\n   \"").append(name).append("\": ")
-							.append(fieldValue);
-				}
-			}
-			buf.append("}");
-			jgen.writeRaw(buf.toString());
+			// PropertyDescriptor[] descriptors = new PropertyUtilsBean()
+			// .getPropertyDescriptors(domainClass);
+			//
+			// StringBuffer buf = new StringBuffer("{\n");
+			//
+			// for (int i = 0; i < descriptors.length; i++) {
+			// PropertyDescriptor descriptor = descriptors[i];
+			// String name = descriptor.getName();
+			// String fieldValue = getFormFieldConfig(domainClass, name,
+			// schema.getType());
+			// if (fieldValue != null && !fieldValue.equalsIgnoreCase("skip")) {
+			// if (i > 0) {
+			// buf.append(",");
+			// }
+			// buf.append("\n   \"").append(name).append("\": ")
+			// .append(fieldValue);
+			// }
+			// }
+			// buf.append("}");
+			// jgen.writeRaw(buf.toString());
 		}
 	}
 

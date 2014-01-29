@@ -18,17 +18,22 @@
 package gr.abiss.calipso.controller;
 
 
-import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.model.dto.MetadatumDTO;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.resthub.common.exception.NotFoundException;
@@ -48,6 +53,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
@@ -60,9 +68,14 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@Autowired
 	private HttpServletRequest request;
 
-	public AbstractServiceBasedRestController() {
-		super();
-	}
+	@Autowired
+	private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+//	@PostConstruct
+//	public void init() {}
+//	public AbstractServiceBasedRestController() {
+//		super();
+//	}
 
 	/**
 	 * Find all resources matching the given criteria and return a paginated
@@ -178,6 +191,32 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	public FormSchema getSchemas(
 			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
 		return this.getSchema(mode);
+	}
+
+	@RequestMapping(value = "apidoc", produces = { "application/json" }, method = {
+			RequestMethod.GET, RequestMethod.OPTIONS })
+	@ResponseBody
+	public List<RestMapping> getRequestMappings() {
+		List<RestMapping> mappings = new LinkedList<RestMapping>();
+	    Map<RequestMappingInfo, HandlerMethod> handlerMethods =
+	                              this.requestMappingHandlerMapping.	getHandlerMethods();
+
+	    for(Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()) {
+	        RequestMappingInfo mapping = item.getKey();
+	        HandlerMethod method = item.getValue();
+	        mappings.add(new RestMapping(mapping, method));
+
+	        for (String urlPattern : mapping.getPatternsCondition().getPatterns()) {
+	            System.out.println(
+	                 method.getBeanType().getName() + "#" + method.getMethod().getName() +
+	                 " <-- " + urlPattern);
+
+	            if (urlPattern.equals("some specific url")) {
+	               //add to list of matching METHODS
+	            }
+	        }
+	    }       
+	    return mappings;
 	}
 
 	// @Secured("ROLE_ADMIN")

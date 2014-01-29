@@ -58,7 +58,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 //@Named("userDetailsService")
 @Transactional(readOnly = true)
 public class UserDetailsServiceImpl implements UserDetailsService,
-		org.springframework.security.core.userdetails.UserDetailsService, org.springframework.social.security.SocialUserDetailsService,
+		org.springframework.security.core.userdetails.UserDetailsService,
+		org.springframework.social.security.SocialUserDetailsService,
 		ConnectionSignUp, SignInAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
@@ -106,33 +107,40 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		return userDetails;
 	}
 
-	@Transactional(readOnly = false)
+	// @Transactional(readOnly = false)
 	@Override
 	public UserDetails create(final UserDetails tryUserDetails) {
 		UserDetails userDetails = null;
-		String userNameOrEmail = tryUserDetails.getUsername();
-		if (StringUtils.isBlank(userNameOrEmail)) {
-			userNameOrEmail = tryUserDetails.getEmail();
+		if (tryUserDetails != null) {
+			try {
+				String userNameOrEmail = tryUserDetails.getUsername();
+				if (StringUtils.isBlank(userNameOrEmail)) {
+					userNameOrEmail = tryUserDetails.getEmail();
+				}
+				String password = tryUserDetails.getPassword();
+				Map<String, String> metadata = tryUserDetails.getMetadata();
+
+				// make sure we have credentials to send
+				if (StringUtils.isNotBlank(userNameOrEmail)
+						&& StringUtils.isNotBlank(password)) {
+
+					// ask for the corresponding persisted user
+					LocalUser localUser = this.localUserService
+							.findByCredentials(userNameOrEmail, password,
+									metadata);
+
+					// convert to UserDetals if not null
+					userDetails = UserDetails.fromUser(localUser);
+					LOGGER.info("Creating user details from localUser...");
+				}
+			} catch (RuntimeException e) {
+				LOGGER.error("Failed creating user details object", e);
+			}
+
 		}
-		String password = tryUserDetails.getPassword();
-		Map<String, String> metadata = tryUserDetails.getMetadata();
 
-
-		// make sure we have credentials to send
-		if (StringUtils.isNotBlank(userNameOrEmail)
-				&& StringUtils.isNotBlank(password)) {
-
-			// ask for the corresponding persisted user
-			LocalUser localUser = this.localUserService.findByCredentials(
-					userNameOrEmail, password, metadata);
-
-			// convert to UserDetals if not null
-			userDetails = UserDetails.fromUser(localUser);
-
-			LOGGER.info("create principal: " + localUser
-					+ ", returning  UserDetails: " + userDetails);
-		}
-
+		LOGGER.info("create testing returning null, userDetails: "
+				+ userDetails);
 		return userDetails;
 	}
 
