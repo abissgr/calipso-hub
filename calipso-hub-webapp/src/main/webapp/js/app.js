@@ -2,10 +2,11 @@ define(['router/app-router'], function(AppRouter) {
 
 	function Calipso(){}
 	Calipso.prototype.getBaseUrl = function() {
-		if (document.getElementById("fforaMainScript")) { // host page
-			var basePathEnd = document.getElementById("fforaMainScript").src.indexOf("/js/lib/require.js");
-			return document.getElementById("fforaMainScript").src.substring(0, basePathEnd);
-		} else { // manager area
+		var calipsoMainScript = document.getElementById("calipso-script-main");
+		if (calipsoMainScript) { // host page
+			var basePathEnd = calipsoMainScript.src.indexOf("/js/lib/require.js");
+			return calipsoMainScript.src.substring(0, basePathEnd);
+		} else {
 			return window.location.protocol + "//" + window.location.host;
 		}
 	};
