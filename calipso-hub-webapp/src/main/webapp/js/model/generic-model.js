@@ -38,8 +38,8 @@ function(Backbone, Backgrid) {
 			    	return;
 			    }
 			    var sUrl = model.url+"/"+model.get("id");
-
-			    model.save({}, {url: sUrl});
+			    //(base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
+			    //model.save({}, {url: sUrl});
 		    });
 		},
 			

@@ -1,4 +1,4 @@
-define([ 'backbone', 'resthub', 'backgrid', 'backgrid-paginator', 'model/user', 'hbs!template/generic' , 'collection/generic-collection'],
+define([ 'backbone', 'resthub', 'backgrid', 'backgrid-paginator', 'model/user', 'hbs!template/generic-collection-grid-view' , 'collection/generic-collection'],
 function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, genericCollectionTemplate, GenericCollection) {
     //Backgrid.Extension.Paginator = Paginator;
     var GenericCollectionGridView = Resthub.View.extend(
