@@ -16,6 +16,7 @@
 		<param-value>classpath*:resthubContext.xml, classpath*:applicationContext.xml</param-value>
 	</context-param>
 	
+	<!-- original -->
 	<context-param>
 		<param-name>spring.profiles.active</param-name>
 		<param-value>resthub-jpa, resthub-web-server</param-value>

@@ -7,16 +7,45 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 				// console.log("UserModel#urlRoot");
 				// return window.calipso.getBaseUrl() + "/api/rest/user";
 				// },
-				schema : function() {
+				
+				schemaComplete : function() {
 					return {
-						userName : 'Text',
-						firstName : 'Text',
-						lastName : 'Text',
+						userName : {
+							"search": 'Text',
+							"default": {
+								type: 'Text',
+								validators : [ 'required' ]
+							}
+						},
+						firstName : {
+							"search": 'Text',
+							"default": {
+								type: 'Text',
+								validators : [ 'required' ]
+							}
+						},
+						lastName : {
+							"search": 'Text',
+							"default": {
+								type: 'Text',
+								validators : [ 'required' ]
+							}
+						},
 						email : {
-							validators : [ 'required', 'email' ]
+							"search": {
+								type: 'Text',
+								validators : [ 'email' ]
+							},
+							"default": {
+								type: 'Text',
+								validators : [ 'required', 'email' ]
+							}
 						},
 					};
-				}
+				},
+
+				
+			
 			});
 
 			var EditCell = Backgrid.Cell.extend({
@@ -29,7 +58,8 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 					e.preventDefault();
 					var user = this.model;
 					var form = new Backbone.Form({
-						model : user
+						model : user,
+						schema : user.isNew() ? user.getSchemaForAction("create") : user.getSchemaForAction("update");
 					});
 
 					var modal = new Backbone.BootstrapModal({

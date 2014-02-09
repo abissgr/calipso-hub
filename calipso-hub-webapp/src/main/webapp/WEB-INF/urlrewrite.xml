@@ -18,10 +18,10 @@
         <from>^/api/(.*)$</from>
         <set type="request" name="Accept">application/json</set>
     </rule>
-    <!--rule>
+    <rule>
         <from>^/users$</from>
         
-        <to type="forward" last="true">/index.html</to>
-    </rule-->
+        <to type="forward" last="true">index.html</to>
+    </rule>
 </urlrewrite>
 

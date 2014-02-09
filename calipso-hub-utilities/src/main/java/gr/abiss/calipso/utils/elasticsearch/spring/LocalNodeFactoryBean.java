@@ -40,9 +40,8 @@ public class LocalNodeFactoryBean extends AbstractFactoryBean<Node> {
 		Builder builder = ImmutableSettings.settingsBuilder()
 				.loadFromClasspath("elasticsearch/elasticsearch.yml");
 
-		// create local node
-		this.node = NodeBuilder.nodeBuilder().local(true).data(true)
-				.settings(builder).node();
+		// create node according to settings
+		this.node = NodeBuilder.nodeBuilder().settings(builder).node();
 		// make the node accessible via the servlet context as
 		// "elasticsearchNode"
 		this.servletContext.setAttribute(

@@ -24,16 +24,24 @@ public class SimpleUserDetailsConfig implements UserDetailsConfig {
 	private String cookiesBasicAuthTokenName = "Authorization";
 	private String cookiesDomain = null;
 	private String cookiesContextPath = null;
+	private boolean cookiesSecure = false;
+	private boolean cookiesHttpOnly = false;
 
 	public SimpleUserDetailsConfig() {
 
 	}
 
 	public SimpleUserDetailsConfig(String cookiesBasicAuthTokenName, String cookiesDomain, String cookiesContextPath) {
+		this(cookiesBasicAuthTokenName, cookiesDomain, cookiesContextPath, false, false);
+	}
+	
+	public SimpleUserDetailsConfig(String cookiesBasicAuthTokenName, String cookiesDomain, String cookiesContextPath, boolean cookiesSecure, boolean cookiesHttpOnly) {
 		super();
 		this.cookiesBasicAuthTokenName = cookiesBasicAuthTokenName;
 		this.cookiesDomain = cookiesDomain;
 		this.cookiesContextPath = cookiesContextPath;
+		this.cookiesSecure = cookiesSecure;
+		this.cookiesHttpOnly = cookiesHttpOnly;
 	}
 
 	public String getCookiesBasicAuthTokenName() {
@@ -46,6 +54,14 @@ public class SimpleUserDetailsConfig implements UserDetailsConfig {
 
 	public String getCookiesContextPath() {
 		return cookiesContextPath;
+	}
+
+	public boolean isCookiesSecure() {
+		return cookiesSecure;
+	}
+
+	public boolean isCookiesHttpOnly() {
+		return cookiesHttpOnly;
 	}
 
 

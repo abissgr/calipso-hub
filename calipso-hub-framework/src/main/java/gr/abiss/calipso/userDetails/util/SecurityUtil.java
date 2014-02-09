@@ -43,23 +43,11 @@ public class SecurityUtil {
 	private static final String COOKIE_NAME_SESSION = "JSESSIONID";
 
 	public static void login(HttpServletRequest request, HttpServletResponse response, LocalUser user, UserDetailsConfig userDetailsConfig) {
-		LOGGER.debug("login S1, Logging in user: " + user);
 		UserDetails userDetails = UserDetails.fromUser(user);
-
-		//        		ExampleUserDetails.getBuilder()
-		//                .firstName(user.getFirstName())
-		//                .id(user.getId())
-		//                .lastName(user.getLastName())
-		//                .password(user.getPassword())
-		//                .role(user.getRole())
-		//                .socialSignInProvider(user.getSignInProvider())
-		//                .username(user.getEmail())
-		//                .build();
-		LOGGER.debug("login S1, Logging in principal: " + userDetails);
-		//		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-		//		SecurityContextHolder.getContext().setAuthentication(authentication);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("login,  userDetails: "+userDetails);
+		}
 		login(request, response, userDetails, userDetailsConfig);
-		LOGGER.debug("login S1, Logged in user: " + userDetails);
 	}
 
 	public static void login(HttpServletRequest request, HttpServletResponse response, UserDetails userDetails,
@@ -82,9 +70,13 @@ public class SecurityUtil {
 		addCookie(response, COOKIE_NAME_SESSION, null, true, userDetailsConfig);
 		HttpSession session = request.getSession();
 		if (session != null) {
-			LOGGER.debug("logout, no session to clear");
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("logout, no session to clear");
+			}
 		} else {
-			LOGGER.debug("logout, invalidating session");
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("logout, invalidating session");
+			}
 			session.invalidate();
 		}
 	}
@@ -103,18 +95,18 @@ public class SecurityUtil {
 		if (StringUtils.isBlank(cookieValue) && !allowClear) {
 			throw new RuntimeException("Was given a blank cookie value but allowClear is false for cookie name: " + cookieName);
 		}
-		// TODO: use own config
-		//Configuration config = null;//Config.getConfiguration();
 
-		LOGGER.debug("addCookie, cookieName: " + cookieName + 
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("addCookie, cookieName: " + cookieName + 
 				", cookie value: " + cookieValue+
-				", Domain: "+userDetailsConfig.getCookiesDomain() +
+				", domain: "+userDetailsConfig.getCookiesDomain() +
+				", secure: "+userDetailsConfig.isCookiesSecure() +
+				", http-only: "+userDetailsConfig.isCookiesHttpOnly() +
 				", path: "+userDetailsConfig.getCookiesContextPath());
+		}
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		if (StringUtils.isNotBlank(userDetailsConfig.getCookiesDomain())) {
 			cookie.setDomain('.' + userDetailsConfig.getCookiesDomain());
-		} else {
-			cookie.setDomain(".localhost");
 		}
 
 		if (StringUtils.isNotBlank(userDetailsConfig.getCookiesContextPath())) {
@@ -122,9 +114,14 @@ public class SecurityUtil {
 		} else {
 			cookie.setPath("/");
 		}
-
+		
+		cookie.setSecure(userDetailsConfig.isCookiesSecure());
+		cookie.setHttpOnly(userDetailsConfig.isCookiesHttpOnly());
+		
 		if (StringUtils.isBlank(cookieValue)) {
-			LOGGER.debug("addCookie, setting max-age to 0 to clear cookie: " + cookieName);
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("addCookie, setting max-age to 0 to clear cookie: " + cookieName);
+			}
 			cookie.setMaxAge(0);
 		}
 		response.addCookie(cookie);
@@ -137,7 +134,9 @@ public class SecurityUtil {
 			principal = SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 		}
-		LOGGER.debug("getPrincipal, principal: " + principal);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("getPrincipal, principal: " + principal);
+		}
 		if (principal != null
 				&& UserDetails.class.isAssignableFrom(principal.getClass())) {
 			return (UserDetails) principal;
