@@ -23,22 +23,26 @@ function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, Use
             //new SamplesView({root:$('#main')});
         },
         users:function () {
+			console.log("users");
         	var userCollection = new GenericCollection([], {
         		model: UserModel,
         		// GenericCollection will use it's model's prototype.getDefaultSchemaForGrid() by default
-        		// schemaForGrid: UserModel.prototype.getDefaultSchemaForGrid(),
+        		//schemaForGrid: UserModel.prototype.getDefaultSchemaForGrid(),
         		url: window.calipso.getBaseUrl() + "/api/rest/user/"
         	});
 
-			console.log("userCollection model: "+userCollection.model);
+			console.log("users, userCollection model: "+userCollection.model);
             new GenericCollectionGridView({root:$('#main'), collection:userCollection}).render();
         },
         about:function () {
             new AboutView({root:$('#main')});
         },
+        
+        
     });
     
 
+	console.log("AppRouter done ");
 
     return AppRouter;
 

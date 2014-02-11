@@ -9,9 +9,14 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 				// },
 				
 				schemaComplete : function() {
-					return {
+					return {//
 						userName : {
 							"search": 'Text',
+							"update": {
+								type: 'Text',
+								validators : [ 'required' ],
+								editorAttrs: { disabled: true }
+							},
 							"default": {
 								type: 'Text',
 								validators : [ 'required' ]
@@ -57,9 +62,10 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 					console.log("Hello");
 					e.preventDefault();
 					var user = this.model;
+					var userSchema = user.isNew() ? user.schema("create") : user.schema("update");
 					var form = new Backbone.Form({
 						model : user,
-						schema : user.isNew() ? user.getSchemaForAction("create") : user.getSchemaForAction("update");
+						schema : userSchema,
 					});
 
 					var modal = new Backbone.BootstrapModal({
@@ -125,5 +131,6 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 					cell : EditCell
 				} ];
 			}
+			console.log("UserModel done");
 			return UserModel;
 		});

@@ -29,5 +29,6 @@ define(['router/app-router'], function(AppRouter) {
 	    }
 	});
 	
+	console.log("app.js done");
 	
 });

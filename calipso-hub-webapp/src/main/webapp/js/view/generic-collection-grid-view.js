@@ -54,6 +54,7 @@ function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, generic
 		}
 
     });
+	console.log("GenericCollectionGridView done");
     return GenericCollectionGridView;
 });
 

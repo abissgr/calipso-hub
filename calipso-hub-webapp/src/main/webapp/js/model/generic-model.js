@@ -25,7 +25,7 @@ function(Backbone, Backgrid) {
 			// the schema to build for the selected action 
 			var schemaForAction = {};
 			// get the complete schema to filter out from
-			var schemaComplete = schemaComplete();
+			var schemaComplete = this.schemaComplete();
 			console.log("GenericModel#schema actionName: "+actionName+", schemaComplete: "+schemaComplete);
 			
 			// for each property, select the appropriate schema entry for the given action
@@ -37,23 +37,22 @@ function(Backbone, Backgrid) {
 		    		
 			    	// if a schema exists for the property
 			    	if(propertySchema){
-				    		// try obtaining a schema for the specific action 
-			    			propertySchemaForAction = propertySchema[actionName];
-			    			// support wild card entries
-			    			if(!propertySchemaForAction){
-			    				propertySchemaForAction = propertySchema["default"];
-			    			}
-			    			if(propertySchemaForAction){
-			    				schemaForAction[propertyName] = propertySchemaForAction;
-			    			}
-			    		}
-			    	}
+			    		// try obtaining a schema for the specific action 
+		    			propertySchemaForAction = propertySchema[actionName];
+		    			// support wild card entries
+		    			if(!propertySchemaForAction){
+		    				propertySchemaForAction = propertySchema["default"];
+		    			}
+		    			if(propertySchemaForAction){
+		    				schemaForAction[propertyName] = propertySchemaForAction;
+		    			}
+		    		}
+		    	}
 			    	
-			    	// reset
-			    	propertySchema = false;
-			    	propertySchemaForAction = false;
-			    }
-			}
+		    	// reset
+		    	propertySchema = false;
+		    	propertySchemaForAction = false;
+		    }
 			console.log("GenericModel#schema schemaForAction: "+schemaForAction);
 			return schemaForAction;
 		},
@@ -106,5 +105,6 @@ function(Backbone, Backgrid) {
 	GenericModel.prototype.getDefaultSchemaForGrid = function(){
 		// TODO: infer based on defaults OR conditionally build the edit etc. button columns
 	}
+	console.log("GenericModel done");
 	return GenericModel;
 });

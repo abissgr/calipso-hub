@@ -12,7 +12,7 @@ function(Backbone, BackbonePageableCollection) {
 			console.log("GenericCollection#initialize, options.model: "+options.model);
 			// use given grid columns if provided, or the
 			// default model columns otherwise
-			if (options.schemaForGrid) {
+							if (options.schemaForGrid) {
 				console.log("GenericCollection#initialize: using options.schemaForGrid");
 				this.schemaForGrid = options.schemaForGrid;
 			} else {
@@ -74,6 +74,7 @@ function(Backbone, BackbonePageableCollection) {
 		 }
 
 
-					});
-			return GenericCollection;
-		});
+	});
+	console.log("GenericCollection done");
+	return GenericCollection;
+});
