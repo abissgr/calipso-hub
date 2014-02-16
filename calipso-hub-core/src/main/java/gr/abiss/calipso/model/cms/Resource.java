@@ -50,7 +50,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @Entity
 @Table(name = "content_resource")
-public class ContentResource extends AbstractAuditable<User> {
+public class Resource extends AbstractAuditable<User> {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 
@@ -76,11 +76,27 @@ public class ContentResource extends AbstractAuditable<User> {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof ContentResource)) {
+		if (!(obj instanceof Resource)) {
 			return false;
 		}
-		ContentResource that = (ContentResource) obj;
+		Resource that = (Resource) obj;
 		return null == this.getId() ? false : this.getId().equals(that.getId());
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public Host getHost() {
+		return host;
+	}
+
+	public void setHost(Host host) {
+		this.host = host;
 	}
 
 

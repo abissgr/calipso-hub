@@ -45,6 +45,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,12 +54,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiResponse;
+
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
+@Api(description = "All generic operations for entities", value = "")
 public abstract class AbstractServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericService<T, ID>>
 		extends
 		ServiceBasedRestController<T, ID, S> {
@@ -70,12 +77,6 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 	@Autowired
 	private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-//	@PostConstruct
-//	public void init() {}
-//	public AbstractServiceBasedRestController() {
-//		super();
-//	}
 
 	/**
 	 * Find all resources matching the given criteria and return a paginated
@@ -94,6 +95,8 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
+	@ApiOperation(value = "search", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
+	
 	public Page<T> findPaginated(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
@@ -111,6 +114,73 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 				new ParameterMapBackedPageRequest(request
 				.getParameterMap(), page - 1, size, new Sort(orders)));
 	}
+	
+	
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    @ApiOperation(value = "create", notes = "Create a new resource", httpMethod = "POST")
+	////@ApiResponse(code = 201, message = "created")
+	public T create(@RequestBody T resource) {
+		return super.create(resource);
+	}
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@RequestMapping(method = RequestMethod.PUT)
+    @ResponseBody
+    @ApiOperation(value = "update", notes = "Update a resource", httpMethod = "PUT")
+	////@ApiResponse(code = 200, message = "OK")
+	public T update(@PathVariable ID id, @RequestBody T resource) {
+		// TODO Auto-generated method stub
+		return super.update(id, resource);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@RequestMapping(method = RequestMethod.GET, params="page=no", produces="application/json")
+    @ResponseBody
+    @ApiOperation(value = "Find all", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)", httpMethod = "GET")
+	//@ApiResponse(code = 200, message = "OK")
+	public Iterable<T> findAll() {
+		// TODO Auto-generated method stub
+		return super.findAll();
+	}
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public T findById(@PathVariable ID id) {
+		// TODO Auto-generated method stub
+		return super.findById(id);
+	}
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void delete(@PathVariable ID id) {
+		// TODO Auto-generated method stub
+		super.delete(id);
+	}
+
+
 
 	/**
 	 * Find all resources matching the given criteria and return a paginated

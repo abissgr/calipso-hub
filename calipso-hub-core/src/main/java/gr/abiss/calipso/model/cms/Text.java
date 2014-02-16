@@ -25,19 +25,36 @@ import javax.persistence.Table;
 /**
  */
 @Entity
-@Table(name = "content_page")
-public class Page extends ContentResource {
+@Table(name = "content_text")
+public class Text extends Resource {
 
 	/**
-	 * The MIME type of the page source. May use to dynamically generate response content. 
+	 * The MIME type of the page source. May be used to dynamically generate response content. 
 	 */
-	@Column(name = "raw_mime", nullable = false)
-	private String rawMime;
+	@Column(name = "source_content_type", nullable = false)
+	private String sourceContentType;
 	
 	/**
 	 * The raw text content of the resource 
 	 */
-	@Column(name = "raw_content", nullable = false)
-	private String rawContent;
+	@Column(name = "source", nullable = false)
+	private String source;
 
+	public String getSourceContentType() {
+		return sourceContentType;
+	}
+
+	public void setSourceContentType(String sourceContentType) {
+		this.sourceContentType = sourceContentType;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	
 }

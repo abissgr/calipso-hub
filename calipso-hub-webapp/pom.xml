@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>calipso-hub</artifactId>
-        <groupId>gr.abiss.calipso</groupId>
-        <version>1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+	<parent>
+		<artifactId>calipso-hub</artifactId>
+		<groupId>gr.abiss.calipso</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
-    <name>calipso-hub-webapp</name>
-    <groupId>gr.abiss.calipso</groupId>
-    <artifactId>calipso-hub-webapp</artifactId>
+	<name>calipso-hub-webapp</name>
+	<groupId>gr.abiss.calipso</groupId>
+	<artifactId>calipso-hub-webapp</artifactId>
 	<packaging>war</packaging>
-    <properties>
-    	<project.parent.basedir>../</project.parent.basedir>
-    </properties>
-    <build>
+	<properties>
+		<project.parent.basedir>../</project.parent.basedir>
+	</properties>
+	<build>
 		<filters>
 			<filter>${project.parent.basedir}/dev.properties</filter>
 		</filters>
@@ -27,28 +27,13 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-    	<plugins>
-            <plugin>
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>maven-enunciate-plugin</artifactId>
-                <version>1.8.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>assemble</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-			            <groupId>com.sun</groupId>
-			            <artifactId>tools</artifactId>
-			            <version>1.0</version>
-			            <scope>system</scope>
-			            <systemPath>/usr/lib/jvm/jdk1.7.0/lib/tools.jar</systemPath>
-                    </dependency>
-                </dependencies>
-            </plugin>
+		<plugins>
+			<!--plugin> <groupId>org.codehaus.enunciate</groupId> <artifactId>maven-enunciate-plugin</artifactId> 
+				<version>1.8.1</version> <executions> <execution> <goals> <goal>assemble</goal> 
+				</goals> </execution> </executions> <dependencies> <dependency> <groupId>com.sun</groupId> 
+				<artifactId>tools</artifactId> <version>1.0</version> <scope>system</scope> 
+				<systemPath>/usr/lib/jvm/jdk1.7.0/lib/tools.jar</systemPath> </dependency> 
+				</dependencies> </plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -58,124 +43,125 @@
 				<artifactId>maven-resources-plugin</artifactId>
 			</plugin>
 			<plugin>
-	                <groupId>org.mortbay.jetty</groupId>
-	                <artifactId>jetty-maven-plugin</artifactId>
-	                <version>${jetty.version}</version>
-	                <configuration>
-	                    <!-- We use non NIO connector in order to avoid read only static files under windows -->
-	                    <connectors>
-	                        <connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
-	                            <port>${jetty.port}</port>
-	                            <maxIdleTime>60000</maxIdleTime>
-	                            <requestBufferSize>30000</requestBufferSize>
-	                            <requestHeaderSize>30000</requestHeaderSize>
-	                        </connector>
-	                    </connectors>
-	                    <webAppConfig>
-	                    	<!--extraClasspath>${basedir}/target/classes/;${basedir}/etc/jetty/classes/</extraClasspath-->
-	                    	<unpackOverlays>true</unpackOverlays>
-	                    </webAppConfig>
-	                    <!--webAppSourceDirectory>${project.build.directory}/${project.name}${project.version}</webAppSourceDirectory-->
-	                    <!-- To run the optimized version of the webapp -->
-	                    <!-- do a 'mvn package -Poptimize' and uncomment the following line -->
-	                    <!-- webAppSourceDirectory>D:\\Workspaces\\resthub\\resthub-archetypes\\resthub-jpa-backbonejs-multi-archetype/target/resthub-jpa-backbonejs-multi-archetype-2.0-rc4</webAppSourceDirectory -->
-	                </configuration>
-	            </plugin>
-    	</plugins>
-    	
-    </build>
-    
-    <dependencies>
-        <dependency>
-            <groupId>gr.abiss.calipso</groupId>
-            <artifactId>calipso-hub-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.resthub</groupId>
-            <artifactId>resthub-jpa</artifactId>
-            <version>${resthub.spring.stack.version}</version>
-        </dependency>
-        
-        <!-- URL Rewrite Filter -->
-        
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>${jetty.version}</version>
+				<configuration>
+					<!-- We use non NIO connector in order to avoid read only static files 
+						under windows -->
+					<connectors>
+						<connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
+							<port>${jetty.port}</port>
+							<maxIdleTime>60000</maxIdleTime>
+							<requestBufferSize>30000</requestBufferSize>
+							<requestHeaderSize>30000</requestHeaderSize>
+						</connector>
+					</connectors>
+					<webAppConfig>
+						<!--extraClasspath>${basedir}/target/classes/;${basedir}/etc/jetty/classes/</extraClasspath -->
+						<unpackOverlays>true</unpackOverlays>
+					</webAppConfig>
+					<!--webAppSourceDirectory>${project.build.directory}/${project.name}${project.version}</webAppSourceDirectory -->
+					<!-- To run the optimized version of the webapp -->
+					<!-- do a 'mvn package -Poptimize' and uncomment the following line -->
+					<!-- webAppSourceDirectory>D:\\Workspaces\\resthub\\resthub-archetypes\\resthub-jpa-backbonejs-multi-archetype/target/resthub-jpa-backbonejs-multi-archetype-2.0-rc4</webAppSourceDirectory -->
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>gr.abiss.calipso</groupId>
+			<artifactId>calipso-hub-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.resthub</groupId>
+			<artifactId>resthub-jpa</artifactId>
+			<version>${resthub.spring.stack.version}</version>
+		</dependency>
+		
+		<!-- URL Rewrite Filter -->
+
 		<dependency>
 			<groupId>org.tuckey</groupId>
 			<artifactId>urlrewritefilter</artifactId>
 			<version>${urlrewritefilter.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.googlecode.flyway</groupId>
 			<artifactId>flyway-core</artifactId>
 			<version>${flyway-core.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
-		
+
 		<!-- javax servlet stuff -->
-			<dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-            </dependency>
-	        <dependency>
-	            <groupId>javax.servlet.jsp</groupId>
-	            <artifactId>jsp-api</artifactId>
-	        </dependency>
-	        <dependency>
-	            <groupId>javax.servlet</groupId>
-	            <artifactId>jstl</artifactId>
-	        </dependency>
-	        <dependency>
-	            <groupId>taglibs</groupId>
-	            <artifactId>standard</artifactId>
-	        </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>taglibs</groupId>
+			<artifactId>standard</artifactId>
+		</dependency>
+	</dependencies>
 
-    <profiles>
-        <profile>
-            <id>optimize</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.mcheely</groupId>
-                        <artifactId>requirejs-maven-plugin</artifactId>
-                        <version>1.0.4</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>optimize</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- path to optimizer json config file -->
-                            <configFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/build-maven-config.js</configFile>
-                            <!-- optional path to optimizer executable -->
-                            <optimizerFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/r.js</optimizerFile>
-                            <!-- whether or not to process config with maven filters -->
-                            <filterConfig>true</filterConfig>
-                            <!-- Skip requirejs optimization if true -->
-                            <skip>false</skip>
-                        </configuration>
-                    </plugin>
+	<profiles>
+		<profile>
+			<id>optimize</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.mcheely</groupId>
+						<artifactId>requirejs-maven-plugin</artifactId>
+						<version>1.0.4</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>optimize</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- path to optimizer json config file -->
+							<configFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/build-maven-config.js</configFile>
+							<!-- optional path to optimizer executable -->
+							<optimizerFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/r.js</optimizerFile>
+							<!-- whether or not to process config with maven filters -->
+							<filterConfig>true</filterConfig>
+							<!-- Skip requirejs optimization if true -->
+							<skip>false</skip>
+						</configuration>
+					</plugin>
 
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>2.3</version>
-                        <configuration>
-                            <warSourceExcludes>js/**,css/**</warSourceExcludes>
-                            <packagingExcludes>%regex[js/libs/(?!require).*],js/templates/**</packagingExcludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<version>2.3</version>
+						<configuration>
+							<warSourceExcludes>js/**,css/**</warSourceExcludes>
+							<packagingExcludes>%regex[js/libs/(?!require).*],js/templates/**</packagingExcludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

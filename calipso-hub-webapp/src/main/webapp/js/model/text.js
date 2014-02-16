@@ -2,15 +2,15 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 		'model/generic-model', 'view/about-view' ],
 		function(Backbone, BackboneBootstrapModal, BackboneForm, Backgrid,
 				GenericModel, AboutView) {
-			var UserModel = GenericModel.extend({
+			var TextModel = GenericModel.extend({
 				// urlRoot: function() {
-				// console.log("UserModel#urlRoot");
+				// console.log("TextModel#urlRoot");
 				// return window.calipso.getBaseUrl() + "/api/rest/user";
 				// },
 				
 				schemaComplete : function() {
 					return {//
-						userName : {
+						"name" : {
 							"search": 'Text',
 							"update": {
 								type: 'Text',
@@ -22,30 +22,14 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 								validators : [ 'required' ]
 							}
 						},
-						firstName : {
+						path : {
 							"search": 'Text',
 							"default": {
 								type: 'Text',
 								validators : [ 'required' ]
 							}
 						},
-						lastName : {
-							"search": 'Text',
-							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
-						},
-						email : {
-							"search": {
-								type: 'Text',
-								validators : [ 'email' ]
-							},
-							"default": {
-								type: 'Text',
-								validators : [ 'required', 'email' ]
-							}
-						},
+						
 					};
 				},
 
@@ -92,7 +76,7 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 				}
 			});
 
-			UserModel.prototype.getDefaultSchemaForGrid = function() {
+			TextModel.prototype.getDefaultSchemaForGrid = function() {
 				return [/*
 						 * { name: "id", // The key of the model attribute
 						 * label: "ID", // The name to display in the header
@@ -131,6 +115,6 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 					cell : EditCell
 				} ];
 			}
-			console.log("UserModel done");
-			return UserModel;
+			console.log("TextModel done");
+			return TextModel;
 		});

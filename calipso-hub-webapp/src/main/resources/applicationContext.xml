@@ -78,4 +78,7 @@
     </bean>
     <alias name="userService" alias="localUserService"/>
     
+    <bean id="swaggerConfig" class="gr.abiss.calipso.utils.swagger.CustomDocumentationConfig" />
+    <!--context:property-placeholder location="classpath:swagger.properties" /-->
+    
 </beans>

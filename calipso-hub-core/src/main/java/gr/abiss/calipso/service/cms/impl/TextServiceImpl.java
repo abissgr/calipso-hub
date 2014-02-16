@@ -18,10 +18,10 @@
  */
 package gr.abiss.calipso.service.cms.impl;
 
-import gr.abiss.calipso.model.cms.Page;
+import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.repository.cms.PageRepository;
 import gr.abiss.calipso.service.EmailService;
-import gr.abiss.calipso.service.cms.PageService;
+import gr.abiss.calipso.service.cms.TextService;
 import gr.abiss.calipso.service.impl.AbstractServiceImpl;
 
 import javax.inject.Inject;
@@ -31,10 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named("pageService")
-public class PageServiceImpl extends AbstractServiceImpl<Page, String, PageRepository> 
-	implements PageService {
+public class TextServiceImpl extends AbstractServiceImpl<Text, String, PageRepository> 
+	implements TextService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PageServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TextServiceImpl.class);
 
 	private EmailService emailService;
 

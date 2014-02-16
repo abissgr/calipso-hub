@@ -135,6 +135,13 @@
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
 		</dependency>
+		
+		
+		<dependency>
+			<groupId>com.mangofactory</groupId>
+			<artifactId>swagger-springmvc</artifactId>
+		</dependency>
+		
 		<!-- elastisearch -->
 		<dependency>
 		    <groupId>org.springframework.data</groupId>

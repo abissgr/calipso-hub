@@ -19,9 +19,9 @@
 package gr.abiss.calipso.service.cms;
 
 import gr.abiss.calipso.jpasearch.service.GenericService;
-import gr.abiss.calipso.model.cms.Page;
+import gr.abiss.calipso.model.cms.Text;
 
-public interface PageService extends GenericService<Page, String> {
+public interface TextService extends GenericService<Text, String> {
 
 
 }

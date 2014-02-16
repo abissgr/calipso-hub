@@ -45,6 +45,9 @@
         <level value="debug" />
     </logger>
 -->
+ <logger name="com.mangofactory.swagger">
+        <level value="debug" />
+    </logger>
     <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>

@@ -19,8 +19,8 @@
 package gr.abiss.calipso.controller.cms;
 
 import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
-import gr.abiss.calipso.model.cms.Page;
-import gr.abiss.calipso.service.cms.PageService;
+import gr.abiss.calipso.model.cms.Text;
+import gr.abiss.calipso.service.cms.TextService;
 
 import javax.inject.Inject;
 
@@ -33,13 +33,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping(value = "/api/rest/cms/page", produces = { "application/json", "application/xml" })
-public class PageController extends AbstractServiceBasedRestController<Page, String, PageService> {
+public class TextController extends AbstractServiceBasedRestController<Text, String, TextService> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PageController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TextController.class);
 
 	@Override
 	@Inject
-	public void setService(PageService service) {
+	public void setService(TextService service) {
 		this.service = service;
 	}
     
