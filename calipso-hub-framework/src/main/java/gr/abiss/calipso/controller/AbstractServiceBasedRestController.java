@@ -95,8 +95,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "search", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
-	
+	@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
 	public Page<T> findPaginated(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
@@ -139,7 +138,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
     @ApiOperation(value = "update", notes = "Update a resource", httpMethod = "PUT")
-	////@ApiResponse(code = 200, message = "OK")
+	//@ApiResponse(code = 200, message = "OK")
 	public T update(@PathVariable ID id, @RequestBody T resource) {
 		// TODO Auto-generated method stub
 		return super.update(id, resource);
@@ -151,30 +150,40 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@Override
 	@RequestMapping(method = RequestMethod.GET, params="page=no", produces="application/json")
     @ResponseBody
-    @ApiOperation(value = "Find all", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)", httpMethod = "GET")
+    @ApiOperation(value = "find all", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)", httpMethod = "GET")
 	//@ApiResponse(code = 200, message = "OK")
 	public Iterable<T> findAll() {
-		// TODO Auto-generated method stub
 		return super.findAll();
 	}
 
 
 
-    /**
-     * {@inheritDoc}
+	/**
+     * Find a resource by its identifier
+     *
+     * @param id The identifier of the resouce to find
+     * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
+     * @throws NotFoundException
      */
-	@Override
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
 	public T findById(@PathVariable ID id) {
-		// TODO Auto-generated method stub
 		return super.findById(id);
 	}
 
 
 
     /**
-     * {@inheritDoc}
+     * Delete a resource by its identifier. 
+     * Return No Content http status code if the request has been correctly processed
+     *
+     * @param id The identifier of the resource to delete
+     * @throws NotFoundException
      */
-	@Override
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation(value = "delete", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
 	public void delete(@PathVariable ID id) {
 		// TODO Auto-generated method stub
 		super.delete(id);
@@ -197,9 +206,9 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@RequestMapping(value = "query", produces = { "application/json" }, method = RequestMethod.POST)
 	@ResponseBody
 	@Deprecated
+	@ApiOperation(value = "deprecated: find paginated with restrictions", httpMethod = "GET")
 	public Page<T> findPaginatedWithRestrictions(
 			@RequestBody Restriction restriction) {
-
 		return this.service.findAll(new RestrictionBackedPageRequest(restriction));
 	}
     
@@ -237,6 +246,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	// TODO: refactor to OPTIONS on base path?
 	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody
+    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "GET")
 	public FormSchema getSchema(
 			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
 		Assert.isTrue(mode == null 
@@ -258,40 +268,42 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
 	@ResponseBody
+    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "OPTIONS")
 	public FormSchema getSchemas(
 			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
 		return this.getSchema(mode);
 	}
 
-	@RequestMapping(value = "apidoc", produces = { "application/json" }, method = {
-			RequestMethod.GET, RequestMethod.OPTIONS })
-	@ResponseBody
-	public List<RestMapping> getRequestMappings() {
-		List<RestMapping> mappings = new LinkedList<RestMapping>();
-	    Map<RequestMappingInfo, HandlerMethod> handlerMethods =
-	                              this.requestMappingHandlerMapping.	getHandlerMethods();
-
-	    for(Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()) {
-	        RequestMappingInfo mapping = item.getKey();
-	        HandlerMethod method = item.getValue();
-	        mappings.add(new RestMapping(mapping, method));
-
-	        for (String urlPattern : mapping.getPatternsCondition().getPatterns()) {
-	            System.out.println(
-	                 method.getBeanType().getName() + "#" + method.getMethod().getName() +
-	                 " <-- " + urlPattern);
-
-	            if (urlPattern.equals("some specific url")) {
-	               //add to list of matching METHODS
-	            }
-	        }
-	    }       
-	    return mappings;
-	}
+//	@RequestMapping(value = "apidoc", produces = { "application/json" }, method = {
+//			RequestMethod.GET, RequestMethod.OPTIONS })
+//	@ResponseBody
+//	public List<RestMapping> getRequestMappings() {
+//		List<RestMapping> mappings = new LinkedList<RestMapping>();
+//	    Map<RequestMappingInfo, HandlerMethod> handlerMethods =
+//	                              this.requestMappingHandlerMapping.	getHandlerMethods();
+//
+//	    for(Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()) {
+//	        RequestMappingInfo mapping = item.getKey();
+//	        HandlerMethod method = item.getValue();
+//	        mappings.add(new RestMapping(mapping, method));
+//
+//	        for (String urlPattern : mapping.getPatternsCondition().getPatterns()) {
+//	            System.out.println(
+//	                 method.getBeanType().getName() + "#" + method.getMethod().getName() +
+//	                 " <-- " + urlPattern);
+//
+//	            if (urlPattern.equals("some specific url")) {
+//	               //add to list of matching METHODS
+//	            }
+//	        }
+//	    }       
+//	    return mappings;
+//	}
 
 	// @Secured("ROLE_ADMIN")
 	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
 	@ResponseBody
+    @ApiOperation(value = "add metadatum", notes = "Add or updated a resource metadatum", httpMethod = "GET")
 	public void addMetadatum(@PathVariable ID subjectId,
 			@RequestBody MetadatumDTO dto) {
 		service.addMetadatum(subjectId, dto);
@@ -300,6 +312,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	// @Secured("ROLE_ADMIN")
 	@RequestMapping(value = "{subjectId}/metadata/{predicate}", method = RequestMethod.DELETE)
 	@ResponseBody
+    @ApiOperation(value = "remove metadatum", notes = "Remove a resource metadatum if it exists", httpMethod = "DELETE")
 	public void removeMetadatum(@PathVariable ID subjectId,
 			@PathVariable String predicate) {
 		service.removeMetadatum(subjectId, predicate);
