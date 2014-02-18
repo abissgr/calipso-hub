@@ -91,16 +91,24 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			String findByUserNameOrEmail) throws UsernameNotFoundException {
 		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
 
-		LOGGER.info("loadUserByUsername using: " + findByUserNameOrEmail);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("loadUserByUsername using: " + findByUserNameOrEmail);
+		}
 		LocalUser user = this.localUserService.findByUserNameOrEmail(findByUserNameOrEmail);
 
-		LOGGER.info("loadUserByUsername user: " + user);
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("loadUserByUsername user: " + user);
+		}
 
 		userDetails = gr.abiss.calipso.userDetails.model.UserDetails
 				.fromUser(user);
 
-		LOGGER.info("loadUserByUsername returns userDetails: " + userDetails
-				+ ",	 with roles: " + userDetails.getAuthorities());
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("loadUserByUsername returns userDetails: " + userDetails
+					+ ",	 with roles: " + userDetails.getAuthorities());
+		}
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + findByUserNameOrEmail);
 		}
@@ -131,7 +139,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 					// convert to UserDetals if not null
 					userDetails = UserDetails.fromUser(localUser);
-					LOGGER.info("Creating user details from localUser...");
+
+					if(LOGGER.isDebugEnabled()){
+						LOGGER.debug("Creating user details from localUser...");
+					}
 				}
 			} catch (RuntimeException e) {
 				LOGGER.error("Failed creating user details object", e);
@@ -139,8 +150,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 		}
 
-		LOGGER.info("create testing returning null, userDetails: "
-				+ userDetails);
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("create testing returning null, userDetails: " + userDetails);
+		}
 		return userDetails;
 	}
 
@@ -153,7 +166,9 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		// convert to UserDetals if not null
 		userDetails = UserDetails.fromUser(localUser);
 
-		LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
+		}
 		return userDetails;
 	}
 
@@ -199,7 +214,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				user = this.localUserService.findByUserNameOrEmail(username);
 			}
 		}
-		LOGGER.debug("getPrincipalUser, user: " + user);
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("getPrincipalUser, user: " + user);
+		}
 		return user;
 	}
 
@@ -280,7 +298,9 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	 */
 	@Override
     public String execute(Connection<?> connection) {
-		// LOGGER.debug("ConnectionSignUp#execute");
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("ConnectionSignUp#execute, connection: "+connection);
+		}
 		String localUserName = null;
 		String accessToken = connection.createData().getAccessToken();
 		UserProfile profile = connection.fetchUserProfile();
@@ -292,7 +312,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		String socialFirstName = profile.getFirstName();
 		String socialLastName = profile.getLastName();
 
-		LOGGER.debug("ConnectionSignUp#execute, profile: " + profile + 
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("ConnectionSignUp#execute, profile: " + profile + 
 				", data: " + data +
 				", socialUsername: " + socialUsername + 
 				", socialName: " + socialName +
@@ -300,7 +321,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				", socialFirstName: " + socialFirstName +
 				", socialLastName: " + socialLastName+
 				", accessToken: "+accessToken);
-
+		}
 		// get email from github if empty
 		//		if (StringUtils.isNullOrEmpty(socialEmail)) {
 		//			Object api = connection.getApi();
@@ -322,13 +343,19 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			// 
 
 			if (user != null) {
-				// LOGGER.debug("Email matches existing local user, no need to create one");
+				if(LOGGER.isDebugEnabled()){
+					LOGGER.debug("ConnectionSignUp#execute, Email matches existing local user, no need to create one");
+				}
 				localUserName = user.getUserName();
 			} else {
-				// LOGGER.debug("Email did not match an local user, trying to create one");
+				if(LOGGER.isDebugEnabled()){
+					LOGGER.debug("ConnectionSignUp#execute, Email did not match an local user, trying to create one");
+				}
 
 				if (localUserService.findByUserNameOrEmail(socialUsername) != null) {
-					// LOGGER.debug("The social account username is taken, will generate one using increment suffix");
+					if(LOGGER.isDebugEnabled()){
+						LOGGER.debug("ConnectionSignUp#execute, The social account username is taken, will generate one using increment suffix");
+					}
 					int increment = 1;
 					for (int i = 0; localUserService.findByUserNameOrEmail(socialUsername + i) != null; i++) {
 						increment++;
@@ -343,35 +370,47 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				user.setLastName(socialLastName);
 				user.setUserPassword(UUID.randomUUID().toString());
 				try {
-					localUserService.createForImplicitSignup(user);
+					user = localUserService.createForImplicitSignup(user);
+					
 					localUserName = user.getUserName();
 				} catch (DuplicateEmailException e) {
-					LOGGER.error("Error while implicitly registering user", e);
+					LOGGER.error("ConnectionSignUp#executeError while implicitly registering user", e);
 				}
 
 			}
 		}
 		else {
-			LOGGER.debug("Social email was not accessible, unable to implicitly sign in user");
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("ConnectionSignUp#execute, Social email was not accessible, unable to implicitly sign in user");
+			}
 		}
 		//localUserService.createAccount(account);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("ConnectionSignUp#execute, returning localUserName: "+localUserName); 
+		}
 		return localUserName;
 	}
 
 	/**
+	 *  {@inheritDoc}
 	 * @see org.springframework.social.connect.web.SignInAdapter#signIn(java.lang.String, org.springframework.social.connect.Connection, org.springframework.web.context.request.NativeWebRequest)
 	 */
 	@Override
 	public String signIn(String userId, Connection<?> connection, NativeWebRequest request) {
 		LocalUser user = this.localUserService.findByUserNameOrEmail(userId);
-		LOGGER.debug("SignInAdapter#signIn userId: " + userId + ", connection: " + connection.getDisplayName() + ", mached user: " + user);
-		SecurityUtil.login((HttpServletRequest) request.getNativeRequest(), (HttpServletResponse) request.getNativeResponse(), user, this.userDetailsConfig);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("SignInAdapter#signIn userId: " + userId + ", connection: " + connection.getDisplayName() + ", mached user: " + user);
+		}
+		if(user != null){
+			SecurityUtil.login((HttpServletRequest) request.getNativeRequest(), (HttpServletResponse) request.getNativeResponse(), user, this.userDetailsConfig);
+		}
 		return null;
 	}
 
 	@Override
 	public gr.abiss.calipso.userDetails.model.UserDetails createForImplicitSignup(
 			LocalUser localUser) throws DuplicateEmailException {
+		LOGGER.debug("createForImplicitSignup, localUser: " + localUser);
 		return gr.abiss.calipso.userDetails.model.UserDetails
 				.fromUser(this.localUserService
 						.createForImplicitSignup(localUser));

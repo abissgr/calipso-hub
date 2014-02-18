@@ -103,11 +103,12 @@ public class ProviderSignInController extends org.springframework.social.connect
 	public ProviderSignInController(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository,
 			SignInAdapter signInAdapter) {
 		super(connectionFactoryLocator, usersConnectionRepository, signInAdapter);
+		LOGGER.debug("constructor");
 	}
 
 	@RequestMapping(value = "/popup/remember", method = RequestMethod.GET)
 	public String showRememberPage() {
-		LOGGER.debug("Rendering remember page.");
+		LOGGER.debug("showRememberPage");
 		return VIEW_NAME_REMEMBER_PAGE;
 	}
 
@@ -117,7 +118,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 	@RequestMapping(value = "/popup/register", method = { RequestMethod.GET })
 	//@RequestMapping(value = "/popup/register", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showRegistrationForm(WebRequest request, Model model) {
-		LOGGER.debug("Rendering registration page.");
+		LOGGER.debug("showRegistrationForm, userAccountData: {}", model);
 
 		Connection<?> connection = ProviderSignInUtils.getConnection(request);
 
@@ -141,10 +142,11 @@ public class ProviderSignInController extends org.springframework.social.connect
 			return VIEW_NAME_REGISTRATION_PAGE;
 		}
 
-		LOGGER.debug("No validation errors found. Continuing registration process.");
+		LOGGER.debug("registerUserAccount, No validation errors found. Continuing registration process.");
 
 		UserDetails registered = createUserAccount(userAccountData, result);
-
+		LOGGER.debug("registerUserAccount, registered: " + registered);
+		
 		//If email address was already found from the database, render the form view.
 		if (registered == null) {
 			LOGGER.debug("An email address was found from the database. Rendering form view.");
@@ -166,7 +168,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 	* from the database, this method adds a field error to the email field of the form object.
 	*/
 	private UserDetails createUserAccount(RegistrationForm userAccountData, BindingResult result) {
-		LOGGER.debug("Creating user account with information: {}", userAccountData);
+		LOGGER.debug("createUserAccount, userAccountData: {}", userAccountData);
 		UserDetails registered = null;
 
 		try {
@@ -203,6 +205,8 @@ public class ProviderSignInController extends org.springframework.social.connect
 	* an empty form object (normal form registration).
 	*/
 	private RegistrationForm createRegistrationDTO(Connection<?> connection) {
+
+		LOGGER.info("createRegistrationDTO, connection: " + connection);
 		RegistrationForm dto = new RegistrationForm();
 
 		if (connection != null) {
@@ -243,7 +247,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 	@RequestMapping(value = "/{providerId}", method = RequestMethod.POST)
 	public RedirectView signIn(@PathVariable String providerId, NativeWebRequest request) {
 		String topWindowDomain = request.getParameter(TOP_WINDOW_DOMAIN);
-		LOGGER.info("popupSignIn, providerId: " + providerId
+		LOGGER.info("signIn, providerId: " + providerId
 				+ ", topWindowDomain: " + topWindowDomain);
 		if (StringUtils.isNotBlank(topWindowDomain)) {
 			HttpServletRequest req = request

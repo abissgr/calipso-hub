@@ -52,6 +52,11 @@ public class SecurityUtil {
 
 	public static void login(HttpServletRequest request, HttpServletResponse response, UserDetails userDetails,
 			UserDetailsConfig userDetailsConfig) {
+		if(LOGGER.isDebugEnabled()){
+			if (userDetails != null){
+				LOGGER.debug("login, userDetails un: "+userDetails.getUsername()+", non-blank pw: "+StringUtils.isNotBlank(userDetails.getPassword()));
+			}
+		}
 		if (userDetails != null
 				&& StringUtils.isNotBlank(userDetails.getUsername())
 				&& StringUtils.isNotBlank(userDetails.getPassword())) {
