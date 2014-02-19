@@ -297,7 +297,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	 * @see org.springframework.social.connect.ConnectionSignUp#execute(org.springframework.social.connect.Connection)
 	 */
 	@Override
-    public String execute(Connection<?> connection) {
+	@Transactional(readOnly = false)
+	public String execute(Connection<?> connection) {
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("ConnectionSignUp#execute, connection: "+connection);
 		}
