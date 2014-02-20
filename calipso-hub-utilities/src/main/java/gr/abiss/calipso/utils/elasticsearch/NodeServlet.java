@@ -5,11 +5,16 @@ import java.io.InputStream;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.node.internal.InternalNode;
 import org.elasticsearch.rest.RestController;
+import org.elasticsearch.wares.ServletRestRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A servlet that can be used to dispatch requests to a local elasticsearch
@@ -24,9 +29,31 @@ import org.elasticsearch.rest.RestController;
 public class NodeServlet extends org.elasticsearch.wares.NodeServlet {
 
 	private static final long serialVersionUID = 5506898154243675564L;
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(NodeServlet.class);
+			
 	private boolean preExistingNode = false;
 
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // search only
+    	LOGGER.debug("getContextPath: "+req.getContextPath());
+    	LOGGER.debug("getPathInfo: "+req.getPathInfo());
+    	LOGGER.debug("getPathTranslated: "+req.getPathTranslated());
+    	boolean allowed = false;
+    	if(req.getMethod().equalsIgnoreCase("GET")){
+    		allowed = true;
+    	} 
+    	else if(req.getMethod().equalsIgnoreCase("POST") && req.getPathInfo().startsWith("/_search")){
+    		allowed = true;
+    	}
+    	
+    	if(allowed){
+        	super.service(req, resp);
+    	}
+    	else{
+    		resp.sendError(405, "Index is readonly");
+    	}
+    }
 	@Override
 	public void init() throws ServletException {
 		getServletContext().log(
