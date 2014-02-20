@@ -18,7 +18,9 @@
  */
 package gr.abiss.calipso;
 
+import gr.abiss.calipso.model.Host;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.UserService;
 
 import java.util.Date;
@@ -34,11 +36,23 @@ public class AppInitializer {
 	@Inject
 	@Named("userService")
 	private UserService userService;
+	
+	@Inject
+	@Named("hostService")
+	private HostService hostService;
 
 	@PostInitialize
 	public void init() {
 		Date now = new Date();
 
+		Host h1 = new Host("www.abiss.gr");
+		h1.addAlias("abiss.gr");
+		hostService.create(h1);
+		Host h2 = new Host("dev.abiss.gr");
+		hostService.create(h2);
+		Host h3 = new Host("calipso.abiss.gr");
+		hostService.create(h3);
+		
 		User u0 = new User("info@abiss.gr");
 		u0.setFirstName("admin");
 		u0.setLastName("user");

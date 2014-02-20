@@ -19,27 +19,26 @@
 package gr.abiss.calipso.controller;
 
 import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.model.Host;
+import gr.abiss.calipso.service.HostService;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping(value = "/api/rest/user", produces = { "application/json", "application/xml" })
-public class UserController extends AbstractServiceBasedRestController<User, String, UserService> {
+@RequestMapping(value = "/api/rest/host", produces = { "application/json", "application/xml" })
+public class HostController extends AbstractServiceBasedRestController<Host, String, HostService> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(HostController.class);
 
 	@Override
 	@Inject
-	public void setService(UserService service) {
+	public void setService(HostService service) {
 		this.service = service;
 	}
     

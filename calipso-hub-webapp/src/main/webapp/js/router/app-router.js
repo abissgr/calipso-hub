@@ -1,5 +1,5 @@
-define(['backbone', 'view/about-view', 'view/generic-collection-grid-view', 'collection/generic-collection', 'model/user'], 
-function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, UserModel) {
+define(['backbone', 'view/about-view', 'view/generic-collection-grid-view', 'collection/generic-collection', 'model/user', 'model/host'], 
+function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, UserModel, HostModel) {
 	// Override Backbone.sync to use X-HTTP-Method-Override
     Backbone.emulateHTTP = true;
     //Backbone.emulateJSON
@@ -15,6 +15,7 @@ function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, Use
         routes:{
             '':'home',
             'home':'home',
+            'hosts':'hosts',
             'users':'users',
             'about':'about'
         },
@@ -33,6 +34,18 @@ function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, Use
 
 			console.log("users, userCollection model: "+userCollection.model);
             new GenericCollectionGridView({root:$('#main'), collection:userCollection}).render();
+        },
+        hosts:function () {
+			console.log("hosts");
+        	var hostCollection = new GenericCollection([], {
+        		model: HostModel,
+        		// GenericCollection will use it's model's prototype.getDefaultSchemaForGrid() by default
+        		//schemaForGrid: UserModel.prototype.getDefaultSchemaForGrid(),
+        		url: window.calipso.getBaseUrl() + "/api/rest/host/"
+        	});
+
+			console.log("hosts, hostCollection model: "+hostCollection.model);
+            new GenericCollectionGridView({root:$('#main'), collection:hostCollection}).render();
         },
         about:function () {
             new AboutView({root:$('#main')});

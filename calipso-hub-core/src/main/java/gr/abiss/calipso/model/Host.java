@@ -27,8 +27,12 @@ import gr.abiss.calipso.utils.MD5Utils;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -54,10 +58,21 @@ public class Host extends AbstractAuditable<User> {
 
 	@Column(name = "domain", nullable = false)
 	private String domain;
+	
+	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
+	@CollectionTable(name = "host_aliases", joinColumns = @JoinColumn(name = "host_id"))
+	@Column(name = "host_alias")
+	Set<String> aliases = new HashSet<String>();
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "alias_of", referencedColumnName = "id", nullable = true)
-	private Host aliasOf;
+	public Host() {
+		super();
+	}
+
+	public Host(String domain) {
+		this();
+		this.domain = domain;
+	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -75,6 +90,29 @@ public class Host extends AbstractAuditable<User> {
 		return null == this.getId() ? false : this.getId().equals(that.getId());
 	}
 
+	public String getDomain() {
+		return domain;
+	}
 
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	public Set<String> getAliases() {
+		return aliases;
+	}
+
+	public void setAliases(Set<String> aliases) {
+		this.aliases = aliases;
+	}
+
+	public void addAlias(String alias) {
+		if(this.aliases == null){
+			this.aliases = new HashSet<String>();
+		}
+		this.aliases.add(alias);
+	}
+	
+	
 
 }

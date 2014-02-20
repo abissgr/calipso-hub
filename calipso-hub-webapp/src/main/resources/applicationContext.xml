@@ -68,6 +68,7 @@
 	<import resource="applicationContext-security.xml" />
     <import resource="applicationContext-acl.xml" />
 	<import resource="applicationContext-social.xml" />
+	<import resource="applicationContext-swagger.xml" />
 	
 	
 
@@ -77,8 +78,5 @@
 	 	<constructor-arg value="/" />
     </bean>
     <alias name="userService" alias="localUserService"/>
-    
-    <bean id="swaggerConfig" class="gr.abiss.calipso.utils.swagger.CustomDocumentationConfig" />
-    <!--context:property-placeholder location="classpath:swagger.properties" /-->
     
 </beans>
