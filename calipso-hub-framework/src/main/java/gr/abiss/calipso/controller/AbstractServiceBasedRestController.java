@@ -61,6 +61,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 
 @Controller
@@ -135,12 +136,14 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
      * {@inheritDoc}
      */
 	@Override
-	@RequestMapping(method = RequestMethod.PUT)
+	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
     @ResponseBody
     @ApiOperation(value = "update", notes = "Update a resource", httpMethod = "PUT")
 	//@ApiResponse(code = 200, message = "OK")
-	public T update(@PathVariable ID id, @RequestBody T resource) {
-		// TODO Auto-generated method stub
+	public T update(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id, @RequestBody T resource) {
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("update, resource: "+resource);
+		}
 		return super.update(id, resource);
 	}
 
@@ -168,7 +171,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
-	public T findById(@PathVariable ID id) {
+	public T findById(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
 		return super.findById(id);
 	}
 
@@ -184,7 +187,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "delete", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
-	public void delete(@PathVariable ID id) {
+	public void delete(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
 		// TODO Auto-generated method stub
 		super.delete(id);
 	}
