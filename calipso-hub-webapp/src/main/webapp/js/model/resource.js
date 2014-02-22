@@ -1,11 +1,24 @@
-define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'model/generic-model', 'model/host' ],
-		function(Backbone, BackboneBootstrapModal, BackboneForm, Backgrid, GenericModel, HostModel) {
+/*
+ * Copyright (c) 2007 - 2013 www.Abiss.gr
+ *
+ * This file is part of Calipso, a software platform by www.Abiss.gr.
+ *
+ * Calipso is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Calipso is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
+ */
+define([ 'backbone', 'model/generic-model', 'model/host' ],
+		function(Backbone, GenericModel, HostModel) {
 			var ResourceModel = GenericModel.extend({
-				// urlRoot: function() {
-				// console.log("TextModel#urlRoot");
-				// return window.calipso.getBaseUrl() + "/api/rest/user";
-				// },
-				
 				schemaComplete : function() {
 					var schema = {//
 						"host" : {
@@ -23,32 +36,17 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', '
 						},
 						
 					};
-					console.log("ResourceModel schema: "+schema);
 					return schema;
 				},
-
-				
-			//address: { type: 'NestedModel', model: Address }
 			});
 
-			
-
 			ResourceModel.prototype.getDefaultSchemaForGrid = function() {
-				return [/*
-						 * { name: "id", // The key of the model attribute
-						 * label: "ID", // The name to display in the header
-						 * editable: false, // By default every cell in a column
-						 * is editable, but *ID* shouldn't be // Defines a cell
-						 * type, and ID is displayed as an integer without the
-						 * ',' separating 1000s. cell:
-						 * Backgrid.StringCell.extend({ orderSeparator: '' }) },
-						 */
+				return [
 				{
 					name : "path",
 					label : "path",
 					cell : "string"
 				}];
 			}
-			console.log("ResourceModel done");
 			return ResourceModel;
 		});

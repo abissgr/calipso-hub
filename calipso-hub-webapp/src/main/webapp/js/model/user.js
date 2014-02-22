@@ -1,13 +1,24 @@
-define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
-		'model/generic-model', 'view/about-view' ],
-		function(Backbone, BackboneBootstrapModal, BackboneForm, Backgrid,
-				GenericModel, AboutView) {
+/*
+ * Copyright (c) 2007 - 2013 www.Abiss.gr
+ *
+ * This file is part of Calipso, a software platform by www.Abiss.gr.
+ *
+ * Calipso is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Calipso is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
+ */
+define([ 'model/generic-model', 'component/edit-in-modal-cell', 'model/generic-model' ],
+		function( GenericModel, EditInModalCell, GenericModel) {
 			var UserModel = GenericModel.extend({
-				// urlRoot: function() {
-				// console.log("UserModel#urlRoot");
-				// return window.calipso.getBaseUrl() + "/api/rest/user";
-				// },
-				
 				schemaComplete : function() {
 					return {//
 						userName : {
@@ -48,60 +59,10 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 						},
 					};
 				},
-
-				
-			
-			});
-
-			var EditCell = Backgrid.Cell.extend({
-				template : _.template('<a href="#" class="btn btn-warning"><span class="glyphicon glyphicon-edit"></span></a>'),
-				events : {
-					"click" : "editRow"
-				},
-				editRow : function(e) {
-					console.log("Hello");
-					e.preventDefault();
-					var user = this.model;
-					var userSchema = user.isNew() ? user.schema("create") : user.schema("update");
-					var form = new Backbone.Form({
-						model : user,
-						schema : userSchema,
-					});
-
-					var modal = new Backbone.BootstrapModal({
-						title : 'My form',
-						content : form,
-						okBtn : 'save'
-					}).open();
-
-					modal.on('ok', function() {
-						var errs = form.commit();
-						if (errs){
-							return modal.preventClose();
-						}
-						var sUrl = user.url+"/"+user.get("id");
-					    //(base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
-						user.save({}, {url: sUrl});
-						//user.save();
-					});
-				},
-				render : function() {
-					this.$el.html(this.template());
-					this.delegateEvents();
-					return this;
-				}
 			});
 
 			UserModel.prototype.getDefaultSchemaForGrid = function() {
-				return [/*
-						 * { name: "id", // The key of the model attribute
-						 * label: "ID", // The name to display in the header
-						 * editable: false, // By default every cell in a column
-						 * is editable, but *ID* shouldn't be // Defines a cell
-						 * type, and ID is displayed as an integer without the
-						 * ',' separating 1000s. cell:
-						 * Backgrid.StringCell.extend({ orderSeparator: '' }) },
-						 */
+				return [
 				{
 					name : "userName",
 					label : "username",
@@ -128,9 +89,8 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 					name : "edit",
 					label : "edit",
 					editable : false,
-					cell : EditCell
+					cell : EditInModalCell
 				} ];
 			}
-			console.log("UserModel done");
 			return UserModel;
 		});
