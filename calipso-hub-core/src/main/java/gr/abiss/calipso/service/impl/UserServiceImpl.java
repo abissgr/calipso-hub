@@ -47,13 +47,6 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	private final StringKeyGenerator generator = KeyGenerators.string();
-	private EmailService emailService;
-
-
-	@Inject
-	public void setEmailService(EmailService emailService) {
-		this.emailService = emailService;
-	}
 
 	@Override
 	@Inject

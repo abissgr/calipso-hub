@@ -5,13 +5,17 @@
     
     <jsp:directive.page contentType="text/html" pageEncoding="UTF-8" />
     <jsp:output omit-xml-declaration="true" doctype-root-element="html" doctype-public="" doctype-system="" />
+    <jsp:scriptlet>
+    String basePath =  gr.abiss.calipso.utils.ConfigurationFactory.getConfiguration()
+    	.getString(gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL, "[Undefined property: "+gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL+"]");
+    pageContext.setAttribute("basePath", basePath);
+    </jsp:scriptlet>
 <!-- 
 <jsp:directive.taglib uri="http://www.springframework.org/tags" prefix="s" />
 <jsp:directive.taglib uri="http://www.springframework.org/spring-social/social/tags" prefix="social" />
  -->
 <html lang="en">
 <head>
-    <c:set var="contextPath" value="${pageContext.request.contextPath}" />
     <meta charset="utf-8" />
     <title>Calipso</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,14 +23,14 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <link href="${contextPath}/css/bootstrap.css" rel="stylesheet" />
+    <link href="${basePath}/css/bootstrap.css" rel="stylesheet" />
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
-    <link href="${contextPath}/css/bootstrap-responsive.css" rel="stylesheet" />
- 	<link href="${contextPath}/css/calipso.css" rel="stylesheet" />
+    <link href="${basePath}/css/bootstrap-responsive.css" rel="stylesheet" />
+ 	<link href="${basePath}/css/calipso.css" rel="stylesheet" />
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -41,7 +45,9 @@
           <a class="brand" href="#"><!-- resthub-jpa-backbonejs-multi-archetype --></a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><a href="home">Home</a></li>
+              <li class="active"><a href="home">calipso</a></li>
+              <li><a href="hosts">Hosts</a></li>
+              <li><a href="text">Text</a></li>
               <li><a href="users">Users</a></li>
               <li><a href="about">About</a></li>
             </ul>
@@ -51,7 +57,7 @@
     </div>
 
     <div class="container">
-      <h1>Calipso NG</h1>
+      <h1>Calipso</h1>
       
       <div id="main"> 
       <!-- -->
@@ -59,7 +65,7 @@
     </div>
       
     <!-- Placed at the end of the document so the pages load faster -->
-    <script data-main="http://localhost:8080/js/main" src="http://localhost:8080/js/lib/require.js">
+    <script data-main="/js/main" src="/js/lib/require.js">
     <!-- -->
     </script>
   </body>

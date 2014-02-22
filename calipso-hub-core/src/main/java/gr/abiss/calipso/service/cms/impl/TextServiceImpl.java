@@ -30,19 +30,11 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Named("pageService")
+@Named("textService")
 public class TextServiceImpl extends AbstractServiceImpl<Text, String, PageRepository> 
 	implements TextService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TextServiceImpl.class);
-
-	private EmailService emailService;
-
-
-	@Inject
-	public void setEmailService(EmailService emailService) {
-		this.emailService = emailService;
-	}
 
 	@Override
 	@Inject

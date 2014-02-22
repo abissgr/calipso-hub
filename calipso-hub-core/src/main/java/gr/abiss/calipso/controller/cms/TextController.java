@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping(value = "/api/rest/cms/page", produces = { "application/json", "application/xml" })
+@RequestMapping(value = "/api/rest/cms/text", produces = { "application/json", "application/xml" })
 public class TextController extends AbstractServiceBasedRestController<Text, String, TextService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TextController.class);

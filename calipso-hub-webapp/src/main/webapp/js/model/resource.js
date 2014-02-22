@@ -1,4 +1,4 @@
-define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'model/generic-model', , 'model/generic-model' ],
+define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'model/generic-model', 'model/host' ],
 		function(Backbone, BackboneBootstrapModal, BackboneForm, Backgrid, GenericModel, HostModel) {
 			var ResourceModel = GenericModel.extend({
 				// urlRoot: function() {
@@ -7,14 +7,14 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', '
 				// },
 				
 				schemaComplete : function() {
-					return {//
+					var schema = {//
 						"host" : {
 							"default": {
 								type: 'NestedModel',
 								model : HostModel,
 							}
 						},
-						path : {
+						"path" : {
 							"search": 'Text',
 							"default": {
 								type: 'Text',
@@ -23,52 +23,17 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', '
 						},
 						
 					};
+					console.log("ResourceModel schema: "+schema);
+					return schema;
 				},
 
 				
 			//address: { type: 'NestedModel', model: Address }
 			});
 
-			var EditCell = Backgrid.Cell.extend({
-				template : _.template('<button class="btn btn-warning">edit</button>'),
-				events : {
-					"click" : "editRow"
-				},
-				editRow : function(e) {
-					console.log("Hello");
-					e.preventDefault();
-					var user = this.model;
-					var userSchema = user.isNew() ? user.schema("create") : user.schema("update");
-					var form = new Backbone.Form({
-						model : user,
-						schema : userSchema,
-					});
+			
 
-					var modal = new Backbone.BootstrapModal({
-						title : 'My form',
-						content : form,
-						okBtn : 'save'
-					}).open();
-
-					modal.on('ok', function() {
-						var errs = form.commit();
-						if (errs){
-							return modal.preventClose();
-						}
-						var sUrl = user.url+"/"+user.get("id");
-					    //(base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
-						user.save({}, {url: sUrl});
-						//user.save();
-					});
-				},
-				render : function() {
-					this.$el.html(this.template());
-					this.delegateEvents();
-					return this;
-				}
-			});
-
-			TextModel.prototype.getDefaultSchemaForGrid = function() {
+			ResourceModel.prototype.getDefaultSchemaForGrid = function() {
 				return [/*
 						 * { name: "id", // The key of the model attribute
 						 * label: "ID", // The name to display in the header
@@ -79,34 +44,11 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', '
 						 * Backgrid.StringCell.extend({ orderSeparator: '' }) },
 						 */
 				{
-					name : "userName",
-					label : "username",
+					name : "path",
+					label : "path",
 					cell : "string"
-				}, {
-					name : "firstName",
-					label : "firstName",
-					editable : true,
-					cell : "string"
-				}, {
-					name : "lastName",
-					label : "lastName",
-					editable : true,
-					cell : "string"
-				}, {
-					name : "email",
-					label : "email",
-					cell : "email"
-				}, {
-					name : "createdDate",
-					label : "created",
-					cell : "date"
-				}, {
-					name : "edit",
-					label : "edit",
-					editable : false,
-					cell : EditCell
-				} ];
+				}];
 			}
-			console.log("TextModel done");
-			return TextModel;
+			console.log("ResourceModel done");
+			return ResourceModel;
 		});

@@ -37,15 +37,6 @@ public class HostServiceImpl extends AbstractServiceImpl<Host, String, HostRepos
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HostServiceImpl.class);
 
-	private final StringKeyGenerator generator = KeyGenerators.string();
-	private EmailService emailService;
-
-
-	@Inject
-	public void setEmailService(EmailService emailService) {
-		this.emailService = emailService;
-	}
-
 	@Override
 	@Inject
 	public void setRepository(HostRepository hostRepository) {
@@ -60,10 +51,4 @@ public class HostServiceImpl extends AbstractServiceImpl<Host, String, HostRepos
 	public Host findByDomain(String domain) {
 		return this.repository.findByDomain(domain);
 	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-
 }

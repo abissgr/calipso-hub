@@ -1,5 +1,5 @@
-define(['backbone', 'view/about-view', 'view/generic-collection-grid-view', 'collection/generic-collection', 'model/user', 'model/host'], 
-function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, UserModel, HostModel) {
+define(['backbone', 'view/about-view', 'view/generic-collection-grid-view', 'collection/generic-collection', 'model/host', 'model/text', 'model/user'], 
+function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, HostModel, TextModel, UserModel) {
 	// Override Backbone.sync to use X-HTTP-Method-Override
     Backbone.emulateHTTP = true;
     //Backbone.emulateJSON
@@ -14,26 +14,15 @@ function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, Use
 
         routes:{
             '':'home',
-            'home':'home',
-            'hosts':'hosts',
-            'users':'users',
-            'about':'about'
+            'client/home':'home',
+            'client/hosts':'hosts',
+            'client/text':'text',
+            'client/users':'users',
+            'client/about':'about'
         },
 
         home:function () {
             //new SamplesView({root:$('#main')});
-        },
-        users:function () {
-			console.log("users");
-        	var userCollection = new GenericCollection([], {
-        		model: UserModel,
-        		// GenericCollection will use it's model's prototype.getDefaultSchemaForGrid() by default
-        		//schemaForGrid: UserModel.prototype.getDefaultSchemaForGrid(),
-        		url: window.calipso.getBaseUrl() + "/api/rest/user/"
-        	});
-
-			console.log("users, userCollection model: "+userCollection.model);
-            new GenericCollectionGridView({root:$('#main'), collection:userCollection}).render();
         },
         hosts:function () {
 			console.log("hosts");
@@ -46,6 +35,30 @@ function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, Use
 
 			console.log("hosts, hostCollection model: "+hostCollection.model);
             new GenericCollectionGridView({root:$('#main'), collection:hostCollection}).render();
+        },
+        text:function () {
+			console.log("text");
+        	var textCollection = new GenericCollection([], {
+        		model: TextModel,
+        		// GenericCollection will use it's model's prototype.getDefaultSchemaForGrid() by default
+        		//schemaForGrid: UserModel.prototype.getDefaultSchemaForGrid(),
+        		url: window.calipso.getBaseUrl() + "/api/rest/cms/text/"
+        	});
+
+			console.log("ress, resCollection model: "+textCollection.model);
+            new GenericCollectionGridView({root:$('#main'), collection:textCollection}).render();
+        },
+        users:function () {
+			console.log("users");
+        	var userCollection = new GenericCollection([], {
+        		model: UserModel,
+        		// GenericCollection will use it's model's prototype.getDefaultSchemaForGrid() by default
+        		//schemaForGrid: UserModel.prototype.getDefaultSchemaForGrid(),
+        		url: window.calipso.getBaseUrl() + "/api/rest/user/"
+        	});
+
+			console.log("users, userCollection model: "+userCollection.model);
+            new GenericCollectionGridView({root:$('#main'), collection:userCollection}).render();
         },
         about:function () {
             new AboutView({root:$('#main')});

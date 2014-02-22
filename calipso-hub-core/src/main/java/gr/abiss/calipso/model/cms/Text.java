@@ -27,6 +27,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "content_text")
 public class Text extends Resource {
+	
+	public static final String MIME_MARKDOWN = "text/x-markdown";
 
 	/**
 	 * The MIME type of the page source. May be used to dynamically generate response content. 

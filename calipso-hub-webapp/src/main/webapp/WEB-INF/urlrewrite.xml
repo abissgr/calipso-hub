@@ -8,20 +8,25 @@
 
 -->
 <urlrewrite>
-
+	<!-- TODO: add proper p3p -->
 	<rule>
 		<note>Set the P3P HTTP response header for all requests</note>
         <from>.*</from>
         <set type="response-header" name="P3P">CP='IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'</set>
     </rule>
+    
+    <!-- TODO: remove -->
     <rule>
         <from>^/api/(.*)$</from>
         <set type="request" name="Accept">application/json</set>
     </rule>
+    
+    <!-- client is single page app -->
     <rule>
-        <from>^/users$</from>
-        
-        <to type="forward" last="true">index.html</to>
-    </rule>
+		<condition type="attribute" name="forwarded-to-client-index" operator="notequal">true</condition>
+	    <from>^/client/*/(.*)</from>
+	    <set type="request" name="forwarded-to-manager-index-jsp">true</set>
+	    <to type="forward" last="true">/client/index.jsp</to>
+	</rule>
 </urlrewrite>
 

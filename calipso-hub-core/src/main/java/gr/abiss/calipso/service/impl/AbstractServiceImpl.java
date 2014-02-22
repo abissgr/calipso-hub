@@ -22,6 +22,7 @@ import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.repository.UserRepository;
+import gr.abiss.calipso.service.EmailService;
 
 import java.io.Serializable;
 
@@ -32,16 +33,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.keygen.KeyGenerators;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
 
 public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends BaseRepository<T, ID>>
 		extends
  GenericServiceImpl<T, ID, R> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceImpl.class);
-
-
+	
+	private final StringKeyGenerator generator = KeyGenerators.string();
+	
 	protected UserRepository userRepository;
+	protected EmailService emailService;
 
+	@Inject
+	public void setEmailService(EmailService emailService) {
+		this.emailService = emailService;
+	}
+	
 	@Inject
 	public void setUserRepository(UserRepository userRepository) {
 		this.userRepository = userRepository;

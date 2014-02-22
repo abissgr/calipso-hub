@@ -36,14 +36,6 @@ public class FolderServiceImpl extends AbstractServiceImpl<Folder, String, Folde
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FolderServiceImpl.class);
 
-	private EmailService emailService;
-
-
-	@Inject
-	public void setEmailService(EmailService emailService) {
-		this.emailService = emailService;
-	}
-
 	@Override
 	@Inject
 	public void setRepository(FolderRepository folderRepository) {

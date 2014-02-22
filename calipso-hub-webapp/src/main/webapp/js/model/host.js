@@ -10,11 +10,6 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', '
 					return {//
 						domain : {
 							"search": 'Text',
-							"update": {
-								type: 'Text',
-								validators : [ 'required' ],
-								editorAttrs: { 'readonly': 'readonly' }
-							},
 							"default": {
 								type: 'Text',
 								validators : [ 'required' ]

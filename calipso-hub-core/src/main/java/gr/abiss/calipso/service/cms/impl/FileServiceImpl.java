@@ -36,14 +36,6 @@ public class FileServiceImpl extends AbstractServiceImpl<File, String, FileRepos
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileServiceImpl.class);
 
-	private EmailService emailService;
-
-
-	@Inject
-	public void setEmailService(EmailService emailService) {
-		this.emailService = emailService;
-	}
-
 	@Override
 	@Inject
 	public void setRepository(FileRepository fileRepository) {

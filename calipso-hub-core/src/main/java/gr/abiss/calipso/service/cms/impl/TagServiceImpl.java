@@ -36,14 +36,6 @@ public class TagServiceImpl extends AbstractServiceImpl<Tag, String, TagReposito
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
 
-	private EmailService emailService;
-
-
-	@Inject
-	public void setEmailService(EmailService emailService) {
-		this.emailService = emailService;
-	}
-
 	@Override
 	@Inject
 	public void setRepository(TagRepository tagRepository) {

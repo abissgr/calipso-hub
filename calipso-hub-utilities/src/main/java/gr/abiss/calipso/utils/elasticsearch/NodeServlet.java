@@ -35,10 +35,7 @@ public class NodeServlet extends org.elasticsearch.wares.NodeServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // search only
-    	LOGGER.debug("getContextPath: "+req.getContextPath());
-    	LOGGER.debug("getPathInfo: "+req.getPathInfo());
-    	LOGGER.debug("getPathTranslated: "+req.getPathTranslated());
+        // GET or GET/POST for search only
     	boolean allowed = false;
     	if(req.getMethod().equalsIgnoreCase("GET")){
     		allowed = true;

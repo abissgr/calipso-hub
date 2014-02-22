@@ -20,8 +20,10 @@ package gr.abiss.calipso;
 
 import gr.abiss.calipso.model.Host;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.service.cms.TextService;
 
 import java.util.Date;
 
@@ -36,10 +38,14 @@ public class AppInitializer {
 	@Inject
 	@Named("userService")
 	private UserService userService;
-	
+
 	@Inject
 	@Named("hostService")
 	private HostService hostService;
+	
+	@Inject
+	@Named("textService")
+	private TextService textService;
 
 	@PostInitialize
 	public void init() {
@@ -52,6 +58,25 @@ public class AppInitializer {
 		hostService.create(h2);
 		Host h3 = new Host("calipso.abiss.gr");
 		hostService.create(h3);
+
+		Text t1 = new Text();
+		t1.setHost(h2);
+		t1.setPath("test2");
+		t1.setSource("test2");
+		t1.setSourceContentType(Text.MIME_MARKDOWN);
+		textService.create(t1);
+		Text t2 = new Text();
+		t2.setHost(h1);
+		t2.setPath("test2");
+		t2.setSource("test2");
+		t2.setSourceContentType(Text.MIME_MARKDOWN);
+		textService.create(t2);
+		Text t3 = new Text();
+		t3.setHost(h1);
+		t3.setPath("test3");
+		t3.setSource("test3");
+		t3.setSourceContentType(Text.MIME_MARKDOWN);
+		textService.create(t3);
 		
 		User u0 = new User("info@abiss.gr");
 		u0.setFirstName("admin");

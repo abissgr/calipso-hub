@@ -1,36 +1,39 @@
-define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
-		'model/generic-model', 'view/about-view' ],
-		function(Backbone, BackboneBootstrapModal, BackboneForm, Backgrid,
-				GenericModel, AboutView) {
-			var TextModel = GenericModel.extend({
+define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'model/generic-model', 'model/resource', 'model/host' ],
+		function(Backbone, BackboneBootstrapModal, BackboneForm, Backgrid, GenericModel, ResourceModel, HostModel) {
+			var TextModel = ResourceModel.extend({
 				// urlRoot: function() {
 				// console.log("TextModel#urlRoot");
 				// return window.calipso.getBaseUrl() + "/api/rest/user";
 				// },
 				
 				schemaComplete : function() {
-					return {//
-						"name" : {
+					// superclass schema
+					var superSchema = TextModel.__super__.schemaComplete.call(this);
+					// own schema
+					var schema = {
+						"sourceContentType" : {
+							"search": { type: 'Select', options: [ 'text/plain', 'text/x-markdown', 'text/html' ] },
+							"default": { 
+								type: 'Select', 
+								options: [ 'text/plain', 'text/x-markdown', 'text/html' ], 	
+								validators : [ 'required' ]
+							}
+						},
+						"source" : {
 							"search": 'Text',
 							"update": {
 								type: 'Text',
 								validators : [ 'required' ],
-								editorAttrs: { 'readonly': 'readonly' }
 							},
 							"default": {
 								type: 'Text',
 								validators : [ 'required' ]
 							}
-						},
-						path : {
-							"search": 'Text',
-							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
-						},
+						}
 						
 					};
+					// return merged schemas
+					return $.extend({}, superSchema, schema);
 				},
 
 				
@@ -77,37 +80,10 @@ define([ 'backbone', 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid',
 			});
 
 			TextModel.prototype.getDefaultSchemaForGrid = function() {
-				return [/*
-						 * { name: "id", // The key of the model attribute
-						 * label: "ID", // The name to display in the header
-						 * editable: false, // By default every cell in a column
-						 * is editable, but *ID* shouldn't be // Defines a cell
-						 * type, and ID is displayed as an integer without the
-						 * ',' separating 1000s. cell:
-						 * Backgrid.StringCell.extend({ orderSeparator: '' }) },
-						 */
-				{
-					name : "userName",
-					label : "username",
+				return [{
+					name : "path",
+					label : "path",
 					cell : "string"
-				}, {
-					name : "firstName",
-					label : "firstName",
-					editable : true,
-					cell : "string"
-				}, {
-					name : "lastName",
-					label : "lastName",
-					editable : true,
-					cell : "string"
-				}, {
-					name : "email",
-					label : "email",
-					cell : "email"
-				}, {
-					name : "createdDate",
-					label : "created",
-					cell : "date"
 				}, {
 					name : "edit",
 					label : "edit",
