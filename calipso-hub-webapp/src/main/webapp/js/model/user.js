@@ -87,7 +87,7 @@ define([ 'model/generic-model', 'component/edit-in-modal-cell', 'model/generic-m
 					cell : "date"
 				}, {
 					name : "edit",
-					label : "edit",
+					label : "",
 					editable : false,
 					cell : EditInModalCell
 				} ];

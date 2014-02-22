@@ -2,45 +2,39 @@
 *  Your specific application stylesheet
 **/
 
+/* Sticky footer styles
+-------------------------------------------------- */
 
-label {
-	font-weight:bold;
+html,
+body {
+  height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
 }
 
-.form-cell {
-	  display:table-cell; 
-	  padding: 5px
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+  /* Pad bottom by footer height */
+  padding: 60px 0 60px;
 }
 
-.form-row {
-	  display:table-row; 
+/* Set the fixed height of the footer here */
+#footer {
+  height: 60px;
+  background-color: #f8f8f8;
+  border-top:1px solid #E7E7E7;
 }
 
-.user {
-	margin: 20px 6px 6px 0px;
-/*	float: left */
+.modal-button-cell{
+	text-align:right!important;
 }
-
-.control-group {
-	border-style:solid;
-	border-color:#eee;
-	border-width: 1px
-}
-
-.user-link {
-	cursor: pointer;
-	font-weight:bold;
-	color: #00e;
-}
-
-#createUser {
-	cursor: pointer;
-	margin: 12px 6px 6px 0px
-}
-
 
 /*
   backgrid
+-------------------------------------------------- 
   http://github.com/wyuenho/backgrid
 
   Copyright (c) 2013 Jimmy Yuen Ho Wong and contributors

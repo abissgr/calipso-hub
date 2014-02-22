@@ -38,7 +38,7 @@ function(Backbone, BackbonePageableCollection) {
 		state: {
 			firstPage: 1,
 			currentPage: 1,
-			pageSize: 15,
+			pageSize: 10,
 		},
 		
 		// You can remap the query parameters from `state keys from

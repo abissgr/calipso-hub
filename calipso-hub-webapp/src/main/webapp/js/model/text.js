@@ -58,7 +58,7 @@ define([ 'model/generic-model', 'component/edit-in-modal-cell', 'model/resource'
 					cell : "string"
 				}, {
 					name : "edit",
-					label : "edit",
+					label : "",
 					editable : false,
 					cell : EditInModalCell
 				} ];

@@ -22,13 +22,12 @@
 		<meta name="author" content="" />
 		<link href="${basePath}/css/bootstrap.css" rel="stylesheet" />
 		<link href="${basePath}/css/calipso.css" rel="stylesheet" />
-		<style type="text/css">body{margin-top:60px;}</style>
 		<!--[if lt IE 9]>
       	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     	<![endif]-->
 	</head>
 	<body>
-
+		<div id="wrap">
 		<div class="navbar navbar-default navbar-fixed-top" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
@@ -51,17 +50,21 @@
 				</div>
 			</div>
 		</div>
-	
-	
-	
+		
+		<!-- page content -->
 		<div class="container">
-			<h1>Calipso</h1>
-	
 			<div id="main">
 				<!-- -->
 			</div>
 		</div>
-	
+		</div>
+		<div id="footer">
+	      <div class="container">
+			<p class="credit text-muted text-center">
+				© Copyright 2010 - 2014 <a title="Powered by Abiss.gr" href="http://abiss.gr">Abiss.gr</a>
+			</p>
+	      </div>
+	    </div>
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script data-main="/js/main" src="/js/lib/require.js">
 		<!-- -->

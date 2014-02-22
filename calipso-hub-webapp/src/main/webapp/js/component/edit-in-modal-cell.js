@@ -21,7 +21,8 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid' ],
 			
 
 			var EditInModalCell = Backgrid.Cell.extend({
-				template : _.template('<button class="btn btn-warning"><span class="glyphicon glyphicon-edit"></span></button>'),
+				tagName: "td class='modal-button-cell'",
+				template : _.template('<button class="btn btn-xs btn-warning"><span class="glyphicon glyphicon-edit"></span></button>'),
 				events : {
 					"click" : "editRow"
 				},
