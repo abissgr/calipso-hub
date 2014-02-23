@@ -26,8 +26,9 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 				events : {
 					"click" : "editRow"
 				},
-				//, // initialise an empty array
+				markdownEditorIds : [], // initialise an empty array
 				editRow : function(e) {
+					var thisModal = this;
 					console.log("Hello");
 					e.preventDefault();
 					var rowModel = this.model;
@@ -37,12 +38,11 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 						model : rowModel,
 						schema : rowModelSchema,
 					});
-					var markdownEditorIds = [];
 					// keep note of markdown editors we need to initialize after rendering
 					form.on('source:render', function(form, markdownEditor, extra) {
 						console.log('source:render fired, id: "' + markdownEditor.id + '".');
-					    markdownEditorIds.push(markdownEditor.id);
-						console.log("modal.on shown.bs.modal, markdownEditorIds: "+markdownEditorIds);
+						thisModal.markdownEditorIds.push(markdownEditor.id);
+						console.log("modal.on shown.bs.modal, markdownEditorIds: "+thisModal.markdownEditorIds);
 					});
 					var modal = new Backbone.BootstrapModal({
 						animate: true,
@@ -51,19 +51,19 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 						okBtn : 'save'
 					});
 					modal.on('shown', function(e) {
-						console.log("modal.on shown.bs.modal, markdownEditorIds: "+markdownEditorIds);
+						console.log("modal.on shown, markdownEditorIds: "+thisModal.markdownEditorIds);
 						// initialize markdown editors
 						$('textarea[data-provide="markdown"]').each(function(){
 					        var $this = $(this);
-					         if ($this.data('markdown')) {
-					        	 $this.data('markdown').showEditor()
-							 }
-					         else{
-					        	 $this.markdown($this.data()) 
-					         }
-							
-							    
-					      })
+					        if($.inArray($this.attr('id'), thisModal.markdownEditorIds) > -1){
+						        if ($this.data('markdown')) {
+						        	$this.data('markdown').showEditor()
+								}
+						        else{
+						        	$this.markdown($this.data()) 
+						        }
+					        }
+					    });
 //						for(editorId in markdownEditorIds){
 //							console.log("initalizing markdown editor: " + editorId);
 //							console.log("editor element: "+document.getElementById(editorId));
