@@ -21,6 +21,7 @@
 		<meta name="description" content="" />
 		<meta name="author" content="" />
 		<link href="${basePath}/css/bootstrap.css" rel="stylesheet" />
+		<link href="${basePath}/css/bootstrap-markdown.css" rel="stylesheet" />
 		<link href="${basePath}/css/calipso.css" rel="stylesheet" />
 		<!--[if lt IE 9]>
       	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

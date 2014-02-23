@@ -23,12 +23,10 @@ function(Backbone, Backgrid) {
 		 * Prefer the collection URL if any for more specific CRUD, fallback to own otherwise 
 		 */
 		url: function() {
-			console.log("GenericModel#url called ");
 			var sUrl = this.collection	 ? _.result(this.collection, 'url') : _.result(this, 'urlRoot') || urlError();
 			if (!this.isNew()) {
 				sUrl + (base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
 			}
-			window.alert("GenericModel#url: "+sUrl);
 			console.log("GenericModel#url: "+sUrl);
 			return sUrl;
 	    },
@@ -44,7 +42,7 @@ function(Backbone, Backgrid) {
 			var schemaForAction = {};
 			// get the complete schema to filter out from
 			var schemaComplete = this.schemaComplete();
-			console.log("GenericModel#schema actionName: "+actionName+", schemaComplete: "+schemaComplete);
+			//console.log("GenericModel#schema actionName: "+actionName+", schemaComplete: "+schemaComplete);
 			
 			// for each property, select the appropriate schema entry for the given action
 			var propertySchema;
@@ -71,7 +69,7 @@ function(Backbone, Backgrid) {
 		    	propertySchema = false;
 		    	propertySchemaForAction = false;
 		    }
-			console.log("GenericModel#schema schemaForAction: "+schemaForAction);
+			//console.log("GenericModel#schema schemaForAction: "+schemaForAction);
 			return schemaForAction;
 		},
 //		url:  function () {
@@ -123,6 +121,6 @@ function(Backbone, Backgrid) {
 	GenericModel.prototype.getDefaultSchemaForGrid = function(){
 		// TODO: infer based on defaults OR conditionally build the edit etc. button columns
 	}
-	console.log("GenericModel done");
+	//console.log("GenericModel done");
 	return GenericModel;
 });

@@ -56,6 +56,10 @@ require.config({
             deps: ['jquery', 'underscore', 'backbone'/*, 'css!lib/backgrid/backgrid'*/],
             exports: 'Backbone.Form'
         },
+        /*'backbone-forms-editor-markdown': {
+            deps: ['backbone-forms'],
+            exports: 'Backbone.Form.editors.Markdown'
+        },*/
         'backgrid-paginator': {
             deps: ['backgrid', 'backbone-pageable'],
             exports: 'Backgrid.Extension.Paginator'
@@ -65,6 +69,11 @@ require.config({
                 'jquery'
             ]
         },
+        'bootstrap-markdown': {
+        	deps: ['jquery'],
+            exports: 'Markdown'
+        },
+        
 //        'backbone-relational': {
 //            deps: [
 //                'backbone'
@@ -97,6 +106,7 @@ require.config({
         'backbone-validation-orig': 'lib/backbone-validation',
         'backbone-bootstrap-modal': 'lib/backbone-bootstrap-modal',
         'backbone-forms': 'lib/backbone-forms',
+        'bootstrap-markdown': 'lib/bootstrap-markdown',
         
         'backbone-validation': 'lib/resthub/backbone-validation-ext',
         'handlebars-orig': 'lib/handlebars',
@@ -106,6 +116,7 @@ require.config({
 //        'backbone-paginator': 'lib/backbone-paginator',
 //        'backbone-relational': 'lib/backbone-relational',
         'backbone-pageable'  : 'lib/backbone-pageable',
+        //'backbone-forms-editor-markdown'  : 'component/backbone-forms-editor-markdown',
         async: 'lib/async',
         keymaster: 'lib/keymaster',
         hbs: 'lib/resthub/require-handlebars',

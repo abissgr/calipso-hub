@@ -34,7 +34,7 @@ function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, Hos
             'client/about':'about'
         },
         home:function () {
-            //new SamplesView({root:$('#main')});
+        	new HomeView({root:$('#main')});
         },
         hosts:function () {
         	this.genericGridView($('#main'), HostModel, "/api/rest/host/");

@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model', 'component/edit-in-modal-cell', 'model/resource', 'model/host' ],
-		function( GenericModel, EditInModalCell, ResourceModel, HostModel) {
+define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown', 'model/generic-model', 'component/edit-in-modal-cell', 'model/resource', 'model/host' ],
+		function( Markdown, BackboneFormMarkdown, GenericModel, EditInModalCell, ResourceModel, HostModel) {
+			//Backbone.Form.editors.Markdown
 			var TextModel = ResourceModel.extend({
 				
 				schemaComplete : function() {
@@ -35,14 +36,11 @@ define([ 'model/generic-model', 'component/edit-in-modal-cell', 'model/resource'
 						},
 						"source" : {
 							"search": 'Text',
-							"update": {
-								type: 'Text',
-								validators : [ 'required' ],
-							},
 							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
+								type: BackboneFormMarkdown,
+								validators : [ 'required' ],
+								editorAttrs: { "data-provide": 'markdown', "data-width": "400" }
+							},
 						}
 						
 					};

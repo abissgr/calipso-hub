@@ -23,6 +23,7 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.entities.AbstractAuditable;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import gr.abiss.calipso.model.types.ResourceProtocol;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.MD5Utils;
@@ -32,6 +33,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -42,6 +45,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.GrantedAuthority;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -66,6 +70,13 @@ public class Resource extends AbstractAuditable<User> {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "host", referencedColumnName = "id", nullable = true)
 	private Host host;
+
+	/**
+	 * The HTTP domain of the resource. 
+	 */
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private ResourceProtocol protocol = ResourceProtocol.HTTP;
 
 	@Override
 	public boolean equals(Object obj) {

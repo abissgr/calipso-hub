@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid' ],
-		function( BackboneBootstrapModal, BackboneForm, Backgrid) {
-			
+define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-markdown' ],
+		function( BackboneBootstrapModal, BackboneForm, Backgrid, Markdown) {
+	//Backbone.Form.editors.Markdown = BackboneFormMarkdown;
 
 			var EditInModalCell = Backgrid.Cell.extend({
 				tagName: "td class='modal-button-cell'",
@@ -26,23 +26,53 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid' ],
 				events : {
 					"click" : "editRow"
 				},
+				//, // initialise an empty array
 				editRow : function(e) {
 					console.log("Hello");
 					e.preventDefault();
 					var rowModel = this.model;
 					var rowModelSchema = rowModel.isNew() ? rowModel.schema("create") : rowModel.schema("update");
+					
 					var form = new Backbone.Form({
 						model : rowModel,
 						schema : rowModelSchema,
 					});
-
+					var markdownEditorIds = [];
+					// keep note of markdown editors we need to initialize after rendering
+					form.on('source:render', function(form, markdownEditor, extra) {
+						console.log('source:render fired, id: "' + markdownEditor.id + '".');
+					    markdownEditorIds.push(markdownEditor.id);
+						console.log("modal.on shown.bs.modal, markdownEditorIds: "+markdownEditorIds);
+					});
 					var modal = new Backbone.BootstrapModal({
-						title : 'My form',
+						animate: true,
+						title : 'My own form',
 						content : form,
 						okBtn : 'save'
-					}).open();
+					});
+					modal.on('shown', function(e) {
+						console.log("modal.on shown.bs.modal, markdownEditorIds: "+markdownEditorIds);
+						// initialize markdown editors
+						$('textarea[data-provide="markdown"]').each(function(){
+					        var $this = $(this);
+					         if ($this.data('markdown')) {
+					        	 $this.data('markdown').showEditor()
+							 }
+					         else{
+					        	 $this.markdown($this.data()) 
+					         }
+							
+							    
+					      })
+//						for(editorId in markdownEditorIds){
+//							console.log("initalizing markdown editor: " + editorId);
+//							console.log("editor element: "+document.getElementById(editorId));
+//							$("#"+editorId).markdown({autofocus:false,savable:false});
+//						}
+					});
 
-					modal.on('ok', function() {
+					modal.on('ok', function(e) {
+						console.log("modal.on ok");
 						var errs = form.commit();
 						if (errs){
 							return modal.preventClose();
@@ -51,6 +81,8 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid' ],
 						sUrl = sUrl + (base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
 						rowModelSchema.save({}, {url: sUrl});
 					});
+					modal.open();
+					
 				},
 				render : function() {
 					this.$el.html(this.template());
