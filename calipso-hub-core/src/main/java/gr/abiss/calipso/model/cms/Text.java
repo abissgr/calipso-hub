@@ -42,6 +42,14 @@ public class Text extends Resource {
 	@Column(name = "source", nullable = false)
 	private String source;
 
+	public Text() {
+		super();
+	}
+	
+	public Text(String name) {
+		super(name);
+	}
+
 	public String getSourceContentType() {
 		return sourceContentType;
 	}

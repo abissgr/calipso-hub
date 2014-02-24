@@ -16,8 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown', 'model/generic-model', 'component/edit-in-modal-cell', 'model/resource', 'model/host' ],
-		function( Markdown, BackboneFormMarkdown, GenericModel, EditInModalCell, ResourceModel, HostModel) {
+define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown', 
+         'model/generic-model', 'component/backgrid-edit-in-modal-button-cell', 
+         'model/resource', 'model/host' ],
+		function( Markdown, BackboneFormMarkdown,
+				GenericModel, EditInModalCell, 
+				ResourceModel, HostModel) {
 			//Backbone.Form.editors.Markdown
 			var TextModel = ResourceModel.extend({
 				
@@ -39,7 +43,7 @@ define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown', 'mode
 							"default": {
 								type: BackboneFormMarkdown,
 								validators : [ 'required' ],
-								editorAttrs: { "data-provide": 'markdown', "data-width": "400" }
+								editorAttrs: { "data-provide": 'markdown' }
 							},
 						}
 						
@@ -50,16 +54,25 @@ define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown', 'mode
 			});
 
 			TextModel.prototype.getDefaultSchemaForGrid = function() {
-				return [{
-					name : "path",
-					label : "path",
-					cell : "string"
-				}, {
-					name : "edit",
-					label : "",
-					editable : false,
-					cell : EditInModalCell
-				} ];
+				return [
+						{
+							name : "name",
+							label : "name",
+							cell : "string"
+						},
+						{
+							name : "pathName",
+							label : "path name",
+							cell : "string"
+						},
+						{
+							name : "edit",
+							label : "",
+							editable : false,
+							cell : EditInModalCell
+						} ];
+				// return merged schemas
+				return $.extend({}, superSchema, schema);
 			}
 			return TextModel;
 		});

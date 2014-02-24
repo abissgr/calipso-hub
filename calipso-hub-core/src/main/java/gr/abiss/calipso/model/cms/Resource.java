@@ -18,18 +18,14 @@
  */
 package gr.abiss.calipso.model.cms;
 
+import static org.apache.commons.lang.CharEncoding.UTF_8;
 import gr.abiss.calipso.model.Host;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.entities.AbstractAuditable;
-import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.model.types.ResourceProtocol;
-import gr.abiss.calipso.model.metadata.UserMetadatum;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.utils.MD5Utils;
 
-import java.util.Collection;
-import java.util.Date;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,17 +34,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.security.core.GrantedAuthority;
-
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
@@ -57,12 +46,21 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class Resource extends AbstractAuditable<User> {
 
 	private static final long serialVersionUID = -7942906897981646998L;
+	private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
 
 	/**
-	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
+	 * The last HTTP URL segment of the resource, excluding the protocol prefix, host, port and extension suffix.
+	 * Starts with a slash. 
 	 */
-	@Column(name = "path", nullable = false)
-	private String path;
+	@Column(name = "name", nullable = false)
+	private String name;
+	
+	/**
+	 * The last HTTP URL segment of the resource, excluding the protocol prefix, host, port and extension suffix.
+	 * Starts with a slash. 
+	 */
+	@Column(name = "path_name", nullable = false)
+	private String pathName;
 
 	/**
 	 * The HTTP domain of the resource. 
@@ -77,6 +75,21 @@ public class Resource extends AbstractAuditable<User> {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private ResourceProtocol protocol = ResourceProtocol.HTTP;
+
+	
+
+	public Resource() {
+		super();
+	}
+	public Resource(String name) {
+		this();
+		this.name = name;
+		try {
+			this.pathName = URLEncoder.encode(name, UTF_8);
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.warn("Could not URL encode given name '"+name+"'", e);
+		}
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -94,12 +107,20 @@ public class Resource extends AbstractAuditable<User> {
 		return null == this.getId() ? false : this.getId().equals(that.getId());
 	}
 
-	public String getPath() {
-		return path;
+	public String getName() {
+		return name;
 	}
 
-	public void setPath(String path) {
-		this.path = path;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getPathName() {
+		return pathName;
+	}
+
+	public void setPathName(String pathName) {
+		this.pathName = pathName;
 	}
 
 	public Host getHost() {
@@ -109,6 +130,15 @@ public class Resource extends AbstractAuditable<User> {
 	public void setHost(Host host) {
 		this.host = host;
 	}
+
+	public ResourceProtocol getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(ResourceProtocol protocol) {
+		this.protocol = protocol;
+	}
+
 
 
 

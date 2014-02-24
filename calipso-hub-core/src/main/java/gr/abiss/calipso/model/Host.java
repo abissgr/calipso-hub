@@ -43,6 +43,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.annotations.Formula;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -56,6 +57,9 @@ public class Host extends AbstractAuditable<User> {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 
+	@Formula("domain")
+	private String name;
+	
 	@Column(name = "domain", nullable = false)
 	private String domain;
 	
@@ -88,6 +92,16 @@ public class Host extends AbstractAuditable<User> {
 		}
 		Host that = (Host) obj;
 		return null == this.getId() ? false : this.getId().equals(that.getId());
+	}
+
+	
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getDomain() {

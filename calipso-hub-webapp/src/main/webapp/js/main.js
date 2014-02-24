@@ -56,6 +56,9 @@ require.config({
             deps: ['jquery', 'underscore', 'backbone'/*, 'css!lib/backgrid/backgrid'*/],
             exports: 'Backbone.Form'
         },
+        'backbone-forms-bootstrap3': {
+            deps: ['jquery', 'underscore', 'backbone', 'backbone-forms', 'backbone-forms'],
+        },
         /*'backbone-forms-editor-markdown': {
             deps: ['backbone-forms'],
             exports: 'Backbone.Form.editors.Markdown'
@@ -106,6 +109,7 @@ require.config({
         'backbone-validation-orig': 'lib/backbone-validation',
         'backbone-bootstrap-modal': 'lib/backbone-bootstrap-modal',
         'backbone-forms': 'lib/backbone-forms',
+        'backbone-forms-bootstrap3': 'lib/backbone-forms-bootstrap3',
         'bootstrap-markdown': 'lib/bootstrap-markdown',
         
         'backbone-validation': 'lib/resthub/backbone-validation-ext',

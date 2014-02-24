@@ -27,8 +27,15 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 								model : HostModel,
 							}
 						},
-						"path" : {
+						"name" : {
 							"search": 'Text',
+							"default": {
+								type: 'Text',
+								validators : [ 'required' ]
+							}
+						},
+						"pathName" : {
+							"search": null,
 							"default": {
 								type: 'Text',
 								validators : [ 'required' ]
@@ -42,11 +49,16 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 
 			ResourceModel.prototype.getDefaultSchemaForGrid = function() {
 				return [
-				{
-					name : "path",
-					label : "path",
-					cell : "string"
-				}];
+						{
+							name : "name",
+							label : "name",
+							cell : "string"
+						},
+						{
+							name : "pathName",
+							label : "path name",
+							cell : "string"
+						}];
 			}
 			return ResourceModel;
 		});

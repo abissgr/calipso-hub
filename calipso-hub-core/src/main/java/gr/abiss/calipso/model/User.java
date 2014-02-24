@@ -35,6 +35,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.annotations.Formula;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,7 +48,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser {
 
 	private static final long serialVersionUID = -7942906897981646998L;
-
+	@Formula("concat(first_name, ' ', last_name )")
+	private String name;
+	
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
 	
@@ -179,6 +182,16 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 		}
 
+	}
+	
+
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override

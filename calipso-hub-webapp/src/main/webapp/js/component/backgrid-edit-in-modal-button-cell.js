@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-markdown' ],
+define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-markdown','backbone-forms-bootstrap3' ],
 		function( BackboneBootstrapModal, BackboneForm, Backgrid, Markdown) {
 	//Backbone.Form.editors.Markdown = BackboneFormMarkdown;
 
@@ -44,9 +44,11 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 						thisModal.markdownEditorIds.push(markdownEditor.id);
 						console.log("modal.on shown.bs.modal, markdownEditorIds: "+thisModal.markdownEditorIds);
 					});
+					var modalTitle = rowModel.isNew() ? "New" : rowModel.get("name");
+					console.log("modal title: "+modalTitle);
 					var modal = new Backbone.BootstrapModal({
 						animate: true,
-						title : 'My own form',
+						title : modalTitle,
 						content : form,
 						okBtn : 'save'
 					});
