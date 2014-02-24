@@ -16,8 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define(['backbone', 'view/about-view', 'view/generic-collection-grid-view', 'collection/generic-collection', 'model/host', 'model/text', 'model/user'], 
-function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, HostModel, TextModel, UserModel) {
+define(['backbone', 'view/about-view', 'view/generic-collection-grid-view', 
+        'collection/generic-collection', 'model/host', 
+        'model/text', 'model/user'], 
+function (Backbone, AboutView, 
+		GenericCollectionGridView, GenericCollection, 
+		HostModel, TextModel, 
+		UserModel) {
 	// Override Backbone.sync to use X-HTTP-Method-Override
     Backbone.emulateHTTP = true;
     //Backbone.emulateJSON
@@ -25,36 +30,50 @@ function (Backbone, AboutView, GenericCollectionGridView, GenericCollection, Hos
         initialize: function() {
             Backbone.history.start({ pushState: true, root: "/" });
         },
-        routes:{
+	    modelsMap : {
+	    		'host' : HostModel,
+	    		'text' : TextModel,
+	    		'user' : UserModel,
+	    },
+        routes : {
             '':'home',
-            'client/home':'home',
-            'client/hosts':'hosts',
-            'client/text':'text',
-            'client/users':'users',
-            'client/about':'about'
+            'client/:mainNavigationTab':'mainNavigation',
+        },
+        mainNavigation:function (mainNavigationTab) {
+        	console.log("main, mainNavigationTab: "+mainNavigationTab);
+        	// sync main menu state
+        	this.syncMainNavigationState(mainNavigationTab);
+        	
+        	// is an explicit route avaiable?
+        	if(typeof this[mainNavigationTab] == 'function'){
+            	// proceed with actual route
+            	this[mainNavigationTab]();
+        	}
+        	else{
+        		this.genericMainNavigationView($('#main'), mainNavigationTab);
+        	}
         },
         home:function () {
         	new HomeView({root:$('#main')});
         },
-        hosts:function () {
-        	this.genericGridView($('#main'), HostModel, "/api/rest/host/");
-        },
-        text:function () {
-        	this.genericGridView($('#main'), TextModel, "/api/rest/cms/text/");
-        },
-        users:function () {
-        	this.genericGridView($('#main'), UserModel, "/api/rest/user/");
-        },
         about:function () {
             new AboutView({root:$('#main')});
         },
-        genericGridView:function (viewRoot, viewModel, viewRoute) {
+        genericMainNavigationView:function (viewRoot, mainNavigationTab) {
+        	var viewModel = this.modelsMap[mainNavigationTab];
+        	console.log("genericGridView, viewModel: "+viewModel);
+    		var viewRoute = "/api/rest/"+mainNavigationTab+"/";
+        	console.log("genericGridView, viewRoute: "+viewRoute);
         	var viewCollection = new GenericCollection([], {
         		model: viewModel,
         		url: window.calipso.getBaseUrl() + viewRoute
         	});
             new GenericCollectionGridView({root:viewRoot, collection:viewCollection}).render();
         },
+        syncMainNavigationState: function(mainNavigationTab){
+        	$('.navbar-nav li.active').removeClass('active');
+			$('#mainNavigationTab-'+mainNavigationTab).addClass('active');
+        }
     });
     return AppRouter;
 });

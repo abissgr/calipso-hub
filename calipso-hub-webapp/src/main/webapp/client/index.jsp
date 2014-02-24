@@ -42,11 +42,11 @@
 				</div>
 				<div class="collapse navbar-collapse navbar-ex1-collapse">
 					<ul class="nav navbar-nav pull-right">
-						<li class="active "><a href="home">Home</a></li>
-						<li><a href="hosts">Hosts</a></li>
-							<li><a href="text">Text</a></li>
-							<li><a href="users">Users</a></li>
-							<li><a href="about">About</a></li>
+						<li id="mainNavigationTab-home" class="active "><a href="home">Home</a></li>
+						<li id="mainNavigationTab-host"><a href="hosts">Hosts</a></li>
+						<li id="mainNavigationTab-text"><a href="text">Text</a></li>
+						<li id="mainNavigationTab-user"><a href="users">Users</a></li>
+						<li id="mainNavigationTab-about"><a href="about">About</a></li>
 					</ul>
 				</div>
 			</div>
