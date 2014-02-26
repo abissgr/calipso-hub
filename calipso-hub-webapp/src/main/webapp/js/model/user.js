@@ -21,6 +21,7 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-modal-button-cell',
 		function( GenericModel, EditInModalCell, 
 				GenericModel) {
 			var UserModel = GenericModel.extend({
+				modelKey: "user",
 				schemaComplete : function() {
 					return {//
 						userName : {

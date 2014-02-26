@@ -25,14 +25,20 @@ function (Backbone, Backgrid, Marionette,
     var GenericCollectionGridView = Marionette.ItemView.extend(
     /** @lends collection/GenericCollectionGridView.prototype */
     {
-    	
+
+       // Define view template
+       getModelKey : function(){
+      	return this.collection && this.collection.model 
+      		? this.collection.model.modelKey
+      		: null;
+       },
         
-    	/**
-         * A generic grid view for generic collections
-         *
-         * @augments external:Resthub.View
-         * @constructs
-         */
+//    	/**
+//         * A generic grid view for generic collections
+//         *
+//         * @augments external:Resthub.View
+//         * @constructs
+//         */
 //    	initialise: function() {
 //    		Backbone.Marionette.ItemView.prototype.initialize.apply(this, arguments);
 //    	},

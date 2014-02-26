@@ -24,7 +24,7 @@ define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown',
 				ResourceModel, HostModel) {
 			//Backbone.Form.editors.Markdown
 			var TextModel = ResourceModel.extend({
-				
+				modelKey: "text",
 				schemaComplete : function() {
 					// superclass schema
 					var superSchema = TextModel.__super__.schemaComplete.call(this);

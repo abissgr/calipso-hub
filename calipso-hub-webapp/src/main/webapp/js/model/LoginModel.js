@@ -2,6 +2,7 @@ define(['backbone', 'app'], function(Backbone, app) {
 
   return Backbone.Model.extend({
 
+		modelKey: "login",
     url: app.config.apiUrl + '/login',
 
     defaults: {

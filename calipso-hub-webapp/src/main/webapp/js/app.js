@@ -1,13 +1,29 @@
-define([
-        'backbone', 
-        'marionette',
-        'view/HeaderView',
-        'view/FooterView'
-],
+/*
+ * Copyright (c) 2007 - 2013 www.Abiss.gr
+ *
+ * This file is part of Calipso, a software platform by www.Abiss.gr.
+ *
+ * Calipso is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Calipso is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
+ */
+define(function(require) {
+	var Backbone = require('backbone'),
+	Marionette = require('marionette'),
+	HeaderView = require('view/HeaderView'),
+	FooterView = require('view/FooterView');
+	
 
-function (Backbone, Marionette, HeaderView, FooterView) {
-
-  var app = new Backbone.Marionette.Application();
+  var app = new Marionette.Application();
   console.log("Backbone.Marionette.Application constructor returns: "+app);
   // application configuration
   app.config = {
@@ -42,17 +58,27 @@ function (Backbone, Marionette, HeaderView, FooterView) {
   //---------------
   // initialize header, footer, history
   app.on("initialize:after", function() {
+ 	 console.log("app event initialize:after");
 		 app.headerRegion.show(new HeaderView());
 		 app.footerRegion.show(new FooterView());
-		 Backbone.history.start();
+		 Backbone.history.start({ pushState: true });
   });
   app.vent.on('app:show', function(appView) {
-    app.mainRegion.show(appView);
+	 	 console.log("vent event app:show");
+	    app.mainRegion.show(appView);
+	  });
+  app.vent.on('nav-menu:change', function(modelkey) {
+	 	 console.log("vent event nav-menu:change");
+	  
+	  $('.navbar-nav li.active').removeClass('active');
+	  $('#mainNavigationTab-' + modelkey).addClass('active');
   });
   app.vent.on('modal:show', function(view) {
+	 	 console.log("vent event modal:show");
     app.modal.show(view);
   });
   app.vent.on('modal:close', function() {
+	 	 console.log("vent event modal:close");
     app.modal.hideModal();
   });
   
@@ -75,9 +101,10 @@ function (Backbone, Marionette, HeaderView, FooterView) {
 //    };
     
     // init ALL app routers
-    _(options.routers).each(function(router) {
-   	 console.log("initialize router");
-      new router();
+    _(options.routers).each(function(routerClass) {
+   	 console.log("initialize router type: "+routerClass);
+      var router = new routerClass();
+  	 console.log("initialized router: "+router);
     });
 
   });
@@ -94,5 +121,4 @@ function (Backbone, Marionette, HeaderView, FooterView) {
 		}
 	};
   return app;
-  
 });

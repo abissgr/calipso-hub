@@ -19,6 +19,7 @@
 define([ 'backbone', 'model/generic-model', 'model/host' ],
 		function(Backbone, GenericModel, HostModel) {
 			var ResourceModel = GenericModel.extend({
+				modelKey: "resource",
 				apiPath : "/api/rest/resource/",
 				schemaComplete : function() {
 					var schema = {//

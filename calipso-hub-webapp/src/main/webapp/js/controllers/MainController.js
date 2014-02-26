@@ -1,30 +1,59 @@
-define([ 'marionette', 'app', 'view/AppLayoutView', 'view/HomeView', 'model/LoginModel', 'view/LoginView', 'session', 'vent', 
-         'model/host', 'model/text', 'model/user',
-         'view/generic-collection-grid-view', 'collection/generic-collection'],
-		
-function(Marionette, CalipsoApp, AppLayoutView, HomeView, LoginModel, LoginView, session, vent,
-		HostModel, TextModel, UserModel,
-		GenericCollectionGridView, GenericCollection) {
+/*
+ * Copyright (c) 2007 - 2013 www.Abiss.gr
+ *
+ * This file is part of Calipso, a software platform by www.Abiss.gr.
+ *
+ * Calipso is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Calipso is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
+ */
+define(function(require) {
+	var Backbone = require('backbone'),
+	Marionette = require('marionette'),
+	CalipsoApp = require('app'),
+	session = require('session'),
+	vent = require('vent'),
+	AppLayoutView = require('view/AppLayoutView'),
+	HomeView = require('view/HomeView'),
+	LoginView = require('model/LoginModel'),
+	GenericCollectionGridView = require('view/generic-collection-grid-view'),
+	GenericCollection = require('collection/generic-collection'),
+	HostModel = require('model/host'),
+	TextModel = require('model/text'),
+	UserModel = require('model/user');
 
-	// private
-	var _initializeLayout = function() {
-		MainController.layout = new AppLayoutView({
-			model : session
-		});
-
-		MainController.layout.on("show", function() {
-			vent.trigger("layout:rendered");
-		});
-
-		vent.trigger('app:show', MainController.layout);
-	};
 
 	vent.on("layout:rendered", function() {
 		console.log('layout:rendered (MainController)');
 	});
 
-	var MainController = {
+	var MainController = Marionette.Controller.extend({
+		constructor: function(options){
+	      
+	      Marionette.Controller.prototype.constructor.call(this, options);
+	      console.log('initialize');
+			//_initializeLayout();
+			this.layout = new AppLayoutView({
+		      model: session
+		    });
+			this.layout.on("show", function() {
+		      vent.trigger("layout:rendered");
+		    });
 
+		    vent.trigger('app:show', this.layout);
+	    },
+		layout : new AppLayoutView({
+			model : session
+		}),
 		modelsMap : {
 			'hosts' : HostModel,
 			'texts' : TextModel,
@@ -34,7 +63,7 @@ function(Marionette, CalipsoApp, AppLayoutView, HomeView, LoginModel, LoginView,
 
 			console.log('MainController home called');
 			if (!session.isAuthenticated()) {
-				Backbone.history.navigate("#login", {
+				Backbone.history.navigate("login", {
 					trigger : true
 				});
 				return false;
@@ -74,7 +103,7 @@ function(Marionette, CalipsoApp, AppLayoutView, HomeView, LoginModel, LoginView,
 				session.save(model);
 				session.load();
 				console.log('MainController authenticate navigating to home');
-				Backbone.history.navigate("#home", {
+				Backbone.history.navigate("home", {
 					trigger : true
 				});
 			}, function(model, xhr, options) {
@@ -84,32 +113,35 @@ function(Marionette, CalipsoApp, AppLayoutView, HomeView, LoginModel, LoginView,
 
 		logout : function() {
 			session.destroy();
-			Backbone.history.navigate("#login", {
+			Backbone.history.navigate("login", {
 				trigger : true
 			});
 		},
 
 		mainNavigationRoute : function(mainNavigationTab) {
 			console.log("main, mainNavigationTab: " + mainNavigationTab);
-			// sync main menu state
-			this.syncMainNavigationState(mainNavigationTab);
-
+			
 			if (typeof this[mainNavigationTab] == 'function') {
 				// proceed with actual route
 				this[mainNavigationTab]();
 				return;
 			} else if (this.modelsMap[mainNavigationTab]) {
-				contentRegionView = this.genericMainNavigationView($('#main'), mainNavigationTab);
+				contentRegionView = this.genericMainNavigationView(mainNavigationTab);
 			} else {
 				window.alert("No route found!");
 			}
 
 			console.log("mainNavigationRoute, contentRegionView: " + contentRegionView);
 			// layout.contentRegion.show(contentRegionView);
-			MainController.layout.content.show(contentRegionView);
+			this.layout.content.show(contentRegionView);
+			console.log("mainNavigationRoute, callinf view onDomRefresh... ");
+			contentRegionView.onDomRefresh();
+			// update nav menu .selected
+			vent.trigger("nav-menu:change", mainNavigationTab);
+			
 
 		},
-		genericMainNavigationView : function(viewRoot, mainNavigationTab, entityKey) {
+		genericMainNavigationView : function(mainNavigationTab, entityKey) {
 			var navigationView;
 			var viewModel = this.modelsMap[mainNavigationTab];
 			console.log("genericMainNavigationView, viewModel: " + viewModel);
@@ -126,7 +158,7 @@ function(Marionette, CalipsoApp, AppLayoutView, HomeView, LoginModel, LoginView,
 				model : viewModel,
 				url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
 			});
-			navigationView = new GenericCollectionGridView({/* root:viewRoot, */
+			navigationView = new GenericCollectionGridView({
 				collection : viewCollection
 			});
 			// }
@@ -134,12 +166,9 @@ function(Marionette, CalipsoApp, AppLayoutView, HomeView, LoginModel, LoginView,
 			console.log("genericMainNavigationView, navigationView: " + navigationView);
 			return navigationView;
 		},
-		syncMainNavigationState : function(mainNavigationTab) {
-			$('.navbar-nav li.active').removeClass('active');
-			$('#mainNavigationTab-' + mainNavigationTab).addClass('active');
-		},
 
-	};
+	});
+	//);
 
 	return MainController;
 });

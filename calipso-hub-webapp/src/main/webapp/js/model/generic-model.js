@@ -19,6 +19,7 @@
 define([ 'backbone', 'backgrid' ], 
 function(Backbone, Backgrid) {
 	var GenericModel = Backbone.Model.extend({
+		modelKey: null,
 		/**
 		 * Prefer the collection URL if any for more specific CRUD, fallback to own otherwise 
 		 */
