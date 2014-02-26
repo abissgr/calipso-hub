@@ -16,18 +16,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'resthub', 'hbs!template/about'],
-function (Backbone, Resthub, aboutTemplate) {
+define([ 'backbone', 'marionette', 'hbs!template/about'],
+function (Backbone, Marionette, aboutTemplate) {
     
-    var AboutView = Resthub.View.extend({
+    var AboutView = Backbone.Marionette.ItemView.extend({
         
         // Define view template
         template: aboutTemplate,
         
-        initialize:function () {
-            // Render the view
-            this.render();
-        }
+//        initialize:function () {
+//            // Render the view
+//            this.render();
+//        }
 
     });
     return AboutView;

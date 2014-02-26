@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping(value = "/api/rest/user", produces = { "application/json", "application/xml" })
+@RequestMapping(value = "/api/rest/users", produces = { "application/json", "application/xml" })
 public class UserController extends AbstractServiceBasedRestController<User, String, UserService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);

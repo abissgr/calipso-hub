@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'resthub', 'backgrid', 'backgrid-paginator', 'model/user', 'hbs!template/generic-collection-grid-view' , 'collection/generic-collection'],
-function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, genericCollectionTemplate, GenericCollection) {
+define([ 'backbone', 'backgrid', 'marionette', 
+         'backgrid-paginator', 'model/user', 'hbs!template/generic-collection-grid-view', 
+         'collection/generic-collection'],
+function (Backbone, Backgrid, Marionette, 
+		BackgridExtensionPaginator, User, genericCollectionTemplate, GenericCollection) {
     //Backgrid.Extension.Paginator = Paginator;
-    var GenericCollectionGridView = Resthub.View.extend(
+    var GenericCollectionGridView = Marionette.ItemView.extend(
     /** @lends collection/GenericCollectionGridView.prototype */
     {
     	
@@ -30,23 +33,24 @@ function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, generic
          * @augments external:Resthub.View
          * @constructs
          */
-    	initialise: function() {
-    		Resthub.View.prototype.initialize.apply(this, arguments);
-    	},
-    	
+//    	initialise: function() {
+//    		Backbone.Marionette.ItemView.prototype.initialize.apply(this, arguments);
+//    	},
+//    	
         // Define view template
         template: genericCollectionTemplate,
 
         
-		render: function() {
-			GenericCollectionGridView.__super__.render.apply(this);
+        onDomRefresh: function() {
+			console.log("GenericCollectionGridView render");
+//			/GenericCollectionGridView.__super__.render.apply(this);
 
 			var backgrid = new Backgrid.Grid({
 				  columns: this.collection.schemaForGrid,
 				  collection: this.collection
 			});
 			
-
+			//console.log("$('#backgrid').attr(id): "+$('#backgrid').attr("id"));
 			$('#backgrid').append(backgrid.render().$el);
 			var paginator = new Backgrid.Extension.Paginator({
 
@@ -69,6 +73,8 @@ function (Backbone, Resthub, Backgrid, BackgridExtensionPaginator, User, generic
 			$('#backgrid-paginator').append(paginator.render().el);
 			this.collection.fetch({reset: true});
 			//this.collection.fetch();
+
+			console.log("GenericCollectionGridView rendered");
 		}
 
     });

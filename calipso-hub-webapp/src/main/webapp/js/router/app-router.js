@@ -16,64 +16,84 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define(['backbone', 'view/about-view', 'view/generic-collection-grid-view', 
-        'collection/generic-collection', 'model/host', 
-        'model/text', 'model/user'], 
-function (Backbone, AboutView, 
-		GenericCollectionGridView, GenericCollection, 
+define(['calipso-app', 
+		'controller/calipso-app-controller', 
+        'backbone', 'view/about-view', 'view/home-view', 
+        'view/generic-collection-grid-view', 'collection/generic-collection', 
+        'model/host', 'model/text', 
+        'model/user'], 
+        
+
+function (CalipsoApp, calipsoController, 
 		HostModel, TextModel, 
 		UserModel) {
 	// Override Backbone.sync to use X-HTTP-Method-Override
     Backbone.emulateHTTP = true;
     //Backbone.emulateJSON
-    var AppRouter = Backbone.Router.extend({
-        initialize: function() {
-            Backbone.history.start({ pushState: true, root: "/" });
-        },
+    var CalipsoAppRouter = Marionette.AppRouter.extend({
+//        initialize: function() {
+//           // Backbone.history.start({ pushState: true, root: "/" });
+//        },
 	    modelsMap : {
-	    		'host' : HostModel,
-	    		'text' : TextModel,
-	    		'user' : UserModel,
+	    		'hosts' : HostModel,
+	    		'texts' : TextModel,
+	    		'users' : UserModel,
 	    },
         routes : {
             '':'home',
-            'client/:mainNavigationTab':'mainNavigation',
+            'client/:mainNavigationTab':'mainNavigationRoute',
         },
-        mainNavigation:function (mainNavigationTab) {
+        appRoutes : {
+            '':'initialize',
+            'initialize':'initialize',
+        },
+        mainNavigationRoute : function (mainNavigationTab) {
         	console.log("main, mainNavigationTab: "+mainNavigationTab);
         	// sync main menu state
         	this.syncMainNavigationState(mainNavigationTab);
+
+        	// begin with layout 
+        	//-------------------
+//        	var layout = new ClientLayout();
+//        	layout.render();
         	
-        	// is an explicit route avaiable?
+        	// then with regions
+        	//-------------------
+        	
+        	// content region
+        	//===================
+        	
+        	var contentRegionView;
+        	// is an explicit route available?
         	if(typeof this[mainNavigationTab] == 'function'){
             	// proceed with actual route
-            	this[mainNavigationTab]();
+        		this[mainNavigationTab]();
+        		return;
+        	}
+        	else if(this.modelsMap[mainNavigationTab]){
+        		contentRegionView = this.genericMainNavigationView($('#main'), mainNavigationTab);
         	}
         	else{
-        		this.genericMainNavigationView($('#main'), mainNavigationTab);
+        		window.alert("No route found!");
         	}
+
+        	console.log("mainNavigationRoute, contentRegionView: " + contentRegionView);
+        	//layout.contentRegion.show(contentRegionView);
+        	CalipsoApp.mainRegion.show(contentRegionView);
+        	
+        	
+        	
+        	/*
+        	
+        	*/
         },
         home:function () {
-        	new HomeView({root:$('#main')});
+        	CalipsoApp.mainRegion.show(new HomeView());
         },
         about:function () {
-            new AboutView({root:$('#main')});
+        	CalipsoApp.mainRegion.show(new AboutView());
         },
-        genericMainNavigationView:function (viewRoot, mainNavigationTab) {
-        	var viewModel = this.modelsMap[mainNavigationTab];
-        	console.log("genericGridView, viewModel: "+viewModel);
-    		var viewRoute = "/api/rest/"+mainNavigationTab+"/";
-        	console.log("genericGridView, viewRoute: "+viewRoute);
-        	var viewCollection = new GenericCollection([], {
-        		model: viewModel,
-        		url: window.calipso.getBaseUrl() + viewRoute
-        	});
-            new GenericCollectionGridView({root:viewRoot, collection:viewCollection}).render();
-        },
-        syncMainNavigationState: function(mainNavigationTab){
-        	$('.navbar-nav li.active').removeClass('active');
-			$('#mainNavigationTab-'+mainNavigationTab).addClass('active');
-        }
+       
     });
-    return AppRouter;
+    return new CalipsoAppRouter({controller: calipsoController});
 });

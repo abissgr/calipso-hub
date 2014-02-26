@@ -18,7 +18,6 @@
  */
 define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-markdown','backbone-forms-bootstrap3' ],
 		function( BackboneBootstrapModal, BackboneForm, Backgrid, Markdown) {
-	//Backbone.Form.editors.Markdown = BackboneFormMarkdown;
 
 			var EditInModalCell = Backgrid.Cell.extend({
 				tagName: "td class='modal-button-cell'",
@@ -29,30 +28,35 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 				markdownEditorIds : [], // initialise an empty array
 				editRow : function(e) {
 					var thisModal = this;
-					console.log("Hello");
+					console.log("editRow ");
 					e.preventDefault();
 					var rowModel = this.model;
+					console.log("editRow, rowModel: "+rowModel);
 					var rowModelSchema = rowModel.isNew() ? rowModel.schema("create") : rowModel.schema("update");
-					
+					console.log("editRow, rowModelSchema: "+rowModelSchema);
+
 					var form = new Backbone.Form({
 						model : rowModel,
 						schema : rowModelSchema,
 					});
+					console.log("editRow, form: "+form);
 					// keep note of markdown editors we need to initialize after rendering
-					form.on('source:render', function(form, markdownEditor, extra) {
+					form.listenTo('source:render', function(form, markdownEditor, extra) {
 						console.log('source:render fired, id: "' + markdownEditor.id + '".');
 						thisModal.markdownEditorIds.push(markdownEditor.id);
 						console.log("modal.on shown.bs.modal, markdownEditorIds: "+thisModal.markdownEditorIds);
 					});
+					console.log("editRow, rowModel: "+rowModel);
 					var modalTitle = rowModel.isNew() ? "New" : rowModel.get("name");
-					console.log("modal title: "+modalTitle);
+					console.log("editRow, modal title: "+modalTitle);
 					var modal = new Backbone.BootstrapModal({
 						animate: true,
 						title : modalTitle,
 						content : form,
 						okBtn : 'save'
 					});
-					modal.on('shown', function(e) {
+					console.log("editRow, modal: "+modal);
+					modal.listenTo('shown', function(e) {
 						console.log("modal.on shown, markdownEditorIds: "+thisModal.markdownEditorIds);
 						// initialize markdown editors
 						$('textarea[data-provide="markdown"]').each(function(){
@@ -66,11 +70,6 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 						        }
 					        }
 					    });
-//						for(editorId in markdownEditorIds){
-//							console.log("initalizing markdown editor: " + editorId);
-//							console.log("editor element: "+document.getElementById(editorId));
-//							$("#"+editorId).markdown({autofocus:false,savable:false});
-//						}
 					});
 
 					modal.on('ok', function(e) {
@@ -83,6 +82,7 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 						sUrl = sUrl + (base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
 						rowModelSchema.save({}, {url: sUrl});
 					});
+					console.log("opening modal: "+modal);
 					modal.open();
 					
 				},

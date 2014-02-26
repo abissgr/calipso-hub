@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping(value = "/api/rest/host", produces = { "application/json", "application/xml" })
+@RequestMapping(value = "/api/rest/hosts", produces = { "application/json", "application/xml" })
 public class HostController extends AbstractServiceBasedRestController<Host, String, HostService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HostController.class);

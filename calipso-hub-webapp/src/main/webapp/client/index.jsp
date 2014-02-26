@@ -27,49 +27,25 @@
       	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     	<![endif]-->
 	</head>
-	<body>
-		<div id="wrap">
-		<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-			<div class="container">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle" data-toggle="collapse"
-						data-target=".navbar-ex1-collapse">
-						<span class="sr-only">Toggle navigation</span> <span
-							class="icon-bar"></span> <span class="icon-bar"></span> <span
-							class="icon-bar"></span>
-					</button>
-					<a href="#" class="navbar-brand">calipso</a>
-				</div>
-				<div class="collapse navbar-collapse navbar-ex1-collapse">
-					<ul class="nav navbar-nav pull-right">
-						<li id="mainNavigationTab-home" class="active "><a href="home">Home</a></li>
-						<li id="mainNavigationTab-host"><a href="hosts">Hosts</a></li>
-						<li id="mainNavigationTab-text"><a href="text">Text</a></li>
-						<li id="mainNavigationTab-user"><a href="users">Users</a></li>
-						<li id="mainNavigationTab-about"><a href="about">About</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
+	<body id="calipso-client">
 		
-		<!-- page content -->
-		<div class="container">
-			<div id="main">
+	    <div id="wrap">
+	    	<div id="calipsoRegionHeader">
 				<!-- -->
 			</div>
-		</div>
-		</div>
-		<div id="footer">
-	      <div class="container">
-			<p class="credit text-muted text-center">
-				© Copyright 2010 - 2014 <a title="Powered by Abiss.gr" href="http://abiss.gr">Abiss.gr</a>
-			</p>
-	      </div>
+	    	<div id="calipsoRegionMain">
+				<!-- -->
+			</div>
 	    </div>
-		<!-- Placed at the end of the document so the pages load faster -->
-		<script data-main="/js/main" src="/js/lib/require.js">
-		<!-- -->
 			
+		<div id="calipsoRegionFooter">
+			<!-- -->
+		</div>
+	    <div id="modal" class="modal hide fade"></div>
+	    
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script data-main="/js/config" src="/js/lib/require.js">
+		<!-- -->
 		</script>
 	</body>
 </html>
