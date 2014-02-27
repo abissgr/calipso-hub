@@ -28,12 +28,11 @@ define(function(require) {
 
 		appRoutes : {
 			'' : 'home',
-			'home' : 'home',
-			'login' : 'login',
-			'logout' : 'logout',
-			':mainNavigationTab' : 'mainNavigationRoute',
+			'client/' : 'home',
+			'client/home' : 'home',
+			'client/login' : 'login',
+			'client/logout' : 'logout',
 			'client/:mainNavigationTab' : 'mainNavigationRoute',
-			'/client/:mainNavigationTab' : 'mainNavigationRoute',
 		},
 
 	});

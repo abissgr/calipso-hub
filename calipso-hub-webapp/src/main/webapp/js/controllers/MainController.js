@@ -24,9 +24,11 @@ define(function(require) {
 	vent = require('vent'),
 	AppLayoutView = require('view/AppLayoutView'),
 	HomeView = require('view/HomeView'),
-	LoginView = require('model/LoginModel'),
+	NotFoundView = require('view/NotFoundView'),
+	LoginView = require('view/LoginView'),
 	GenericCollectionGridView = require('view/generic-collection-grid-view'),
 	GenericCollection = require('collection/generic-collection'),
+	LoginModel = require('model/LoginModel'),
 	HostModel = require('model/host'),
 	TextModel = require('model/text'),
 	UserModel = require('model/user');
@@ -60,7 +62,7 @@ define(function(require) {
 
 			console.log('MainController home called');
 			if (!session.isAuthenticated()) {
-				Backbone.history.navigate("login", {
+				Backbone.history.navigate("client/login", {
 					trigger : true
 				});
 				return false;
@@ -99,7 +101,7 @@ define(function(require) {
 				session.save(model);
 				session.load();
 				console.log('MainController authenticate navigating to home');
-				Backbone.history.navigate("home", {
+				Backbone.history.navigate("client/home", {
 					trigger : true
 				});
 			}, function(model, xhr, options) {
@@ -109,11 +111,13 @@ define(function(require) {
 
 		logout : function() {
 			session.destroy();
-			Backbone.history.navigate("login", {
+			Backbone.history.navigate("client/login", {
 				trigger : true
 			});
 		},
-
+		notFoundRoute : function(mainNavigationTab) {
+			this.layout.content.show(new NotFoundView());
+		},
 		mainNavigationRoute : function(mainNavigationTab) {
 			console.log("main, mainNavigationTab: " + mainNavigationTab);
 			
@@ -122,26 +126,26 @@ define(function(require) {
 				this[mainNavigationTab]();
 				return;
 			} else if (this.modelsMap[mainNavigationTab]) {
-				contentRegionView = this.genericMainNavigationView(mainNavigationTab);
+				contentRegionView = this.createGenericCollectionView(mainNavigationTab);
 			} else {
-				window.alert("No route found!");
+				contentRegionView = new NotFoundView();
 			}
 
 			console.log("mainNavigationRoute, contentRegionView: " + contentRegionView);
 			this.layout.content.show(contentRegionView);
 			console.log("mainNavigationRoute, callinf view onDomRefresh... ");
-			contentRegionView.onDomRefresh();
+			//contentRegionView.onDomRefresh();
 			// update nav menu .selected
 			vent.trigger("nav-menu:change", mainNavigationTab);
 			
 
 		},
-		genericMainNavigationView : function(mainNavigationTab, entityKey) {
+		createGenericCollectionView : function(mainNavigationTab, entityKey) {
 			var navigationView;
 			var viewModel = this.modelsMap[mainNavigationTab];
-			console.log("genericMainNavigationView, viewModel: " + viewModel);
+			console.log("createGenericCollectionView, viewModel: " + viewModel);
 			var viewRoute = "/api/rest/" + mainNavigationTab + "/";
-			console.log("genericMainNavigationView, viewRoute: " + viewRoute);
+			console.log("createGenericCollectionView, viewRoute: " + viewRoute);
 			// is a specific entity requested?
 			// if(entityKey){
 			//	        		
@@ -158,7 +162,7 @@ define(function(require) {
 			});
 			// }
 
-			console.log("genericMainNavigationView, navigationView: " + navigationView);
+			console.log("createGenericCollectionView, navigationView: " + navigationView);
 			return navigationView;
 		},
 
