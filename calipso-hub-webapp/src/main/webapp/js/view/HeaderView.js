@@ -1,14 +1,22 @@
-define(['underscore', 'marionette', 'hbs!template/header'], function(_, Marionette, tmpl) {
+define([ 'underscore', 'marionette', 'hbs!template/header' ], function(_, Marionette, tmpl) {
 
-  return Marionette.ItemView.extend({
-    className: 'container span8 home',
-    
-    template: tmpl,
+	return Marionette.ItemView.extend({
+		className : 'container span8 home',
 
-    initialize: function (options) {
-      _.bindAll(this);
-    }
+		template : tmpl,
 
-  });
+		initialize : function(options) {
+			_.bindAll(this);
+		},
+//		events : {
+//			"click a" : "linkClicked"
+//		},
+
+		linkClicked : function(options) {
+			$('.navbar-nav li.active').removeClass('active');
+			$('#mainNavigationTab-' + modelkey).addClass('active');
+		},
+
+	});
 
 });

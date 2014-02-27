@@ -28,7 +28,7 @@ define(function(require) {
   // application configuration
   app.config = {
     // you can provide an absolute URL like http://api.yourserver.com/v1
-    apiUrl: 'apiUrlManos'
+    //apiUrl: 'apiUrlManos'
   };
 
   //custom region that shows a view in bootstrap modal
