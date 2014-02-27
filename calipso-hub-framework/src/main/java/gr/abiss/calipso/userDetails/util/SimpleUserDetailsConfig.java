@@ -31,6 +31,9 @@ public class SimpleUserDetailsConfig implements UserDetailsConfig {
 
 	}
 
+	public SimpleUserDetailsConfig(String cookiesBasicAuthTokenName) {
+		this(cookiesBasicAuthTokenName, null, null, false, false);
+	}
 	public SimpleUserDetailsConfig(String cookiesBasicAuthTokenName, String cookiesDomain, String cookiesContextPath) {
 		this(cookiesBasicAuthTokenName, cookiesDomain, cookiesContextPath, false, false);
 	}

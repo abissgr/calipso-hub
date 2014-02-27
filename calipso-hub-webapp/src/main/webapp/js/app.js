@@ -52,6 +52,8 @@ define(function(require) {
 	  modal:   ModalRegion,
 	  footerRegion: "#calipsoRegionFooter"
   });
+  
+
 
   //---------------
   // app events
@@ -59,9 +61,14 @@ define(function(require) {
   // initialize header, footer, history
   app.on("initialize:after", function() {
  	 console.log("app event initialize:after");
+		//	this.tryRememberMe();
 		 app.headerRegion.show(new HeaderView());
 		 app.footerRegion.show(new FooterView());
-		 Backbone.history.start({ pushState: true });
+		 
+		 Backbone.history.start({ pushState: true, hashChange: false, root: "/", useBackboneNavigate: true });
+		 // TODO: hostpages
+		 // { pushState: true, hashChange: false, root: "/" }
+
   });
   app.vent.on('app:show', function(appView) {
 	 	 console.log("vent event app:show");

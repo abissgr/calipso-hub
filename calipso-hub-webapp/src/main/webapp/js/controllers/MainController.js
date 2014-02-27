@@ -42,9 +42,6 @@ define(function(require) {
 	      Marionette.Controller.prototype.constructor.call(this, options);
 	      console.log('initialize');
 			//_initializeLayout();
-			this.layout = new AppLayoutView({
-		      model: session
-		    });
 			this.layout.on("show", function() {
 		      vent.trigger("layout:rendered");
 		    });
@@ -99,7 +96,6 @@ define(function(require) {
 			var password = this.$('input[name="password"]').val();
 
 			$.when(this.model.authenticate(email, password)).then(function(model, response, options) {
-				var token = model.get('token');
 				session.save(model);
 				session.load();
 				console.log('MainController authenticate navigating to home');
@@ -132,7 +128,6 @@ define(function(require) {
 			}
 
 			console.log("mainNavigationRoute, contentRegionView: " + contentRegionView);
-			// layout.contentRegion.show(contentRegionView);
 			this.layout.content.show(contentRegionView);
 			console.log("mainNavigationRoute, callinf view onDomRefresh... ");
 			contentRegionView.onDomRefresh();

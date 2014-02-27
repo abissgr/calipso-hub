@@ -4,8 +4,6 @@ require([
   'bootstrap',
   // Main App Object
   'app',
-  // Auth module 
-  'auth',
   // Application routers
   'routers/MainRouter',
   //'routers/UserRouter'
@@ -15,9 +13,7 @@ function (
 		  // Libraries
 			$, _, Backbone, bootstrap, 
 			// Main App Object
-		  App,
-		  // Auth module 
-		  auth,
+		  CalipsoApp,
 		  // Application routers
 		  MainRouter
 		  //, UserRouter
@@ -53,6 +49,6 @@ function (
     }
   };
   
-  App.start(options);
+  CalipsoApp.start(options);
 
 });
