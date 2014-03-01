@@ -12,6 +12,7 @@ require.config({
 		jquery : 'lib/jquery',
 		underscore : 'lib/underscore',
 		'underscore-string' : 'lib/underscore-string',
+		'underscore-inflection' : 'lib/underscore-inflection',
 		backbone : 'lib/backbone',
 		resthub : 'lib/resthub/resthub',
 		localstorage : 'lib/localstorage',
@@ -50,6 +51,9 @@ require.config({
 			exports : '_'
 		},
 		'underscore-string' : {
+			deps : [ 'underscore' ]
+		},
+		'underscore-inflection' : {
 			deps : [ 'underscore' ]
 		},
 		'handlebars-orig' : {

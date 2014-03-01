@@ -21,15 +21,15 @@ function(Backbone, BackbonePageableCollection) {
 	var GenericCollection = Backbone.PageableCollection.extend({
 		mode: "server",
 		initialize : function(attributes, options) {
-			if (options.model) {
-				this.model = options.model;	
+			if (options.modelClass) {
+				this.modelClass = options.modelClass;	
 			}
 			// use given grid columns if provided, or the
 			// default model columns otherwise
 			if (options.schemaForGrid) {
 				this.schemaForGrid = options.schemaForGrid;
 			} else {
-				this.schemaForGrid = this.model.prototype.getDefaultSchemaForGrid();
+				this.schemaForGrid = this.modelClass.prototype.getDefaultSchemaForGrid();
 			}
 		},
 

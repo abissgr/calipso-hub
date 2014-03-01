@@ -30,18 +30,18 @@
 	<body id="calipso-client">
 		
 	    <div id="wrap">
-	    	<div id="calipsoRegionHeader">
+	    	<div id="calipsoHeaderRegion">
 				<!-- -->
 			</div>
-	    	<div id="calipsoRegionMain">
+	    	<div id="calipsoMainContentRegion">
 				<!-- -->
 			</div>
 	    </div>
 			
-		<div id="calipsoRegionFooter">
+		<div id="calipsoFooterRegion">
 			<!-- -->
 		</div>
-	    <div id="modal" class="modal hide fade"></div>
+	    <div id="calipsoRegionModal" class="modal hide fade"></div>
 	    
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script data-main="/js/config" src="/js/lib/require.js">

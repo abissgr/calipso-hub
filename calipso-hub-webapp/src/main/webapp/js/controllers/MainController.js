@@ -26,41 +26,36 @@ define(function(require) {
 	HomeView = require('view/HomeView'),
 	NotFoundView = require('view/NotFoundView'),
 	LoginView = require('view/LoginView'),
+	MainContentNavView = require('view/MainContentNavView'),
 	GenericCollectionGridView = require('view/generic-collection-grid-view'),
+	GenericFormView = require('view/GenericFormView'),
 	GenericCollection = require('collection/generic-collection'),
 	LoginModel = require('model/LoginModel'),
-	HostModel = require('model/host'),
-	TextModel = require('model/text'),
-	UserModel = require('model/user');
+	HostModel = require('model/host');
 
 
-	vent.on("layout:rendered", function() {
-		console.log('layout:rendered (MainController)');
-	});
+//	vent.on("layout:rendered", function() {
+//		console.log('layout:rendered (MainController)');
+//	});
 
 	var MainController = Marionette.Controller.extend({
 		constructor: function(options){
-	      
-	      Marionette.Controller.prototype.constructor.call(this, options);
-	      console.log('initialize');
-			//_initializeLayout();
-			this.layout.on("show", function() {
-		      vent.trigger("layout:rendered");
-		    });
 
-		    vent.trigger('app:show', this.layout);
-	    },
+			Marionette.Controller.prototype.constructor.call(this, options);
+//			console.log('initialize');
+			// _initializeLayout();
+			this.layout.on("show", function() {
+				vent.trigger("layout:rendered");
+			});
+
+			vent.trigger('app:show', this.layout);
+		},
 		layout : new AppLayoutView({
 			model : session
 		}),
-		modelsMap : {
-			'hosts' : HostModel,
-			'texts' : TextModel,
-			'users' : UserModel,
-		},
 		home : function() {
 
-			console.log('MainController home called');
+//			console.log('MainController home called');
 			if (!session.isAuthenticated()) {
 				Backbone.history.navigate("client/login", {
 					trigger : true
@@ -92,7 +87,7 @@ define(function(require) {
 		},
 
 		authenticate : function(args) {
-			console.log('MainController authenticate called');
+//			console.log('MainController authenticate called');
 			var self = this;
 			var email = this.$('input[name="email"]').val();
 			var password = this.$('input[name="password"]').val();
@@ -100,7 +95,7 @@ define(function(require) {
 			$.when(this.model.authenticate(email, password)).then(function(model, response, options) {
 				session.save(model);
 				session.load();
-				console.log('MainController authenticate navigating to home');
+//				console.log('MainController authenticate navigating to home');
 				Backbone.history.navigate("client/home", {
 					trigger : true
 				});
@@ -115,59 +110,71 @@ define(function(require) {
 				trigger : true
 			});
 		},
-		notFoundRoute : function(mainNavigationTab) {
+		notFoundRoute : function(path) {
+//			console.log("notFoundRoute, path: "+path);
 			this.layout.content.show(new NotFoundView());
 		},
-		mainNavigationRoute : function(mainNavigationTab) {
-			console.log("main, mainNavigationTab: " + mainNavigationTab);
-			
-			if (typeof this[mainNavigationTab] == 'function') {
-				// proceed with actual route
-				this[mainNavigationTab]();
-				return;
-			} else if (this.modelsMap[mainNavigationTab]) {
-				contentRegionView = this.createGenericCollectionView(mainNavigationTab);
-			} else {
-				contentRegionView = new NotFoundView();
+		mainNavigationRoute : function(mainNavTabName, genericViewTab) {
+			if(!genericViewTab){
+				genericViewTab = "results";
 			}
+//			console.log("main, mainNavTabName: " + mainNavTabName);
 
-			console.log("mainNavigationRoute, contentRegionView: " + contentRegionView);
-			this.layout.content.show(contentRegionView);
-			console.log("mainNavigationRoute, callinf view onDomRefresh... ");
-			//contentRegionView.onDomRefresh();
-			// update nav menu .selected
-			vent.trigger("nav-menu:change", mainNavigationTab);
-			
+			if (typeof this[mainNavTabName] == 'function') {
+				// render explicit route
+				this[mainNavTabName]();
+			} 
+			else{
+				// render generic model driven view
+				var viewRoute = "/api/rest/" + mainNavTabName + "/";
+				var modelDependency = 'model/'+mainNavTabName.slice(0, -1);
+				var _self = this;
+				console.log("mainNavTabName: " + mainNavTabName + ", genericViewTab: " + genericViewTab);
+				if (genericViewTab == "results"){
+//					console.log("rendering results");
+					// this.modelsMap[mainNavTabName]) {
 
-		},
-		createGenericCollectionView : function(mainNavigationTab, entityKey) {
-			var navigationView;
-			var viewModel = this.modelsMap[mainNavigationTab];
-			console.log("createGenericCollectionView, viewModel: " + viewModel);
-			var viewRoute = "/api/rest/" + mainNavigationTab + "/";
-			console.log("createGenericCollectionView, viewRoute: " + viewRoute);
-			// is a specific entity requested?
-			// if(entityKey){
-			//	        		
-			// }
-			// else{
-			// no specific entity requested,
-			// go for collection view
-			var viewCollection = new GenericCollection([], {
-				model : viewModel,
-				url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
-			});
-			navigationView = new GenericCollectionGridView({
-				collection : viewCollection
-			});
-			// }
+					// dynamically load the model matching the tab name
+					// and feed it to the generic view. The view will
+					// access the model schemas and do it's thing
+					require([modelDependency], function(ModelClass) {
+						var viewCollection = new GenericCollection([], {
+							modelClass : ModelClass,
+							url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
+						});
+						var navigationView = new GenericCollectionGridView({
+							collection : viewCollection
+						});
+						// render view
+						_self.layout.mainContentNavRegion.show(new MainContentNavView());
+						_self.layout.content.show(navigationView);
+		        });
+				}
+				else{
+					console.log("mainNavigationRoute, rendering generic form view, view model dependency: " + modelDependency);
+					require([modelDependency], function(ModelClass) {
+						var emptyModel = new ModelClass();
+						console.log("mainNavigationRoute, ModelClass: "+ModelClass);
+						var formView = new GenericFormView({
+							model: emptyModel,
+							// select the appropriate schema for create/update/search etc.
+							schemaAction: genericViewTab
+						});
+						//var formView = new GenericFormView({model: new HostModel()});
+						// render edit/new/search view based on backbone forms
+						_self.layout.mainContentNavRegion.show(new MainContentNavView());
+						_self.layout.content.show(formView);
+					});
+				}
+				// update active nav menu tab
+				$('.navbar-nav li.active').removeClass('active');
+				$('#mainNavigationTab-' + mainNavTabName).addClass('active');
+			}
+		} 
 
-			console.log("createGenericCollectionView, navigationView: " + navigationView);
-			return navigationView;
-		},
+		
 
 	});
-	//);
-
 	return MainController;
 });
+	

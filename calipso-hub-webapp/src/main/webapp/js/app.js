@@ -20,7 +20,9 @@ define(function(require) {
 	var Backbone = require('backbone'),
 	Marionette = require('marionette'),
 	HeaderView = require('view/HeaderView'),
-	FooterView = require('view/FooterView');
+	FooterView = require('view/FooterView')/*.
+	_Inflection = require('underscore-inflection')*/;
+	
 	
 
   var app = new Marionette.Application();
@@ -33,7 +35,7 @@ define(function(require) {
 
   //custom region that shows a view in bootstrap modal
   var ModalRegion = Marionette.Region.extend({
-    el: "#modal",
+    el: "#calipsoRegionModal",
 
     onShow: function(view) {
       view.on("close", this.hideModal, this);
@@ -45,12 +47,12 @@ define(function(require) {
     }
   });
 
-  // main regions, check index.html 
+  // client interface regions, apply to /src/main/webapp/client/index.jsp
   app.addRegions({
-	  headerRegion: "#calipsoRegionHeader",
-	  mainRegion: "#calipsoRegionMain",
+	  headerRegion: "#calipsoHeaderRegion",
+	  mainContentRegion: "#calipsoMainContentRegion",
 	  modal:   ModalRegion,
-	  footerRegion: "#calipsoRegionFooter"
+	  footerRegion: "#calipsoFooterRegion"
   });
   
 
@@ -63,6 +65,7 @@ define(function(require) {
  	 console.log("app event initialize:after");
 		//	this.tryRememberMe();
 		 app.headerRegion.show(new HeaderView());
+		// app.mainContentNavRegion.show(new MainContentNavView());
 		 app.footerRegion.show(new FooterView());
 		 
 		 Backbone.history.start({ pushState: true, hashChange: false, root: "/", useBackboneNavigate: true });
@@ -72,13 +75,12 @@ define(function(require) {
   });
   app.vent.on('app:show', function(appView) {
 	 	 console.log("vent event app:show");
-	    app.mainRegion.show(appView);
+	    app.mainContentRegion.show(appView);
 	  });
   app.vent.on('nav-menu:change', function(modelkey) {
 	 	 console.log("vent event nav-menu:change");
 	  
-	  $('.navbar-nav li.active').removeClass('active');
-	  $('#mainNavigationTab-' + modelkey).addClass('active');
+	 
   });
   app.vent.on('modal:show', function(view) {
 	 	 console.log("vent event modal:show");

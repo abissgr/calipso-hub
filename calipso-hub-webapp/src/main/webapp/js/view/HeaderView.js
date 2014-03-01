@@ -9,13 +9,15 @@ define([ 'underscore', 'marionette', 'hbs!template/header' ], function(_, Marion
 			_.bindAll(this);
 		},
 //		events : {
-//			"click a" : "linkClicked"
+//			"click li" : "linkClicked"
 //		},
 
-		linkClicked : function(options) {
-			$('.navbar-nav li.active').removeClass('active');
-			$('#mainNavigationTab-' + modelkey).addClass('active');
-		},
+//		linkClicked : function(e) {
+//			console.log("linkClicked");
+//			e.preventDefault();
+//			this.$el.find('.navbar-nav li.active').removeClass('active');
+//			$(e.currentTarget).addClass('active');
+//		},
 
 	});
 

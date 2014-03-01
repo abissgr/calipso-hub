@@ -53,7 +53,7 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 						animate: true,
 						title : modalTitle,
 						content : form,
-						okBtn : 'save'
+						okBtn : 'save',
 					});
 					console.log("editRow, modal: "+modal);
 					modal.listenTo('shown', function(e) {

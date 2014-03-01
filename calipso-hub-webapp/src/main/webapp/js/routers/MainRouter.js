@@ -33,6 +33,8 @@ define(function(require) {
 			'client/login' : 'login',
 			'client/logout' : 'logout',
 			'client/:mainNavigationTab' : 'mainNavigationRoute',
+			'client/:mainNavigationTab/:genericViewTab' : 'mainNavigationRoute',
+			'*path':  'notFoundRoute'
 		},
 
 	});
