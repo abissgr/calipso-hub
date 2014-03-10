@@ -51,6 +51,10 @@ define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown',
 					// return merged schemas
 					return $.extend({}, superSchema, schema);
 				},
+			},
+			// static members
+			{
+				className: "TextModel"
 			});
 
 			TextModel.prototype.getDefaultSchemaForGrid = function() {

@@ -24,7 +24,7 @@
     <!-- client is single page app -->
     <rule>
 		<condition type="attribute" name="forwarded-to-client-index" operator="notequal">true</condition>
-	    <from>^/client/*/(.*)</from>
+	    <from>^/client/hosts</from>
 	    <set type="request" name="forwarded-to-manager-index-jsp">true</set>
 	    <to type="forward" last="true">/client/index.jsp</to>
 	</rule>

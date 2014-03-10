@@ -27,9 +27,12 @@ define(function(require) {
 	NotFoundView = require('view/NotFoundView'),
 	LoginView = require('view/LoginView'),
 	MainContentNavView = require('view/MainContentNavView'),
+	TabLayout = require('view/generic-crud-layout'),
 	GenericCollectionGridView = require('view/generic-collection-grid-view'),
 	GenericFormView = require('view/GenericFormView'),
 	GenericCollection = require('collection/generic-collection'),
+	GenericModel = require('model/generic-model'),
+	GenericCollectionWrapperModel = require('model/generic-collection-wrapper-model'),
 	LoginModel = require('model/LoginModel'),
 	HostModel = require('model/host');
 
@@ -114,7 +117,68 @@ define(function(require) {
 //			console.log("notFoundRoute, path: "+path);
 			this.layout.content.show(new NotFoundView());
 		},
+		mainNavigationCrudRoute : function(mainNavTabName, genericViewTab) {
+
+			this.tryExplicitRoute(mainNavTabName);
+
+			if(!genericViewTab){
+				genericViewTab = "results";
+			}
+			
+
+			// render generic model driven view
+			var viewRoute = "/api/rest/" + mainNavTabName + "/";
+			var ModelClass = require('model/'+mainNavTabName.slice(0, -1));
+			var _self = this;
+			console.log("mainNavTabName: " + mainNavTabName + ", genericViewTab: " + genericViewTab);
+			if (genericViewTab == "results"){
+				console.log("mainNavigationCrudRoute, mainNavTabName: " + mainNavTabName + ", genericViewTab: " + genericViewTab);
+				if(!this.searchResults){
+					this.searchResults = new GenericCollection([], {
+						modelClass : ModelClass,
+						url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
+					});
+				}
+				var searchResultsModel = new GenericCollectionWrapperModel({
+					name : "Search",
+					wrappedCollection : this.searchResults
+				});
+				console.log("MainController#mainNavigationCrudRoute, searchResultsModel.get(name): "+
+						searchResultsModel.get("name"));
+				var TabModel      = Backbone.Model.extend();
+				var TabCollection = Backbone.Collection.extend({ model: GenericModel });
+	
+				var tabs = new TabCollection([
+	            (new HostModel({ name: 'foobar' })),
+	            (searchResultsModel)      
+	         ]);
+	         var tabLayout = new TabLayout({collection: tabs});
+				// render view
+				//_self.layout.mainContentNavRegion.show(tabLayout);
+				this.layout.content.show(tabLayout);
+
+				// update active nav menu tab
+				//$('.navbar-nav li.active').removeClass('active');
+				$('#generic-crud-layout-tabs-' + mainNavTabName).addClass('active');
+			}
+			else{
+				
+			}//
+
+		},
+		tryExplicitRoute : function(mainNavTabName){
+			if(!mainNavTabName){
+				mainNavTabName = "hosts";
+			}
+			else if (typeof this[mainNavTabName] == 'function') {
+				// render explicit route
+				this[mainNavTabName]();
+			} 
+		},
 		mainNavigationRoute : function(mainNavTabName, genericViewTab) {
+			
+			tryExplicitRoute(mainNavTabName);
+
 			if(!genericViewTab){
 				genericViewTab = "results";
 			}

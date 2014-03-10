@@ -28,12 +28,16 @@ define(function(require) {
 
 		appRoutes : {
 			'' : 'home',
+			'client' : 'home',
 			'client/' : 'home',
 			'client/home' : 'home',
 			'client/login' : 'login',
 			'client/logout' : 'logout',
-			'client/:mainNavigationTab' : 'mainNavigationRoute',
-			'client/:mainNavigationTab/:genericViewTab' : 'mainNavigationRoute',
+//			'client/users' : 'mainNavigationRoute',
+			'client/:mainNavigationTab' : 'mainNavigationCrudRoute',
+			'client/:mainNavigationTab/:genericViewTab' : 'mainNavigationCrudRoute',
+//			'client/:mainNavigationTab' : 'mainNavigationRoute',
+//			'client/:mainNavigationTab/:genericViewTab' : 'mainNavigationRoute',
 			'*path':  'notFoundRoute'
 		},
 

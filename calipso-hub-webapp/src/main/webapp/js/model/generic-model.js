@@ -32,47 +32,11 @@ function(Backbone, Backgrid) {
 			return sUrl;
 	    },
 	    schemaComplete : function() {
-			return {};
+	   	 return this.prototype.schemaComplete(this);
 		},
 	    schema : function(actionName) {
-			// decide based on model persistence state if no action was given 
-			if(!actionName){
-				actionName = this.isNew() ? "create" : "update";
-			}
-			// the schema to build for the selected action 
-			var schemaForAction = {};
-			// get the complete schema to filter out from
-			var schemaComplete = this.schemaComplete();
-			//console.log("GenericModel#schema actionName: "+actionName+", schemaComplete: "+schemaComplete);
-			
-			// for each property, select the appropriate schema entry for the given action
-			var propertySchema;
-			var propertySchemaForAction;
-			for(var propertyName in schemaComplete) {
-			    if(schemaComplete.hasOwnProperty(propertyName)) {
-			    	propertySchema = schemaComplete[propertyName];
-		    		
-			    	// if a schema exists for the property
-			    	if(propertySchema){
-			    		// try obtaining a schema for the specific action 
-		    			propertySchemaForAction = propertySchema[actionName];
-		    			// support wild card entries
-		    			if(!propertySchemaForAction){
-		    				propertySchemaForAction = propertySchema["default"];
-		    			}
-		    			if(propertySchemaForAction){
-		    				schemaForAction[propertyName] = propertySchemaForAction;
-		    			}
-		    		}
-		    	}
-			    	
-		    	// reset
-		    	propertySchema = false;
-		    	propertySchemaForAction = false;
-		    }
-			//console.log("GenericModel#schema schemaForAction: "+schemaForAction);
-			return schemaForAction;
-		},
+	   	 return this.prototype.schema(this, actionName);
+	    },
 //		url:  function () {
 //			console.log("GenericModel#url");
 //			var sUrl;
@@ -88,7 +52,11 @@ function(Backbone, Backgrid) {
 //				sUrl = sUrl + this.get(this.idAttribute); 
 //			}
 //		},
-//		
+		getClassName: function(){
+			var c = this.constructor.className;
+			console.log("GenericModel#getClassName: "+c);
+			return c;
+		},
 		initialize: function () {
 		    Backbone.Model.prototype.initialize.apply(this, arguments);
 		    var thisModel = this;
@@ -113,14 +81,57 @@ function(Backbone, Backgrid) {
 
 		
 		},
-
 		// static members
 		{
-			
+			className: "GenericModel"
 		}
 	);
 	GenericModel.prototype.getDefaultSchemaForGrid = function(){
 		// TODO: infer based on defaults OR conditionally build the edit etc. button columns
+	}
+
+	GenericModel.prototype.schemaComplete = function(instance) {
+		return {};
+	}
+	
+	GenericModel.prototype.schema  = function(instance, actionName) {
+		// decide based on model persistence state if no action was given 
+		if(!actionName){
+			actionName = instance.isNew() ? "create" : "update";
+		}
+		// the schema to build for the selected action 
+		var schemaForAction = {};
+		// get the complete schema to filter out from
+		var schemaComplete = instance.schemaComplete();
+		//console.log("GenericModel#schema actionName: "+actionName+", schemaComplete: "+schemaComplete);
+		
+		// for each property, select the appropriate schema entry for the given action
+		var propertySchema;
+		var propertySchemaForAction;
+		for(var propertyName in schemaComplete) {
+		    if(schemaComplete.hasOwnProperty(propertyName)) {
+		    	propertySchema = schemaComplete[propertyName];
+	    		
+		    	// if a schema exists for the property
+		    	if(propertySchema){
+		    		// try obtaining a schema for the specific action 
+	    			propertySchemaForAction = propertySchema[actionName];
+	    			// support wild card entries
+	    			if(!propertySchemaForAction){
+	    				propertySchemaForAction = propertySchema["default"];
+	    			}
+	    			if(propertySchemaForAction){
+	    				schemaForAction[propertyName] = propertySchemaForAction;
+	    			}
+	    		}
+	    	}
+		    	
+	    	// reset
+	    	propertySchema = false;
+	    	propertySchemaForAction = false;
+	    }
+		//console.log("GenericModel#schema schemaForAction: "+schemaForAction);
+		return schemaForAction;
 	}
 	//console.log("GenericModel done");
 	return GenericModel;

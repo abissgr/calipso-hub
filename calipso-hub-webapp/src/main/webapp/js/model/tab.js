@@ -16,40 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model', 'component/backgrid-edit-in-modal-button-cell' ],
-		function( GenericModel, EditInModalCell) {
-			var HostModel = GenericModel.extend({
-				modelKey: "host",
-
-			},
-			// static members
-			{
-				className: "HostModel"
-			});
-
-			HostModel.prototype.schemaComplete = function() {
-				return {//
-					domain : {
-						"search": 'Text',
-						"default": {
-							type: 'Text',
-							validators : [ 'required' ]
-						}
-					},
-				};
-			}
-			HostModel.prototype.getDefaultSchemaForGrid = function() {
-				return [
-				{
-					name : "domain",
-					label : "domain",
-					cell : "string"
-				}, {
-					name : "edit",
-					label : "",
-					editable : false,
-					cell : EditInModalCell
-				}];
-			}
-			return HostModel;
-		});
+define([ 'model/generic-model'],
+function( GenericModel) {
+		var TabModel = Backbone.Model.extend();
+		return TabModel;
+});

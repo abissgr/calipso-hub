@@ -27,11 +27,11 @@ function (Backbone, Backgrid, Marionette,
     {
 
        // Define view template
-       getModelKey : function(){
-      	return this.collection && this.collection.model 
-      		? this.collection.model.modelKey
-      		: null;
-       },
+//       getModelKey : function(){
+//      	return this.collection && this.collection.model 
+//      		? this.collection.model.modelKey
+//      		: null;
+//       },
         
 //    	/**
 //         * A generic grid view for generic collections
@@ -45,15 +45,24 @@ function (Backbone, Backgrid, Marionette,
 //    	
         // Define view template
         template: genericCollectionTemplate,
-
+// 	    onShow: function(){
+//       	 console.log("GenericCollectionGridView#onShow");
+// 	        
+// 	    },
         
-        onDomRefresh: function() {
-			console.log("GenericCollectionGridView render");
+        onShow: function() {
+			console.log("GenericCollectionGridView onShow");
 //			/GenericCollectionGridView.__super__.render.apply(this);
-
+			var gridCollection;
+			if(this.collection){
+				gridCollection = this.collection;
+			}
+			else if(this.model.className = "GenericCollectionWrapperModel"){
+				gridCollection = this.model.wrappedCollection;
+			}
 			var backgrid = new Backgrid.Grid({
-				  columns: this.collection.schemaForGrid,
-				  collection: this.collection
+				  columns: gridCollection.schemaForGrid,
+				  collection: gridCollection
 			});
 			
 			//console.log("$('#backgrid').attr(id): "+$('#backgrid').attr("id"));
@@ -73,14 +82,14 @@ function (Backbone, Backgrid, Marionette,
 				  // Whether sorting should go back to the first page
 				  goBackFirstOnSort: false, // Default is true
 
-				  collection: this.collection
+				  collection: gridCollection
 				});
 
 			$('#backgrid-paginator').append(paginator.render().el);
-			this.collection.fetch({reset: true});
+			gridCollection.fetch({reset: true});
 			//this.collection.fetch();
 
-			console.log("GenericCollectionGridView rendered");
+			console.log("GenericCollectionGridView showed");
 		}
 
     });

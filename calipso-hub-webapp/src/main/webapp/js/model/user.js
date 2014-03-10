@@ -60,6 +60,10 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-modal-button-cell', 
 						},
 					};
 				},
+			},
+			// static members
+			{
+				className: "UserModel"
 			});
 
 			UserModel.prototype.getDefaultSchemaForGrid = function() {

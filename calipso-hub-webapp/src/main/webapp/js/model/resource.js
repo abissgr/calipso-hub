@@ -21,34 +21,39 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 			var ResourceModel = GenericModel.extend({
 				modelKey: "resource",
 				apiPath : "/api/rest/resource/",
-				schemaComplete : function() {
-					var schema = {//
-						"host" : {
-							"default": {
-								type: 'NestedModel',
-								model : HostModel,
-							}
-						},
-						"name" : {
-							"search": 'Text',
-							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
-						},
-						"pathName" : {
-							"search": null,
-							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
-						},
-						
-					};
-					return schema;
-				},
+				
+			},
+			// static members
+			{
+				className: "ResourceModel"
 			});
 
+			ResourceModel.prototype.schemaComplete = function() {
+				var schema = {//
+					"host" : {
+						"default": {
+							type: 'NestedModel',
+							model : HostModel,
+						}
+					},
+					"name" : {
+						"search": 'Text',
+						"default": {
+							type: 'Text',
+							validators : [ 'required' ]
+						}
+					},
+					"pathName" : {
+						"search": null,
+						"default": {
+							type: 'Text',
+							validators : [ 'required' ]
+						}
+					},
+					
+				};
+				return schema;
+			}
 			ResourceModel.prototype.getDefaultSchemaForGrid = function() {
 				return [
 						{
