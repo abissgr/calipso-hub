@@ -4,8 +4,8 @@
 
 /* Sticky footer styles
 -------------------------------------------------- */
-/*.tmpl-hint{display:none}
-*/
+.tmpl-hint{display:none}
+.hidden{display:none}
 html,
 body {
   height: 100%;

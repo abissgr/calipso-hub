@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'marionette', 'hbs!template/generic-crud-layout', 'view/generic-collection-grid-view', 
+define([ 'app', 'backbone', 'marionette', 'hbs!template/generic-crud-layout', 'view/generic-collection-grid-view', 'view/GenericFormView', 
          'collection/generic-collection', 'hbs!template/tabs', 'hbs!template/tab-label', 'hbs!template/tab-content'],
-function (Backbone, Marionette, tmpl, GenericCollectionGridView, GenericCollection, tmplTabs, tmplTabLabel, tmplTabContent) {
+function (CalipsoApp, Backbone, Marionette, tmpl, GenericCollectionGridView, GenericFormView, GenericCollection, tmplTabs, tmplTabLabel, tmplTabContent) {
 	var TabLayout = Backbone.Marionette.Layout.extend({
 	    template:  tmpl,
 	    className: 'tabbable',
@@ -28,23 +28,24 @@ function (Backbone, Marionette, tmpl, GenericCollectionGridView, GenericCollecti
 	    },
 	    onShow: function(){
       	 console.log("TabLayout#onShow");
-	        var tabLabels   = new TabLabelCollection({   collection: this.collection});
-	        var tabContents = new TabPaneCollection({ collection: this.collection});
-	    
-	        this.labels.show(tabLabels);
-	        this.panes.show(tabContents);
+	        var tabLabelsView   = new TabLabelCollectionView({   collection: this.collection});
+	        var tabContentsView = new TabPaneCollectionView({ collection: this.collection});
+	        this.labels.show(tabLabelsView);
+	        this.panes.show(tabContentsView);
+
+	        
 	    },
 	});
 	
 
-	var TabLabelCollection = Backbone.Marionette.CollectionView.extend({
+	var TabLabelCollectionView = Backbone.Marionette.CollectionView.extend({
 	    className: 'nav nav-tabs tab-labels',
 	    tagName: 'ul',
 		 template: tmplTabs,
 		 itemViewContainer: '.nav-tabs',
 	    events: {
 	        "click .show-tab": "showTab",
-	        "click .close-tab": "closeTab"
+	        "click .close": "closeTab"
 	    },
 	    showTab: function(e) {
 	   	 // TODO:
@@ -58,25 +59,23 @@ function (Backbone, Marionette, tmpl, GenericCollectionGridView, GenericCollecti
 		 getItemView: function(item) {
 			 return Backbone.Marionette.ItemView.extend({ 
 		        tagName: 'li',
-		        id: "generic-crud-layout-tabs-" + item.get("name"),
+		        className: 'generic-crud-layout-tab-label',
+		        id: "generic-crud-layout-tab-label-" + item.get("id"),
 		        template: tmplTabLabel
 		    });
 		 }
 	});
 
-	var TabPaneCollection = Backbone.Marionette.CollectionView.extend({
+	var TabPaneCollectionView = Backbone.Marionette.CollectionView.extend({
 	    className: 'tab-content',
 	    getItemView: function(item) {
 	   	 var someItemSpecificView;
-      	 console.log("TabPaneCollection#getItemView, item is instance of "+ item.getClassName());
-	       if(item.getClassName() == "GenericCollectionWrapperModel"){
+	       if(item.getClassName && item.getClassName() == "GenericCollectionWrapperModel"){
+	      	 console.log("TabPaneCollection#getItemView, item is instance of "+ item.getClassName());
 	      	 someItemSpecificView = GenericCollectionGridView;
 	       }
 	       else{
-	      	 someItemSpecificView = Backbone.Marionette.ItemView.extend({
-		  	        className: 'tab-pane',
-			        template: tmplTabContent
-			    });
+	      	 someItemSpecificView = GenericFormView;
 	       }
 	       return someItemSpecificView;
 	     }

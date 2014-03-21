@@ -29,12 +29,13 @@ define(function(require) {
 			// get appropriate schema
 			var schemaAction = Marionette.getOption(this, "schemaAction");
 			if(!schemaAction){
-				schemaAction = this.model.isNew() ? this.model.schema("create") : this.model.schema("update");
+				schemaAction = this.model.isNew() ? "create" : "update";
 			}
+			console.log("GenericFormView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
 			// render form
 			var form = new Backbone.Form({
 				model :  this.model,
-				schema : this.model.schema(schemaAction)
+				schema : this.model.schemaForAction(schemaAction)
 			}).render();
 			$('#generic-form').append(form.el);
 			$('#generic-form textarea[data-provide="markdown"]').each(function(){
@@ -50,6 +51,5 @@ define(function(require) {
 		    });
 		}
 	});
-	console.log("GenericCollectionGridView done");
 	return GenericFormView;
 });

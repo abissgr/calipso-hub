@@ -29,10 +29,11 @@ function(Backbone, Backgrid, GenericModel) {
 //		toJSON: function() {
 //		    return this.wrappedCollection.toJSON(); // where model is the collection class YOU defined above
 //		},
-//		defaults: {
-//         name: 'Search',
-//		},	
-		//name : "search",
+		defaults: {
+         id: 'Search',
+         name: 'Search',
+		},	
+//		id : "Search",
 		getClassName: function(){
 			var c = this.constructor.className;
 			console.log("GenericCollectionWrapperModel#getClassName: "+c);
@@ -40,17 +41,20 @@ function(Backbone, Backgrid, GenericModel) {
 		},
 		initialize : function(attributes, options) {
 			// the collection to wrap
-			if (attributes.wrappedCollection) {
-				this.wrappedCollection = attributes.wrappedCollection;
-				// note collections modelClass if available,
-				// this can be overriden by options.modelClass
-				if (this.wrappedCollection.modelClass) {
-					this.modelClass = this.wrappedCollection.modelClass;	
+			if (attributes){
+				if (attributes.wrappedCollection) {
+					this.wrappedCollection = attributes.wrappedCollection;
+					console.log("GenericCollectionWrapperModel#initialize from attributes");
+					// note collections modelClass if available,
+					// this can be overriden by attributes.modelClass
+					if (this.wrappedCollection.modelClass) {
+						this.modelClass = this.wrappedCollection.modelClass;	
+					}
 				}
+				// override modelClass
+				if (attributes.modelClass) {
+					this.modelClass = attributes.modelClass;	
 			}
-			// override modelClass
-			if (attributes.modelClass) {
-				this.modelClass = options.modelClass;	
 			}
 			// use  given grid columns if provided, or the
 			// collection model columns if not, finally default to 

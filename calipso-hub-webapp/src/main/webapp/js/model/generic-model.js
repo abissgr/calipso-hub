@@ -34,9 +34,47 @@ function(Backbone, Backgrid) {
 	    schemaComplete : function() {
 	   	 return this.prototype.schemaComplete(this);
 		},
-	    schema : function(actionName) {
-	   	 return this.prototype.schema(this, actionName);
-	    },
+	    schemaForAction : function(actionName) {
+	 		// decide based on model persistence state if no action was given 
+	 		if(!actionName){
+	 			console.log("GenericModel.prototype.schema, this: "+this);
+	 			console.log("GenericModel.prototype.schema, caller is " + arguments.callee.caller.toString());
+	 			actionName = this.isNew() ? "create" : "update";
+	 		}
+	 		// the schema to build for the selected action 
+	 		var schemaForAction = {};
+	 		// get the complete schema to filter out from
+	 		var schemaComplete = this.schemaComplete();
+	 		//console.log("GenericModel#schema actionName: "+actionName+", schemaComplete: "+schemaComplete);
+	 		
+	 		// for each property, select the appropriate schema entry for the given action
+	 		var propertySchema;
+	 		var propertySchemaForAction;
+	 		for(var propertyName in schemaComplete) {
+	 		    if(schemaComplete.hasOwnProperty(propertyName)) {
+	 		    	propertySchema = schemaComplete[propertyName];
+	 	    		
+	 		    	// if a schema exists for the property
+	 		    	if(propertySchema){
+	 		    		// try obtaining a schema for the specific action 
+	 	    			propertySchemaForAction = propertySchema[actionName];
+	 	    			// support wild card entries
+	 	    			if(!propertySchemaForAction){
+	 	    				propertySchemaForAction = propertySchema["default"];
+	 	    			}
+	 	    			if(propertySchemaForAction){
+	 	    				schemaForAction[propertyName] = propertySchemaForAction;
+	 	    			}
+	 	    		}
+	 	    	}
+	 		    	
+	 	    	// reset
+	 	    	propertySchema = false;
+	 	    	propertySchemaForAction = false;
+	 	    }
+	 		//console.log("GenericModel#schema schemaForAction: "+schemaForAction);
+	 		return schemaForAction;
+	 	},
 //		url:  function () {
 //			console.log("GenericModel#url");
 //			var sUrl;
@@ -94,45 +132,6 @@ function(Backbone, Backgrid) {
 		return {};
 	}
 	
-	GenericModel.prototype.schema  = function(instance, actionName) {
-		// decide based on model persistence state if no action was given 
-		if(!actionName){
-			actionName = instance.isNew() ? "create" : "update";
-		}
-		// the schema to build for the selected action 
-		var schemaForAction = {};
-		// get the complete schema to filter out from
-		var schemaComplete = instance.schemaComplete();
-		//console.log("GenericModel#schema actionName: "+actionName+", schemaComplete: "+schemaComplete);
-		
-		// for each property, select the appropriate schema entry for the given action
-		var propertySchema;
-		var propertySchemaForAction;
-		for(var propertyName in schemaComplete) {
-		    if(schemaComplete.hasOwnProperty(propertyName)) {
-		    	propertySchema = schemaComplete[propertyName];
-	    		
-		    	// if a schema exists for the property
-		    	if(propertySchema){
-		    		// try obtaining a schema for the specific action 
-	    			propertySchemaForAction = propertySchema[actionName];
-	    			// support wild card entries
-	    			if(!propertySchemaForAction){
-	    				propertySchemaForAction = propertySchema["default"];
-	    			}
-	    			if(propertySchemaForAction){
-	    				schemaForAction[propertyName] = propertySchemaForAction;
-	    			}
-	    		}
-	    	}
-		    	
-	    	// reset
-	    	propertySchema = false;
-	    	propertySchemaForAction = false;
-	    }
-		//console.log("GenericModel#schema schemaForAction: "+schemaForAction);
-		return schemaForAction;
-	}
 	//console.log("GenericModel done");
 	return GenericModel;
 });

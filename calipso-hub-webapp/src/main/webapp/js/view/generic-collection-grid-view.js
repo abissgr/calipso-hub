@@ -16,84 +16,62 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'backgrid', 'marionette', 
-         'backgrid-paginator', 'model/user', 'hbs!template/generic-collection-grid-view', 
-         'collection/generic-collection'],
-function (Backbone, Backgrid, Marionette, 
-		BackgridExtensionPaginator, User, genericCollectionTemplate, GenericCollection) {
-    //Backgrid.Extension.Paginator = Paginator;
-    var GenericCollectionGridView = Marionette.ItemView.extend(
-    /** @lends collection/GenericCollectionGridView.prototype */
-    {
+define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user', 'hbs!template/generic-collection-grid-view', 'collection/generic-collection' ], function(Backbone, Backgrid, Marionette, BackgridExtensionPaginator, User, genericCollectionTemplate, GenericCollection) {
+	// Backgrid.Extension.Paginator = Paginator;
+	var GenericCollectionGridView = Marionette.ItemView.extend(
+	/** @lends collection/GenericCollectionGridView.prototype */
+	{
 
-       // Define view template
-//       getModelKey : function(){
-//      	return this.collection && this.collection.model 
-//      		? this.collection.model.modelKey
-//      		: null;
-//       },
-        
-//    	/**
-//         * A generic grid view for generic collections
-//         *
-//         * @augments external:Resthub.View
-//         * @constructs
-//         */
-//    	initialise: function() {
-//    		Backbone.Marionette.ItemView.prototype.initialize.apply(this, arguments);
-//    	},
-//    	
-        // Define view template
-        template: genericCollectionTemplate,
-// 	    onShow: function(){
-//       	 console.log("GenericCollectionGridView#onShow");
-// 	        
-// 	    },
-        
-        onShow: function() {
-			console.log("GenericCollectionGridView onShow");
-//			/GenericCollectionGridView.__super__.render.apply(this);
-			var gridCollection;
-			if(this.collection){
-				gridCollection = this.collection;
+		// Define view template
+		template : genericCollectionTemplate,
+		onShow : function() {
+			var _self = this;
+			// console.log("GenericCollectionGridView onShow");
+			// /GenericCollectionGridView.__super__.render.apply(this);
+			console.log("GenericCollectionGridView onShow, model className: " + (this.model.getClassName ? this.model.getClassName() : undefined));
+			if (this.model.getClassName && this.model.getClassName() == "GenericCollectionWrapperModel") {
+				this.collection = this.model.wrappedCollection;
+				console.log("GenericCollectionGridView onShow, got collection from GenericCollectionWrapperModel");
+			} else {
+				console.log("GenericCollectionGridView onShow, got collection from GenericCollectionWrapperModel");
 			}
-			else if(this.model.className = "GenericCollectionWrapperModel"){
-				gridCollection = this.model.wrappedCollection;
-			}
+			// console.log("GenericCollectionGridView onShow, this.collection:
+			// "+this.collection + ", gridCollection: "+gridCollection);
 			var backgrid = new Backgrid.Grid({
-				  columns: gridCollection.schemaForGrid,
-				  collection: gridCollection
+				columns : _self.collection.schemaForGrid,
+				collection : _self.collection
 			});
-			
-			//console.log("$('#backgrid').attr(id): "+$('#backgrid').attr("id"));
+			//			
+
+			// console.log("$('#backgrid').attr(id): "+$('#backgrid').attr("id"));
 			$('#backgrid').append(backgrid.render().$el);
 			var paginator = new Backgrid.Extension.Paginator({
 
-				  // If you anticipate a large number of pages, you can adjust
-				  // the number of page handles to show. The sliding window
-				  // will automatically show the next set of page handles when
-				  // you click next at the end of a window.
-				  windowSize: 20, // Default is 10
+				// If you anticipate a large number of pages, you can adjust
+				// the number of page handles to show. The sliding window
+				// will automatically show the next set of page handles when
+				// you click next at the end of a window.
+				windowSize : 20, // Default is 10
 
-				  // Used to multiple windowSize to yield a number of pages to slide,
-				  // in the case the number is 5
-				  slideScale: 0.25, // Default is 0.5
+				// Used to multiple windowSize to yield a number of pages to slide,
+				// in the case the number is 5
+				slideScale : 0.25, // Default is 0.5
 
-				  // Whether sorting should go back to the first page
-				  goBackFirstOnSort: false, // Default is true
+				// Whether sorting should go back to the first page
+				goBackFirstOnSort : false, // Default is true
 
-				  collection: gridCollection
-				});
+				collection : _self.collection
+			});
 
 			$('#backgrid-paginator').append(paginator.render().el);
-			gridCollection.fetch({reset: true});
-			//this.collection.fetch();
+			_self.collection.fetch({
+				reset : true
+			});
+			// this.collection.fetch();
 
-			console.log("GenericCollectionGridView showed");
+			// console.log("GenericCollectionGridView showed");
 		}
 
-    });
-	console.log("GenericCollectionGridView done");
-    return GenericCollectionGridView;
+	});
+	return GenericCollectionGridView;
 });
-

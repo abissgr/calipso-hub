@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model', 'component/backgrid-edit-in-modal-button-cell' ],
-		function( GenericModel, EditInModalCell) {
+define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell' ],
+		function( GenericModel, EditInTabCell) {
 			var HostModel = GenericModel.extend({
 				modelKey: "host",
 
@@ -48,7 +48,7 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-modal-button-cell' ]
 					name : "edit",
 					label : "",
 					editable : false,
-					cell : EditInModalCell
+					cell : EditInTabCell
 				}];
 			}
 			return HostModel;
