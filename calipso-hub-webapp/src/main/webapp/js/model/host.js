@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell' ],
-		function( GenericModel, EditInTabCell) {
+define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ],
+		function( GenericModel, EditInTabCell, ViewInTabCell) {
 			var HostModel = GenericModel.extend({
 				modelKey: "host",
 
 			},
 			// static members
 			{
-				className: "HostModel"
+				className: "HostModel",
+				parent: GenericModel
 			});
 
 			HostModel.prototype.schemaComplete = function() {
@@ -43,7 +44,8 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell' ],
 				{
 					name : "domain",
 					label : "domain",
-					cell : "string"
+					editable : false,
+					cell : ViewInTabCell
 				}, {
 					name : "edit",
 					label : "",

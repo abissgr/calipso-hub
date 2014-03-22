@@ -29,6 +29,7 @@ define(function(require) {
 	MainContentNavView = require('view/MainContentNavView'),
 	TabLayout = require('view/generic-crud-layout'),
 	GenericCollectionGridView = require('view/generic-collection-grid-view'),
+	GenericView = require('view/GenericView'),
 	GenericFormView = require('view/GenericFormView'),
 	GenericCollection = require('collection/generic-collection'),
 	GenericModel = require('model/generic-model'),
@@ -118,7 +119,7 @@ define(function(require) {
 
 			this.tryExplicitRoute(mainNavTabName);
 			var mainAreaChange = (mainNavTabName != this.lastMainNavTabName);
-
+			
 			// note last main nav tab
 			if(!mainNavTabName){
 				mainNavTabName = this.lastMainNavTabName;
@@ -133,47 +134,87 @@ define(function(require) {
 			var ModelClass = require(this.modelClasses[mainNavTabName]);
 			var _self = this;
 			console.log("AbstractController#mainNavigationCrudRoute, mainNavTabName: " + mainNavTabName + ", contentNavTabName: " + contentNavTabName);
-			if (contentNavTabName == "Search"){
-				if(mainAreaChange	){
-					console.log("AbstractController#mainNavigationCrudRoute, updating this.searchResults");
-					this.searchResults = new GenericCollection([], {
-						model : ModelClass,
-						url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
-					});
+			if(!this.tabs || mainAreaChange){
+				this.initCrudLayout(ModelClass, mainNavTabName, viewRoute);
+			}
+			// add tab for entity if needed
+			if(contentNavTabName != "Search"){
+				if(!this.tabs.tabKeys[contentNavTabName]){
+					console.log("adding new tab");
+					this.tabs.add(ModelClass.all().get(contentNavTabName));
 				}
 				else{
-					console.log("AbstractController#mainNavigationCrudRoute, updating NOT updated");
+					console.log("showing existing tab");
 				}
-				var searchResultsModel = new GenericCollectionWrapperModel({
-					modelClass : ModelClass,
-					wrappedCollection : this.searchResults
-				});
-				console.log("AbstractController#mainNavigationCrudRoute, searchResultsModel.get(name): "+
-						searchResultsModel.get("name"));
-				var TabModel      = Backbone.Model.extend();
-				var TabCollection = Backbone.Collection.extend({ model: GenericModel });
-	
-				this.tabs = new TabCollection([
-	            //(new HostModel({ name: 'foobar' })),
-	            (searchResultsModel)      
-	         ]);
-	         var tabLayout = new TabLayout({collection: this.tabs});
-
-	         vent.on("editItem", function(itemModel) {
-	       	 	console.log("vent event editItem: "+itemModel.get("name"));
-	       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), {
-						trigger : false
-					});
-	       	 	_self.tabs.add(itemModel);
-	       	 	_self.syncMainNavigationState(null, itemModel.get("id"));
-	         });
-				// render view
-				//_self.layout.mainContentNavRegion.show(tabLayout);
-				this.layout.content.show(tabLayout);
-
-				this.syncMainNavigationState(mainNavTabName, contentNavTabName);
+				
 			}
 
+			this.syncMainNavigationState(mainNavTabName, contentNavTabName);
+
+		},
+		initCrudLayout : function(ModelClass, mainNavTabName, viewRoute){
+
+			var _self = this;
+			console.log("AbstractController#mainNavigationCrudRoute, updating this.searchResults");
+			this.searchResults = new GenericCollection([], {
+				model : ModelClass,
+				url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
+			});
+
+			var searchResultsModel = new GenericCollectionWrapperModel({
+				modelClass : ModelClass,
+				wrappedCollection : this.searchResults
+			});
+			console.log("AbstractController#mainNavigationCrudRoute, searchResultsModel.get(name): "+
+					searchResultsModel.get("name"));
+			var TabModel      = Backbone.Model.extend();
+			var TabCollection = Backbone.Collection.extend({ 
+				model: GenericModel,
+				tabKeys: {},
+			   initialize: function () {
+			        console.log("people collection is initialized");
+			        this.bind('add', this.onModelAdded, this);
+			        this.bind('remove', this.onModelRemoved, this);
+			    }, 
+			    onModelAdded: function(model, collection, options) {
+			        this.tabKeys[model.get("id")] = model;
+			    },
+			    onModelRemoved: function (model, collection, options) {
+			        this.tabKeys[model.get("id")] = null;
+			    },
+			});
+			this.tabs = new TabCollection([
+            //(new HostModel({ name: 'foobar' })),
+            (searchResultsModel)      
+         ]);
+         var tabLayout = new TabLayout({collection: this.tabs});
+
+         vent.on("editItem", function(itemModel) {
+       	 	console.log("vent event editItem: "+itemModel.get("name"));
+       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"));
+       	 	_self.tabs.add(itemModel);
+       	 	_self.syncMainNavigationState(null, itemModel.get("id"));
+         });
+         vent.on("viewItem", function(itemModel) {
+       	 	console.log("vent event viewItem: "+itemModel.get("name"));
+       	 	itemModel.set("itemView", GenericView),
+//       	  controller.showPost(post);
+//       	 	router.navigate("/post/" + post.id);
+       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), {
+					trigger : false
+				});
+       	 	_self.tabs.add(itemModel);
+       	 	_self.syncMainNavigationState(null, itemModel.get("id"));
+         });
+         vent.on("viewTab", function(itemModel) {
+       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), {
+					trigger : false
+				});
+       	 	_self.syncMainNavigationState(null, itemModel.get("id"));
+       	});
+			// render view
+			//_self.layout.mainContentNavRegion.show(tabLayout);
+			this.layout.content.show(tabLayout);
 		},
 		syncMainNavigationState : function(mainNavTabName, contentNavTabName) {
 			console.log("AbstractController#syncMainNavigationState, mainNavTabName: " + mainNavTabName + ", contentNavTabName: "+contentNavTabName);

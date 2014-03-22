@@ -43,6 +43,7 @@ require.config({
 		console : 'lib/resthub/console',
 		backgrid : 'lib/backgrid/backgrid',
 		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
+		supermodel : 'lib/supermodel'
 	},
 
 	shim : {
@@ -66,6 +67,10 @@ require.config({
 		marionette : {
 			deps : [ 'jquery', 'underscore', 'backbone' ],
 			exports : 'Marionette'
+		},
+		supermodel : {
+			deps : [ 'underscore', 'backbone' ],
+			exports : 'Supermodel'
 		},
 		'backbone-pageable' : {
 			deps : [ 'backbone' ],

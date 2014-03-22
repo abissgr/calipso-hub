@@ -54,7 +54,8 @@ define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown',
 			},
 			// static members
 			{
-				className: "TextModel"
+				className: "TextModel",
+				parent: ResourceModel
 			});
 
 			TextModel.prototype.getDefaultSchemaForGrid = function() {

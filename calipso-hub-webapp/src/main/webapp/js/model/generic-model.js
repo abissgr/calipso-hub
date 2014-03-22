@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'backgrid' ], 
-function(Backbone, Backgrid) {
-	var GenericModel = Backbone.Model.extend({
+define([ 'backbone', 'supermodel', 'backgrid', 'view/GenericFormView' ], 
+function(Backbone, Supermodel, Backgrid, GenericFormView) {
+	var GenericModel = Supermodel.Model.extend({
 		modelKey: null,
 		/**
 		 * Prefer the collection URL if any for more specific CRUD, fallback to own otherwise 
@@ -90,6 +90,9 @@ function(Backbone, Backgrid) {
 //				sUrl = sUrl + this.get(this.idAttribute); 
 //			}
 //		},
+		defaults: {
+         itemView: GenericFormView
+		},	
 		getClassName: function(){
 			var c = this.constructor.className;
 			console.log("GenericModel#getClassName: "+c);

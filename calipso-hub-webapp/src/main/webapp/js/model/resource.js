@@ -25,7 +25,8 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 			},
 			// static members
 			{
-				className: "ResourceModel"
+				className: "ResourceModel",
+				parent: GenericModel
 			});
 
 			ResourceModel.prototype.schemaComplete = function() {

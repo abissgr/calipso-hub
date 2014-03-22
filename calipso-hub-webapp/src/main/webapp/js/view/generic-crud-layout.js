@@ -43,25 +43,31 @@ function (CalipsoApp, Backbone, Marionette, tmpl, GenericCollectionGridView, Gen
 	    tagName: 'ul',
 		 template: tmplTabs,
 		 itemViewContainer: '.nav-tabs',
-	    events: {
-	        "click .show-tab": "showTab",
-	        "click .close": "closeTab"
-	    },
-	    showTab: function(e) {
-	   	 // TODO:
-	    },
-	    closeTab: function(e) {
-	       e.stopPropagation();
-	       e.preventDefault();
-	       this.model.collection.remove(this.model);
-	       this.close();
-	    },
 		 getItemView: function(item) {
 			 return Backbone.Marionette.ItemView.extend({ 
 		        tagName: 'li',
 		        className: 'generic-crud-layout-tab-label',
 		        id: "generic-crud-layout-tab-label-" + item.get("id"),
-		        template: tmplTabLabel
+		        template: tmplTabLabel,
+
+		 	    events: {
+		 	        "click .show-tab": "viewTab",
+		 	        "click .close": "closeTab"
+		 	    },
+		 	    viewTab: function(e) {
+		      	 console.log("TabPaneCollectionView.itemView#viewTab");
+		 	       e.stopPropagation();
+		 	       e.preventDefault();
+		 			CalipsoApp.vent.trigger("viewTab", this.model);
+		 	    },
+		 	    closeTab: function(e) {
+		      	 console.log("TabPaneCollectionView.itemView#closeTab");
+		 	       e.stopPropagation();
+		 	       e.preventDefault();
+		 	       this.model.collection.remove(this.model);
+		 	       this.close();
+		 				CalipsoApp.vent.trigger("viewTab", {id:"Search"});
+		 	    },
 		    });
 		 }
 	});
@@ -70,9 +76,9 @@ function (CalipsoApp, Backbone, Marionette, tmpl, GenericCollectionGridView, Gen
 	    className: 'tab-content',
 	    getItemView: function(item) {
 	   	 var someItemSpecificView;
-	       if(item.getClassName && item.getClassName() == "GenericCollectionWrapperModel"){
-	      	 console.log("TabPaneCollection#getItemView, item is instance of "+ item.getClassName());
-	      	 someItemSpecificView = GenericCollectionGridView;
+	       if(item.get("itemView")){
+	      	 someItemSpecificView = item.get("itemView");
+	      	 console.log("TabPaneCollectionView#getItemView, view: "+someItemSpecificView.constructor);
 	       }
 	       else{
 	      	 someItemSpecificView = GenericFormView;
