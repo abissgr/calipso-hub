@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'backgrid', 'model/generic-model','view/generic-collection-grid-view' ], 
-function(Backbone, Backgrid, GenericModel, GenericCollectionGridView) {
+define([ 'backbone', 'backgrid', 'model/generic-model','view/generic-search-layout' ], 
+function(Backbone, Backgrid, GenericModel, GenericCollectionSearchView) {
 	var GenericCollectionWrapperModel = Backbone.Model.extend({
 		// TODO: bulk persist, see also if Supermodel can be used 
 		// for useful stuff like updating the owner entities' children based on 
@@ -32,7 +32,7 @@ function(Backbone, Backgrid, GenericModel, GenericCollectionGridView) {
 		defaults: {
          id: 'Search',
          name: 'Search',
-         itemView: GenericCollectionGridView
+         itemView: GenericCollectionSearchView
 		},	
 //		id : "Search",
 		getClassName: function(){

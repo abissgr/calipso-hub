@@ -29,6 +29,7 @@ define([ 'backbone-bootstrap-modal', 'backbone-forms', 'backgrid', 'bootstrap-ma
 				editRow : function(e) {
 					var thisModal = this;
 					console.log("editRow ");
+					e.stopPropagation();
 					e.preventDefault();
 					var rowModel = this.model;
 					console.log("editRow, rowModel: "+rowModel);

@@ -28,6 +28,7 @@ function( CalipsoApp, BackboneForm, Backgrid, Markdown) {
 		editRow : function(e) {
 //					var thisModal = this;
 			console.log("EditInTabCell#editRow ");
+			e.stopPropagation();
 			e.preventDefault();
 			var rowModel = this.model;
 			console.log("editRow, rowModel: "+rowModel.constructor.name);

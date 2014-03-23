@@ -22,7 +22,7 @@ define(function(require) {
 		BackboneForm = require('backbone-forms'), 
 		tmpl = require('hbs!template/GenericFormView');
 
-	var GenericFormView = Marionette.ItemView.extend({
+	var GenericView = Marionette.ItemView.extend({
 		// Define view template
 		template : tmpl,
 		onShow : function() {
@@ -31,14 +31,16 @@ define(function(require) {
 			if(!schemaAction){
 				schemaAction = this.model.isNew() ? "create" : "update";
 			}
-			console.log("GenericFormView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
+			//console.log("GenericView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
+			var selector = '#generic-form-'+this.model.get("id");
+			console.log("GenericView#onShow, selector: "+selector);
 			// render form
 			var form = new Backbone.Form({
 				model :  this.model,
 				schema : this.model.schemaForAction(schemaAction)
 			}).render();
-			$('#generic-form').append(form.el);
-			$('#generic-form textarea[data-provide="markdown"]').each(function(){
+			$(selector).append(form.el);
+			$(selector+' textarea[data-provide="markdown"]').each(function(){
 		        var $this = $(this);
 
 		        if ($this.data('markdown')) {
@@ -51,5 +53,5 @@ define(function(require) {
 		    });
 		}
 	});
-	return GenericFormView;
+	return GenericView;
 });

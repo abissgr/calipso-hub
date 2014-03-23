@@ -31,14 +31,16 @@ define(function(require) {
 			if(!schemaAction){
 				schemaAction = this.model.isNew() ? "create" : "update";
 			}
-			console.log("GenericFormView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
+			//console.log("GenericFormView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
+			var selector = '#generic-form-'+this.model.get("id");
+			console.log("GenericFormView#onShow, selector: "+selector);
 			// render form
 			var form = new Backbone.Form({
 				model :  this.model,
 				schema : this.model.schemaForAction(schemaAction)
 			}).render();
-			$('#generic-form').append(form.el);
-			$('#generic-form textarea[data-provide="markdown"]').each(function(){
+			$(selector).append(form.el);
+			$(selector+' textarea[data-provide="markdown"]').each(function(){
 		        var $this = $(this);
 
 		        if ($this.data('markdown')) {
