@@ -25,7 +25,9 @@ define(function(require) {
 	
 	
 
-  var app = new Marionette.Application();
+  var app = new Marionette.Application({
+	  routers: {}
+  });
   console.log("Backbone.Marionette.Application constructor returns: "+app);
   // application configuration
   app.config = {
@@ -111,8 +113,9 @@ define(function(require) {
     
     // init ALL app routers
     _(options.routers).each(function(routerClass) {
-   	 console.log("initialize router type: "+routerClass);
+   	 console.log("initialize router type: "+router);
       var router = new routerClass();
+      app.routers[routerClass.className] = router;
   	 console.log("initialized router: "+router);
     });
 

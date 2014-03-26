@@ -41,6 +41,10 @@ define(function(require) {
 			'*path':  'notFoundRoute'
 		},
 
+	},
+	// static members
+	{
+		className: "MainRouter",
 	});
 
 });

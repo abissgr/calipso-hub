@@ -28,19 +28,28 @@ function(Backbone, BackbonePageableCollection) {
 			// default model columns otherwise
 			if (options.schemaForGrid) {
 				this.schemaForGrid = options.schemaForGrid;
-			} else {
-				this.schemaForGrid = this.model.prototype.getDefaultSchemaForGrid();
-			}
+			} 
 		},
-
-		schemaForGrid : {},
 		// Initial pagination states
 		state: {
 			firstPage: 1,
 			currentPage: 1,
 			pageSize: 10,
 		},
-		
+		getGridSchema : function(){
+			// use explicit configuration if available
+			var configuredSchema = this.schemaForGrid;
+			// try obtaining the grid schema from the model otherwise
+			if(!configuredSchema && this.model && this.model.prototype.getGridSchema){
+				configuredSchema = this.model.prototype.getGridSchema();
+			}
+			
+			// ensure proper configuration is available
+			if(!configuredSchema){
+				throw new "A grid schema has not been given and the collection model does not offer one or is undefined";
+			}
+			return configuredSchema;
+		},
 		// You can remap the query parameters from `state keys from
 		// the default to those your server supports
 		queryParams: {

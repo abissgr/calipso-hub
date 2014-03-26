@@ -38,7 +38,7 @@ define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user
 			// console.log("GenericCollectionGridView onShow, this.collection:
 			// "+this.collection + ", gridCollection: "+gridCollection);
 			var backgrid = new Backgrid.Grid({
-				columns : _self.collection.schemaForGrid,
+				columns : _self.collection.getGridSchema(),
 				collection : _self.collection
 			});
 			//			
@@ -72,6 +72,10 @@ define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user
 			// console.log("GenericCollectionGridView showed");
 		}
 
+	},
+	// static members
+	{
+		className: "GenericCollectionGridView",
 	});
 	return GenericCollectionGridView;
 });

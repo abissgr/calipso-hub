@@ -16,79 +16,91 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'app', 'backbone', 'marionette', 'hbs!template/generic-crud-layout', 'view/generic-collection-grid-view', 'view/GenericFormView', 
-         'collection/generic-collection', 'hbs!template/tabs', 'hbs!template/tab-label', 'hbs!template/tab-content'],
-function (CalipsoApp, Backbone, Marionette, tmpl, GenericCollectionGridView, GenericFormView, GenericCollection, tmplTabs, tmplTabLabel, tmplTabContent) {
+define(function(require) {
+	var CalipsoApp = require('app'), 
+	Backbone = require('backbone'), 
+	Marionette = require('marionette'), 
+	BackboneForm = require('backbone-forms'), 
+	GenericCollectionGridView = require('view/generic-collection-grid-view'), 
+	GenericCollection = require('collection/generic-collection'), 
+	GenericFormTabContentView = require('view/GenericFormTabContentView'), 
+	tmplTabLabel = require('hbs!template/tab-label'), 
+	tmpl = require('hbs!template/generic-crud-layout');
+
 	var TabLayout = Backbone.Marionette.Layout.extend({
-	    template:  tmpl,
-	    className: 'tabbable',
-	    regions: {
-	        labels: '.tab-labels',
-	        panes:  '.contents'
-	    },
-	    onShow: function(){
-      	 console.log("TabLayout#onShow");
-	        var tabLabelsView   = new TabLabelCollectionView({   collection: this.collection});
-	        var tabContentsView = new TabPaneCollectionView({ collection: this.collection});
-	        this.labels.show(tabLabelsView);
-	        this.panes.show(tabContentsView);
+		template : tmpl,
+		tagName : 'div',
+		className : 'container',
+		regions : {
+			tabLabelsRegion : '#calipsoTabLabelsRegion',
+			tabContentsRegion : '#calipsoTabContentsRegion'
+		},
+		onShow : function() {
+			console.log("TabLayout#onShow");
+			var tabLabelsView = new TabLabelsCollectionView({
+				collection : this.collection
+			});
+			var tabContentsView = new TabContentsCollectionView({
+				collection : this.collection
+			});
+			this.tabLabelsRegion.show(tabLabelsView);
+			this.tabContentsRegion.show(tabContentsView);
 
-	        
-	    },
-	});
-	
-
-	var TabLabelCollectionView = Backbone.Marionette.CollectionView.extend({
-	    className: 'nav nav-tabs tab-labels',
-	    tagName: 'ul',
-		 template: tmplTabs,
-		 itemViewContainer: '.nav-tabs',
-		 getItemView: function(item) {
-			 return Backbone.Marionette.ItemView.extend({ 
-		        tagName: 'li',
-		        className: 'generic-crud-layout-tab-label',
-		        id: "generic-crud-layout-tab-label-" + item.get("id"),
-		        template: tmplTabLabel,
-
-		 	    events: {
-		 	        "click .show-tab": "viewTab",
-		 	        "click .close": "closeTab"
-		 	    },
-		 	    viewTab: function(e) {
-		      	 console.log("TabPaneCollectionView.itemView#viewTab");
-		 	       e.stopPropagation();
-		 	       e.preventDefault();
-		 			CalipsoApp.vent.trigger("viewTab", this.model);
-		 	    },
-		 	    closeTab: function(e) {
-		      	 console.log("TabPaneCollectionView.itemView#closeTab");
-		 	       e.stopPropagation();
-		 	       e.preventDefault();
-		 	       this.model.collection.remove(this.model);
-		 	       this.close();
-		 				CalipsoApp.vent.trigger("viewTab", {id:"Search"});
-		 	    },
-		    });
-		 }
+		},
+	},
+	// static members
+	{
+		className : "TabLayout",
 	});
 
-	var TabPaneCollectionView = Backbone.Marionette.CollectionView.extend({
-	    className: 'tab-content',
-	    getItemView: function(item) {
-	   	 var someItemSpecificView;
-	       if(item.get("itemView")){
-	      	 someItemSpecificView = item.get("itemView");
-	      	 console.log("TabPaneCollectionView#getItemView, view: "+someItemSpecificView.constructor);
-	       }
-	       else{
-	      	 someItemSpecificView = GenericFormView;
-	       }
-	       return someItemSpecificView;
-	     }
+	var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
+		className : 'nav nav-tabs nav-justified',
+		tagName : 'ul',
+		itemViewContainer : '.nav-tabs',
+		getItemView : function(item) {
+			return Backbone.Marionette.ItemView.extend({
+				tagName : 'li',
+				className : 'generic-crud-layout-tab-label',
+				id : "generic-crud-layout-tab-label-" + item.get("id"),
+				template : tmplTabLabel,
+
+				events : {
+					"click .show-tab": "viewTab",
+					"click .close-tab" : "closeTab"
+				},
+				 viewTab: function(e) {
+					 console.log("TabPaneCollectionView.itemView#viewTab");
+					 e.stopPropagation();
+					 e.preventDefault();
+					 CalipsoApp.vent.trigger("viewTab", this.model);
+				 },
+				closeTab : function(e) {
+					console.log("TabPaneCollectionView.itemView#closeTab");
+					e.stopPropagation();
+					e.preventDefault();
+//					this.model.collection.remove(this.model);
+					this.close();
+					CalipsoApp.vent.trigger("viewTab", {
+						id : "Search"
+					});
+				},
+			});
+		}
 	});
 
-	
-	
-    return TabLayout;
+	var TabContentsCollectionView = Backbone.Marionette.CollectionView.extend({
+		tagName : 'div',
+		getItemView : function(item) {
+			var someItemSpecificView;
+			if (item.get("itemView")) {
+				someItemSpecificView = item.get("itemView");
+			} else {
+				someItemSpecificView = GenericFormTabContentView;
+			}
+			//console.log("TabContentsCollectionView#getItemView returns: " + someItemSpecificView.className);
+			return someItemSpecificView;
+		}
+	});
+
+	return TabLayout;
 });
-

@@ -26,13 +26,12 @@ function( CalipsoApp, BackboneForm, Backgrid, Markdown) {
 				"click" : "viewRow"
 			},
 			viewRow : function(e) {
-//						var thisModal = this;
-				console.log("EditInTabCell#editRow ");
+				console.log("ViewInTabCell#editRow ");
 				e.stopPropagation();
 				e.preventDefault();
 				var rowModel = this.model;
 				console.log("editRow, rowModel: "+rowModel.constructor.name);
-				CalipsoApp.vent.trigger("viewItem", rowModel);
+				CalipsoApp.vent.trigger("openGridRowInTab", rowModel);
 			},
 
 		  render: function () {

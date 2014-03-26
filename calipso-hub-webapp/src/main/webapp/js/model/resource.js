@@ -55,17 +55,24 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 				};
 				return schema;
 			}
-			ResourceModel.prototype.getDefaultSchemaForGrid = function() {
+			ResourceModel.prototype.getGridSchema = function() {
 				return [
 						{
 							name : "name",
 							label : "name",
-							cell : "string"
+							editable : false,
+							cell : ViewInTabCell
 						},
 						{
 							name : "pathName",
 							label : "path name",
+							editable : false,
 							cell : "string"
+						}, {
+							name : "edit",
+							label : "",
+							editable : false,
+							cell : EditInTabCell
 						}];
 			}
 			return ResourceModel;

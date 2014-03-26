@@ -24,6 +24,11 @@ define(function(require) {
 
 	var GenericView = Marionette.ItemView.extend({
 		// Define view template
+		tagName : 'div',
+		className : "tab-pane active",
+		id: function(){
+			return this.model.get("id");
+		},
 		template : tmpl,
 		onShow : function() {
 			// get appropriate schema
@@ -52,6 +57,10 @@ define(function(require) {
 	        
 		    });
 		}
+	},
+	// static members
+	{
+		className: "GenericView",
 	});
 	return GenericView;
 });

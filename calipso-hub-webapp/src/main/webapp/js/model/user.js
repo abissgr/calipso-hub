@@ -66,10 +66,9 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-modal-button-cell', 
 				className: "UserModel",
 				parent: GenericModel
 			});
-
-			UserModel.prototype.getDefaultSchemaForGrid = function() {
-				return [
-				{
+			
+			UserModel.prototype.getGridSchema = function() {
+				return [{
 					name : "userName",
 					label : "username",
 					cell : "string"
@@ -96,7 +95,8 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-modal-button-cell', 
 					label : "",
 					editable : false,
 					cell : EditInModalCell
-				} ];
+				}];
 			}
+			
 			return UserModel;
 		});

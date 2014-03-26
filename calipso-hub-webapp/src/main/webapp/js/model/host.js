@@ -28,7 +28,7 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'c
 				parent: GenericModel
 			});
 
-			HostModel.prototype.schemaComplete = function() {
+			HostModel.prototype.schemaComplete = function(instance) {
 				return {//
 					domain : {
 						"search": 'Text',
@@ -39,7 +39,7 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'c
 					},
 				};
 			}
-			HostModel.prototype.getDefaultSchemaForGrid = function() {
+			HostModel.prototype.getGridSchema = function() {
 				return [
 				{
 					name : "domain",

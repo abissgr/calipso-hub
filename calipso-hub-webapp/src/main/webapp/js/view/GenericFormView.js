@@ -24,6 +24,7 @@ define(function(require) {
 
 	var GenericFormView = Marionette.ItemView.extend({
 		// Define view template
+		tagName : 'div',
 		template : tmpl,
 		onShow : function() {
 			// get appropriate schema
@@ -33,7 +34,7 @@ define(function(require) {
 			}
 			//console.log("GenericFormView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
 			var selector = '#generic-form-'+this.model.get("id");
-			console.log("GenericFormView#onShow, selector: "+selector);
+			//console.log("GenericFormView#onShow, selector: "+selector+", schemaAction: "+schemaAction+", schema: "+this.model.schemaForAction(schemaAction));
 			// render form
 			var form = new Backbone.Form({
 				model :  this.model,
@@ -52,6 +53,10 @@ define(function(require) {
 	        
 		    });
 		}
+	},
+	// static members
+	{
+		className: "GenericFormView",
 	});
 	return GenericFormView;
 });

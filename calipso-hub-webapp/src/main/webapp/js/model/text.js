@@ -58,26 +58,15 @@ define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown',
 				parent: ResourceModel
 			});
 
-			TextModel.prototype.getDefaultSchemaForGrid = function() {
-				return [
-						{
-							name : "name",
-							label : "name",
-							cell : "string"
-						},
-						{
-							name : "pathName",
-							label : "path name",
-							cell : "string"
-						},
-						{
-							name : "edit",
-							label : "",
-							editable : false,
-							cell : EditInModalCell
-						} ];
+			TextModel.prototype.getGridSchema = function() {
+				var superSchema = ResourceModel.prototype.getGridSchema();
+				var localSchema = [/*{
+					name : "name",
+					label : "name",
+					cell : "string"
+				}*/];
 				// return merged schemas
-				return $.extend({}, superSchema, schema);
+				return $.extend({}, superSchema, localSchema);
 			}
 			return TextModel;
 		});

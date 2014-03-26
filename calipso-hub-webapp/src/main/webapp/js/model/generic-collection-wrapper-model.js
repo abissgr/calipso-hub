@@ -34,7 +34,7 @@ function(Backbone, Backgrid, GenericModel, GenericCollectionSearchView) {
          name: 'Search',
          itemView: GenericCollectionSearchView
 		},	
-//		id : "Search",
+		id : "Search",
 		getClassName: function(){
 			var c = this.constructor.className;
 			console.log("GenericCollectionWrapperModel#getClassName: "+c);
@@ -55,41 +55,36 @@ function(Backbone, Backgrid, GenericModel, GenericCollectionSearchView) {
 				// override modelClass
 				if (attributes.modelClass) {
 					this.modelClass = attributes.modelClass;	
-			}
+				}
 			}
 			// use  given grid columns if provided, or the
 			// collection model columns if not, finally default to 
 			// the model columns
-			if (attributes.schemaForGrid) {
-				this.schemaForGrid = attributes.schemaForGrid;
-			}
-			else if (this.wrappedCollection && this.wrappedCollection.schemaForGrid) {
-				this.schemaForGrid = this.wrappedCollection.schemaForGrid;
-			} else {
-				this.schemaForGrid = this.modelClass.prototype.getDefaultSchemaForGrid();
-			}
+//			if (attributes.schemaForGrid) {
+//				this.schemaForGrid = attributes.schemaForGrid;
+//			}
+//			else if (this.wrappedCollection && this.wrappedCollection.schemaForGrid) {
+//				this.schemaForGrid = this.wrappedCollection.schemaForGrid;
+//			} else {
+//				this.schemaForGrid = this.modelClass.prototype.getDefaultSchemaForGrid();
+//			}
 			
 			var thisModel = this;
 		    this.on("change", function (model, options) {
 			    console.log("GenericCollectionWrapperModel 'change' fired");
 		    });
-		}
+		},
+		schemaComplete : function() {
+			return this.modelClass.prototype.schemaComplete();
+		},
+		schemaForAction : function(actionName) {
+			return this.modelClass.prototype.schemaForAction(actionName);
+		},
 	},
 	// static members
 	{
 		className: "GenericCollectionWrapperModel"
 	});
-	GenericModel.prototype.getDefaultSchemaForGrid = function(instance){
-
-		// override modelClass
-		if (instance.wrappedCollection && instance.wrappedCollection.first()) {
-			return instance.wrappedCollection.first().getDefaultSchemaForGrid();	
-		}
-		else if (instance.modelClass) {
-			return instance.modelClass.prototype = options.modelClass;	
-		}
-	
-	}
 	//console.log("GenericModel done");
 	return GenericCollectionWrapperModel;
 });

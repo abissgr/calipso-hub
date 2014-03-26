@@ -29,7 +29,6 @@ define(function(require) {
 	MainContentNavView = require('view/MainContentNavView'),
 	TabLayout = require('view/generic-crud-layout'),
 	GenericCollectionGridView = require('view/generic-collection-grid-view'),
-	GenericView = require('view/GenericView'),
 	GenericFormView = require('view/GenericFormView'),
 	GenericCollection = require('collection/generic-collection'),
 	GenericModel = require('model/generic-model'),
@@ -115,6 +114,7 @@ define(function(require) {
 //			console.log("notFoundRoute, path: "+path);
 			this.layout.content.show(new NotFoundView());
 		},
+		tabKeys: {},
 		mainNavigationCrudRoute : function(mainNavTabName, contentNavTabName) {
 
 			this.tryExplicitRoute(mainNavTabName);
@@ -139,8 +139,9 @@ define(function(require) {
 			}
 			// add tab for entity if needed
 			if(contentNavTabName != "Search"){
-				if(!this.tabs.tabKeys[contentNavTabName]){
+				if(!this.tabKeys[contentNavTabName]){
 					console.log("adding new tab");
+					// tab keys index updated automatically
 					this.tabs.add(ModelClass.all().get(contentNavTabName));
 				}
 				else{
@@ -153,14 +154,14 @@ define(function(require) {
 
 		},
 		initCrudLayout : function(ModelClass, mainNavTabName, viewRoute){
-
+			console.log("AbstractController#initCrudLayout, updating this.searchResults");
 			var _self = this;
-			console.log("AbstractController#mainNavigationCrudRoute, updating this.searchResults");
+			// update grid collection
 			this.searchResults = new GenericCollection([], {
 				model : ModelClass,
 				url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
 			});
-
+			// wrap in single model
 			var searchResultsModel = new GenericCollectionWrapperModel({
 				modelClass : ModelClass,
 				wrappedCollection : this.searchResults
@@ -170,41 +171,26 @@ define(function(require) {
 			var TabModel      = Backbone.Model.extend();
 			var TabCollection = Backbone.Collection.extend({ 
 				model: GenericModel,
-				tabKeys: {},
 			   initialize: function () {
-			        console.log("people collection is initialized");
+			        console.log("AbstractController#mainNavigationCrudRoute, TabCollection initializing");
 			        this.bind('add', this.onModelAdded, this);
 			        this.bind('remove', this.onModelRemoved, this);
 			    }, 
 			    onModelAdded: function(model, collection, options) {
-			        this.tabKeys[model.get("id")] = model;
+			        _self.tabKeys[model.get("id")] = model;
 			    },
 			    onModelRemoved: function (model, collection, options) {
-			        this.tabKeys[model.get("id")] = null;
+			   	 _self.tabKeys[model.get("id")] = null;
 			    },
 			});
 			this.tabs = new TabCollection([
-            //(new HostModel({ name: 'foobar' })),
             (searchResultsModel)      
          ]);
          var tabLayout = new TabLayout({collection: this.tabs});
 
-         vent.on("editItem", function(itemModel) {
-       	 	console.log("vent event editItem: "+itemModel.get("name"));
-       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"));
-       	 	_self.tabs.add(itemModel);
-       	 	_self.syncMainNavigationState(null, itemModel.get("id"));
-         });
-         vent.on("viewItem", function(itemModel) {
-       	 	console.log("vent event viewItem: "+itemModel.get("name"));
-       	 	itemModel.set("itemView", GenericView),
-//       	  controller.showPost(post);
-//       	 	router.navigate("/post/" + post.id);
-       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), {
-					trigger : false
-				});
-       	 	_self.tabs.add(itemModel);
-       	 	_self.syncMainNavigationState(null, itemModel.get("id"));
+         vent.on("openGridRowInTab", function(itemModel) {
+         	_self.tabs.add(itemModel);
+         	CalipsoApp.vent.trigger("viewTab", itemModel);
          });
          vent.on("viewTab", function(itemModel) {
        	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), {
@@ -212,8 +198,7 @@ define(function(require) {
 				});
        	 	_self.syncMainNavigationState(null, itemModel.get("id"));
        	});
-			// render view
-			//_self.layout.mainContentNavRegion.show(tabLayout);
+         
 			this.layout.content.show(tabLayout);
 		},
 		syncMainNavigationState : function(mainNavTabName, contentNavTabName) {
@@ -226,11 +211,14 @@ define(function(require) {
 			}
 			// update active content tab
 			if(contentNavTabName && contentNavTabName != this.lastContentNavTabName){
-				$('#generic-crud-layout-tab-labels li.active').removeClass('active');
+				$('#calipsoTabLabelsRegion li.active').removeClass('active');
 				$('#generic-crud-layout-tab-label-' + contentNavTabName).addClass('active');
 				// show coressponding content
-				$('.generic-crud-layout-tab-panel').addClass('hidden');
-				$('#generic-crud-layout-tab-panel-' + contentNavTabName).removeClass('hidden');
+				console.log("show tab: "+contentNavTabName);
+				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');
+				$('#calipsoTabContentsRegion .tab-pane').addClass('hidden');
+				$('#tab-' + contentNavTabName).removeClass('hidden');
+				$('#tab-' + contentNavTabName).addClass('active');
 				this.lastContentNavTabName = contentNavTabName;
 			}
 		},

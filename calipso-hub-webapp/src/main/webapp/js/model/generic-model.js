@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'supermodel', 'backgrid', 'view/GenericFormView' ], 
-function(Backbone, Supermodel, Backgrid, GenericFormView) {
+define([ 'backbone', 'supermodel', 'backgrid', 'view/GenericFormTabContentView' ], 
+function(Backbone, Supermodel, Backgrid, GenericFormTabContentView) {
 	var GenericModel = Supermodel.Model.extend({
 		modelKey: null,
 		/**
@@ -34,7 +34,7 @@ function(Backbone, Supermodel, Backgrid, GenericFormView) {
 	    schemaComplete : function() {
 	   	 return this.prototype.schemaComplete(this);
 		},
-	    schemaForAction : function(actionName) {
+	   schemaForAction : function(actionName) {
 	 		// decide based on model persistence state if no action was given 
 	 		if(!actionName){
 	 			console.log("GenericModel.prototype.schema, this: "+this);
@@ -91,7 +91,7 @@ function(Backbone, Supermodel, Backgrid, GenericFormView) {
 //			}
 //		},
 		defaults: {
-         itemView: GenericFormView
+         itemView: GenericFormTabContentView
 		},	
 		getClassName: function(){
 			var c = this.constructor.className;
@@ -127,12 +127,14 @@ function(Backbone, Supermodel, Backgrid, GenericFormView) {
 			className: "GenericModel"
 		}
 	);
-	GenericModel.prototype.getDefaultSchemaForGrid = function(){
-		// TODO: infer based on defaults OR conditionally build the edit etc. button columns
+	GenericModel.prototype.getGridSchema = function(){
+		console.log("GenericModel.prototype.getSchemaForGrid() called, will return undefined");
+		return undefined;
 	}
 
-	GenericModel.prototype.schemaComplete = function(instance) {
-		return {};
+	GenericModel.prototype.getFormSchema = function(instance) {
+		console.log("GenericModel.prototype.getFormSchemad() called, will return undefined");
+		return undefined;
 	}
 	
 	//console.log("GenericModel done");
