@@ -1,13 +1,14 @@
 define([ 'underscore', 'marionette', 'hbs!template/applayout' ], function(_, Marionette, tmpl) {
 	return Marionette.Layout.extend({
-		className : 'app-layout',
+		tagName: "div",
+		className : 'app-layout container-fluid',
 		template : tmpl,// _.template(templates.applayout),
 		regions : {
-			mainContentNavRegion : "#calipsoMainContentNavRegion",
-			content : "#content"
+			navRegion : "#calipsoAppLayoutNavRegion",
+			contentRegion : "#calipsoAppLayoutContentRegion"
 		},
-		initialize : function(options) {
-			$('body').removeClass('stripes-bg');
-		}
+//		initialize : function(options) {
+//			$('body').removeClass('stripes-bg');
+//		}
 	});
 });

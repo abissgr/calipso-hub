@@ -20,8 +20,7 @@ define(function(require) {
 	var Backbone = require('backbone'),
 	Marionette = require('marionette'),
 	HeaderView = require('view/HeaderView'),
-	FooterView = require('view/FooterView')/*.
-	_Inflection = require('underscore-inflection')*/;
+	FooterView = require('view/FooterView');
 	
 	
 

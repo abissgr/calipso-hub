@@ -34,10 +34,10 @@ define(function(require) {
 			'client/login' : 'login',
 			'client/logout' : 'logout',
 //			'client/users' : 'mainNavigationRoute',
-			'client/:mainNavigationTab' : 'mainNavigationCrudRoute',
-			'client/:mainNavigationTab/:genericViewTab' : 'mainNavigationCrudRoute',
-//			'client/:mainNavigationTab' : 'mainNavigationRoute',
-//			'client/:mainNavigationTab/:genericViewTab' : 'mainNavigationRoute',
+			'client/:mainRoutePart' : 'mainNavigationCrudRoute',
+			'client/:mainRoutePart/:genericViewTab' : 'mainNavigationCrudRoute',
+//			'client/:modelFileName' : 'mainNavigationRoute',
+//			'client/:modelFileName/:genericViewTab' : 'mainNavigationRoute',
 			'*path':  'notFoundRoute'
 		},
 

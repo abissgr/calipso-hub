@@ -29,8 +29,7 @@ define(function(require) {
 
 	var TabLayout = Backbone.Marionette.Layout.extend({
 		template : tmpl,
-		tagName : 'div',
-		className : 'container',
+		tagName : "div",
 		regions : {
 			tabLabelsRegion : '#calipsoTabLabelsRegion',
 			tabContentsRegion : '#calipsoTabContentsRegion'
@@ -54,7 +53,7 @@ define(function(require) {
 	});
 
 	var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
-		className : 'nav nav-tabs nav-justified',
+		className : 'nav nav-tabs',
 		tagName : 'ul',
 		itemViewContainer : '.nav-tabs',
 		getItemView : function(item) {

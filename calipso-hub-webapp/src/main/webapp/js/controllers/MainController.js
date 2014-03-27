@@ -41,23 +41,12 @@ define(function(require) {
 
 
 	var MainController = AbstractController.extend({
-		constructor: function(options){
+//		constructor: function(options){
 //			options.layout : new AppLayoutView({
 //				model : session
 //			});
-			AbstractController.prototype.constructor.call(this, options);
-			this.viewRoutes = {
-					"users":  "/api/rest/users/",
-					"hosts":  "/api/rest/hosts/",
-					"texts":  "/api/rest/texts/",
-			};
-			this.modelClasses = {
-					"users":  "model/user",
-					"hosts":  "model/host",
-					"texts":  "model/text",
-			};
-//			
-		},
+//			AbstractController.prototype.constructor.call(this, options);
+//		},
 
 
 	});

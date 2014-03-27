@@ -1,6 +1,6 @@
 require([
   // Libraries
-  'jquery', 'underscore', 'backbone',
+  'jquery', 'underscore', 'underscore-inflection', 'backbone',
   'bootstrap',
   // Main App Object
   'app',
@@ -11,7 +11,7 @@ require([
 
 function (
 		  // Libraries
-			$, _, Backbone, bootstrap, 
+			$, _, _inflection, Backbone, bootstrap, 
 			// Main App Object
 		  CalipsoApp,
 		  // Application routers

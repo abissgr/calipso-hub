@@ -16,83 +16,91 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'backbone-pageable' ],
-function(Backbone, BackbonePageableCollection) {
+define([ 'backbone', 'backbone-pageable' ], function(Backbone, BackbonePageableCollection) {
 	var GenericCollection = Backbone.PageableCollection.extend({
-		mode: "server",
+		mode : "server",
 		initialize : function(attributes, options) {
 			if (options.model) {
-				this.model = options.model;	
+				this.model = options.model;
+				console.log("GenericCollection#initialize, model given: "+this.model.className);
+			}
+			else{
+				console.log("GenericCollection#initialize, model given: "+this.model.className);
 			}
 			// use given grid columns if provided, or the
 			// default model columns otherwise
 			if (options.schemaForGrid) {
 				this.schemaForGrid = options.schemaForGrid;
-			} 
+			}
 		},
 		// Initial pagination states
-		state: {
-			firstPage: 1,
-			currentPage: 1,
-			pageSize: 10,
+		state : {
+			firstPage : 1,
+			currentPage : 1,
+			pageSize : 10,
 		},
-		getGridSchema : function(){
+		getGridSchema : function() {
 			// use explicit configuration if available
 			var configuredSchema = this.schemaForGrid;
 			// try obtaining the grid schema from the model otherwise
-			if(!configuredSchema && this.model && this.model.prototype.getGridSchema){
+			if (!configuredSchema && this.model && this.model.prototype.getGridSchema) {
 				configuredSchema = this.model.prototype.getGridSchema();
 			}
-			
+
 			// ensure proper configuration is available
-			if(!configuredSchema){
+			if (!configuredSchema) {
 				throw new "A grid schema has not been given and the collection model does not offer one or is undefined";
 			}
 			return configuredSchema;
 		},
 		// You can remap the query parameters from `state keys from
 		// the default to those your server supports
-		queryParams: {
-			 currentPage: "page",
-			 pageSize: "size",
-			 totalPages: "totalPages",
-			 totalRecords: "totalElements",
-			 sortKey: "properties",
-			 direction: "order"
+		queryParams : {
+			currentPage : "page",
+			pageSize : "size",
+			totalPages : "totalPages",
+			totalRecords : "totalElements",
+			sortKey : "properties",
+			direction : "order"
 		},
-						//		
-//						 parseState: function (resp, queryParams, state, options) {
-//							 return {
-//								 totalRecords: resp.totalElements
-//							 };
-//						 },
-//						//		
-//						 parseRecords: function (resp, options) {
-//							 return resp.content ;
-//						 },
+		//		
+		// parseState: function (resp, queryParams, state, options) {
+		// return {
+		// totalRecords: resp.totalElements
+		// };
+		// },
+		// //
+		// parseRecords: function (resp, options) {
+		// return resp.content ;
+		// },
 
-						// Parse the JSON response and get the total number of
-						// elements.
-						// Return only the content JSON element, that contains
-						// the users.
-						// These are necessary for paging to work.
-//						parse : function(resp) {
-//							this.total = resp.totalElements;
-//							this.totalPages = resp.totalPages;
-//							return resp.content;
-//						}
-		 parse: function(resp){
-			this.total = resp.totalElements;
-			this.totalPages = resp.totalPages;
-		    var _resp = {};
-		    _resp.results = [];
-		    _.each(resp.content, function(model) {
-		    	model.collection - this;
-		        _resp.results.push(model);
-		    });
-		    return _resp.results;
-		 }
-
+		// Parse the JSON response and get the total number of
+		// elements.
+		// Return only the content JSON element, that contains
+		// the users.
+		// These are necessary for paging to work.
+		// parse : function(resp) {
+		// this.total = resp.totalElements;
+		// this.totalPages = resp.totalPages;
+		// return resp.content;
+		// }
+		parse : function(response) {
+			console.log("GenericCollection#parse");
+			_self = this;
+			this.total = response.totalElements;
+			this.totalPages = response.totalPages;
+			superModelAwareInstances = [];
+			console.log("GenericCollection#parse, items: "+response.content.length);
+			_.each(response.content, function(modelItem) {
+				// make Backbone Supermodel aware of this item
+				console.log("GenericCollection#parse model id: "+modelItem.constructor);
+				superModelAwareInstance = _self.model.create(modelItem);
+				superModelAwareInstance.collection = _self;
+				// add to results
+				superModelAwareInstances.push(superModelAwareInstance);
+			});
+			return superModelAwareInstances;
+		}
 
 	});
 	return GenericCollection;

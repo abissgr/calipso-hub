@@ -67,7 +67,7 @@ define(function(require) {
 			}
 			var homeView = new HomeView();
 			_initializeLayout();
-			MainController.layout.content.show(homeView);
+			MainController.layout.contentRegion.show(homeView);
 		},
 
 		login : function() {
@@ -112,17 +112,17 @@ define(function(require) {
 		},
 		notFoundRoute : function(path) {
 //			console.log("notFoundRoute, path: "+path);
-			this.layout.content.show(new NotFoundView());
+			this.layout.contentRegion.show(new NotFoundView());
 		},
 		tabKeys: {},
-		mainNavigationCrudRoute : function(mainNavTabName, contentNavTabName) {
+		mainNavigationCrudRoute : function(mainRoutePart, contentNavTabName) {
 
-			this.tryExplicitRoute(mainNavTabName);
-			var mainAreaChange = (mainNavTabName != this.lastMainNavTabName);
+			this.tryExplicitRoute(mainRoutePart, contentNavTabName);
+			var mainAreaChange = (mainRoutePart != this.lastMainNavTabName);
 			
 			// note last main nav tab
-			if(!mainNavTabName){
-				mainNavTabName = this.lastMainNavTabName;
+			if(!mainRoutePart){
+				mainRoutePart = this.lastMainNavTabName;
 			}
 			if(!contentNavTabName){
 				contentNavTabName = "Search";
@@ -130,12 +130,12 @@ define(function(require) {
 			
 
 			// render generic model driven view
-			var viewRoute = this.viewRoutes[mainNavTabName];
-			var ModelClass = require(this.modelClasses[mainNavTabName]);
+			var viewRoute = "/api/rest/" + mainRoutePart;
+			var ModelClass = require("model/" + _.singularize( mainRoutePart ));
 			var _self = this;
-			console.log("AbstractController#mainNavigationCrudRoute, mainNavTabName: " + mainNavTabName + ", contentNavTabName: " + contentNavTabName);
+			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", contentNavTabName: " + contentNavTabName);
 			if(!this.tabs || mainAreaChange){
-				this.initCrudLayout(ModelClass, mainNavTabName, viewRoute);
+				this.initCrudLayout(ModelClass, mainRoutePart, viewRoute);
 			}
 			// add tab for entity if needed
 			if(contentNavTabName != "Search"){
@@ -150,10 +150,10 @@ define(function(require) {
 				
 			}
 
-			this.syncMainNavigationState(mainNavTabName, contentNavTabName);
+			this.syncMainNavigationState(mainRoutePart, contentNavTabName);
 
 		},
-		initCrudLayout : function(ModelClass, mainNavTabName, viewRoute){
+		initCrudLayout : function(ModelClass, mainRoutePart, viewRoute){
 			console.log("AbstractController#initCrudLayout, updating this.searchResults");
 			var _self = this;
 			// update grid collection
@@ -199,15 +199,15 @@ define(function(require) {
        	 	_self.syncMainNavigationState(null, itemModel.get("id"));
        	});
          
-			this.layout.content.show(tabLayout);
+			this.layout.contentRegion.show(tabLayout);
 		},
-		syncMainNavigationState : function(mainNavTabName, contentNavTabName) {
-			console.log("AbstractController#syncMainNavigationState, mainNavTabName: " + mainNavTabName + ", contentNavTabName: "+contentNavTabName);
+		syncMainNavigationState : function(mainRoutePart, contentNavTabName) {
+			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: "+contentNavTabName);
 		// update active nav menu tab
-			if(mainNavTabName && mainNavTabName != this.lastMainNavTabName){
+			if(mainRoutePart && mainRoutePart != this.lastMainNavTabName){
 				$('.navbar-nav li.active').removeClass('active');
-				$('#mainNavigationTab-' + mainNavTabName).addClass('active');
-				this.lastMainNavTabName = mainNavTabName;
+				$('#mainNavigationTab-' + mainRoutePart).addClass('active');
+				this.lastMainNavTabName = mainRoutePart;
 			}
 			// update active content tab
 			if(contentNavTabName && contentNavTabName != this.lastContentNavTabName){
@@ -222,16 +222,12 @@ define(function(require) {
 				this.lastContentNavTabName = contentNavTabName;
 			}
 		},
-		tryExplicitRoute : function(mainNavTabName){
-			if(!mainNavTabName){
-				mainNavTabName = "hosts";
-			}
-			else if (typeof this[mainNavTabName] == 'function') {
+		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart){
+			if (typeof this[mainRoutePart] == 'function') {
 				// render explicit route
-				this[mainNavTabName]();
+				this[mainRoutePart](secondaryRoutePart);
 			} 
 		},
-		mainNavigationRoute : function(mainNavTabName, contentNavTabName) {},
 
 		editItem : function(item) {
 			console.log("MainController#editItem, item: "+item);
