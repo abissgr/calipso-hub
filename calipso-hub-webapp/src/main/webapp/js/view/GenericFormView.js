@@ -17,46 +17,56 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 define(function(require) {
-	var Backbone = require('backbone'), 
-		Marionette = require('marionette'), 
-		BackboneForm = require('backbone-forms'), 
-		tmpl = require('hbs!template/GenericFormView');
+	var Backbone = require('backbone'), Marionette = require('marionette'), BackboneForm = require('backbone-forms'), tmpl = require('hbs!template/GenericFormView');
 
 	var GenericFormView = Marionette.ItemView.extend({
 		// Define view template
 		tagName : 'div',
 		template : tmpl,
+		events : {
+			"click .submit" : "save"
+		},
+		save : function(){
+			console.log("GenericFormView#save");
+			// runs schema and model validation
+			if(this.form && !this.form.commit({ validate: true })){
+				// persist changes
+				this.model.save();
+			}
+		},
 		onShow : function() {
 			// get appropriate schema
-			var schemaAction = Marionette.getOption(this, "schemaAction");
-			if(!schemaAction){
-				schemaAction = this.model.isNew() ? "create" : "update";
+			if (!this.formSchemaKey) {
+				this.formSchemaKey = this.model.isNew() ? "create" : "view";
 			}
-			//console.log("GenericFormView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
-			var selector = '#generic-form-'+this.model.get("id");
-			//console.log("GenericFormView#onShow, selector: "+selector+", schemaAction: "+schemaAction+", schema: "+this.model.schemaForAction(schemaAction));
+			// console.log("GenericFormView#onShow, formSchemaKey:
+			// "+formSchemaKey+", model:
+			// "+this.model.constructor.name+this.model.constructor);
+			var selector = '#generic-form-' + this.model.get("id");
+			// console.log("GenericFormView#onShow, selector: "+selector+",
+			// formSchemaKey: "+formSchemaKey+", schema:
+			// "+this.model.schemaForAction(formSchemaKey));
 			// render form
-			var form = new Backbone.Form({
-				model :  this.model,
-				schema : this.model.schemaForAction(schemaAction)
+			this.form = new Backbone.Form({
+				model : this.model,
+				schema : this.model.schemaForAction(this.formSchemaKey)
 			}).render();
-			$(selector).append(form.el);
-			$(selector+' textarea[data-provide="markdown"]').each(function(){
-		        var $this = $(this);
+			$(selector).append(this.form.el);
+			$(selector + ' textarea[data-provide="markdown"]').each(function() {
+				var $this = $(this);
 
-		        if ($this.data('markdown')) {
-		        	$this.data('markdown').showEditor()
+				if ($this.data('markdown')) {
+					$this.data('markdown').showEditor()
+				} else {
+					$this.markdown($this.data())
 				}
-		        else{
-		        	$this.markdown($this.data()) 
-		        }
-	        
-		    });
+
+			});
 		}
 	},
 	// static members
 	{
-		className: "GenericFormView",
+		className : "GenericFormView",
 	});
 	return GenericFormView;
 });

@@ -26,9 +26,9 @@ function(Backbone, Supermodel, Backgrid, GenericFormTabContentView) {
 		url: function() {
 			var sUrl = this.collection	 ? _.result(this.collection, 'url') : _.result(this, 'urlRoot') || urlError();
 			if (!this.isNew()) {
-				sUrl + (base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
+				sUrl = sUrl + (sUrl.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.get("id"));
 			}
-			console.log("GenericModel#url: "+sUrl);
+			console.log("GenericModel#url: " + sUrl + ", is new: "+this.isNew() + ", id: "+this.get("id"));
 			return sUrl;
 	    },
 	    schemaComplete : function() {

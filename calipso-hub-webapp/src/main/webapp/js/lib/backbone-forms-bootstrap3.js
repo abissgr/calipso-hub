@@ -6,7 +6,7 @@
 define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Backbone) {
   var Form = Backbone.Form;
 
-  
+
   /**
    * Bootstrap 3 templates
    */
