@@ -130,12 +130,15 @@ define(function(require) {
 			
 
 			// render generic model driven view
-			var viewRoute = "/api/rest/" + mainRoutePart;
 			var ModelClass = require("model/" + _.singularize( mainRoutePart ));
+
+			// a client side model might be an alias for another server model
+			var collectionUrl = "/api/rest/" +  (ModelClass.prototype.serverModelKey ? ModelClass.prototype.serverModelKey : mainRoutePart);
+			console.log("AbstractController#mainNavigationCrudRoute, model class: " + ModelClass.className + ", collectionUrl: "+collectionUrl);
 			var _self = this;
 			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", contentNavTabName: " + contentNavTabName);
 			if(!this.tabs || mainAreaChange){
-				this.initCrudLayout(ModelClass, mainRoutePart, viewRoute);
+				this.initCrudLayout(ModelClass, mainRoutePart, collectionUrl);
 			}
 			// add tab for entity if needed
 			if(contentNavTabName != "Search"){
@@ -153,13 +156,13 @@ define(function(require) {
 			this.syncMainNavigationState(mainRoutePart, contentNavTabName);
 
 		},
-		initCrudLayout : function(ModelClass, mainRoutePart, viewRoute){
+		initCrudLayout : function(ModelClass, mainRoutePart, collectionUrl){
 			console.log("AbstractController#initCrudLayout, updating this.searchResults");
 			var _self = this;
 			// update grid collection
 			this.searchResults = new GenericCollection([], {
 				model : ModelClass,
-				url : CalipsoApp.getCalipsoAppBaseUrl() + viewRoute
+				url : CalipsoApp.getCalipsoAppBaseUrl() + collectionUrl
 			});
 			// wrap in single model
 			var searchResultsModel = new GenericCollectionWrapperModel({

@@ -63,6 +63,16 @@ define([ 'backbone', 'backbone-pageable' ], function(Backbone, BackbonePageableC
 			sortKey : "properties",
 			direction : "order"
 		},
+		/*
+		 totalElements: 32
+		 lastPage false 
+		 totalPages 4
+		 numberOfElements 10
+		 firstPage true
+		 sort [Object { direction="DESC", property="id", ascending=false}]
+		 number 0
+		 size 10
+		 */
 		//		
 		// parseState: function (resp, queryParams, state, options) {
 		// return {
