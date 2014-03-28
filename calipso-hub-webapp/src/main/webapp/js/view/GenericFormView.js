@@ -19,8 +19,7 @@
 define(function(require) {
 	var Backbone = require('backbone'), Marionette = require('marionette'), 
 	BackboneForm = require('backbone-forms'), 
-	tmpl = require('hbs!template/GenericFormView'),
-	form2js = require('form2js');
+	tmpl = require('hbs!template/GenericFormView');
 	var GenericFormView = Marionette.ItemView.extend({
 		// Define view template
 		tagName : 'div',
@@ -73,10 +72,13 @@ define(function(require) {
 
 				toJson: function(){
 					return _.reduce(this.$el.serializeArray(), function (hash, pair) {
-						hash[pair.name] = pair.value;
+						if(pair.value){
+							hash[pair.name] = pair.value;
+						}
+						
 						return hash;
 						}, {});
-				}
+				},
 			});
 			this.form = new JsonableForm({
 				model : this.model,
