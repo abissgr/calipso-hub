@@ -3,16 +3,26 @@ define([ 'underscore', 'marionette', 'hbs!template/generic-search-layout', 'view
 	var GenericSearchLayout = Marionette.Layout.extend({
 		tagName : 'div',
 		className : "tab-pane active",
+		searchResultsCollection : null,
 		id: "tab-Search",
 		template : tmpl,// _.template(templates.applayout),
+
+		initialize: function(options){
+
+			Marionette.Layout.prototype.initialize.apply(this, arguments);
+			if(this.options.searchResultsCollection){
+				this.searchResultsCollection = options.searchResultsCollection;
+			}
+	  },
 		regions : {
 			searchCriteriaRegion : "#calipsoSearchCriteriaRegion",
 			searchResultsRegion : "#calipsoSearchResultsRegion"
 		},
 		onShow : function() {
-			
-			var searchFormView = new GenericFormView({ schemaAction: "search",  model: this.model});
-	      this.searchCriteriaRegion.show(searchFormView);
+			var searchFormView = new GenericFormView({ formSchemaKey: "search",  model: this.model, searchResultsCollection: this.searchResultsCollection});
+
+			console.log("GenericSearchLayout.onShow, model: "+this.model.className+", searchResultsCollection: "+this.searchResultsCollection);
+			this.searchCriteriaRegion.show(searchFormView);
 			var searchResultsView = new GenericCollectionGridView({   model: this.model});
 	      this.searchResultsRegion.show(searchResultsView);
 

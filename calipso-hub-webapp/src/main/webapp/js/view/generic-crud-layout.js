@@ -98,7 +98,23 @@ define(function(require) {
 			}
 			//console.log("TabContentsCollectionView#getItemView returns: " + someItemSpecificView.className);
 			return someItemSpecificView;
-		}
+		},
+		buildItemView: function(item, ItemViewClass){
+			console.log("TabContentsCollectionView#buildItemView, ItemView: "+ItemViewClass.className+", item: "+item.getClassName());
+			
+			var options = {model: item};
+			if(item && ItemViewClass.className == "GenericSearchLayout"){
+				console.log("item.wrappedCollection: "+item.wrappedCollection.length);
+				options.searchResultsCollection = item.wrappedCollection;
+			}
+		    // do custom stuff here
+
+		    var view = new ItemViewClass(options);
+
+		    // more custom code working off the view instance
+
+		    return view;
+		  },
 	});
 
 	return TabLayout;

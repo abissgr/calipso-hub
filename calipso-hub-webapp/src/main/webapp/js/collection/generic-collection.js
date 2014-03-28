@@ -22,7 +22,7 @@ define([ 'backbone', 'backbone-pageable' ], function(Backbone, BackbonePageableC
 		initialize : function(attributes, options) {
 			if (options.model) {
 				this.model = options.model;
-				console.log("GenericCollection#initialize, model given: "+this.model.className);
+				console.log("GenericCollection#initialize, model given: "+this.model.getClassName);
 			}
 			else{
 				console.log("GenericCollection#initialize, model given: "+this.model.className);

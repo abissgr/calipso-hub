@@ -33,7 +33,7 @@ define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user
 				this.collection = this.model.wrappedCollection;
 				console.log("GenericCollectionGridView onShow, got collection from GenericCollectionWrapperModel");
 			} else {
-				console.log("GenericCollectionGridView onShow, got collection from GenericCollectionWrapperModel");
+				console.log("GenericCollectionGridView onShow, got collection from properties");
 			}
 			// console.log("GenericCollectionGridView onShow, this.collection:
 			// "+this.collection + ", gridCollection: "+gridCollection);

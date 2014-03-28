@@ -36,6 +36,7 @@ function(Backbone, Supermodel, Backgrid, GenericFormTabContentView) {
 		},
 	   schemaForAction : function(actionName) {
 	 		// decide based on model persistence state if no action was given 
+ 			console.log("GenericModel.prototype.schema, actionName: "+actionName);
 	 		if(!actionName){
 	 			console.log("GenericModel.prototype.schema, this: "+this);
 	 			console.log("GenericModel.prototype.schema, caller is " + arguments.callee.caller.toString());
@@ -105,7 +106,7 @@ function(Backbone, Supermodel, Backgrid, GenericFormTabContentView) {
 			    if (options && options.save === false) {
 			    	return;
 			    }
-			    var sUrl = model.url+"/"+model.get("id");
+			    //var sUrl = model.url+"/"+model.get("id");
 			    //(base.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
 			    //model.save({}, {url: sUrl});
 		    });

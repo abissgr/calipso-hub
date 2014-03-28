@@ -72,7 +72,13 @@ function(Backbone, Backgrid, GenericModel, GenericCollectionSearchView) {
 			var thisModel = this;
 		    this.on("change", function (model, options) {
 			    console.log("GenericCollectionWrapperModel 'change' fired");
+			    return;
 		    });
+		},
+		
+		save : function(attributes, options) {
+			console.log("GenericCollectionWrapperModel#save, attributes: "+attributes+", options: "+options);
+			
 		},
 		schemaComplete : function() {
 			return this.modelClass.prototype.schemaComplete();
