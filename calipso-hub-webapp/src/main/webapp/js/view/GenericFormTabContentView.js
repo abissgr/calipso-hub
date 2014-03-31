@@ -28,6 +28,10 @@ define(function(require) {
 		// dynamically set the id
 		initialize: function(){
 		  this.$el.prop("id", "tab-"+this.model.get("id"));
+		  this.formTemplate = _.template('\
+		    <form class="form-vertical" role="form" data-fieldsets></form>\
+		  ');
+
 		},
 	},
 	{className: "GenericFormTabContentView"});

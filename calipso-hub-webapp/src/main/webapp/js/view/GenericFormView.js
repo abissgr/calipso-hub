@@ -32,6 +32,8 @@ define(function(require) {
 			if(this.options.searchResultsCollection){
 				this.searchResultsCollection = options.searchResultsCollection;
 			}
+
+			this.formTemplate = this.options.formTemplate? this.options.formTemplate : BackboneForm.template;
 	  },
 		formSchemaKey: "view",
 		events : {
@@ -54,6 +56,7 @@ define(function(require) {
 			// search entities?
 		},
 		onShow : function() {
+			var _self = this;
 			// get appropriate schema
 			console.log("GenericFormView.onShow, this.formSchemaKey: "+this.formSchemaKey);
 			if (!this.formSchemaKey) {
@@ -83,6 +86,7 @@ define(function(require) {
 			this.form = new JsonableForm({
 				model : this.model,
 				schema : this.model.schemaForAction(this.formSchemaKey),
+				template : _self.formTemplate
 			}).render();
 			$(selector).append(this.form.el);
 			$(selector + ' textarea[data-provide="markdown"]').each(function() {

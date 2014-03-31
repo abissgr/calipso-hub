@@ -93,7 +93,7 @@ function(Backbone, Supermodel, Backgrid, GenericFormTabContentView) {
 //		},
 		defaults: {
          itemView: GenericFormTabContentView
-		},	
+		},
 		getClassName: function(){
 			var c = this.constructor.className;
 			console.log("GenericModel#getClassName: "+c);

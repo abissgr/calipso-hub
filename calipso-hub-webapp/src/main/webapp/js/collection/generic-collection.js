@@ -95,19 +95,21 @@ define([ 'backbone', 'backbone-pageable' ], function(Backbone, BackbonePageableC
 		// return resp.content;
 		// }
 		parse : function(response) {
-			console.log("GenericCollection#parse");
+			console.log("GenericCollection#parse, model: "+this.model.toSource()+", className: "+this.model.className);
 			_self = this;
 			this.total = response.totalElements;
 			this.totalPages = response.totalPages;
 			superModelAwareInstances = [];
 			console.log("GenericCollection#parse, items: "+response.content.length);
 			_.each(response.content, function(modelItem) {
-				// make Backbone Supermodel aware of this item
-				console.log("GenericCollection#parse model id: "+modelItem.constructor);
-				superModelAwareInstance = _self.model.create(modelItem);
-				superModelAwareInstance.collection = _self;
-				// add to results
-				superModelAwareInstances.push(superModelAwareInstance);
+				//if(modelItem && modelItem.get){
+					// make Backbone Supermodel aware of this item
+					//console.log("GenericCollection#parse model: "+modelItem.toSource());
+					superModelAwareInstance = _self.model.create(modelItem);
+					superModelAwareInstance.collection = _self;
+					// add to results
+					superModelAwareInstances.push(superModelAwareInstance);
+				//}
 			});
 			return superModelAwareInstances;
 		}

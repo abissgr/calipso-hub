@@ -30,6 +30,7 @@ define(function(require) {
 	var TabLayout = Backbone.Marionette.Layout.extend({
 		template : tmpl,
 		tagName : "div",
+		className : "panel",
 		regions : {
 			tabLabelsRegion : '#calipsoTabLabelsRegion',
 			tabContentsRegion : '#calipsoTabContentsRegion'
@@ -53,7 +54,7 @@ define(function(require) {
 	});
 
 	var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
-		className : 'nav nav-tabs',
+		className : 'nav nav-pills',
 		tagName : 'ul',
 		itemViewContainer : '.nav-tabs',
 		getItemView : function(item) {
@@ -96,7 +97,7 @@ define(function(require) {
 			} else {
 				someItemSpecificView = GenericFormTabContentView;
 			}
-			//console.log("TabContentsCollectionView#getItemView returns: " + someItemSpecificView.className);
+			console.log("TabContentsCollectionView#getItemView returns: " + someItemSpecificView.className);
 			return someItemSpecificView;
 		},
 		buildItemView: function(item, ItemViewClass){

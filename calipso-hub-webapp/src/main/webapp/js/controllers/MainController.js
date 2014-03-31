@@ -22,22 +22,7 @@ define(function(require) {
 	CalipsoApp = require('app'),
 	session = require('session'),
 	vent = require('vent'),
-	AbstractController = require('controllers/abstract-controller'),
-	AppLayoutView = require('view/AppLayoutView'),
-	HomeView = require('view/HomeView'),
-	NotFoundView = require('view/NotFoundView'),
-	LoginView = require('view/LoginView'),
-	MainContentNavView = require('view/MainContentNavView'),
-	TabLayout = require('view/generic-crud-layout'),
-	GenericCollectionGridView = require('view/generic-collection-grid-view'),
-	GenericFormView = require('view/GenericFormView'),
-	GenericCollection = require('collection/generic-collection'),
-	GenericModel = require('model/generic-model'),
-	GenericCollectionWrapperModel = require('model/generic-collection-wrapper-model'),
-	LoginModel = require('model/LoginModel'),
-	UserModel = require('model/user'),
-	TextModel = require('model/text'),
-	HostModel = require('model/host');
+	AbstractController = require('controllers/abstract-controller');
 
 
 	var MainController = AbstractController.extend({

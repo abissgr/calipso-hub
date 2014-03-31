@@ -34,6 +34,16 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Ba
       </div>\
     </div>\
   ');
+  
+  Form.Field.templateNoLabel = _.template('\
+		    <div class="form-group field-<%= key %>">\
+		      <div class="col-sm-12">\
+		        <span data-editor></span>\
+		        <p class="help-block" data-error></p>\
+		        <p class="help-block"><%= help %></p>\
+		      </div>\
+		    </div>\
+		  ');
 
 
   Form.NestedField.template = _.template('\

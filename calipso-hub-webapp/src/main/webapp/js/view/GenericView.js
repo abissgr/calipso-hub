@@ -17,50 +17,26 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 define(function(require) {
-	var Backbone = require('backbone'), 
-		Marionette = require('marionette'), 
-		BackboneForm = require('backbone-forms'), 
-		tmpl = require('hbs!template/GenericFormView');
-
+	var Backbone = require('backbone'), Marionette = require('marionette'), 
+	BackboneForm = require('backbone-forms'), 
+	tmpl = require('hbs!template/GenericFormView');
 	var GenericView = Marionette.ItemView.extend({
 		// Define view template
 		tagName : 'div',
-		className : "tab-pane active",
-		id: function(){
-			return this.model.get("id");
-		},
-		template : tmpl,
-		onShow : function() {
-			// get appropriate schema
-			var schemaAction = Marionette.getOption(this, "schemaAction");
-			if(!schemaAction){
-				schemaAction = this.model.isNew() ? "create" : "update";
-			}
-			//console.log("GenericView#onShow, schemaAction: "+schemaAction+", model: "+this.model.constructor.name+this.model.constructor);
-			var selector = '#generic-form-'+this.model.get("id");
-			console.log("GenericView#onShow, selector: "+selector);
-			// render form
-			var form = new Backbone.Form({
-				model :  this.model,
-				schema : this.model.schemaForAction(schemaAction)
-			}).render();
-			$(selector).append(form.el);
-			$(selector+' textarea[data-provide="markdown"]').each(function(){
-		        var $this = $(this);
+		template : tmpl,className : "tab-pane active fade in",
+		// dynamically set the id
+		initialize: function(options){
 
-		        if ($this.data('markdown')) {
-		        	$this.data('markdown').showEditor()
-				}
-		        else{
-		        	$this.markdown($this.data()) 
-		        }
-	        
-		    });
-		}
+			Marionette.ItemView.prototype.initialize.apply(this, arguments);
+			this.$el.prop("id", "tab-"+this.model.get("id"));
+			
+			this.formTemplate = this.options.formTemplate? this.options.formTemplate : BackboneForm.template;
+	  },
+		formSchemaKey: "view",
 	},
 	// static members
 	{
-		className: "GenericView",
+		className : "GenericView",
 	});
 	return GenericView;
 });
