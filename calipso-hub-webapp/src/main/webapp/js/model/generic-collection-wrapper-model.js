@@ -48,7 +48,10 @@ function(Backbone, Backgrid, GenericModel, GenericCollectionSearchView) {
 					console.log("GenericCollectionWrapperModel#initialize from attributes");
 					// note collections modelClass if available,
 					// this can be overriden by attributes.modelClass
-					if (this.wrappedCollection.modelClass) {
+					if (this.wrappedCollection.model) {
+						this.modelClass = this.wrappedCollection.model;	
+					}
+					else if (this.wrappedCollection.modelClass) {
 						this.modelClass = this.wrappedCollection.modelClass;	
 					}
 				}

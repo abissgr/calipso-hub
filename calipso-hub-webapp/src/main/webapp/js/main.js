@@ -18,6 +18,14 @@ function (
 		  MainRouter
 		  //, UserRouter
 		  ) {
+	if(!window.console){
+		window.console = {
+				log: function(){
+					// do nothing
+				}
+		}
+		
+	}
 
   // Navigation handler
 	$(document).on("click",  "a", function(event) {

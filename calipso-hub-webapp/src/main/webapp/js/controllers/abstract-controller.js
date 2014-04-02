@@ -23,16 +23,18 @@ define(function(require) {
 	session = require('session'),
 	vent = require('vent'),
 	AppLayoutView = require('view/AppLayoutView'),
-	HomeView = require('view/HomeView'),
+	HomeView = require('view/home-view'),
 	NotFoundView = require('view/NotFoundView'),
 	LoginView = require('view/LoginView'),
 	MainContentNavView = require('view/MainContentNavView'),
 	TabLayout = require('view/generic-crud-layout'),
 	GenericCollectionGridView = require('view/generic-collection-grid-view'),
+	GenericHomeLayout = require('view/generic-home-layout'),
 	GenericFormView = require('view/GenericFormView'),
 	GenericCollection = require('collection/generic-collection'),
 	GenericModel = require('model/generic-model'),
 	GenericCollectionWrapperModel = require('model/generic-collection-wrapper-model'),
+	HomeModel = require('model/home'),
 	LoginModel = require('model/LoginModel'),
 	UserModel = require('model/user'),
 	HostModel = require('model/host');
@@ -138,23 +140,24 @@ define(function(require) {
 			}
 			// get route model class
 			routeHelper.modelClass = require("model/" + _.singularize( routeHelper.mainRoutePart ));
+
+			console.log("AbstractController#buildRouteHelper, loaded model class: "+routeHelper.modelClass.className);
+			var searchModelClass = routeHelper.modelClass.searchModel ?  routeHelper.modelClass.searchModel : routeHelper.modelClass
 			// get route collection if applicable
-			if(routeHelper.mainRoutePart != "homes"){
 			// a client side model might be an alias for another server model
-				var collectionUrl = "/api/rest/" +  (routeHelper.modelClass.prototype.serverModelKey ? routeHelper.modelClass.prototype.serverModelKey : routeHelper.mainRoutePart);
-				console.log("AbstractController#buildRouteHelper, model class: " + routeHelper.modelClass.className + ", collectionUrl: "+collectionUrl);
-				
-				console.log("AbstractController#buildRouteHelper, updating this.searchResults");
-				this.searchResults = new GenericCollection([], {
-					model : routeHelper.modelClass,
-					url : CalipsoApp.getCalipsoAppBaseUrl() + collectionUrl
-				});
-				// wrap in single model
-				routeHelper.routeModel = new GenericCollectionWrapperModel({
-					modelClass : routeHelper.modelClass,
-					wrappedCollection : this.searchResults
-				});
+			console.log("AbstractController#buildRouteHelper, updating this.searchResults");
+			this.searchResults = new GenericCollection([], {
+				model : routeHelper.modelClass,
+				url : CalipsoApp.getCalipsoAppBaseUrl() + "/api/rest/" +  searchModelClass.apiUrlSegment
+			});
+			var wrapperModelOptions = {
+				modelClass : routeHelper.modelClass,
+				wrappedCollection : this.searchResults
+			};
+			if(routeHelper.mainRoutePart == "homes"){
+				wrapperModelOptions.itemView = HomeView;
 			}
+			routeHelper.routeModel = new GenericCollectionWrapperModel(wrapperModelOptions);
 			return routeHelper;
 		},
 		mainNavigationCrudRoute : function(mainRoutePart, contentNavTabName) {
@@ -177,7 +180,6 @@ define(function(require) {
 				else{
 					console.log("showing existing tab");
 				}
-				
 			}
 
 			this.syncMainNavigationState(routeHelper);

@@ -64,8 +64,10 @@ define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user
 			});
 
 			$('#backgrid-paginator').append(paginator.render().el);
+//			console.log("GenericCollectionGridView.onShow, collection url: "+);
 			_self.collection.fetch({
-				reset : true
+				reset : true,
+				url: _self.collection.url
 			});
 			// this.collection.fetch();
 

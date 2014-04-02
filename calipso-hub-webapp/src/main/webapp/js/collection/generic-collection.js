@@ -16,17 +16,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'backbone-pageable' ], function(Backbone, BackbonePageableCollection) {
+define([ 'app', 'backbone', 'backbone-pageable' ], function(CalipsoApp, Backbone, BackbonePageableCollection) {
 	var GenericCollection = Backbone.PageableCollection.extend({
 		mode : "server",
 		initialize : function(attributes, options) {
 			if (options.model) {
-				this.model = options.model;
-				console.log("GenericCollection#initialize, model given: "+this.model.getClassName);
+				this.model = options.model.searchModel ? options.model.searchModel : options.model;
+				this.modelClass = this.model;
 			}
-			else{
-				console.log("GenericCollection#initialize, model given: "+this.model.className);
+			
+			// use url from unwrapped model
+			if(options.url){
+				//this.url = options.url;
+				console.log("GenericCollection#initialize, given URL: " + this.url);
+				
 			}
+			
 			// use given grid columns if provided, or the
 			// default model columns otherwise
 			if (options.schemaForGrid) {
@@ -49,7 +54,7 @@ define([ 'backbone', 'backbone-pageable' ], function(Backbone, BackbonePageableC
 
 			// ensure proper configuration is available
 			if (!configuredSchema) {
-				throw new "A grid schema has not been given and the collection model does not offer one or is undefined";
+				throw "A grid schema has not been given and the collection model does not offer one or is undefined";
 			}
 			return configuredSchema;
 		},

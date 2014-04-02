@@ -19,7 +19,6 @@
 define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ],
 		function( GenericModel, EditInTabCell, ViewInTabCell) {
 			var UserModel = GenericModel.extend({
-				modelKey: "user",
 				schemaComplete : function() {
 					return {//
 						userName : {
@@ -63,6 +62,7 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'c
 			},
 			// static members
 			{
+				apiUrlSegment: "users",
 				className: "UserModel",
 				parent: GenericModel
 			});
