@@ -57,18 +57,18 @@ define(function(require) {
 			vent.trigger('app:show', this.layout);
 
 		},
-		home : function() {
-
-			if (!session.isAuthenticated()) {
-				Backbone.history.navigate("client/login", {
-					trigger : true
-				});
-				return false;
-			}
-			var homeView = new HomeView();
-			_initializeLayout();
-			MainController.layout.contentRegion.show(homeView);
-		},
+//		home : function() {
+//
+//			if (!session.isAuthenticated()) {
+//				Backbone.history.navigate("client/login", {
+//					trigger : true
+//				});
+//				return false;
+//			}
+//			var homeView = new HomeView();
+//			_initializeLayout();
+//			MainController.layout.contentRegion.show(homeView);
+//		},
 
 		login : function() {
 
@@ -115,37 +115,64 @@ define(function(require) {
 			this.layout.contentRegion.show(new NotFoundView());
 		},
 		tabKeys: {},
+		buildRouteHelper: function(mainRoutePart, contentNavTabName){
+			var routeHelper = {};
+			routeHelper.mainAreaChange = (mainRoutePart != this.lastMainNavTabName);
+			// get main route part
+			if(!mainRoutePart){
+				if(this.lastMainNavTabName){
+					// go previous route if one exists
+					routeHelper.mainRoutePart = this.lastMainNavTabName;
+				}
+				else{
+					// go to home if no previous route exists
+					routeHelper.mainRoutePart = "homes";
+				}
+			}
+			else{
+				routeHelper.mainRoutePart = mainRoutePart;
+			}
+			// get secondary route part
+			if(!contentNavTabName){
+				routeHelper.contentNavTabName = "Search";
+			}
+			// get route model class
+			routeHelper.modelClass = require("model/" + _.singularize( routeHelper.mainRoutePart ));
+			// get route collection if applicable
+			if(routeHelper.mainRoutePart != "homes"){
+			// a client side model might be an alias for another server model
+				var collectionUrl = "/api/rest/" +  (routeHelper.modelClass.prototype.serverModelKey ? routeHelper.modelClass.prototype.serverModelKey : routeHelper.mainRoutePart);
+				console.log("AbstractController#buildRouteHelper, model class: " + routeHelper.modelClass.className + ", collectionUrl: "+collectionUrl);
+				
+				console.log("AbstractController#buildRouteHelper, updating this.searchResults");
+				this.searchResults = new GenericCollection([], {
+					model : routeHelper.modelClass,
+					url : CalipsoApp.getCalipsoAppBaseUrl() + collectionUrl
+				});
+				// wrap in single model
+				routeHelper.routeModel = new GenericCollectionWrapperModel({
+					modelClass : routeHelper.modelClass,
+					wrappedCollection : this.searchResults
+				});
+			}
+			return routeHelper;
+		},
 		mainNavigationCrudRoute : function(mainRoutePart, contentNavTabName) {
 
 			this.tryExplicitRoute(mainRoutePart, contentNavTabName);
-			var mainAreaChange = (mainRoutePart != this.lastMainNavTabName);
+			var routeHelper = this.buildRouteHelper(mainRoutePart, contentNavTabName);
 			
-			// note last main nav tab
-			if(!mainRoutePart){
-				mainRoutePart = this.lastMainNavTabName;
-			}
-			if(!contentNavTabName){
-				contentNavTabName = "Search";
-			}
-			
-
-			// render generic model driven view
-			var ModelClass = require("model/" + _.singularize( mainRoutePart ));
-
-			// a client side model might be an alias for another server model
-			var collectionUrl = "/api/rest/" +  (ModelClass.prototype.serverModelKey ? ModelClass.prototype.serverModelKey : mainRoutePart);
-			console.log("AbstractController#mainNavigationCrudRoute, model class: " + ModelClass.className + ", collectionUrl: "+collectionUrl);
 			var _self = this;
-			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", contentNavTabName: " + contentNavTabName);
-			if(!this.tabs || mainAreaChange){
-				this.initCrudLayout(ModelClass, mainRoutePart, collectionUrl);
+			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + routeHelper.mainRoutePart + ", contentNavTabName: " + routeHelper.contentNavTabName);
+			if(!this.tabs || routeHelper.mainAreaChange){
+				this.initCrudLayout(routeHelper);
 			}
 			// add tab for entity if needed
-			if(contentNavTabName != "Search"){
-				if(!this.tabKeys[contentNavTabName]){
+			if(routeHelper.contentNavTabName != "Search"){
+				if(!this.tabKeys[routeHelper.contentNavTabName]){
 					console.log("adding new tab");
 					// tab keys index updated automatically
-					this.tabs.add(ModelClass.all().get(contentNavTabName));
+					this.tabs.add(routeHelper.modelClass.all().get(routeHelper.contentNavTabName));
 				}
 				else{
 					console.log("showing existing tab");
@@ -153,24 +180,15 @@ define(function(require) {
 				
 			}
 
-			this.syncMainNavigationState(mainRoutePart, contentNavTabName);
+			this.syncMainNavigationState(routeHelper);
 
 		},
-		initCrudLayout : function(ModelClass, mainRoutePart, collectionUrl){
-			console.log("AbstractController#initCrudLayout, updating this.searchResults");
+		initCrudLayout : function(routeHelper){
 			var _self = this;
 			// update grid collection
-			this.searchResults = new GenericCollection([], {
-				model : ModelClass,
-				url : CalipsoApp.getCalipsoAppBaseUrl() + collectionUrl
-			});
-			// wrap in single model
-			var searchResultsModel = new GenericCollectionWrapperModel({
-				modelClass : ModelClass,
-				wrappedCollection : this.searchResults
-			});
+			
 			console.log("AbstractController#mainNavigationCrudRoute, searchResultsModel.get(name): "+
-					searchResultsModel.get("name"));
+					routeHelper.routeModel.get("name"));
 			var TabModel      = Backbone.Model.extend();
 			var TabCollection = Backbone.Collection.extend({ 
 				model: GenericModel,
@@ -187,7 +205,7 @@ define(function(require) {
 			    },
 			});
 			this.tabs = new TabCollection([
-            (searchResultsModel)      
+            (routeHelper.routeModel)      
          ]);
          var tabLayout = new TabLayout({collection: this.tabs});
 
@@ -204,25 +222,25 @@ define(function(require) {
          
 			this.layout.contentRegion.show(tabLayout);
 		},
-		syncMainNavigationState : function(mainRoutePart, contentNavTabName) {
-			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: "+contentNavTabName);
+		syncMainNavigationState : function(routeHelper) {
+			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + routeHelper.mainRoutePart + ", contentNavTabName: "+routeHelper.contentNavTabName);
 		// update active nav menu tab
-			if(mainRoutePart && mainRoutePart != this.lastMainNavTabName){
+			if(routeHelper.mainRoutePart && routeHelper.mainRoutePart != this.lastMainNavTabName){
 				$('.navbar-nav li.active').removeClass('active');
-				$('#mainNavigationTab-' + mainRoutePart).addClass('active');
-				this.lastMainNavTabName = mainRoutePart;
+				$('#mainNavigationTab-' + routeHelper.mainRoutePart).addClass('active');
+				this.lastMainNavTabName = routeHelper.mainRoutePart;
 			}
 			// update active content tab
-			if(contentNavTabName && contentNavTabName != this.lastContentNavTabName){
+			if(routeHelper.contentNavTabName && routeHelper.contentNavTabName != this.lastContentNavTabName){
 				$('#calipsoTabLabelsRegion li.active').removeClass('active');
-				$('#generic-crud-layout-tab-label-' + contentNavTabName).addClass('active');
+				$('#generic-crud-layout-tab-label-' + routeHelper.contentNavTabName).addClass('active');
 				// show coressponding content
-				console.log("show tab: "+contentNavTabName);
+				console.log("show tab: "+routeHelper.contentNavTabName);
 				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');
 				$('#calipsoTabContentsRegion .tab-pane').addClass('hidden');
-				$('#tab-' + contentNavTabName).removeClass('hidden');
-				$('#tab-' + contentNavTabName).addClass('active');
-				this.lastContentNavTabName = contentNavTabName;
+				$('#tab-' + routeHelper.contentNavTabName).removeClass('hidden');
+				$('#tab-' + routeHelper.contentNavTabName).addClass('active');
+				this.lastContentNavTabName = routeHelper.contentNavTabName;
 			}
 		},
 		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart){
