@@ -59,6 +59,10 @@ function(Backbone, Backgrid, GenericModel, GenericCollectionSearchView) {
 				if (attributes.modelClass) {
 					this.modelClass = attributes.modelClass;	
 				}
+				// override modelClass
+				if (attributes.itemView) {
+					this.set("itemView", attributes.itemView);	
+				}
 			}
 			// use  given grid columns if provided, or the
 			// collection model columns if not, finally default to 

@@ -97,14 +97,14 @@ define(function(require) {
 			} else {
 				someItemSpecificView = GenericFormTabContentView;
 			}
-			console.log("TabContentsCollectionView#getItemView returns: " + someItemSpecificView.className);
+			console.log("TabContentsCollectionView#getItemView for item class " + item.className + " returns: " + someItemSpecificView.className);
 			return someItemSpecificView;
 		},
 		buildItemView: function(item, ItemViewClass){
 			console.log("TabContentsCollectionView#buildItemView, ItemView: "+ItemViewClass.className+", item: "+item.getClassName());
 			
 			var options = {model: item};
-			if(item && ItemViewClass.className == "GenericSearchLayout"){
+			if(item && item.wrappedCollection){
 				console.log("item.wrappedCollection: "+item.wrappedCollection.length);
 				options.searchResultsCollection = item.wrappedCollection;
 			}

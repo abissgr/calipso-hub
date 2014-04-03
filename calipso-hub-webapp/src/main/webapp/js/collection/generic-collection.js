@@ -28,7 +28,7 @@ define([ 'app', 'backbone', 'backbone-pageable' ], function(CalipsoApp, Backbone
 			// use url from unwrapped model
 			if(options.url){
 				//this.url = options.url;
-				console.log("GenericCollection#initialize, given URL: " + this.url);
+				console.log("GenericCollection#initialize, given URL: " + this.url + ", model: "+this.model.className);
 				
 			}
 			
@@ -106,16 +106,21 @@ define([ 'app', 'backbone', 'backbone-pageable' ], function(CalipsoApp, Backbone
 			this.totalPages = response.totalPages;
 			superModelAwareInstances = [];
 			console.log("GenericCollection#parse, items: "+response.content.length);
-			_.each(response.content, function(modelItem) {
-				//if(modelItem && modelItem.get){
+			var modelItem;
+			var superModelAwareInstance;
+			for(var i=0; i < response.content.length; i++){
+				modelItem = response.content[i];
+				if(modelItem && modelItem.get){
 					// make Backbone Supermodel aware of this item
-					//console.log("GenericCollection#parse model: "+modelItem.toSource());
+					console.log("GenericCollection#parse model: "+modelItem.get("id"));
 					superModelAwareInstance = _self.model.create(modelItem);
 					superModelAwareInstance.collection = _self;
 					// add to results
+					console.log("GenericCollection#parse adding: "+superModelAwareInstance.get("id"));
 					superModelAwareInstances.push(superModelAwareInstance);
-				//}
-			});
+				}
+			}
+			//_.each(response.content, function(modelItem) {});
 			return superModelAwareInstances;
 		}
 

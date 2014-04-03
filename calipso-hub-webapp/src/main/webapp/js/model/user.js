@@ -16,90 +16,92 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ],
-		function( GenericModel, EditInTabCell, ViewInTabCell) {
-			var UserModel = GenericModel.extend({
-				schemaComplete : function() {
-					return {//
-						userName : {
-							"search": 'Text',
-							"update": {
-								type: 'Text',
-								validators : [ 'required' ],
-								editorAttrs: { 'readonly': 'readonly' }
-							},
-							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
-						},
-						firstName : {
-							"search": 'Text',
-							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
-						},
-						lastName : {
-							"search": 'Text',
-							"default": {
-								type: 'Text',
-								validators : [ 'required' ]
-							}
-						},
-						email : {
-							"search": {
-								type: 'Text',
-								validators : [ 'email' ]
-							},
-							"default": {
-								type: 'Text',
-								validators : [ 'required', 'email' ]
-							}
-						},
-					};
+define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ], function(GenericModel, EditInTabCell, ViewInTabCell) {
+	var UserModel = GenericModel.extend({
+		urlRoot : "/api/rest/users",
+		schemaComplete : function() {
+			return {//
+				userName : {
+					"search" : 'Text',
+					"update" : {
+						type : 'Text',
+						validators : [ 'required' ],
+						editorAttrs : {
+							'readonly' : 'readonly'
+						}
+					},
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
 				},
-			},
-			// static members
-			{
-				apiUrlSegment: "users",
-				className: "UserModel",
-				parent: GenericModel
-			});
-			
-			UserModel.prototype.getGridSchema = function() {
-				return [{
-					name : "userName",
-					label : "username",
-					cell : ViewInTabCell,
-					editable : false,
-				}, {
-					name : "firstName",
-					label : "firstName",
-					editable : false,
-					cell : "string"
-				}, {
-					name : "lastName",
-					label : "lastName",
-					editable : false,
-					cell : "string"
-				}, {
-					name : "email",
-					label : "email",
-					cell : "email",
-					editable : false,
-				}, {
-					name : "createdDate",
-					label : "created",
-					cell : "date",
-					editable : false,
-				}, {
-					name : "edit",
-					label : "",
-					editable : false,
-					cell : EditInTabCell
-				}];
-			}
-			
-			return UserModel;
-		});
+				firstName : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				lastName : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				email : {
+					"search" : {
+						type : 'Text',
+						validators : [ 'email' ]
+					},
+					"default" : {
+						type : 'Text',
+						validators : [ 'required', 'email' ]
+					}
+				},
+			};
+		},
+	},
+	// static members
+	{
+		apiUrlSegment : "users",
+		className : "UserModel",
+		parent : GenericModel
+	});
+
+	UserModel.prototype.getGridSchema = function() {
+		return [ {
+			name : "userName",
+			label : "username",
+			cell : ViewInTabCell,
+			editable : false,
+		}, {
+			name : "firstName",
+			label : "firstName",
+			editable : false,
+			cell : "string"
+		}, {
+			name : "lastName",
+			label : "lastName",
+			editable : false,
+			cell : "string"
+		}, {
+			name : "email",
+			label : "email",
+			cell : "email",
+			editable : false,
+		}, {
+			name : "createdDate",
+			label : "created",
+			cell : "date",
+			editable : false,
+		}, {
+			name : "edit",
+			label : "",
+			editable : false,
+			cell : EditInTabCell
+		} ];
+	}
+
+	return UserModel;
+});

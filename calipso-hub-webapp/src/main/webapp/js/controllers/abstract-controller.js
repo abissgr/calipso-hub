@@ -135,9 +135,9 @@ define(function(require) {
 				routeHelper.mainRoutePart = mainRoutePart;
 			}
 			// get secondary route part
-			if(!contentNavTabName){
-				routeHelper.contentNavTabName = "Search";
-			}
+			routeHelper.contentNavTabName = contentNavTabName ? contentNavTabName : "Search";
+			
+			console.log("AbstractController#buildRouteHelper, contentNavTabName: "+ routeHelper.contentNavTabName);
 			// get route model class
 			routeHelper.modelClass = require("model/" + _.singularize( routeHelper.mainRoutePart ));
 
@@ -155,7 +155,8 @@ define(function(require) {
 				wrappedCollection : this.searchResults
 			};
 			if(routeHelper.mainRoutePart == "homes"){
-				wrapperModelOptions.itemView = HomeView;
+				wrapperModelOptions.itemView = GenericHomeLayout;
+				console.log("AbstractController#buildRouteHelper, set wrapperModelOptions.itemView: "+GenericHomeLayout.className);
 			}
 			routeHelper.routeModel = new GenericCollectionWrapperModel(wrapperModelOptions);
 			return routeHelper;
@@ -173,16 +174,26 @@ define(function(require) {
 			// add tab for entity if needed
 			if(routeHelper.contentNavTabName != "Search"){
 				if(!this.tabKeys[routeHelper.contentNavTabName]){
-					console.log("adding new tab");
-					// tab keys index updated automatically
-					this.tabs.add(routeHelper.modelClass.all().get(routeHelper.contentNavTabName));
+					var showModel = routeHelper.modelClass.all().get(routeHelper.contentNavTabName);
+					if(showModel){
+						// tab keys index updated automatically
+						console.log("adding new tab for existing model: " + showModel.get("id"));
+						_self.tabs.add(showModel);
+					}
+					else{
+						showModel = routeHelper.modelClass.create({id:routeHelper.contentNavTabName});
+						showModel.fetch().then(function(){
+							console.log("adding new tab for fetched model: " + showModel.get("id"));
+							_self.tabs.add(showModel);
+						});
+					}
 				}
 				else{
 					console.log("showing existing tab");
 				}
 			}
 
-			this.syncMainNavigationState(routeHelper);
+			this.syncMainNavigationState(routeHelper.mainRoutePart, routeHelper.contentNavTabName);
 
 		},
 		initCrudLayout : function(routeHelper){
@@ -224,25 +235,25 @@ define(function(require) {
          
 			this.layout.contentRegion.show(tabLayout);
 		},
-		syncMainNavigationState : function(routeHelper) {
-			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + routeHelper.mainRoutePart + ", contentNavTabName: "+routeHelper.contentNavTabName);
+		syncMainNavigationState : function(mainRoutePart, contentNavTabName) {
+			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: "+contentNavTabName);
 		// update active nav menu tab
-			if(routeHelper.mainRoutePart && routeHelper.mainRoutePart != this.lastMainNavTabName){
+			if(mainRoutePart && mainRoutePart != this.lastMainNavTabName){
 				$('.navbar-nav li.active').removeClass('active');
-				$('#mainNavigationTab-' + routeHelper.mainRoutePart).addClass('active');
-				this.lastMainNavTabName = routeHelper.mainRoutePart;
+				$('#mainNavigationTab-' + mainRoutePart).addClass('active');
+				this.lastMainNavTabName = mainRoutePart;
 			}
 			// update active content tab
-			if(routeHelper.contentNavTabName && routeHelper.contentNavTabName != this.lastContentNavTabName){
+			if(contentNavTabName && contentNavTabName != this.lastContentNavTabName){
 				$('#calipsoTabLabelsRegion li.active').removeClass('active');
-				$('#generic-crud-layout-tab-label-' + routeHelper.contentNavTabName).addClass('active');
+				$('#generic-crud-layout-tab-label-' + contentNavTabName).addClass('active');
 				// show coressponding content
-				console.log("show tab: "+routeHelper.contentNavTabName);
+				console.log("show tab: "+contentNavTabName);
 				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');
 				$('#calipsoTabContentsRegion .tab-pane').addClass('hidden');
-				$('#tab-' + routeHelper.contentNavTabName).removeClass('hidden');
-				$('#tab-' + routeHelper.contentNavTabName).addClass('active');
-				this.lastContentNavTabName = routeHelper.contentNavTabName;
+				$('#tab-' + contentNavTabName).removeClass('hidden');
+				$('#tab-' + contentNavTabName).addClass('active');
+				this.lastContentNavTabName = contentNavTabName;
 			}
 		},
 		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart){

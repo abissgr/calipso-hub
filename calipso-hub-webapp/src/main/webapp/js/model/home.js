@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/abstract-home', 'view/generic-home-layout' ],
-	function( AbstractHomeModel, GenericHomeLayout) {
+define([ 'model/abstract-home', 'model/user', 'view/generic-home-layout' ],
+	function( AbstractHomeModel, UserModel, GenericHomeLayout) {
 		var HomeModel = AbstractHomeModel.extend({
 			modelKey: "home",
 			defaults: {
@@ -30,7 +30,8 @@ define([ 'model/abstract-home', 'view/generic-home-layout' ],
 		// static members
 		{
 			className: "HomeModel",
-			parent: AbstractHomeModel
+			parent: AbstractHomeModel,
+			searchModel: UserModel
 		});
 
 		return HomeModel;
