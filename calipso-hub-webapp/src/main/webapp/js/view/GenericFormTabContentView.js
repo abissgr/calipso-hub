@@ -34,6 +34,7 @@ define(function(require) {
 
 		},
 	},
-	{className: "GenericFormTabContentView"});
-	return GenericFormTabContentView;
+	{
+		typeName: "GenericFormTabContentView"
+	});
 });

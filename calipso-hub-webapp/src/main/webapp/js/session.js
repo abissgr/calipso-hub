@@ -10,9 +10,6 @@ function ($, _, Backbone, CalipsoApp, UserModel){
 
   var Session = Backbone.Model.extend({
 	  
-	  // The current user details
-	 userDetails: null,
-
     // Creating a new session instance will attempt to load
 	 // the user using a "remember me" cookie token, if one exists.
     initialize: function() {
@@ -21,7 +18,7 @@ function ($, _, Backbone, CalipsoApp, UserModel){
 
     // Returns true if the user is authenticated.
     isAuthenticated: function() {
-      return this.userDetails != null && this.userDetails.get("id") != null;
+      return CalipsoApp.userDetails != null && CalipsoApp.userDetails.get("id") != null;
     },
 
     // Saving will try to login the user
@@ -36,7 +33,8 @@ function ($, _, Backbone, CalipsoApp, UserModel){
 					// If the login was successful set the user for the whole application.
 					// Also do post-successful login stuff, e.g. redirect to previous page.
 					if (model.id) {
-						_self.userDetails = userDetails;
+
+						vent.trigger('session:created', model);
 						if(false/*CalipsoApp.afterLoginRedirectUrl*/){
 							
 						}
@@ -68,10 +66,11 @@ function ($, _, Backbone, CalipsoApp, UserModel){
    	var _self = this;
    	 // Backbone.methodOverride = true;
    	new UserModel().fetch({
+   		async:false,
  			url: CalipsoApp.getCalipsoAppBaseUrl() + "/api-auth/userDetails/remembered",
  			success: function(model, response, options) {
  				if (model.id) {
- 					_self.userDetails = model;
+ 					CalipsoApp.userDetails = model;
  				}
  			}
  		});
@@ -79,11 +78,11 @@ function ($, _, Backbone, CalipsoApp, UserModel){
  	},
    // Logout the user here and on the server side.
  	destroy: function () {
-   	 if (this.userDetails) {
-   		 this.userDetails.url = CalipsoApp.getCalipsoAppBaseUrl() + "/api-auth/userDetails/logout";
-   		 this.userDetails.save();
-   		 this.userDetails.clear();
-   		 this.userDetails = null;
+   	 if (CalipsoApp.userDetails) {
+   		 CalipsoApp.userDetails.url = CalipsoApp.getCalipsoAppBaseUrl() + "/api-auth/userDetails/logout";
+   		 CalipsoApp.userDetails.save();
+   		 CalipsoApp.userDetails.clear();
+   		 CalipsoApp.userDetails = null;
  		}
     }
 

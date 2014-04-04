@@ -10,5 +10,8 @@ define([ 'underscore', 'marionette', 'hbs!template/applayout' ], function(_, Mar
 //		initialize : function(options) {
 //			$('body').removeClass('stripes-bg');
 //		}
+	},
+	{
+		typeName: "AppLayoutView"
 	});
 });

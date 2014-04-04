@@ -30,7 +30,6 @@ define(function(require) {
 	var TabLayout = Backbone.Marionette.Layout.extend({
 		template : tmpl,
 		tagName : "div",
-		className : "panel",
 		regions : {
 			tabLabelsRegion : '#calipsoTabLabelsRegion',
 			tabContentsRegion : '#calipsoTabContentsRegion'
@@ -50,7 +49,7 @@ define(function(require) {
 	},
 	// static members
 	{
-		className : "TabLayout",
+		typeName : "TabLayout",
 	});
 
 	var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({

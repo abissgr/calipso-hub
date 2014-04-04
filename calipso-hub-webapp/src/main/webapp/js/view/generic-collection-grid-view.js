@@ -77,7 +77,7 @@ define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user
 	},
 	// static members
 	{
-		className: "GenericCollectionGridView",
+		typeName: "GenericCollectionGridView",
 	});
 	return GenericCollectionGridView;
 });

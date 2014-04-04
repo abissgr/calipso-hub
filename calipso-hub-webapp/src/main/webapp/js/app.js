@@ -65,7 +65,7 @@ define(function(require) {
   app.on("initialize:after", function() {
  	 console.log("app event initialize:after");
 		//	this.tryRememberMe();
-		 app.headerRegion.show(new HeaderView());
+		 app.headerRegion.show(new HeaderView({model: app.userDetails}));
 		// app.mainContentNavRegion.show(new MainContentNavView());
 		 app.footerRegion.show(new FooterView());
 		 
@@ -75,8 +75,28 @@ define(function(require) {
 
   });
   app.vent.on('app:show', function(appView) {
-	 	 console.log("vent event app:show");
+	 	 console.log("vent event app:show, appView: "+appView.typeName);
 	    app.mainContentRegion.show(appView);
+	  });
+  app.vent.on('session:created', function(userDetails) {
+	 	 console.log("vent event session:created");
+	 	 app.userDetails = userDetails;
+		 app.headerRegion.show(new HeaderView({model: app.userDetails}));
+
+			// send logged in user on their way
+			var fw = app.fw ? app.fw : "/client/home";
+			console.log("session:created, update model: "+app.userDetails.get("email")+", navigating to: "+fw);
+
+			Backbone.history.navigate(fw, {
+				trigger : true
+			});
+			//window.location = fw;
+	  });
+  app.vent.on('session:destroy', function(userDetails) {
+	  session.destroy();
+		Backbone.history.navigate("client/login", {
+			trigger : true
+		});
 	  });
   app.vent.on('nav-menu:change', function(modelkey) {
 	 	 console.log("vent event nav-menu:change");

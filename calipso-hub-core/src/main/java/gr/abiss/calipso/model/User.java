@@ -97,7 +97,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	private Short loginAttempts = 0;
 
 	@Column(name = "active")
-	private Boolean active = false;
+	private Boolean active = true;
 
 	@Column(name = "inactivation_reason")
 	private String inactivationReason;

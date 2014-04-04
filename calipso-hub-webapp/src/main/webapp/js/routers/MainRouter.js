@@ -27,10 +27,10 @@ define(function(require) {
 //	   controller: MainController,
 
 		appRoutes : {
-			'' : 'mainNavigationCrudRoute',
-			'client' : 'mainNavigationCrudRoute',
-			'client/' : 'mainNavigationCrudRoute',
-			'client/home' : 'mainNavigationCrudRoute',
+			//'' : 'home',
+			'client' : 'home',
+			'client/' : 'home',
+			'client/home' : 'home',
 			'client/login' : 'login',
 			'client/logout' : 'logout',
 //			'client/users' : 'mainNavigationRoute',

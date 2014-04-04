@@ -26,6 +26,9 @@ function (Marionette, clientLayoutTemplate) {
 				contentRegion: "#client-layout-region-content"
 		    };
 		}
+	},
+	{
+		typeName: "ClientLayout"
 	});
     return ClientLayout;
 });

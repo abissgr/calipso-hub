@@ -55,11 +55,11 @@ public class UserDetails implements SocialUserDetails/*
 
 
 	private String id;
-	@JsonProperty(value = "userName")
+	@JsonProperty(value = "username")
 	private String username;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
-	@JsonProperty(value = "userPassword")
+	@JsonProperty(value = "password")
 	private String password;
 	private Date lastPassWordChangeDate;
 

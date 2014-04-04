@@ -32,7 +32,7 @@ define([ 'underscore', 'marionette', 'hbs!template/generic-search-layout', 'view
 	},
 	// static members
 	{
-		className: "GenericSearchLayout",
+		typeName: "GenericSearchLayout",
 	});
 	return GenericSearchLayout;
 });

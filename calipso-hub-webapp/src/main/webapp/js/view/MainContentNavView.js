@@ -29,7 +29,10 @@ function (Marionette, tmpl) {
 				console.log("MainContentTabsView onDomRefresh");
 			}
 
-    });
+    },
+ 	{
+ 		typeName: "MainContentNavView"
+ 	});
     return MainContentNavView;
 });
 

@@ -3,7 +3,8 @@ define(['backbone', 'app'], function(Backbone, app) {
   return Backbone.Model.extend({
 
 		modelKey: "login",
-    url: app.config.apiUrl + '/login',
+
+		url:app.getCalipsoAppBaseUrl()+'/api-auth/userDetails',
 
     defaults: {
       email    : '',

@@ -100,23 +100,23 @@ define([ 'app', 'backbone', 'backbone-pageable' ], function(CalipsoApp, Backbone
 		// return resp.content;
 		// }
 		parse : function(response) {
-			console.log("GenericCollection#parse, model: "+this.model.toSource()+", className: "+this.model.className);
+			//console.log("GenericCollection#parse, model: "+this.model.toSource()+", className: "+this.model.className);
 			_self = this;
 			this.total = response.totalElements;
 			this.totalPages = response.totalPages;
 			superModelAwareInstances = [];
-			console.log("GenericCollection#parse, items: "+response.content.length);
+			//console.log("GenericCollection#parse, items: "+response.content.length);
 			var modelItem;
 			var superModelAwareInstance;
 			for(var i=0; i < response.content.length; i++){
 				modelItem = response.content[i];
-				if(modelItem && modelItem.get){
+				if(modelItem){
 					// make Backbone Supermodel aware of this item
-					console.log("GenericCollection#parse model: "+modelItem.get("id"));
+					//console.log("GenericCollection#parse model: "+modelItem.id);
 					superModelAwareInstance = _self.model.create(modelItem);
 					superModelAwareInstance.collection = _self;
 					// add to results
-					console.log("GenericCollection#parse adding: "+superModelAwareInstance.get("id"));
+					//console.log("GenericCollection#parse adding: "+superModelAwareInstance.get("id"));
 					superModelAwareInstances.push(superModelAwareInstance);
 				}
 			}

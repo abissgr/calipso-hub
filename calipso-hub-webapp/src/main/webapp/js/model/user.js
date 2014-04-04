@@ -17,12 +17,26 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ], function(GenericModel, EditInTabCell, ViewInTabCell) {
+
+	var templateNoLabel = _.template('\
+			    <div class="form-group field-<%= key %>">\
+			      <div class="col-sm-11">\
+			        <span data-editor></span><p class="help-block" data-error></p><p class="help-block"><%= help %></p>\
+			      </div>\
+			    </div>\
+			  ');
 	var UserModel = GenericModel.extend({
 		urlRoot : "/api/rest/users",
 		schemaComplete : function() {
 			return {//
 				userName : {
-					"search" : 'Text',
+					"search" : {
+						type : 'Text',
+						template : templateNoLabel,
+						editorAttrs : {
+							placeholder : "Αριθμός Πελάτη"
+						},
+					},
 					"update" : {
 						type : 'Text',
 						validators : [ 'required' ],

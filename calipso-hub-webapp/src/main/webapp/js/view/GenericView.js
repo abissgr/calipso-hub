@@ -36,7 +36,7 @@ define(function(require) {
 	},
 	// static members
 	{
-		className : "GenericView",
+		typeName : "GenericView",
 	});
 	return GenericView;
 });

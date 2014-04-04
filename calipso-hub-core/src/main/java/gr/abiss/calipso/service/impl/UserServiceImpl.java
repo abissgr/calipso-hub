@@ -71,10 +71,11 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public User findByCredentials(String userNameOrEmail, 	String password, Map metadata) {
-		if(LOGGER.isDebugEnabled()) LOGGER.debug("findByCredentials, userNameOrEmail: " + userNameOrEmail + ", metadata: " + metadata);
+		if(LOGGER.isDebugEnabled()) LOGGER.debug("findByCredentials, userNameOrEmail: " + userNameOrEmail + ", password: " + password + ", metadata: " + metadata);
 		User user = null;
 		try {
 			user = this.repository.findByCredentials(userNameOrEmail, password);
+			LOGGER.error("findByCredentials: matched user: "+user);
 			if (user != null && !CollectionUtils.isEmpty(metadata)) {
 				List<Metadatum> saved = this.repository.addMetadata(user.getId(), metadata);
 				for (Metadatum meta : saved) {

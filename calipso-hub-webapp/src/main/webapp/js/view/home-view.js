@@ -29,6 +29,9 @@ function (Backbone, Marionette, homeTemplate) {
 //            this.render();
 //        }
 
-    });
+    },
+ 	{
+ 		typeName: "HomeView"
+ 	});
     return HomeView;
 });

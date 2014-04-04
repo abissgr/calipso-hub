@@ -9,6 +9,9 @@ define(['underscore', 'marionette', 'hbs!template/notfound'], function(_, Marion
       _.bindAll(this);
     }
 
-  });
+  },
+	{
+		typeName: "NotFoundView"
+	});
 
 });

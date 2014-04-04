@@ -12,6 +12,9 @@ define(['underscore', 'marionette', 'hbs!template/loading'], function (_, Marion
       this.model.set(opt.loadingViewData, { silent: true });
     }
 
-  });
+  },
+	{
+		typeName: "LoadingView"
+	});
 
 });

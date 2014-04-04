@@ -118,6 +118,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	// @Transactional(readOnly = false)
 	@Override
 	public UserDetails create(final UserDetails tryUserDetails) {
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("Trying to login with: "+tryUserDetails);
+		}
 		UserDetails userDetails = null;
 		if (tryUserDetails != null) {
 			try {

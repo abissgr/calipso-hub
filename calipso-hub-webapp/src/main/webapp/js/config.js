@@ -26,7 +26,7 @@ require.config({
 		'backbone-forms-bootstrap3' : 'lib/backbone-forms-bootstrap3',
 		'bootstrap-markdown' : 'lib/bootstrap-markdown',
 		'backbone-validation' : 'lib/resthub/backbone-validation-ext',
-		'marionette' : 'lib//backbone.marionette',
+		'marionette' : 'lib/backbone.marionette',
 		'handlebars-orig' : 'lib/handlebars',
 		'handlebars' : 'lib/resthub/handlebars-helpers',
 		'backbone-queryparams' : 'lib/backbone-queryparams',

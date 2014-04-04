@@ -42,8 +42,13 @@ define(function(require) {
 
 	var AbstractController = Marionette.Controller.extend({
 		constructor: function(options){
-
+			this.userDetails = session.userDetails;
 			Marionette.Controller.prototype.constructor.call(this, options);
+			this._initializeLayout(options);
+
+		},
+		_initializeLayout : function(options){
+			// console.log('AbstractController#_initializeLayout');
 			if(options && options.layout){
 				this.layout = options.layout;
 			}
@@ -52,25 +57,27 @@ define(function(require) {
 					model : session
 				});
 			}
+
+			console.log('AbstractController#_initializeLayout, this.layout: ' + ((this.layout && this.layout.typeName) ? this.layout.typeName : this.layout));
 			this.layout.on("show", function() {
 				vent.trigger("layout:rendered");
 			});
 
 			vent.trigger('app:show', this.layout);
-
 		},
-//		home : function() {
-//
-//			if (!session.isAuthenticated()) {
-//				Backbone.history.navigate("client/login", {
-//					trigger : true
-//				});
-//				return false;
-//			}
-//			var homeView = new HomeView();
-//			_initializeLayout();
-//			MainController.layout.contentRegion.show(homeView);
-//		},
+		home : function() {
+			console.log("AbstractController#home");
+			if (!session.isAuthenticated()) {
+				Backbone.history.navigate("client/login", {
+					trigger : true
+				});
+				return false;
+			}
+			//var homeView = new HomeView();
+			this._initializeLayout({layout: new GenericHomeLayout({
+				model : session
+			})});
+		},
 
 		login : function() {
 
@@ -89,7 +96,7 @@ define(function(require) {
 		},
 
 		authenticate : function(args) {
-//			console.log('MainController authenticate called');
+			// console.log('MainController authenticate called');
 			var self = this;
 			var email = this.$('input[name="email"]').val();
 			var password = this.$('input[name="password"]').val();
@@ -97,7 +104,7 @@ define(function(require) {
 			$.when(this.model.authenticate(email, password)).then(function(model, response, options) {
 				session.save(model);
 				session.load();
-//				console.log('MainController authenticate navigating to home');
+				// console.log('MainController authenticate navigating to home');
 				Backbone.history.navigate("client/home", {
 					trigger : true
 				});
@@ -107,10 +114,8 @@ define(function(require) {
 		},
 
 		logout : function() {
-			session.destroy();
-			Backbone.history.navigate("client/login", {
-				trigger : true
-			});
+
+			app.vent.trigger('session:destroy', model);
 		},
 		notFoundRoute : function(path) {
 //			console.log("notFoundRoute, path: "+path);
@@ -137,13 +142,14 @@ define(function(require) {
 			// get secondary route part
 			routeHelper.contentNavTabName = contentNavTabName ? contentNavTabName : "Search";
 			
-			console.log("AbstractController#buildRouteHelper, contentNavTabName: "+ routeHelper.contentNavTabName);
+			// console.log("AbstractController#buildRouteHelper, contentNavTabName: "+ routeHelper.contentNavTabName);
 			// get route model class
 			routeHelper.modelClass = require("model/" + _.singularize( routeHelper.mainRoutePart ));
 
 			console.log("AbstractController#buildRouteHelper, loaded model class: "+routeHelper.modelClass.className);
 			var searchModelClass = routeHelper.modelClass.searchModel ?  routeHelper.modelClass.searchModel : routeHelper.modelClass
-			// get route collection if applicable
+			
+					// get route collection if applicable
 			// a client side model might be an alias for another server model
 			console.log("AbstractController#buildRouteHelper, updating this.searchResults");
 			this.searchResults = new GenericCollection([], {
@@ -154,20 +160,25 @@ define(function(require) {
 				modelClass : routeHelper.modelClass,
 				wrappedCollection : this.searchResults
 			};
-			if(routeHelper.mainRoutePart == "homes"){
-				wrapperModelOptions.itemView = GenericHomeLayout;
-				console.log("AbstractController#buildRouteHelper, set wrapperModelOptions.itemView: "+GenericHomeLayout.className);
-			}
 			routeHelper.routeModel = new GenericCollectionWrapperModel(wrapperModelOptions);
 			return routeHelper;
 		},
 		mainNavigationCrudRoute : function(mainRoutePart, contentNavTabName) {
-
+			
 			this.tryExplicitRoute(mainRoutePart, contentNavTabName);
 			var routeHelper = this.buildRouteHelper(mainRoutePart, contentNavTabName);
-			
+
+			if (!CalipsoApp.userDetails) {
+				CalipsoApp.fw = "/client/"+routeHelper.mainRoutePart+"/"+routeHelper.contentNavTabName;
+				Backbone.history.navigate("client/login", {
+					trigger : true
+				});
+
+				$('#session-info').hide();
+				return false;
+			}
 			var _self = this;
-			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + routeHelper.mainRoutePart + ", contentNavTabName: " + routeHelper.contentNavTabName);
+			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + routeHelper.mainRoutePart + ", contentNavTabName: " + routeHelper.contentNavTabName + ", mainAreaChange: " + routeHelper.mainAreaChange);
 			if(!this.tabs || routeHelper.mainAreaChange){
 				this.initCrudLayout(routeHelper);
 			}
@@ -177,19 +188,19 @@ define(function(require) {
 					var showModel = routeHelper.modelClass.all().get(routeHelper.contentNavTabName);
 					if(showModel){
 						// tab keys index updated automatically
-						console.log("adding new tab for existing model: " + showModel.get("id"));
+						// console.log("adding new tab for existing model: " + showModel.get("id"));
 						_self.tabs.add(showModel);
 					}
 					else{
 						showModel = routeHelper.modelClass.create({id:routeHelper.contentNavTabName});
 						showModel.fetch().then(function(){
-							console.log("adding new tab for fetched model: " + showModel.get("id"));
+							// console.log("adding new tab for fetched model: " + showModel.get("id"));
 							_self.tabs.add(showModel);
 						});
 					}
 				}
 				else{
-					console.log("showing existing tab");
+					// console.log("showing existing tab");
 				}
 			}
 
@@ -197,16 +208,20 @@ define(function(require) {
 
 		},
 		initCrudLayout : function(routeHelper){
+			if((!this.layout) || this.layout.className != "AppLayoutView"){
+		      // console.log("AbstractController#initCrudLayout, calling this._initializeLayout()");
+				this._initializeLayout();
+			}
+			else{
+		      // console.log("AbstractController#initCrudLayout, not updating this.layout: "+this.layout.className);
+			}
 			var _self = this;
-			// update grid collection
 			
-			console.log("AbstractController#mainNavigationCrudRoute, searchResultsModel.get(name): "+
-					routeHelper.routeModel.get("name"));
 			var TabModel      = Backbone.Model.extend();
 			var TabCollection = Backbone.Collection.extend({ 
 				model: GenericModel,
 			   initialize: function () {
-			        console.log("AbstractController#mainNavigationCrudRoute, TabCollection initializing");
+			        // console.log("AbstractController#initCrudLayout, TabCollection initializing");
 			        this.bind('add', this.onModelAdded, this);
 			        this.bind('remove', this.onModelRemoved, this);
 			    }, 
@@ -248,7 +263,7 @@ define(function(require) {
 				$('#calipsoTabLabelsRegion li.active').removeClass('active');
 				$('#generic-crud-layout-tab-label-' + contentNavTabName).addClass('active');
 				// show coressponding content
-				console.log("show tab: "+contentNavTabName);
+				// console.log("show tab: "+contentNavTabName);
 				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');
 				$('#calipsoTabContentsRegion .tab-pane').addClass('hidden');
 				$('#tab-' + contentNavTabName).removeClass('hidden');

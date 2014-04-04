@@ -172,6 +172,10 @@ HttpServletRequest request,
 	@RequestMapping(value = "userDetails", method = RequestMethod.POST)
 	@ResponseBody
 	public UserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("Trying to login with: "+resource);
+		}
 		try {
 			UserDetails userDetails = resource != null ? this.service
 					.create(resource) : null;
