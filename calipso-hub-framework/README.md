@@ -13,8 +13,7 @@
 
 ## About calipso-hub-framework
 
-The calipso-hub-framework is part of [calipso-hub][calipso-hub]. The module is available under the [Apache License, Version 2.0][license-asl] 
-and provides a number of enhancements for your [RESTHub][resthub]-based projects.
+The calipso-hub-framework is part of [calipso-hub][calipso-hub]. The module provides a number of enhancements for your [RESTHub][resthub]-based Spring projects.
 
 
 ## Installation

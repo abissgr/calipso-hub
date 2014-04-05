@@ -22,7 +22,6 @@ define(function(require) {
 	tmpl = require('hbs!template/GenericFormView');
 	var GenericFormView = Marionette.ItemView.extend({
 		// Define view template
-		tagName : 'div',
 		template : tmpl,
 		initialize: function(options){
 			// set schema action/key

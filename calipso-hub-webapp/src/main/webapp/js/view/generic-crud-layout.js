@@ -30,6 +30,7 @@ define(function(require) {
 	var TabLayout = Backbone.Marionette.Layout.extend({
 		template : tmpl,
 		tagName : "div",
+		className : "col-sm-12",
 		regions : {
 			tabLabelsRegion : '#calipsoTabLabelsRegion',
 			tabContentsRegion : '#calipsoTabContentsRegion'
