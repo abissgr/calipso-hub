@@ -30,8 +30,8 @@ function( vent, BackboneForm, Backgrid, Markdown) {
 				e.stopPropagation();
 				e.preventDefault();
 				var rowModel = this.model;
-				console.log("editRow, rowModel: "+rowModel.constructor.name);
-				vent.trigger("openGridRowInTab", rowModel);
+				console.log("editRow, rowModel: "+rowModel.getTypeName());
+				vent.trigger("ViewInTabCell:viewGridRow", rowModel);
 
 //				Backbone.history.navigate("client/"+rowModel.get("apiUrlSegment")+"/"+rowModel.get("id"), {
 //					trigger : true

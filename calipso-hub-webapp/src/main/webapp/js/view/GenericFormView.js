@@ -55,7 +55,7 @@ define(function(require) {
 			this.formTemplate = this.options.formTemplate? this.options.formTemplate : BackboneForm.template;
 
 			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + 
-					",  searchResultsCollection: " + this.searchResultsCollection.length + 
+					",  searchResultsCollection: " + 
 					" of type " + this.model.getTypeName());
 			
 			// console.log("GenericFormView#onShow, formSchemaKey:

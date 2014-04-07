@@ -10,11 +10,12 @@ define([
   'model/user',
   'model/userDetails',
   'view/md-browse-layout',
-  'view/md-search-layout'
+  'view/md-search-layout',
+  'view/GenericFormView'
 ],
 
 function ($, _, Backbone, GenericModel, HostModel, ResourceModel, PageModel, TextModel, UserModel, UserDetailsModel, 
-		ModelDrivenBrowseLayout, ModelDrivenSearchLayout){
+		ModelDrivenBrowseLayout, ModelDrivenSearchLayout, GenericFormView){
 
   var modelsConfig = {
 		  models : {
@@ -30,6 +31,7 @@ function ($, _, Backbone, GenericModel, HostModel, ResourceModel, PageModel, Tex
 		  layouts : {
 			  ModelDrivenBrowseLayout: ModelDrivenBrowseLayout,
 			  ModelDrivenSearchLayout: ModelDrivenSearchLayout,
+			  GenericFormView: GenericFormView,
 		  }
   };
 

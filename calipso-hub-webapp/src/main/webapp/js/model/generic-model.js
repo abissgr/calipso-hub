@@ -156,6 +156,8 @@ function(Backbone, Supermodel, Backgrid) {
 		 * @see {@link GenericModel.prototype.getItemViewType}
 		 */
 		getItemViewType : function() {
+
+			console.log("GenericModel.getItemViewType() called, will return GenericFormView");
 			return this.prototype.getItemViewType();
 		},
 		/**
@@ -308,8 +310,8 @@ function(Backbone, Supermodel, Backgrid) {
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
 	 */
 	GenericModel.prototype.getItemViewType = function() {
-		console.log("GenericModel.prototype.getItemViewType() called, will return GenericFormViewt");
-		return require('view/GenericFormViewt');
+		console.log("GenericModel.prototype.getItemViewType() called, will return GenericFormView");
+		return require('view/GenericFormView');
 	}
 	
 	/**
