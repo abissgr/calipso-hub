@@ -172,6 +172,7 @@ function(Backbone, Supermodel, Backgrid) {
 		 * @see {@link GenericModel.prototype.getFormSchema}
 		 */
 		getFormSchemas : function() {
+			console.log("GenericModel.getFormSchemas");
 			return this.prototype.getFormSchemas();
 		},
 		/**
@@ -189,7 +190,7 @@ function(Backbone, Supermodel, Backgrid) {
 		 */
 		getFormSchema : function(actionName) {
 			// decide based on model persistence state if no action was given
-			console.log("GenericModel.prototype.schema, actionName: " + actionName);
+			console.log("GenericModel.getFormSchema, actionName: " + actionName);
 			if (!actionName) {
 				console.log("GenericModel.prototype.schema, this: " + this);
 				console.log("GenericModel.prototype.schema, caller is " + arguments.callee.caller.toString());
@@ -198,7 +199,7 @@ function(Backbone, Supermodel, Backgrid) {
 			// the schema to build for the selected action
 			var formSchema = {};
 			// get the complete schema to filter out from
-			var formSchemas = this.formSchemas();
+			var formSchemas = this.getFormSchemas();
 			// console.log("GenericModel#schema actionName: "+actionName+",
 			// formSchemas: "+formSchemas);
 
@@ -277,8 +278,8 @@ function(Backbone, Supermodel, Backgrid) {
 	 * Override this in your subclass to declaratively define 
 	 * form views for the default or custom actions
 	 */
-	GenericModel.prototype.getFormSchema = function() {
-		console.log("GenericModel.prototype.getFormSchemad() called, will return undefined");
+	GenericModel.prototype.getFormSchemas = function() {
+		console.log("GenericModel.prototype.getFormSchema() called, will return undefined");
 		return undefined;
 	}
 

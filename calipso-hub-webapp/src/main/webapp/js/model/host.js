@@ -39,6 +39,7 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'c
 				return require('view/md-search-layout')
 			}
 			HostModel.prototype.getFormSchemas = function() {
+				console.log("HostModel.prototype.getFormSchemas() called, will return undefined");
 				return {//
 					domain : {
 						"search": 'Text',

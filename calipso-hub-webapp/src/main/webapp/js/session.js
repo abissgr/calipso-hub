@@ -1,15 +1,15 @@
-define([ 'jquery', 'underscore', 'backbone', 'model/userDetails', 'model/user' ],
+define([ 'jquery', 'underscore', 'backbone', 'vent' ],
 
-function($, _, Backbone, UserDetailsModel, UserModel) {
+function($, _, Backbone, vent) {
 	var baseUrl;
 	var calipsoMainScript = document.getElementById("calipso-script-main");
 	// calipso in host page
 	if (calipsoMainScript) {
 		var basePathEnd = calipsoMainScript.src.indexOf("/js/lib/require.js");
-		this.baseUrl = calipsoMainScript.src.substring(0, basePathEnd);
+		baseUrl = calipsoMainScript.src.substring(0, basePathEnd);
 	} else {
 		// fallback, will only work with a root web application context
-		this.baseUrl = window.location.protocol + "//" + window.location.host;
+		baseUrl = window.location.protocol + "//" + window.location.host;
 	}
 	console.log("session, base URL:" + baseUrl);
 
@@ -63,7 +63,7 @@ function($, _, Backbone, UserDetailsModel, UserModel) {
 			var userNameOrEmail = model.get('email') ? model.get('email') : model.get('username');
 			new UserDetailsModel().save({
 				email : userNameOrEmail,
-				userPassword : model.get('password')
+				password : model.get('password')
 			}, {
 				success : function(model, response) {
 					// If the login was successful set the user for the whole
