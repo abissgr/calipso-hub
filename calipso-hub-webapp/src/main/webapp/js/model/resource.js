@@ -25,11 +25,17 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 			},
 			// static members
 			{
-				className: "ResourceModel",
 				parent: GenericModel
 			});
 
-			ResourceModel.prototype.schemaComplete = function() {
+			/**
+			 * Get the model class URL fragment corresponding this class
+			 * @returns the URL path fragment as a string
+			 */
+			ResourceModel.prototype.getPathFragment = function() {
+				return "resources";
+			}
+			ResourceModel.prototype.getFormSchemas = function() {
 				var schema = {//
 					"host" : {
 						"default": {

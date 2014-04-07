@@ -11,7 +11,7 @@ define(['underscore', 'marionette', 'hbs!template/notfound'], function(_, Marion
 
   },
 	{
-		typeName: "NotFoundView"
+		getTypeName: function(){return "NotFoundView"}
 	});
 
 });

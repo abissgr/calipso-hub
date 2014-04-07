@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'app', 'backbone-forms', 'backgrid', 'bootstrap-markdown','backbone-forms-bootstrap3' ],
-function( CalipsoApp, BackboneForm, Backgrid, Markdown) {
+define([ 'vent', 'backbone-forms', 'backgrid', 'bootstrap-markdown','backbone-forms-bootstrap3' ],
+function( vent, BackboneForm, Backgrid, Markdown) {
 	var ViewInTabCell = Backgrid.StringCell.extend({
 
 		  /** @property */
@@ -31,7 +31,11 @@ function( CalipsoApp, BackboneForm, Backgrid, Markdown) {
 				e.preventDefault();
 				var rowModel = this.model;
 				console.log("editRow, rowModel: "+rowModel.constructor.name);
-				CalipsoApp.vent.trigger("openGridRowInTab", rowModel);
+				vent.trigger("openGridRowInTab", rowModel);
+
+//				Backbone.history.navigate("client/"+rowModel.get("apiUrlSegment")+"/"+rowModel.get("id"), {
+//					trigger : true
+//				});
 			},
 
 		  render: function () {

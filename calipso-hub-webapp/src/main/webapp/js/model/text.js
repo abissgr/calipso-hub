@@ -25,39 +25,46 @@ define([ 'bootstrap-markdown', 'component/backbone-forms-editor-markdown',
 			//Backbone.Form.editors.Markdown
 			var TextModel = ResourceModel.extend({
 				modelKey: "text",
-				schemaComplete : function() {
-					// superclass schema
-					var superSchema = TextModel.__super__.schemaComplete.call(this);
-					// own schema
-					var schema = {
-						"sourceContentType" : {
-							"search": { type: 'Select', options: [ 'text/plain', 'text/x-markdown', 'text/html' ] },
-							"default": { 
-								type: 'Select', 
-								options: [ 'text/plain', 'text/x-markdown', 'text/html' ], 	
-								validators : [ 'required' ]
-							}
-						},
-						"source" : {
-							"search": 'Text',
-							"default": {
-								type: BackboneFormMarkdown,
-								validators : [ 'required' ],
-								editorAttrs: { "data-provide": 'markdown' }
-							},
-						}
-						
-					};
-					// return merged schemas
-					return $.extend({}, superSchema, schema);
-				},
 			},
 			// static members
 			{
-				className: "TextModel",
 				parent: ResourceModel
 			});
 
+			/**
+			 * Get the model class URL fragment corresponding this class
+			 * @returns the URL path fragment as a string
+			 */
+			TextModel.prototype.getPathFragment = function() {
+				return "texts";
+			}
+			TextModel.prototype.getFormSchemas = function() {
+				// superclass schema
+				var superSchema = TextModel.parent.getFormSchemas();
+				// own schema
+				var schema = {
+					"sourceContentType" : {
+						"search": { type: 'Select', options: [ 'text/plain', 'text/x-markdown', 'text/html' ] },
+						"default": { 
+							type: 'Select', 
+							options: [ 'text/plain', 'text/x-markdown', 'text/html' ], 	
+							validators : [ 'required' ]
+						}
+					},
+					"source" : {
+						"search": 'Text',
+						"default": {
+							type: BackboneFormMarkdown,
+							validators : [ 'required' ],
+							editorAttrs: { "data-provide": 'markdown' }
+						},
+					}
+					
+				};
+				// return merged schemas
+				return $.extend({}, superSchema, schema);
+			}
+			
 			TextModel.prototype.getGridSchema = function() {
 				var superSchema = ResourceModel.prototype.getGridSchema();
 				var localSchema = [/*{

@@ -16,20 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'app', 'backbone', 'backbone-pageable' ], function(CalipsoApp, Backbone, BackbonePageableCollection) {
+define([ 'session', 'backbone', 'backbone-pageable' ], function(session, Backbone, BackbonePageableCollection) {
 	var GenericCollection = Backbone.PageableCollection.extend({
 		mode : "server",
 		initialize : function(attributes, options) {
 			if (options.model) {
 				this.model = options.model.searchModel ? options.model.searchModel : options.model;
 				this.modelClass = this.model;
-			}
-			
-			// use url from unwrapped model
-			if(options.url){
-				//this.url = options.url;
-				console.log("GenericCollection#initialize, given URL: " + this.url + ", model: "+this.model.className);
-				
 			}
 			
 			// use given grid columns if provided, or the
@@ -100,7 +93,7 @@ define([ 'app', 'backbone', 'backbone-pageable' ], function(CalipsoApp, Backbone
 		// return resp.content;
 		// }
 		parse : function(response) {
-			//console.log("GenericCollection#parse, model: "+this.model.toSource()+", className: "+this.model.className);
+			//console.log("GenericCollection#parse, model: "+this.model.toSource()+", className: "+this.model.getTypeName());
 			_self = this;
 			this.total = response.totalElements;
 			this.totalPages = response.totalPages;

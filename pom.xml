@@ -11,7 +11,7 @@
 	<inceptionYear>2005</inceptionYear>
 	<groupId>gr.abiss.calipso</groupId>
 	<artifactId>calipso-hub</artifactId>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<organization>
 		<name>abiss.gr</name>

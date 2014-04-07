@@ -1,10 +1,10 @@
-define(['backbone', 'app'], function(Backbone, app) {
+define(['backbone', 'session'], function(Backbone, session) {
 
   return Backbone.Model.extend({
 
 		modelKey: "login",
 
-		url:app.getCalipsoAppBaseUrl()+'/api-auth/userDetails',
+		url: session.getBaseUrl()+'/api-auth/userDetails',
 
     defaults: {
       email    : '',

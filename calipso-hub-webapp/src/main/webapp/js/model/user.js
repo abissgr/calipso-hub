@@ -16,7 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ], function(GenericModel, EditInTabCell, ViewInTabCell) {
+define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ], 
+		function(GenericModel, EditInTabCell, ViewInTabCell) {
 
 	var templateNoLabel = _.template('\
 			    <div class="form-group field-<%= key %>">\
@@ -27,62 +28,71 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'c
 			  ');
 	var UserModel = GenericModel.extend({
 		urlRoot : "/api/rest/users",
-		schemaComplete : function() {
-			return {//
-				userName : {
-					"search" : {
-						type : 'Text',
-						template : templateNoLabel,
-						editorAttrs : {
-							placeholder : "Αριθμός Πελάτη"
-						},
-					},
-					"update" : {
-						type : 'Text',
-						validators : [ 'required' ],
-						editorAttrs : {
-							'readonly' : 'readonly'
-						}
-					},
-					"default" : {
-						type : 'Text',
-						validators : [ 'required' ]
-					}
-				},
-				firstName : {
-					"search" : 'Text',
-					"default" : {
-						type : 'Text',
-						validators : [ 'required' ]
-					}
-				},
-				lastName : {
-					"search" : 'Text',
-					"default" : {
-						type : 'Text',
-						validators : [ 'required' ]
-					}
-				},
-				email : {
-					"search" : {
-						type : 'Text',
-						validators : [ 'email' ]
-					},
-					"default" : {
-						type : 'Text',
-						validators : [ 'required', 'email' ]
-					}
-				},
-			};
-		},
 	},
 	// static members
 	{
-		apiUrlSegment : "users",
-		className : "UserModel",
 		parent : GenericModel
 	});
 
+
+	/**
+	 * Get the model class URL fragment corresponding this class
+	 * @returns the URL path fragment as a string
+	 */
+	UserModel.prototype.getPathFragment = function() {
+		return "users";
+	}
+	UserModel.prototype.getFormSchemas = function() {
+
+		return {//
+			userName : {
+				"search" : {
+					type : 'Text',
+					template : templateNoLabel,
+					editorAttrs : {
+						placeholder : "Αριθμός Πελάτη"
+					},
+				},
+				"update" : {
+					type : 'Text',
+					validators : [ 'required' ],
+					editorAttrs : {
+						'readonly' : 'readonly'
+					}
+				},
+				"default" : {
+					type : 'Text',
+					validators : [ 'required' ]
+				}
+			},
+			firstName : {
+				"search" : 'Text',
+				"default" : {
+					type : 'Text',
+					validators : [ 'required' ]
+				}
+			},
+			lastName : {
+				"search" : 'Text',
+				"default" : {
+					type : 'Text',
+					validators : [ 'required' ]
+				}
+			},
+			email : {
+				"search" : {
+					type : 'Text',
+					validators : [ 'email' ]
+				},
+				"default" : {
+					type : 'Text',
+					validators : [ 'required', 'email' ]
+				}
+			},
+		};
+	
+	}
+	
 	UserModel.prototype.getGridSchema = function() {
 		return [ {
 			name : "userName",

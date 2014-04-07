@@ -28,6 +28,7 @@ define(function(require) {
 		initialize: function(options){
 
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
+			this.getTypeName() = "GenericView";
 			this.$el.prop("id", "tab-"+this.model.get("id"));
 			
 			this.formTemplate = this.options.formTemplate? this.options.formTemplate : BackboneForm.template;
@@ -36,7 +37,7 @@ define(function(require) {
 	},
 	// static members
 	{
-		typeName : "GenericView",
+		getTypeName: function(){return "GenericView"}
 	});
 	return GenericView;
 });

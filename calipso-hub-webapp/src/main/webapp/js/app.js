@@ -20,12 +20,16 @@ define(function(require) {
 	var Backbone = require('backbone'),
 	Marionette = require('marionette'),
 	HeaderView = require('view/HeaderView'),
-	FooterView = require('view/FooterView');
+	FooterView = require('view/FooterView'),
+	modelsConfig = require('modules-config'),
+	session = require('session'),
+	vent = require('vent');
 	
 	
 
   var app = new Marionette.Application({
-	  routers: {}
+	  routers: {},
+	  models: modelsConfig.models
   });
   console.log("Backbone.Marionette.Application constructor returns: "+app);
   // application configuration
@@ -64,8 +68,11 @@ define(function(require) {
   // initialize header, footer, history
   app.on("initialize:after", function() {
  	 console.log("app event initialize:after");
-		//	this.tryRememberMe();
-		 app.headerRegion.show(new HeaderView({model: app.userDetails}));
+		//	try "remember me"
+ 	 	session.load();
+ 	 	// render basic structure
+		 app.headerRegion.show(new HeaderView({
+			model : session.userDetails}));
 		// app.mainContentNavRegion.show(new MainContentNavView());
 		 app.footerRegion.show(new FooterView());
 		 
@@ -74,40 +81,41 @@ define(function(require) {
 		 // { pushState: true, hashChange: false, root: "/" }
 
   });
-  app.vent.on('app:show', function(appView) {
-	 	 console.log("vent event app:show, appView: "+appView.typeName);
+  vent.on('app:show', function(appView) {
+	  console.log("vent event app:show, appView: "+appView.getTypeName());
+	 	 
 	    app.mainContentRegion.show(appView);
 	  });
-  app.vent.on('session:created', function(userDetails) {
+  vent.on('session:created', function(userDetails) {
 	 	 console.log("vent event session:created");
-	 	 app.userDetails = userDetails;
-		 app.headerRegion.show(new HeaderView({model: app.userDetails}));
+	 	 session.userDetails = userDetails;
+		 app.headerRegion.show(new HeaderView({model: userDetails}));
 
 			// send logged in user on their way
 			var fw = app.fw ? app.fw : "/client/home";
-			console.log("session:created, update model: "+app.userDetails.get("email")+", navigating to: "+fw);
+			console.log("session:created, update model: "+userDetails.get("email")+", navigating to: "+fw);
 
 			Backbone.history.navigate(fw, {
 				trigger : true
 			});
 			//window.location = fw;
 	  });
-  app.vent.on('session:destroy', function(userDetails) {
+  vent.on('session:destroy', function(userDetails) {
 	  session.destroy();
 		Backbone.history.navigate("client/login", {
 			trigger : true
 		});
 	  });
-  app.vent.on('nav-menu:change', function(modelkey) {
+  vent.on('nav-menu:change', function(modelkey) {
 	 	 console.log("vent event nav-menu:change");
 	  
 	 
   });
-  app.vent.on('modal:show', function(view) {
+  vent.on('modal:show', function(view) {
 	 	 console.log("vent event modal:show");
     app.modal.show(view);
   });
-  app.vent.on('modal:close', function() {
+  vent.on('modal:close', function() {
 	 	 console.log("vent event modal:close");
     app.modal.hideModal();
   });
@@ -134,22 +142,12 @@ define(function(require) {
     _(options.routers).each(function(routerClass) {
    	 console.log("initialize router type: "+router);
       var router = new routerClass();
-      app.routers[routerClass.className] = router;
+      app.routers[routerClass.getTypeName()] = router;
   	 console.log("initialized router: "+router);
     });
 
   });
   
-  app.getCalipsoAppBaseUrl = function() {
-		var calipsoMainScript = document.getElementById("calipso-script-main");
-		// calipso in host page
-		if (calipsoMainScript) { 
-			var basePathEnd = calipsoMainScript.src.indexOf("/js/lib/require.js");
-			return calipsoMainScript.src.substring(0, basePathEnd);
-		} else {
-			// calipso client
-			return window.location.protocol + "//" + window.location.host;
-		}
-	};
+  
   return app;
 });

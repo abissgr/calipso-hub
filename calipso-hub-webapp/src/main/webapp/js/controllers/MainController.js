@@ -19,7 +19,6 @@
 define(function(require) {
 	var Backbone = require('backbone'),
 	Marionette = require('marionette'),
-	CalipsoApp = require('app'),
 	session = require('session'),
 	vent = require('vent'),
 	AbstractController = require('controllers/abstract-controller');

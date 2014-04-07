@@ -1,5 +1,5 @@
-define([ 'underscore', 'marionette', 'hbs!template/applayout' ], function(_, Marionette, tmpl) {
-	return Marionette.Layout.extend({
+define([ 'view/abstract-layout-view', 'hbs!template/applayout' ], function(AbstractLayoutView, tmpl) {
+	return AbstractLayoutView.extend({
 		tagName: "div",
 		className : 'row',
 		template : tmpl,// _.template(templates.applayout),
@@ -7,11 +7,9 @@ define([ 'underscore', 'marionette', 'hbs!template/applayout' ], function(_, Mar
 			navRegion : "#calipsoAppLayoutNavRegion",
 			contentRegion : "#calipsoAppLayoutContentRegion"
 		},
-//		initialize : function(options) {
-//			$('body').removeClass('stripes-bg');
-//		}
 	},
 	{
-		typeName: "AppLayoutView"
+		getTypeName: function(){return "AppLayoutView"}
 	});
+	
 });

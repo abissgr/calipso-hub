@@ -44,7 +44,7 @@ define(function(require) {
 	},
 	// static members
 	{
-		className: "MainRouter",
+		getTypeName: function(){return "MainRouter"}
 	});
 
 });

@@ -1,28 +1,32 @@
-define([ 'app', 'underscore', 'marionette', 'hbs!template/generic-home-layout', 'view/GenericFormView', 'view/home-view', 
-         'collection/generic-collection', 'view/generic-search-layout', 'view/generic-collection-grid-view',
-         'model/generic-collection-wrapper-model', 'model/client'], 
-		function(CalipsoApp, _, Marionette, tmpl, GenericFormView, HomeView, 
-				GenericCollection, GenericSearchLayout, GenericCollectionGridView,
-				GenericCollectionWrapperModel, ClientModel) {
-	var GenericHomeLayout = GenericSearchLayout.extend({
+define([ 'session', 'vent', 'underscore', 'marionette', 'hbs!template/generic-home-layout', 'view/GenericFormView', 'view/home-view', 
+         'collection/generic-collection', 'view/md-browse-layout', 'view/md-collection-grid-view',
+         'model/user'], 
+		function(session, vent, _, Marionette, tmpl, GenericFormView, HomeView, 
+				GenericCollection, ModelDrivenBrowseLayout, GenericCollectionGridView,
+				UserModel) {
+	var GenericHomeLayout = ModelDrivenBrowseLayout.extend({
 		
 		tagName : 'div',
 		className : "row",
 		template: tmpl,
+		regions : {
+			sidebarRegion : "#calipsoModelDrivenBrowseLayout-",
+			contentRegion : "#calipsoModelDrivenBrowseLayout-ContentRegion"
+		},
 		onShow : function() {
 			var _this = this;
 			this.searchResultsCollection = new GenericCollection([], {
-				model : ClientModel,
-				url : CalipsoApp.getCalipsoAppBaseUrl() + "/api/rest/clients"
+				model : UserModel,
+				url : session.getBaseUrl() + "/api/rest/users"
 			});
-			var searchFormView = new GenericFormView({ formSchemaKey: "search", model: new ClientModel(), searchResultsCollection: this.searchResultsCollection});
+			var searchFormView = new GenericFormView({ formSchemaKey: "search", model: new UserModel(), searchResultsCollection: this.searchResultsCollection});
 			
-			this.searchCriteriaRegion.show(searchFormView);
+			this.sidebarRegion.show(searchFormView);
 			var homeView = new HomeView();
 	      this.searchResultsRegion.show(homeView);
 	      
 	      searchFormView.on("search:retreivedResults", function(searchResultsCollection){
-	      	console.log("GenericSearchLayout, searchFormView on search:retreivedResults"+searchResultsCollection.className);
+	      	console.log("ModelDrivenBrowseLayout, searchFormView on search:retreivedResults"+searchResultsCollection.getTypeName());
 	      	var wrapperModel = new GenericCollectionWrapperModel({
 					modelClass : searchResultsCollection.model,
 					wrappedCollection : searchResultsCollection
@@ -39,7 +43,7 @@ define([ 'app', 'underscore', 'marionette', 'hbs!template/generic-home-layout', 
 	},
 	// static members
 	{
-		typeName: "GenericHomeLayout",
+		getTypeName: function(){return "GenericHomeLayout"}
 	});
 	return GenericHomeLayout;
 });

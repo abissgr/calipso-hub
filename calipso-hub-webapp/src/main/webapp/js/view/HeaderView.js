@@ -19,7 +19,7 @@ define([ 'underscore', 'marionette', 'hbs!template/header' ], function(_, Marion
 
 	},
 	{
-		typeName: "HeaderView"
+		getTypeName: function(){return "HeaderView"}
 	});
 
 });

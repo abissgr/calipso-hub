@@ -1,6 +1,6 @@
-define([ 'underscore', 'marionette', 'hbs!template/generic-search-layout', 'view/GenericFormView', 'view/generic-collection-grid-view' ], 
-		function(_, Marionette, tmpl, GenericFormView, GenericCollectionGridView) {
-	var GenericSearchLayout = Marionette.Layout.extend({
+define([ 'underscore', 'marionette', 'view/abstract-layout-view', 'hbs!template/generic-search-layout', 'view/GenericFormView', 'view/md-collection-grid-view' ], 
+		function(_, Marionette, AbstractLayoutView, tmpl, GenericFormView, GenericCollectionGridView) {
+	var GenericSearchLayout = AbstractLayoutView.extend({
 		tagName : 'div',
 		className : "tab-pane active",
 		searchResultsCollection : null,
@@ -32,7 +32,7 @@ define([ 'underscore', 'marionette', 'hbs!template/generic-search-layout', 'view
 	},
 	// static members
 	{
-		typeName: "GenericSearchLayout",
+		getTypeName: function(){return "GenericSearchLayout"}
 	});
 	return GenericSearchLayout;
 });

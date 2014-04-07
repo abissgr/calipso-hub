@@ -1,13 +1,19 @@
-define(['app', 'underscore', 'backbone', 'marionette', 'hbs!template/login', 'model/userDetails' ],
+define(['session', 'underscore', 'backbone', 'marionette', 'hbs!template/login', 'model/user' ],
 
-function(app, _, Backbone, Marionette, tmpl, UserDetailsModel) {
+function(session, _, Backbone, Marionette, tmpl, UserModel) {
 
-	return Marionette.ItemView.extend({
+	var LoginView = Marionette.ItemView.extend({
 
 		className : 'row',
 
 		template : tmpl,
-
+		/**
+		 * Get the name of this class
+		 * @returns the class name as a string
+		 */
+		getTypeName : function() {
+			return this.prototype.getTypeName();
+		},
 		events : {
 			"click button" : "commit",
 			"submit" : "commit"
@@ -17,26 +23,13 @@ function(app, _, Backbone, Marionette, tmpl, UserDetailsModel) {
 
 			
 			var _this = this;
-			var userDetails = new UserDetailsModel();
-			userDetails.save({
+			var userDetails = new UserModel({
 				email: this.$('.input-email').val(),
 				password: this.$('.input-password').val(),
 				// was used for testing
 				// metadata: {"loginViewMetadatum":"true"}
-			},{
-				success: function(model, response){
-					console.log("LoginView.commit, success");
-
-					app.vent.trigger('session:created', model);
-					
-				},
-
-				// Generic error, show an alert.
-				error: function(model, response){
-					alert("Authentication failed: ");
-				}
-
 			});
+			session.save(userDetails);
 
 		},
 
@@ -53,7 +46,15 @@ function(app, _, Backbone, Marionette, tmpl, UserDetailsModel) {
 
 	},
 	{
-		typeName: "LoginView"
+		
 	});
 
+	/**
+	 * Get the name of this class
+	 * @returns the class name as a string
+	 */
+	LoginView.prototype.getTypeName = function() {
+		return "LoginView";
+	}
+	return LoginView;
 });

@@ -14,7 +14,7 @@ define(['underscore', 'marionette', 'hbs!template/loading'], function (_, Marion
 
   },
 	{
-		typeName: "LoadingView"
+		getTypeName: function(){return "LoadingView"}
 	});
 
 });

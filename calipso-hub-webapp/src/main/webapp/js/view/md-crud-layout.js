@@ -17,18 +17,19 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 define(function(require) {
-	var CalipsoApp = require('app'), 
+	var session = require('session'), 
+	vent = require('vent'), 
 	Backbone = require('backbone'), 
 	Marionette = require('marionette'), 
-	AbstractLayoutView = require'view/abstract-layout-view'),
+	AbstractLayoutView = require('view/abstract-layout-view'),
 	BackboneForm = require('backbone-forms'), 
 	GenericCollectionGridView = require('view/md-collection-grid-view'), 
 	GenericCollection = require('collection/generic-collection'), 
 	GenericFormTabContentView = require('view/GenericFormTabContentView'), 
 	tmplTabLabel = require('hbs!template/tab-label'), 
-	tmpl = require('hbs!template/generic-crud-layout');
+	tmpl = require('hbs!template/md-crud-layout');
 
-	var TabLayout = AbstractLayoutView.extend({
+	var ModelDrivenCrudLayout = AbstractLayoutView.extend({
 		template : tmpl,
 		tagName : "div",
 		className : "col-sm-12",
@@ -36,8 +37,23 @@ define(function(require) {
 			tabLabelsRegion : '#calipsoTabLabelsRegion',
 			tabContentsRegion : '#calipsoTabContentsRegion'
 		},
+		initialize: function(options){
+			
+			Marionette.Layout.prototype.initialize.apply(this, arguments);
+			if(options.collection){
+				this.collection = options.collection;
+			}
+			else if(options.model && options.model.constructor.getTypeName() == "GenericCollectionWrapperModel"){
+					this.collection = options.model.wrappedCollection;
+			}
+			if(!this.collection){
+				throw "no collection or collection wrapper model was provided";
+			}
+			console.log("ModelDrivenCrudLayout.initialize, collection size: " + this.collection.length  +
+					", collection.model: "+this.collection.model.getTypeName());
+	  },
 		onShow : function() {
-			console.log("TabLayout#onShow");
+			console.log("ModelDrivenCrudLayout#onShow");
 			var tabLabelsView = new TabLabelsCollectionView({
 				collection : this.collection
 			});
@@ -51,7 +67,7 @@ define(function(require) {
 	},
 	// static members
 	{
-		getTypeName: function(){return "TabLayout"}
+ 		getTypeName: function(){return "ModelDrivenCrudLayout"}
 	});
 
 	var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
@@ -61,8 +77,8 @@ define(function(require) {
 		getItemView : function(item) {
 			return Backbone.Marionette.ItemView.extend({
 				tagName : 'li',
-				className : 'generic-crud-layout-tab-label',
-				id : "generic-crud-layout-tab-label-" + item.get("id"),
+				className : 'md-crud-layout-tab-label',
+				id : "md-crud-layout-tab-label-" + item.get("id"),
 				template : tmplTabLabel,
 
 				events : {
@@ -73,7 +89,7 @@ define(function(require) {
 					 console.log("TabPaneCollectionView.itemView#viewTab");
 					 e.stopPropagation();
 					 e.preventDefault();
-					 CalipsoApp.vent.trigger("viewTab", this.model);
+					 vent.trigger("viewTab", this.model);
 				 },
 				closeTab : function(e) {
 					console.log("TabPaneCollectionView.itemView#closeTab");
@@ -81,7 +97,7 @@ define(function(require) {
 					e.preventDefault();
 //					this.model.collection.remove(this.model);
 					this.close();
-					CalipsoApp.vent.trigger("viewTab", {
+					vent.trigger("viewTab", {
 						id : "Search"
 					});
 				},
@@ -92,32 +108,34 @@ define(function(require) {
 	var TabContentsCollectionView = Backbone.Marionette.CollectionView.extend({
 		tagName : 'div',
 		getItemView : function(item) {
-			var someItemSpecificView;
-			if (item.get("itemView")) {
-				someItemSpecificView = item.get("itemView");
-			} else {
-				someItemSpecificView = GenericFormTabContentView;
+			var ItemViewClass;
+			if(item){
+				if (item.get("itemView")) {
+					ItemViewClass = item.get("itemView");
+				} else {
+					ItemViewClass = GenericFormTabContentView;
+				}
+				console.log("TabContentsCollectionView#getItemView for item class " + item.constructor.getTypeName() + " returns: " + ItemViewClass.getTypeName());
 			}
-			console.log("TabContentsCollectionView#getItemView for item class " + item.className + " returns: " + someItemSpecificView.className);
-			return someItemSpecificView;
+			return ItemViewClass;
 		},
 		buildItemView: function(item, ItemViewClass){
-			console.log("TabContentsCollectionView#buildItemView, ItemView: "+ItemViewClass.className+", item: "+item.getClassName());
-			
-			var options = {model: item};
-			if(item && item.wrappedCollection){
-				console.log("item.wrappedCollection: "+item.wrappedCollection.length);
-				options.searchResultsCollection = item.wrappedCollection;
+			console.log("TabContentsCollectionView#buildItemView, ItemView: "+ItemViewClass.getTypeName()+", item: "+item.constructor.getTypeName() + ", wrapped collection: "+item.wrappedCollection);
+			if(item){
+				var options = {model: item};
+				if(item && item.wrappedCollection){
+					options.collection = item.wrappedCollection;
+				}
+			    // do custom stuff here
+	
+			    var view = new ItemViewClass(options);
+	
+			    // more custom code working off the view instance
+	
+			    return view;
 			}
-		    // do custom stuff here
-
-		    var view = new ItemViewClass(options);
-
-		    // more custom code working off the view instance
-
-		    return view;
 		  },
 	});
 
-	return TabLayout;
+	return ModelDrivenCrudLayout;
 });

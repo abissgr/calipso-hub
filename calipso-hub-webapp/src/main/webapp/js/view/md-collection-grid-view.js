@@ -16,25 +16,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user', 'hbs!template/generic-collection-grid-view', 'collection/generic-collection' ], function(Backbone, Backgrid, Marionette, BackgridExtensionPaginator, User, genericCollectionTemplate, GenericCollection) {
+define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user', 'hbs!template/md-collection-grid-view', 'collection/generic-collection' ], function(Backbone, Backgrid, Marionette, BackgridExtensionPaginator, User, genericCollectionTemplate, GenericCollection) {
 	// Backgrid.Extension.Paginator = Paginator;
-	var GenericCollectionGridView = Marionette.ItemView.extend(
+	var ModelDrivenCollectionGridView = Marionette.ItemView.extend(
 	/** @lends collection/GenericCollectionGridView.prototype */
 	{
+		initialize: function(options){
 
+			Marionette.ItemView.prototype.initialize.apply(this, arguments);
+			if(options.collection){
+				this.collection = options.collection;
+			}
+			else if(options.model && options.model.wrappedCollection){
+					this.collection = options.model.wrappedCollection;
+			}
+			if(!this.collection){
+				throw "no collection or collection wrapper model was provided";
+			}
+			console.log("GenericCollectionGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
+	  },
 		// Define view template
 		template : genericCollectionTemplate,
 		onShow : function() {
 			var _self = this;
-			// console.log("GenericCollectionGridView onShow");
-			// /GenericCollectionGridView.__super__.render.apply(this);
-			console.log("GenericCollectionGridView onShow, model className: " + (this.model.getClassName ? this.model.getClassName() : undefined));
-			if (this.model.getClassName && this.model.getClassName() == "GenericCollectionWrapperModel") {
-				this.collection = this.model.wrappedCollection;
-				console.log("GenericCollectionGridView onShow, got collection from GenericCollectionWrapperModel");
-			} else {
-				console.log("GenericCollectionGridView onShow, got collection from properties");
-			}
+			
 			// console.log("GenericCollectionGridView onShow, this.collection:
 			// "+this.collection + ", gridCollection: "+gridCollection);
 			var backgrid = new Backgrid.Grid({
@@ -77,7 +82,7 @@ define([ 'backbone', 'backgrid', 'marionette', 'backgrid-paginator', 'model/user
 	},
 	// static members
 	{
-		typeName: "GenericCollectionGridView",
+ 		getTypeName: function(){return "ModelDrivenCollectionGridView"}
 	});
-	return GenericCollectionGridView;
+	return ModelDrivenCollectionGridView;
 });

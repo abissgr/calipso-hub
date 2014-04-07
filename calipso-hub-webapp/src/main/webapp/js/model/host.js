@@ -19,16 +19,26 @@
 define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ],
 		function( GenericModel, EditInTabCell, ViewInTabCell) {
 			var HostModel = GenericModel.extend({
-				modelKey: "host",
-
 			},
 			// static members
 			{
-				className: "HostModel",
 				parent: GenericModel
 			});
-
-			HostModel.prototype.schemaComplete = function(instance) {
+			/**
+			 * Get the model class URL fragment corresponding this class
+			 * @returns the URL path fragment as a string
+			 */
+			HostModel.prototype.getPathFragment = function() {
+				return "hosts";
+			}
+		
+			HostModel.prototype.getTypeName = function() {
+			 		return "HostModel";
+			}
+			HostModel.prototype.getLayoutViewType = function() {
+				return require('view/md-search-layout')
+			}
+			HostModel.prototype.getFormSchemas = function() {
 				return {//
 					domain : {
 						"search": 'Text',

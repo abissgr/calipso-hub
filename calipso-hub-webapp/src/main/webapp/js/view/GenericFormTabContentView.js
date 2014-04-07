@@ -27,6 +27,8 @@ define(function(require) {
 		className : "tab-pane active fade in",
 		// dynamically set the id
 		initialize: function(){
+			GenericFormView.prototype.initialize.apply(this, arguments);
+			this.getTypeName() = "GenericFormTabContentView";
 		  this.$el.prop("id", "tab-"+this.model.get("id"));
 		  this.formTemplate = _.template('\
 		    <form class="form-vertical" role="form" data-fieldsets></form>\
@@ -35,6 +37,6 @@ define(function(require) {
 		},
 	},
 	{
-		typeName: "GenericFormTabContentView"
+		getTypeName: function(){return "GenericFormTabContentView"}
 	});
 });

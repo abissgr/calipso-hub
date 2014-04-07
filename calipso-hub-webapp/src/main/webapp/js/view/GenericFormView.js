@@ -17,13 +17,17 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 define(function(require) {
-	var Backbone = require('backbone'), Marionette = require('marionette'), 
+	var Backbone = require('backbone'), 
+	Marionette = require('marionette'), 
 	BackboneForm = require('backbone-forms'), 
 	tmpl = require('hbs!template/GenericFormView');
 	var GenericFormView = Marionette.ItemView.extend({
 		// Define view template
 		template : tmpl,
 		initialize: function(options){
+			console.log("GenericFormView#initialize, model: "+this.model.getTypeName());
+			Marionette.ItemView.prototype.initialize.apply(this, arguments);
+
 			// set schema action/key
 			if(this.options.formSchemaKey){
 				this.formSchemaKey = options.formSchemaKey;
@@ -34,17 +38,25 @@ define(function(require) {
 			else{
 				this.formSchemaKey = "search";
 			}
-			// ensure we can use some sortof unique form id
+			
+			// ensure we can use some sort of unique form id
 			if(!this.model.get("id")){
 				this.model.set("id", this.formSchemaKey);
 			}
 
-			if(this.options.searchResultsCollection){
+			// grab a handle for the search results collection if any
+			if(this.model.wrappedCollection){
+				this.searchResultsCollection = this.model.wrappedCollection;
+			}
+			else if(this.options.searchResultsCollection){
 				this.searchResultsCollection = options.searchResultsCollection;
 			}
 
 			this.formTemplate = this.options.formTemplate? this.options.formTemplate : BackboneForm.template;
-			
+
+			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + 
+					",  searchResultsCollection: " + this.searchResultsCollection.length + 
+					" of type " + this.model.getTypeName());
 			
 			// console.log("GenericFormView#onShow, formSchemaKey:
 			// "+formSchemaKey+", model:
@@ -91,7 +103,7 @@ define(function(require) {
 //			console.log("GenericFormView.onShow, this.formSchemaKey: "+this.formSchemaKey);
 			
 			var selector = '#generic-form-' + this.model.get("id");
-			var schemaForAction = this.model.schemaForAction(this.formSchemaKey);
+			var schemaForAction = this.model.getFormSchema(this.formSchemaKey);
 			
 			console.log("GenericFormView#onShow, selector: " + selector + 
 					 ", formSchemaKey: " + this.formSchemaKey + 
@@ -141,7 +153,7 @@ define(function(require) {
 	},
 	// static members
 	{
-		typeName : "GenericFormView",
+		getTypeName: function(){return "GenericFormView"}
 	});
 	return GenericFormView;
 });

@@ -19,51 +19,32 @@
 define(function(require) {
 	var Backbone = require('backbone'),
 	Marionette = require('marionette'),
-	CalipsoApp = require('app'),
-	session = require('session'),
 	vent = require('vent'),
+	session = require('session'),
+	//vent = require('vent'),
 	AppLayoutView = require('view/AppLayoutView'),
 	HomeView = require('view/home-view'),
 	NotFoundView = require('view/NotFoundView'),
 	LoginView = require('view/LoginView'),
 	MainContentNavView = require('view/MainContentNavView'),
-	TabLayout = require('view/generic-crud-layout'),
-	GenericCollectionGridView = require('view/generic-collection-grid-view'),
+	TabLayout = require('view/md-crud-layout'),
 	GenericHomeLayout = require('view/generic-home-layout'),
 	GenericFormView = require('view/GenericFormView'),
 	GenericCollection = require('collection/generic-collection'),
 	GenericModel = require('model/generic-model'),
-	GenericCollectionWrapperModel = require('model/generic-collection-wrapper-model'),
-	HomeModel = require('model/home'),
 	LoginModel = require('model/LoginModel'),
-	UserModel = require('model/user'),
-	HostModel = require('model/host');
+	ModelDrivenBrowseLayout = require('view/md-browse-layout');
 
 
 	var AbstractController = Marionette.Controller.extend({
 		constructor: function(options){
-			this.userDetails = session.userDetails;
+			console.log("AbstractController#constructor");
 			Marionette.Controller.prototype.constructor.call(this, options);
-			this._initializeLayout(options);
-
-		},
-		_initializeLayout : function(options){
-			// console.log('AbstractController#_initializeLayout');
-			if(options && options.layout){
-				this.layout = options.layout;
-			}
-			else{
-				this.layout = new AppLayoutView({
-					model : session
-				});
-			}
-
-			console.log('AbstractController#_initializeLayout, this.layout: ' + ((this.layout && this.layout.typeName) ? this.layout.typeName : this.layout));
-			this.layout.on("show", function() {
-				vent.trigger("layout:rendered");
+			this.layout = new AppLayoutView({
+				model : session
 			});
-
 			vent.trigger('app:show', this.layout);
+
 		},
 		home : function() {
 			console.log("AbstractController#home");
@@ -73,15 +54,12 @@ define(function(require) {
 				});
 				return false;
 			}
-			//var homeView = new HomeView();
-			this._initializeLayout({layout: new GenericHomeLayout({
-				model : session
-			})});
+			this.layout.contentRegion.show(new HomeLayout());
 		},
 
 		login : function() {
-
-			var loginModel = new LoginModel({
+			var UserModel = require('model/user');
+			var loginModel = new UserModel({
 				email : session.get('email'),
 				issuer : session.get('issuer')
 			});
@@ -91,7 +69,7 @@ define(function(require) {
 			});
 
 			view.on('app:login', AbstractController.authenticate);
-
+			console.log("AbstractController#login, showing login view");
 			vent.trigger('app:show', view);
 		},
 
@@ -114,106 +92,83 @@ define(function(require) {
 		},
 
 		logout : function() {
-
-			app.vent.trigger('session:destroy', model);
+			session.destroy();
+			login();
 		},
 		notFoundRoute : function(path) {
 //			console.log("notFoundRoute, path: "+path);
 			this.layout.contentRegion.show(new NotFoundView());
 		},
-		tabKeys: {},
-		buildRouteHelper: function(mainRoutePart, contentNavTabName){
-			var routeHelper = {};
-			routeHelper.mainAreaChange = (mainRoutePart != this.lastMainNavTabName);
-			// get main route part
-			if(!mainRoutePart){
-				if(this.lastMainNavTabName){
-					// go previous route if one exists
-					routeHelper.mainRoutePart = this.lastMainNavTabName;
-				}
-				else{
-					// go to home if no previous route exists
-					routeHelper.mainRoutePart = "homes";
-				}
+		/**
+		 * Get a model representing the current request.
+		 * 
+		 * For an example, consider the URL [api-root]/users/[some-id]. First, 
+		 * a model class is loaded based on the URL fragment representing the type, 
+		 * e.g. "users" for UserModel.
+		 * 
+		 * A model instance is then created using some-id if provided or "search" otherwise. If 
+		 * a backbone supermodel instance is already cached, it is reused.
+		 * 
+		 *  In case of "search" a collection of the given model type is initialized but, 
+		 *  similarly to the model instance, it is not fetched from the server.
+		 *  
+		 * @param {string} modelTypeKey the URL fragment representing the model type key, e.g. "users" for UserModel
+		 * @param {string} modelId the model identifier. The identifier may be either a primary or business key, 
+		 * depending on your server side implementation. The default property name in client side models is "name".
+		 * You can override {@linkcode GenericModel.prototype.getBusinessKey} to define another property name.
+		 * @see (@link GenericModel.prototype.getBusinessKey}
+		 */
+		getModelForRoute : function(modelTypeKey, modelId){
+			var modelForRoute;
+			var ModelType = require("model/" + _.singularize( modelTypeKey ));
+			if(!ModelType){
+				throw "No matching model type was found for key: " + modelTypeKey;
+			}
+			if(modelId && modelId.toLowerCase() != "search"){
+				// try cached models first
+				modelForRoute = ModelType.all().get(modelId);
+				// otherwise create a transient instance and let the view load it from the server  
+				modelForRoute = ModelType.create(modelId);
 			}
 			else{
-				routeHelper.mainRoutePart = mainRoutePart;
+				// create a model to use as a wrapper for a collection of instances of the same type
+				modelForRoute = ModelType.create("search");
+				modelForRoute.wrappedCollection = new GenericCollection([], {
+					model : ModelType,
+					url : session.getBaseUrl() + "/api/rest/" +  modelForRoute.getPathFragment()
+				});
 			}
-			// get secondary route part
-			routeHelper.contentNavTabName = contentNavTabName ? contentNavTabName : "Search";
+			console.log("AbstractController#getModelForRoute, collection URL: " + session.getBaseUrl() + "/api/rest/" +  modelForRoute.getPathFragment());
+			return modelForRoute;
 			
-			// console.log("AbstractController#buildRouteHelper, contentNavTabName: "+ routeHelper.contentNavTabName);
-			// get route model class
-			routeHelper.modelClass = require("model/" + _.singularize( routeHelper.mainRoutePart ));
-
-			console.log("AbstractController#buildRouteHelper, loaded model class: "+routeHelper.modelClass.className);
-			var searchModelClass = routeHelper.modelClass.searchModel ?  routeHelper.modelClass.searchModel : routeHelper.modelClass
-			
-					// get route collection if applicable
-			// a client side model might be an alias for another server model
-			console.log("AbstractController#buildRouteHelper, updating this.searchResults");
-			this.searchResults = new GenericCollection([], {
-				model : routeHelper.modelClass,
-				url : CalipsoApp.getCalipsoAppBaseUrl() + "/api/rest/" +  searchModelClass.apiUrlSegment
-			});
-			var wrapperModelOptions = {
-				modelClass : routeHelper.modelClass,
-				wrappedCollection : this.searchResults
-			};
-			routeHelper.routeModel = new GenericCollectionWrapperModel(wrapperModelOptions);
-			return routeHelper;
 		},
 		mainNavigationCrudRoute : function(mainRoutePart, contentNavTabName) {
+			// build the model instancde representing the current request
+			var modelForRoute = this.getModelForRoute(mainRoutePart, contentNavTabName);
 			
-			this.tryExplicitRoute(mainRoutePart, contentNavTabName);
-			var routeHelper = this.buildRouteHelper(mainRoutePart, contentNavTabName);
-
-			if (!CalipsoApp.userDetails) {
-				CalipsoApp.fw = "/client/"+routeHelper.mainRoutePart+"/"+routeHelper.contentNavTabName;
-				Backbone.history.navigate("client/login", {
-					trigger : true
-				});
-
-				$('#session-info').hide();
-				return false;
-			}
-			var _self = this;
-			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + routeHelper.mainRoutePart + ", contentNavTabName: " + routeHelper.contentNavTabName + ", mainAreaChange: " + routeHelper.mainAreaChange);
-			if(!this.tabs || routeHelper.mainAreaChange){
-				this.initCrudLayout(routeHelper);
-			}
-			// add tab for entity if needed
-			if(routeHelper.contentNavTabName != "Search"){
-				if(!this.tabKeys[routeHelper.contentNavTabName]){
-					var showModel = routeHelper.modelClass.all().get(routeHelper.contentNavTabName);
-					if(showModel){
-						// tab keys index updated automatically
-						// console.log("adding new tab for existing model: " + showModel.get("id"));
-						_self.tabs.add(showModel);
-					}
-					else{
-						showModel = routeHelper.modelClass.create({id:routeHelper.contentNavTabName});
-						showModel.fetch().then(function(){
-							// console.log("adding new tab for fetched model: " + showModel.get("id"));
-							_self.tabs.add(showModel);
-						});
-					}
-				}
-				else{
-					// console.log("showing existing tab");
-				}
-			}
-
-			this.syncMainNavigationState(routeHelper.mainRoutePart, routeHelper.contentNavTabName);
+			// get the layout type corresponding to the requested model
+			var RequestedModelLayoutType = modelForRoute.getLayoutViewType();
+			
+			// show the layout 
+			// TODO: reuse layout if of the same type
+			var routeLayout = new RequestedModelLayoutType({model: modelForRoute});
+			this.layout.contentRegion.show(routeLayout);
+			
+			// update page header tabs etc.
+			this.syncMainNavigationState(modelForRoute);
 
 		},
+
+		/*
+		 * TODO
+
 		initCrudLayout : function(routeHelper){
-			if((!this.layout) || this.layout.className != "AppLayoutView"){
-		      // console.log("AbstractController#initCrudLayout, calling this._initializeLayout()");
-				this._initializeLayout();
+			if((!this.layout) || this.layout.getTypeName() != "AppLayoutView"){
+		      // console.log("AbstractController#initCrudLayout, calling this.ensureActiveLayout()");
+				this.ensureActiveLayout();
 			}
 			else{
-		      // console.log("AbstractController#initCrudLayout, not updating this.layout: "+this.layout.className);
+		      // console.log("AbstractController#initCrudLayout, not updating this.layout: "+this.layout.getTypeName());
 			}
 			var _self = this;
 			
@@ -237,20 +192,27 @@ define(function(require) {
          ]);
          var tabLayout = new TabLayout({collection: this.tabs});
 
+         vent.on("itemView:openGridRowInTab", function(itemModel) {
+         	vent.trigger("openGridRowInTab", itemModel);
+         });
          vent.on("openGridRowInTab", function(itemModel) {
+         	console.log("openGridRowInTab");
          	_self.tabs.add(itemModel);
-         	CalipsoApp.vent.trigger("viewTab", itemModel);
+         	vent.trigger("viewTab", itemModel);
          });
          vent.on("viewTab", function(itemModel) {
-       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), {
-					trigger : false
-				});
+         	this.layout.contentRegion.show(new itemmodel.itemView(itemmodel));
+//       	 	Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), {
+//					trigger : false
+//				});
        	 	_self.syncMainNavigationState(null, itemModel.get("id"));
        	});
          
 			this.layout.contentRegion.show(tabLayout);
 		},
-		syncMainNavigationState : function(mainRoutePart, contentNavTabName) {
+		*/
+		syncMainNavigationState : function(modelForRoute) {
+			var mainRoutePart = modelForRoute.getPathFragment(), contentNavTabName = modelForRoute.get("id");
 			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: "+contentNavTabName);
 		// update active nav menu tab
 			if(mainRoutePart && mainRoutePart != this.lastMainNavTabName){
@@ -261,7 +223,7 @@ define(function(require) {
 			// update active content tab
 			if(contentNavTabName && contentNavTabName != this.lastContentNavTabName){
 				$('#calipsoTabLabelsRegion li.active').removeClass('active');
-				$('#generic-crud-layout-tab-label-' + contentNavTabName).addClass('active');
+				$('#md-crud-layout-tab-label-' + contentNavTabName).addClass('active');
 				// show coressponding content
 				// console.log("show tab: "+contentNavTabName);
 				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');

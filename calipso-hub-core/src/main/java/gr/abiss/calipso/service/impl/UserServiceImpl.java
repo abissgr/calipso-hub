@@ -40,7 +40,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.util.CollectionUtils;
 
-@Named("userService")
+//@Named("userService")
 public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepository> 
 	implements UserService, LocalUserService<String, User> {
 

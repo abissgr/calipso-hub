@@ -16,26 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'marionette', 'hbs!template/MainContentNavView',],
-function (Marionette, tmpl) {
-    //Backgrid.Extension.Paginator = Paginator;
-    var MainContentNavView = Marionette.ItemView.extend({
-
-        // Define view template
-        template: tmpl,
-
-        initialize: function(options){
-	  			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-	  			this.getTypeName() = "MainContentNavView";
-        },
-        onDomRefresh: function() {
-				console.log("MainContentTabsView onDomRefresh");
-			}
-
+define([ 'backbone', 'marionette'],
+function (Backbone, Marionette) {
+    
+    var AbstractItemView = Backbone.Marionette.ItemView.extend({
+        getTypeName: function(){
+      	  return this.constructor.getTypeName();
+        }
     },
- 	{
- 		getTypeName: function(){return "MainContentNavView"}
- 	});
-    return MainContentNavView;
+    {
+   	 getTypeName: function(){return "AbstractItemView"}
+    });
+    return AbstractItemView;
 });
-
