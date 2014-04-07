@@ -27,7 +27,7 @@ define(function(require) {
 //	  },
 		showContent: function(routeModel){
 			var _this = this;
-			console.log("ModelDrivenBrowseLayout.showContent: "+routeModel.get("id"));
+			//console.log("ModelDrivenBrowseLayout.showContent: "+routeModel.get("id"));
 			// get the model collection view type
 			var ContentViewType = routeModel.getCollectionViewType();
 			// create a new collection instance

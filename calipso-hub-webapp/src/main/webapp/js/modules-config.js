@@ -8,14 +8,14 @@ define([
   'model/page',
   'model/text',
   'model/user',
-  'model/userDetails',
   'view/md-browse-layout',
   'view/md-search-layout',
-  'view/GenericFormView'
+  'view/GenericFormView',
+  'view/home-view'
 ],
 
-function ($, _, Backbone, GenericModel, HostModel, ResourceModel, PageModel, TextModel, UserModel, UserDetailsModel, 
-		ModelDrivenBrowseLayout, ModelDrivenSearchLayout, GenericFormView){
+function ($, _, Backbone, GenericModel, HostModel, ResourceModel, PageModel, TextModel, UserModel,  
+		ModelDrivenBrowseLayout, ModelDrivenSearchLayout, GenericFormView, HomeView){
 
   var modelsConfig = {
 		  models : {
@@ -25,13 +25,13 @@ function ($, _, Backbone, GenericModel, HostModel, ResourceModel, PageModel, Tex
 			  PageModel: PageModel,
 			  TextModel: TextModel,
 			  UserModel: UserModel,
-			  UserDetailsModel: UserDetailsModel
 		  },
 
 		  layouts : {
 			  ModelDrivenBrowseLayout: ModelDrivenBrowseLayout,
 			  ModelDrivenSearchLayout: ModelDrivenSearchLayout,
 			  GenericFormView: GenericFormView,
+			  HomeView: HomeView,
 		  }
   };
 

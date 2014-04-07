@@ -9,17 +9,17 @@ define(function(require) {
 		id: "calipsoModelDrivenSearchLayout",
 		template : tmpl,
 		regions : {
-			sideBarRegion : "#calipsoModelDrivenSearchLayout-sideBarRegion",
+			sidebarRegion : "#calipsoModelDrivenSearchLayout-sideBarRegion",
 			contentRegion : "#calipsoModelDrivenSearchLayout-contentRegion"
 		},
 		onShow: function(){
 			this.showRSidebar(this.model);
 			this.showContent(this.model);
 		},
-		showRSidebar: function(routeModel){
-			console.log("ModelDrivenSearchLayout.showRSidebar: "+routeModel.get("id"));
+		showSidebar: function(routeModel){
+			//console.log("ModelDrivenSearchLayout.showRSidebar: "+routeModel.get("id"));
 			// show the search form
-			this.sideBarRegion.show(new GenericFormView({formSchemaKey: "search", model: routeModel}));
+			this.sidebarRegion.show(new GenericFormView({formSchemaKey: "search", model: routeModel}));
 		}
 	},
 	// static members

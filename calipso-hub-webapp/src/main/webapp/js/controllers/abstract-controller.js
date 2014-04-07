@@ -28,7 +28,6 @@ define(function(require) {
 	LoginView = require('view/LoginView'),
 	MainContentNavView = require('view/MainContentNavView'),
 	TabLayout = require('view/md-crud-layout'),
-	GenericHomeLayout = require('view/generic-home-layout'),
 	GenericFormView = require('view/GenericFormView'),
 	GenericCollection = require('collection/generic-collection'),
 	GenericModel = require('model/generic-model'),

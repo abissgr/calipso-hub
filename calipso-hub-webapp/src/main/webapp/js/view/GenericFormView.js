@@ -90,7 +90,7 @@ define(function(require) {
 
 					// Generic error, show an alert.
 					error: function(model, response){
-						alert("Authentication failed: ");
+						alert("Failed retreiving search results");
 					}
 
 				})

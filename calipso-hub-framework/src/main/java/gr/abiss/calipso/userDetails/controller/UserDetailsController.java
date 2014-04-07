@@ -205,7 +205,7 @@ HttpServletRequest request,
 		return resource;
 	}
 
-	@RequestMapping(value = "userDetails/logout", method = RequestMethod.POST)
+	@RequestMapping(value = "userDetails/logout", method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST})
 	@ResponseBody
 	public void logout(HttpServletRequest request,
 			HttpServletResponse response, @RequestBody UserDetails resource) {
