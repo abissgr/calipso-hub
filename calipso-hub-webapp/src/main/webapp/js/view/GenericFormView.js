@@ -73,13 +73,14 @@ define(function(require) {
 			// runs schema and model validation
 			var errors = this.form.commit({ validate: true });
 			var _this = this;
-			// persist entity?
+			// Case: create/update
 			if(_this.formSchemaKey == "create" || _this.formSchemaKey == "update"){
 				// persist changes
 				//this.model.save();
 				// signal save event for the model
 				vent.trigger("genericFormSave", _this.model);	
 			}
+			// Case: search 
 			else if(this.formSchemaKey == "search"){
 				this.searchResultsCollection.bind('refresh', function(){alert("refreshed")});
 				this.searchResultsCollection.fetch({
@@ -90,7 +91,6 @@ define(function(require) {
 						// for the currently active layout to handle presentation
 						console.log("GenericFormView#commit: search success, triggering: genericFormSearched");
 						vent.trigger("genericFormSearched", _this.model);	
-						
 					},
 
 					// Generic error, show an alert.

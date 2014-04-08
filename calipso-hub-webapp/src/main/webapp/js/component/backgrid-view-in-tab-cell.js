@@ -31,7 +31,8 @@ function( vent, BackboneForm, Backgrid, Markdown) {
 				e.preventDefault();
 				var rowModel = this.model;
 				console.log("editRow, rowModel: "+rowModel.getTypeName());
-				vent.trigger("ViewInTabCell:viewGridRow", rowModel);
+				vent.trigger("collectionView:viewItem", rowModel);
+				
 
 //				Backbone.history.navigate("client/"+rowModel.get("apiUrlSegment")+"/"+rowModel.get("id"), {
 //					trigger : true

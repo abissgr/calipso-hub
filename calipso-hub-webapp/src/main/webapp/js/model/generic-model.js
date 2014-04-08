@@ -72,6 +72,10 @@ define([ 'backbone', 'supermodel', 'backgrid', 'view/GenericFormTabContentView' 
  * 	PersonModel.prototype.getItemViewType = function() {
  * 		//...
  * 	}
+ * 	// OPTIONAL: our subclass item view template, 
+ * 	PersonModel.prototype.getItemViewTemplate = function() {
+ * 		//...
+ * 	}
  * 	// OPTIONAL: our subclass business key, 
  * 	// used to check if the model has been loaded from the server. 
  * 	// defaults to "name" 
@@ -159,6 +163,21 @@ function(Backbone, Supermodel, Backgrid) {
 
 			console.log("GenericModel.getItemViewType() called, will return GenericFormView");
 			return this.prototype.getItemViewType();
+		},
+		/**
+		 * Get the item view template for this model. the template is picked up and 
+		 * used by item views like GenericView.  To specify an item view template for 
+		 * your model under a static or instance context, 
+		 * override {@link GenericModel.prototype.getItemViewTemplate} 
+		 * or {@link getItemViewTemplate} respectively in your subclass.
+		 * 
+		 * Layout views defined this way are picked up by controllers.
+		 * 
+		 * @see {@link GenericModel.prototype.getItemViewType}
+		 */
+		getItemViewTemplate : function() {
+			console.log("GenericModel.getItemViewTemplate() called");
+			return this.prototype.getItemViewTemplate();
 		},
 		/**
 		 * Get the complete set of form schemas. You can also obtain the form schema for 
@@ -313,6 +332,16 @@ function(Backbone, Supermodel, Backgrid) {
 		console.log("GenericModel.prototype.getItemViewType() called, will return GenericFormView");
 		return require('view/GenericFormView');
 	}
+	/**
+	 * Override this to define a default layout view at a static context for your subclass, 
+	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
+	 */
+	GenericModel.prototype.getItemViewTemplate = function() {
+		console.log("GenericModel.prototype.getItemViewTemplate() called, will return null");
+		return null;
+	}
+	
+	
 	
 	/**
 	 * Get the name of the model's business key property. The property name is used to 

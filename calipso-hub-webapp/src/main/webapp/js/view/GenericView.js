@@ -23,13 +23,17 @@ define(function(require) {
 	var GenericView = Marionette.ItemView.extend({
 		// Define view template
 		tagName : 'div',
-		template : tmpl,className : "tab-pane active fade in",
+		template : tmpl,
+		className : "tab-pane active fade in",
 		// dynamically set the id
 		initialize: function(options){
 
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			this.getTypeName() = "GenericView";
 			this.$el.prop("id", "tab-"+this.model.get("id"));
+			var itemViewTemplate = this.model.getItemViewTemplate();
+			if(itemViewTemplate){
+				this.tmpl = itemViewTemplate;
+			}
 			
 			this.formTemplate = this.options.formTemplate? this.options.formTemplate : BackboneForm.template;
 	  },

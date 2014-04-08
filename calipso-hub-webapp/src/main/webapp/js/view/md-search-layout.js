@@ -34,10 +34,24 @@ define(function(require) {
 					// create the search results view instance
 					var searchResultsView = new CollectionViewType({model: wrapperModel});
 					
-					// show the results
-					// TODO: bind to collection item selection events (view/edit)
+
+					// bind to collection item selection events (view/edit)
+					vent.on("collectionView:viewItem", function(itemModel) {
+						console.log("ModelDrivenSearchLayout caught 'collectionView:viewItem' event");
+						
+						// get the itemView type for the given model
+						var ItemViewType = itemModel.getItemViewType();
+						
+						// create a view instance for the given model
+						var itemView = new ItemViewType({model: itemModel});
+						// show the results				
+						_this.contentRegion.show(itemView);
+					});
+					
+					// show the results				
 					_this.contentRegion.show(searchResultsView);
 			});
+			
 			
 			// show the search form
 			this.sidebarRegion.show(formView);
