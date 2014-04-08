@@ -20,7 +20,8 @@ define(function(require) {
 	var Backbone = require('backbone'), 
 	Marionette = require('marionette'), 
 	BackboneForm = require('backbone-forms'), 
-	tmpl = require('hbs!template/GenericFormView');
+	tmpl = require('hbs!template/GenericFormView'), 
+	vent = require('vent');
 	var GenericFormView = Marionette.ItemView.extend({
 		// Define view template
 		template : tmpl,
@@ -65,16 +66,19 @@ define(function(require) {
 	  },
 		formSchemaKey: "view",
 		events : {
-			"click .submit" : "commit"
+			"click .submit" : "commit",
+			"submit form: ": "commit"
 		},
 		commit : function(){
 			// runs schema and model validation
 			var errors = this.form.commit({ validate: true });
 			var _this = this;
 			// persist entity?
-			if(this.formSchemaKey == "create" || this.formSchemaKey == "update"){
+			if(_this.formSchemaKey == "create" || _this.formSchemaKey == "update"){
 				// persist changes
-				this.model.save();
+				//this.model.save();
+				// signal save event for the model
+				vent.trigger("genericFormSave", _this.model);	
 			}
 			else if(this.formSchemaKey == "search"){
 				this.searchResultsCollection.bind('refresh', function(){alert("refreshed")});
@@ -82,9 +86,10 @@ define(function(require) {
 					reset : true, 
 					data: this.form.toJson(),
 					success: function(){
-						//console.log("GenericFormView#commit search, success");
-
-						_this.trigger('search:retreivedResults', _this.searchResultsCollection);
+						// signal successful retreival of search results
+						// for the currently active layout to handle presentation
+						console.log("GenericFormView#commit: search success, triggering: genericFormSearched");
+						vent.trigger("genericFormSearched", _this.model);	
 						
 					},
 
