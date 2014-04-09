@@ -67,6 +67,29 @@
 					<!-- webAppSourceDirectory>D:\\Workspaces\\resthub\\resthub-archetypes\\resthub-jpa-backbonejs-multi-archetype/target/resthub-jpa-backbonejs-multi-archetype-2.0-rc4</webAppSourceDirectory -->
 				</configuration>
 			</plugin>
+			
+            <plugin>
+                <groupId>com.github.phasebash</groupId>
+                <artifactId>jsdoc3-maven-plugin</artifactId>
+                <version>1.0.7</version>
+                <configuration>
+                    <recursive>true</recursive>
+                    <directoryRoots>
+                        <directoryRoot>${basedir}/src/main/webapp/js/collection</directoryRoot>
+                        <directoryRoot>${basedir}/src/main/webapp/js/component</directoryRoot>
+                        <directoryRoot>${basedir}/src/main/webapp/js/controllers</directoryRoot>
+                        <directoryRoot>${basedir}/src/main/webapp/js/model</directoryRoot>
+                        <directoryRoot>${basedir}/src/main/webapp/js/routers</directoryRoot>
+                        <directoryRoot>${basedir}/src/main/webapp/js/view</directoryRoot>
+                    </directoryRoots>
+                    
+                    <sourceFiles>
+                        <sourceFile>${basedir}/src/main/webapp/js/app.js</sourceFile>
+                        <sourceFile>${basedir}/src/main/webapp/js/session.js</sourceFile>
+                        <sourceFile>${basedir}/src/main/webapp/js/vent.js</sourceFile>
+                    </sourceFiles>
+                </configuration>
+            </plugin>
 		</plugins>
 
 	</build>

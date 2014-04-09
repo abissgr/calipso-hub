@@ -24,12 +24,14 @@ import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.service.cms.TextService;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 
 import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.configuration.Configuration;
 import org.resthub.common.util.PostInitialize;
 
 @Named("sampleInitializer")
@@ -49,56 +51,63 @@ public class AppInitializer {
 
 	@PostInitialize
 	public void init() {
-		Date now = new Date();
+		Configuration config = ConfigurationFactory.getConfiguration();
+		boolean initData = config.getBoolean(ConfigurationFactory.INIT_DATA, true);
+		if(initData){
 
-		Host h1 = new Host("www.abiss.gr");
-		h1.addAlias("abiss.gr");
-		hostService.create(h1);
-		Host h2 = new Host("dev.abiss.gr");
-		hostService.create(h2);
-		Host h3 = new Host("calipso.abiss.gr");
-		hostService.create(h3);
+			Date now = new Date();
 
-		Text t1 = new Text("test2");
-		t1.setHost(h2);
-		t1.setSource("test2");
-		t1.setSourceContentType(Text.MIME_MARKDOWN);
-		textService.create(t1);
-		Text t2 = new Text("test2");
-		t2.setHost(h1);
-		t2.setSource("test2");
-		t2.setSourceContentType(Text.MIME_MARKDOWN);
-		textService.create(t2);
-		Text t3 = new Text("test3");
-		t3.setHost(h1);
-		t3.setSource("test3");
-		t3.setSourceContentType(Text.MIME_MARKDOWN);
-		textService.create(t3);
+			Host h1 = new Host("www.abiss.gr");
+			h1.addAlias("abiss.gr");
+			hostService.create(h1);
+			Host h2 = new Host("dev.abiss.gr");
+			hostService.create(h2);
+			Host h3 = new Host("calipso.abiss.gr");
+			hostService.create(h3);
+
+			Text t1 = new Text("test2");
+			t1.setHost(h2);
+			t1.setSource("test2");
+			t1.setSourceContentType(Text.MIME_MARKDOWN);
+			textService.create(t1);
+			Text t2 = new Text("test2");
+			t2.setHost(h1);
+			t2.setSource("test2");
+			t2.setSourceContentType(Text.MIME_MARKDOWN);
+			textService.create(t2);
+			Text t3 = new Text("test3");
+			t3.setHost(h1);
+			t3.setSource("test3");
+			t3.setSourceContentType(Text.MIME_MARKDOWN);
+			textService.create(t3);
+			
+			User u0 = new User("info@abiss.gr");
+			u0.setFirstName("admin");
+			u0.setLastName("user");
+			u0.setUserName("admin");
+			u0.setUserPassword("admin");
+			u0.setLastVisit(now);
+			u0 = userService.create(u0);
+
+			User u1 = new User("manosi@abiss.gr");
+			u1.setFirstName("Manos");
+			u1.setLastName("Batsis");
+			u1.setUserName("manos");
+			u1.setUserPassword("manos");
+			u1.setLastVisit(now);
+			u1 = userService.create(u1);
+			
+			for(int i = 0; i < 30; i++){
+				User u = new User("user"+i+"@abiss.gr");
+				u.setFirstName("First"+i);
+				u.setLastName("Last"+i);
+				u.setUserName("user"+i);
+				u.setUserPassword("user"+i);
+				u.setLastVisit(now);
+				u = userService.create(u);
+			}
 		
-		User u0 = new User("info@abiss.gr");
-		u0.setFirstName("admin");
-		u0.setLastName("user");
-		u0.setUserName("admin");
-		u0.setUserPassword("admin");
-		u0.setLastVisit(now);
-		u0 = userService.create(u0);
-
-		User u1 = new User("manosi@abiss.gr");
-		u1.setFirstName("Manos");
-		u1.setLastName("Batsis");
-		u1.setUserName("manos");
-		u1.setUserPassword("manos");
-		u1.setLastVisit(now);
-		u1 = userService.create(u1);
-		
-		for(int i = 0; i < 30; i++){
-			User u = new User("user"+i+"@abiss.gr");
-			u.setFirstName("First"+i);
-			u.setLastName("Last"+i);
-			u.setUserName("user"+i);
-			u.setUserPassword("user"+i);
-			u.setLastVisit(now);
-			u = userService.create(u);
 		}
+		
 	}
 }

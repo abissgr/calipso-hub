@@ -48,7 +48,7 @@ define(function(require) {
 		home : function() {
 			console.log("AbstractController#home");
 			if (!session.isAuthenticated()) {
-				Backbone.history.navigate("client/login", {
+				Backbone.history.navigate("cmart/client/login", {
 					trigger : true
 				});
 				return false;
@@ -82,7 +82,7 @@ define(function(require) {
 				session.save(model);
 				session.load();
 				// console.log('MainController authenticate navigating to home');
-				Backbone.history.navigate("client/home", {
+				Backbone.history.navigate("cmart/client/home", {
 					trigger : true
 				});
 			}, function(model, xhr, options) {

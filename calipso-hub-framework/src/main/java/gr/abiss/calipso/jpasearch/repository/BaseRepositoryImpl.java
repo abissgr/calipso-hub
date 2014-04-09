@@ -66,7 +66,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 
 	@Override
 	public T merge(T entity) {
-		return this.entityManager.merge(entity);
+		return this.getEntityManager().merge(entity);
 	}
 
 	@Override
@@ -99,11 +99,11 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 					MetadataSubject subject = (MetadataSubject) entity;
 					metadatum = this.buildMetadatum(subject, predicate,
 							metadata.get(predicate));
-					this.entityManager.persist(metadatum);
+					this.getEntityManager().persist(metadatum);
 				} else {
 					// if exists, only update the value
 					metadatum.setObject(metadata.get(predicate));
-					metadatum = this.entityManager.merge(metadatum);
+					metadatum = this.getEntityManager().merge(metadatum);
 				}
 
 				// subject.addMetadatum(dto.getPredicate(), dto.getObject());
@@ -148,7 +148,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 		Metadatum metadatum = findMetadatum(subjectId, predicate,
 				metadatumClass);
 		if (metadatum != null) {
-			this.entityManager.remove(metadatum);
+			this.getEntityManager().remove(metadatum);
 		}
 		// CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
 		// CriteriaQuery criteria = builder.createQuery(metadatumClass);
@@ -176,7 +176,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	
 	protected Metadatum findMetadatum(ID subjectId, String predicate,
 			Class<?> metadatumClass) {
-		List<Metadatum> results = this.entityManager
+		List<Metadatum> results = this.getEntityManager()
 				.createQuery(
 				"from " + metadatumClass.getSimpleName()
 						+ " m where m.predicate = ?1 and m.subject.id = ?2")
@@ -195,13 +195,13 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 
 	@Override
 	public void refresh(T entity) {
-		this.entityManager.refresh(entity);
+		this.getEntityManager().refresh(entity);
 	}
 
 	@Override
 	public T saveAndRefresh(T entity) {
 		entity = this.save(entity);
-		this.entityManager.refresh(entity);
+		this.getEntityManager().refresh(entity);
 		return entity;
 	}
 
@@ -218,6 +218,13 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 		} else {
 			return super.findAll(pageable);
 		}
+	}
+
+	/**
+	 * @return the entityManager
+	 */
+	protected EntityManager getEntityManager() {
+		return entityManager;
 	}
 
 }

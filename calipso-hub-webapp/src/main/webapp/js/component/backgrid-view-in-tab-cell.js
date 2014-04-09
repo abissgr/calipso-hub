@@ -20,7 +20,6 @@ define([ 'vent', 'backbone-forms', 'backgrid', 'bootstrap-markdown','backbone-fo
 function( vent, BackboneForm, Backgrid, Markdown) {
 	var ViewInTabCell = Backgrid.StringCell.extend({
 
-		  /** @property */
 		  className: "view-in-tab-cell",
 		  events : {
 				"click" : "viewRow"
