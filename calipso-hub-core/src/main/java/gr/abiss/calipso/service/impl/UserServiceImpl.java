@@ -54,16 +54,6 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 		super.setRepository(userRepository);
 	}
 
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public User findByCredentials(String userNameOrEmail, String password) {
-		return this.findByCredentials(userNameOrEmail, password, null); 
-	}
-	
-
 	/**
 	 * {@inheritDoc}
 	 * @see gr.abiss.calipso.userDetails.integration.LocalUserService#findByCredentials(java.lang.String, java.lang.String, java.util.Map)

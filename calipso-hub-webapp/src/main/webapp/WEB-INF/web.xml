@@ -19,7 +19,7 @@
 	<!-- original -->
 	<context-param>
 		<param-name>spring.profiles.active</param-name>
-		<param-value>resthub-jpa, resthub-web-server</param-value>
+		<param-value>resthub-jpa, resthub-web-server, resthub-pool-bonecp</param-value>
 	</context-param>
 		
 

@@ -100,6 +100,7 @@ public abstract class AbstractAuditableMetadataSubject<M extends Metadatum, U ex
 		try {
 			metadatum = (M) metadatumClass.getConstructor(String.class,
 					String.class).newInstance(predicate, object);
+			metadatum.setSubject(this);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed adding metadatum", e);
 		}

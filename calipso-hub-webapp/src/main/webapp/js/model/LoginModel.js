@@ -4,7 +4,7 @@ define(['backbone', 'session'], function(Backbone, session) {
 
 		modelKey: "login",
 
-		url: session.getBaseUrl()+'/api-auth/userDetails',
+		url: session.getBaseUrl()+'/api-auth',
 
     defaults: {
       email    : '',

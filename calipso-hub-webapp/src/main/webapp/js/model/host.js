@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'component/backgrid-view-in-tab-cell' ],
-		function( GenericModel, EditInTabCell, ViewInTabCell) {
-			var HostModel = GenericModel.extend({
+define([ 'calipso', 'component/backgrid-edit-in-tab-button-cell', 'backgrid-view-row-maximized-cell'],
+		function( Calipso, EditInTabCell, ViewRowCell) {
+			var HostModel = Calipso.model.GenericModel.extend({
 			},
 			// static members
 			{
-				parent: GenericModel
+				parent: Calipso.model.GenericModel
 			});
 			/**
 			 * Get the model class URL fragment corresponding this class
@@ -36,7 +36,7 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'c
 			 		return "HostModel";
 			}
 			HostModel.prototype.getLayoutViewType = function() {
-				return require('view/md-search-layout')
+				return Calipso.view.ModelDrivenSearchLayout
 			}
 			HostModel.prototype.getFormSchemas = function() {
 				console.log("HostModel.prototype.getFormSchemas() called, will return undefined");
@@ -56,12 +56,12 @@ define([ 'model/generic-model', 'component/backgrid-edit-in-tab-button-cell', 'c
 					name : "domain",
 					label : "domain",
 					editable : false,
-					cell : ViewInTabCell
+					//cell : ViewRowCell
 				}, {
 					name : "edit",
 					label : "",
 					editable : false,
-					cell : EditInTabCell
+					//cell : EditInTabCell
 				}];
 			}
 			return HostModel;

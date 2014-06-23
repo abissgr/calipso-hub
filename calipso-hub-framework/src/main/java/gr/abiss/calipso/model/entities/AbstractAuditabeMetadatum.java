@@ -57,7 +57,11 @@ public abstract class AbstractAuditabeMetadatum<S extends MetadataSubject, U ext
 
 	@Column(name = "object")
 	private String object;
-
+	public AbstractAuditabeMetadatum(String predicate, String object) {
+		super();
+		this.predicate = predicate;
+		this.object = object;
+	}
 	public AbstractAuditabeMetadatum(S subject, String predicate, String object) {
 		super();
 		this.predicate = predicate;

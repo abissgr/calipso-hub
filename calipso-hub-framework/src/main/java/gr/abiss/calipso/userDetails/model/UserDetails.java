@@ -104,7 +104,9 @@ public class UserDetails implements SocialUserDetails/*
 		if (user != null) {
 			details = new UserDetails();
 			BeanUtils.copyProperties(user, details);
-			details.setId(user.getId().toString());
+			if(user.getId() != null){
+				details.setId(user.getId().toString());
+			}
 			details.setUsername(user.getUserName());
 			details.setPassword(user.getUserPassword());
 			details.setEmail(user.getEmail());

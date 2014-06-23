@@ -18,11 +18,13 @@
  */
 package gr.abiss.calipso.service;
 
+import java.util.Map;
+
 import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.User;
 
 public interface UserService extends GenericService<User, String> {
 
-	User findByCredentials(String userNameOrEmail, String password);
+	User findByCredentials(String userNameOrEmail, String password, Map metadata);
 
 }

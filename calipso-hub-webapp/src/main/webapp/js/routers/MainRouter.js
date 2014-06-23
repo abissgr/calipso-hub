@@ -16,34 +16,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define(function(require) {
-	var Backbone = require('backbone'),
-		Marionette = require('marionette'),
-		MainController = require('controllers/MainController')
-	
+define(['marionette', 'calipso', 'controllers/MainController'], function (Marionette, Calipso, MainController) {
+
 	return Marionette.AppRouter.extend({
 
 		controller : new MainController(),
 //	   controller: MainController,
 
 		appRoutes : {
-			//'' : 'home',
-			'client' : 'home',
-			'client/' : 'home',
-			'client/home' : 'home',
-			'client/login' : 'login',
-			'client/logout' : 'logout',
-//			'client/users' : 'mainNavigationRoute',
-			'client/:mainRoutePart' : 'mainNavigationCrudRoute',
-			'client/:mainRoutePart/:genericViewTab' : 'mainNavigationCrudRoute',
-//			'client/:modelFileName' : 'mainNavigationRoute',
-//			'client/:modelFileName/:genericViewTab' : 'mainNavigationRoute',
+
+			'' : 'home',
+			'calipso/client/' : 'home',
+			'calipso/client/home' : 'home',
+			'calipso/client/login' : 'login',
+			'calipso/client/logout' : 'logout',
+//			'users' : 'mainNavigationRoute',
+			'calipso/client/:mainRoutePart' : 'mainNavigationSearchRoute',
+			'calipso/client/:mainRoutePart?*queryString' : 'mainNavigationSearchRoute',
+			'calipso/client/:mainRoutePart/:modelId' : 'mainNavigationCrudRoute',
 			'*path':  'notFoundRoute'
-		},
+		}
 
 	},
-	// static members
 	{
+	// static members
 		getTypeName: function(){return "MainRouter"}
 	});
 

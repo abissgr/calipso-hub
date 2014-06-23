@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
-@Controller
+//@Controller
 @RequestMapping(value = "/api/rest/users", produces = { "application/json", "application/xml" })
 public class UserController extends AbstractServiceBasedRestController<User, String, UserService> {
 

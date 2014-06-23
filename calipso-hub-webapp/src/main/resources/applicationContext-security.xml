@@ -2,11 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:sec="http://www.springframework.org/schema/security"
-       xmlns:http="http://www.springframework.org/schema/security"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 	
-	<!-- Calipso UserDetailsService implementation -->
+    <!-- choose the default user controller -->
+     <bean id="userController" 
+        class="gr.abiss.calipso.controller.UserController" />
+    <!-- Calipso UserDetailsService implementation -->
     <bean id="userDetailsService" 
     	class="gr.abiss.calipso.userDetails.service.impl.UserDetailsServiceImpl" 
     	autowire="byType" />

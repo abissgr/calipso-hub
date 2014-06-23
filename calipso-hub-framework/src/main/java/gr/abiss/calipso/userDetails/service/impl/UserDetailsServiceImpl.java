@@ -29,6 +29,7 @@ import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -141,7 +142,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 							.findByCredentials(userNameOrEmail, password,
 									metadata);
 
-					// convert to UserDetals if not null
+					// convert to UserDetails if not null
 					userDetails = UserDetails.fromUser(localUser);
 
 					if(LOGGER.isDebugEnabled()){
@@ -419,6 +420,11 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		return gr.abiss.calipso.userDetails.model.UserDetails
 				.fromUser(this.localUserService
 						.createForImplicitSignup(localUser));
+	}
+
+	//@Override
+	public Iterable<UserDetails> findByIds(Set<String> ids) {
+		throw new UnsupportedOperationException();
 	}
 
 }

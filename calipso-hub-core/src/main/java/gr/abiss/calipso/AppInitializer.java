@@ -34,7 +34,7 @@ import javax.inject.Named;
 import org.apache.commons.configuration.Configuration;
 import org.resthub.common.util.PostInitialize;
 
-@Named("sampleInitializer")
+//@Named("sampleInitializer")
 public class AppInitializer {
 
 	@Inject

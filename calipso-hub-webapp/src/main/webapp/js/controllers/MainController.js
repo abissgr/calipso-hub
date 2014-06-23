@@ -16,22 +16,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define(function(require) {
-	var Backbone = require('backbone'),
-	Marionette = require('marionette'),
-	session = require('session'),
-	vent = require('vent'),
-	AbstractController = require('controllers/abstract-controller');
+define(['calipso', 'underscore', 'backbone', 'marionette'],
+
+function(Calipso, _, Backbone, Marionette) {
 
 
-	var MainController = AbstractController.extend({
-//		constructor: function(options){
-//			options.layout : new AppLayoutView({
-//				model : session
-//			});
-//			AbstractController.prototype.constructor.call(this, options);
-//		},
+	var MainController = Calipso.controller.AbstractController.extend({
 
+		home : function() {
+			console.log("AbstractController#home");
+//			if (!session.isAuthenticated()) {
+//				Backbone.history.navigate(Calipso.app.config.contextPath + "client/login", {
+//					trigger : true
+//				});
+//				return false;
+//			}
+			var modelForRoute = Calipso.model.UserModel.create({id: "search"});
+			
+			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], {
+				model : Calipso.model.UserModel,
+				url : Calipso.session.getBaseUrl() + "/api/rest/users",
+				data: {foobar: true}
+				
+			});
+			console.log("Tryiung to show home with client layout");
+			var LayoutType = Calipso.model.UserModel.prototype.getLayoutViewType();
+			Calipso.vent.trigger('app:show', new LayoutType({
+				model: modelForRoute,
+				hideSidebarOnSearched: true
+			}));
+		}
 
 	});
 	return MainController;

@@ -62,7 +62,7 @@ public class SecurityUtil {
 				&& StringUtils.isNotBlank(userDetails.getPassword())) {
 			String token = new String(Base64.encode((userDetails.getUsername()
 					+ ":" + userDetails.getPassword()).getBytes()));
-			addCookie(response, userDetailsConfig.getCookiesBasicAuthTokenName(), token, false, userDetailsConfig);
+			addCookie(request, response, userDetailsConfig.getCookiesBasicAuthTokenName(), token, false, userDetailsConfig);
 		} else{
 			throw new BadCredentialsException("The provided user details are incomplete");
 		}
@@ -71,10 +71,10 @@ public class SecurityUtil {
 
 
 	public static void logout(HttpServletRequest request, HttpServletResponse response, UserDetailsConfig userDetailsConfig) {
-		addCookie(response, userDetailsConfig.getCookiesBasicAuthTokenName(), null, true, userDetailsConfig);
-		addCookie(response, COOKIE_NAME_SESSION, null, true, userDetailsConfig);
+		addCookie(request, response, userDetailsConfig.getCookiesBasicAuthTokenName(), null, true, userDetailsConfig);
+		addCookie(request, response, COOKIE_NAME_SESSION, null, true, userDetailsConfig);
 		HttpSession session = request.getSession();
-		if (session != null) {
+		if (session == null) {
 			if(LOGGER.isDebugEnabled()){
 				LOGGER.debug("logout, no session to clear");
 			}
@@ -96,7 +96,7 @@ public class SecurityUtil {
 	 * @param cookieValue
 	 * @param allowClear
 	 */
-	private static void addCookie(HttpServletResponse response, String cookieName, String cookieValue, boolean allowClear, UserDetailsConfig userDetailsConfig) {
+	private static void addCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, boolean allowClear, UserDetailsConfig userDetailsConfig) {
 		if (StringUtils.isBlank(cookieValue) && !allowClear) {
 			throw new RuntimeException("Was given a blank cookie value but allowClear is false for cookie name: " + cookieName);
 		}
@@ -110,15 +110,26 @@ public class SecurityUtil {
 				", path: "+userDetailsConfig.getCookiesContextPath());
 		}
 		Cookie cookie = new Cookie(cookieName, cookieValue);
+		
+		// set the cookie domain
 		if (StringUtils.isNotBlank(userDetailsConfig.getCookiesDomain())) {
 			cookie.setDomain('.' + userDetailsConfig.getCookiesDomain());
 		}
-
+		// maybe not a good idea unless you can trust the proxy
+//		else if (StringUtils.isNotBlank(request.getHeader("X-Forwarded-Host"))) {
+//			cookie.setDomain('.' + request.getHeader("X-Forwarded-Host"));
+//		}
+//		else{
+//			cookie.setDomain('.' + request.getLocalName());
+//			
+//		}
+		// set the cookie path
 		if (StringUtils.isNotBlank(userDetailsConfig.getCookiesContextPath())) {
 			cookie.setPath(userDetailsConfig.getCookiesContextPath());
-		} else {
-			cookie.setPath("/");
-		}
+		} 
+//		else {
+//			cookie.setPath("/");
+//		}
 		
 		cookie.setSecure(userDetailsConfig.isCookiesSecure());
 		cookie.setHttpOnly(userDetailsConfig.isCookiesHttpOnly());

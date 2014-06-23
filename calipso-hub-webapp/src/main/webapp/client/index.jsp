@@ -1,18 +1,14 @@
-<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
-	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:fn="http://java.sun.com/jsp/jstl/functions" version="2.0">
-
+<!DOCTYPE html>
+<%@page contentType="text/html;charset=UTF-8" %>
 <html lang="en">
-	<jsp:directive.page contentType="text/html" pageEncoding="UTF-8" />
-	<jsp:output omit-xml-declaration="true" />
-	<jsp:output doctype-root-element="HTML"
-		doctype-system="about:legacy-compat" />
-	<jsp:scriptlet>
-	String basePath = gr.abiss.calipso.utils.ConfigurationFactory
-					.getConfiguration()
-					.getString(gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
-	pageContext.setAttribute("basePath", basePath);
-	</jsp:scriptlet>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%
+String basePath = gr.abiss.calipso.utils.ConfigurationFactory
+.getConfiguration()
+.getString(gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
+pageContext.setAttribute("basePath", basePath);
+ %>
 	<head>
 		<meta charset="utf-8" />
 		<title>Calipso</title>
@@ -21,6 +17,15 @@
 		<meta name="description" content="" />
 		<meta name="author" content="" />
 		<link href="${basePath}/css/bootstrap.css" rel="stylesheet" />
+		<link href="${basePath}/font-awesome/css/font-awesome.css" rel="stylesheet" />
+        <!-- SB Admin -->
+	    <link href="${basePath}/css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet" />
+	    <link href="${basePath}/css/plugins/timeline/timeline.css" rel="stylesheet" />
+	    <!-- SB Admin CSS - Include with every page -->
+	    <link href="${basePath}/css/sb-admin.css" rel="stylesheet" />
+		
+		
+		
 		<link href="${basePath}/css/bootstrap-markdown.css" rel="stylesheet" />
 		<link href="${basePath}/css/calipso.css" rel="stylesheet" />
 		<link href="${basePath}/css/style.css" rel="stylesheet" />
@@ -28,14 +33,16 @@
       	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     	<![endif]-->
 	</head>
-	<body id="calipso-client">
-		
-	    <div id="wrap">
-	    	<div id="calipsoHeaderRegion">
+	<body class="page-sidebar-fixed page-footer-fixed">
+        <div id="wrapper">
+
+	    	<nav id="calipsoHeaderRegion" style="margin-bottom: 0" role="navigation" class="navbar navbar-default navbar-fixed-top">
 				<!-- -->
-			</div>
+			</nav>
+			 <div id="page-wrapper">
 	    	<div id="calipsoMainContentRegion">
 				<!-- -->
+			</div>
 			</div>
 	    </div>
 			
@@ -45,9 +52,8 @@
 	    <div id="calipsoRegionModal" class="modal hide fade"></div>
 	    
 		<!-- Placed at the end of the document so the pages load faster -->
-		<script data-main="/js/config" src="/js/lib/require.js">
+		<script id="calipso-script-main" data-main="${basePath}/js/config" src="${basePath}/js/lib/require.js">
 		<!-- -->
 		</script>
 	</body>
 </html>
-</jsp:root>

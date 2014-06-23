@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'model/generic-model'],
-function( GenericModel) {
+define([ 'calipso'],
+function( Calipso) {
 		var TabModel = Backbone.Model.extend();
 		return TabModel;
 });

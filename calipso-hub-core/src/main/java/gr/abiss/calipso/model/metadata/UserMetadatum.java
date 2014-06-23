@@ -19,6 +19,10 @@ public class UserMetadatum extends AbstractAuditabeMetadatum<User, User> {
 		super(null, null, null);
 	}
 
+	public UserMetadatum(String predicate, String object) {
+		super(predicate, object);
+	}
+
 	public UserMetadatum(User subject, String predicate, String object) {
 		super(subject, predicate, object);
 	}

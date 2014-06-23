@@ -17,7 +17,7 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define(function(require) {
+define("calipso", function(require) {
 
 	// Baseline setup
 	// --------------
@@ -48,8 +48,12 @@ define(function(require) {
 		return _.extend(target, result);
 	};
 
-	// Define and export the Calipso namespace
+	/**
+	 * Calipso namespace
+	 * @namespace
+	 */
 	var Calipso = {
+		config : {},
 		util : {},
 		components : {},
 		collection : {},
@@ -60,11 +64,177 @@ define(function(require) {
 
 	// Get the DOM manipulator for later use
 	Calipso.$ = Backbone.$;
+	Calipso.decodeParamRexex = /\+/g;
+	Calipso.decodeParam = function (s) { 
+		return decodeURIComponent(s.replace(Calipso.decodeParamRexex, " ")); 
+	}
+	Calipso.getHttpUrlParams = function(url){
+		var urlParams  = {};
+		if(!url){
+			url = window.location.href;
+		}
+		console.log("Calipso.getHttpUrlParams, URL");
+		var queryString = url.indexOf("?") > -1 ? url.substring(url.indexOf("?")+1) : url;
+		var keyValuePairs = queryString.split('&'); 
+		for(var i in keyValuePairs) {
+			var keyValuePair = keyValuePairs[i].split('=');
+			urlParams[Calipso.decodeParam(keyValuePair[0])] = (keyValuePair.length > 1) ? this.decodeParam(keyValuePair[1]) : null;
+		} 
+	
+		
+		return urlParams; 
+	}
+	// utility method to stop events, covers IE8+
+	Calipso.stopEvent = function(e) {
+		var event = e ? e : window.event;
+		if (event.preventDefault) {
+			event.preventDefault();
+		} else {
+			event.returnValue = false;
+			event.stop();
+		}
+		if (event.stopPropagation) {
+			event.stopPropagation();
+		} else {
+			event.cancelBubble = true;
+		}
+	}
+
+	Calipso.getConfigProperty = function(propertyName) {
+		return Calipso.config[propertyName];
+	}
+	Calipso.navigate = function(url, options) {
+		Calipso.app.routers["MainRouter"].navigate(url, options);
+	}
+	Calipso.initializeApp = function(customConfig) {
+		customConfig = customConfig || {};
+		var config = {
+			contextPath : "/",
+			loginViewType : Calipso.view.LoginView,
+			sessionType : Calipso.util.Session,
+			apiAuthPath: "/api-auth"
+		}
+		Calipso.config = _.defaults(customConfig, config);
+		
+
+
+		console.log("Setting up Calipso.session...");
+		var SessionType = Calipso.getConfigProperty("sessionType");
+		Calipso.session = new SessionType();
+		console.log("Calipso.session has been configured");
+
+		console.log("Setting up Calipso.app...");
+		Calipso.app = new Marionette.Application({
+			config : Calipso.config,
+			routers : {}
+		});
+
+		// application configuration
+		Calipso.app.addRegions({
+			headerRegion : "#calipsoHeaderRegion",
+			mainContentRegion : "#calipsoMainContentRegion",
+			modal : Calipso.view.ModalRegion,
+			footerRegion : "#calipsoFooterRegion"
+		});
+
+		Calipso.app.addInitializer(function(options) {
+
+			// init ALL app routers
+			_(options.routers).each(function(routerClass) {
+				var router = new routerClass();
+				Calipso.app.routers[routerClass.getTypeName()] = router;
+				console.log("initialized router: " + routerClass.getTypeName());
+			});
+
+			Calipso.modelTypesMap = {};
+			_(Calipso.model).each(function(ModelClass) {
+				var model = new ModelClass();
+				console.log("initialize model type: " + model.getTypeName());
+				if (model.getTypeName() != "GenericModel") {
+
+					Calipso.modelTypesMap[model.getPathFragment()] = ModelClass;
+					console.log("initialized model type: " + model.getTypeName() + " and key: " + model.getPathFragment());
+				}
+			});
+
+		});
+		console.log("Calipso.app has been configured");
+
+		////////////////////////////////
+		// app init/events
+		////////////////////////////////
+		// initialize header, footer, history
+		Calipso.app.on("initialize:after", function() {
+			console.log("app event initialize:after");
+			//	try "remember me"
+			Calipso.session.load();
+			// render basic structure
+			Calipso.app.headerRegion.show(new Calipso.view.HeaderView({
+				model : Calipso.session.userDetails
+			}));
+			// app.mainContentNavRegion.show(new MainContentNavView());
+			Calipso.app.footerRegion.show(new Calipso.view.FooterView());
+
+			var pushStateSupported = _.isFunction(history.pushState);
+			var contextPath =  Calipso.getConfigProperty("contextPath");
+			if(contextPath.length > 1){
+				contextPath = "/" + contextPath;
+			}
+			var startRoot = "/" + contextPath + "client/"
+			
+			if(pushStateSupported){
+				Backbone.history.start({ pushState: true, hashChange: false, useBackboneNavigate: true });
+			}
+			else{
+				Backbone.history.start({pushState: false});
+			}
+		});
+			
+
+		Calipso.vent.on('app:show', function(appView) {
+			Calipso.app.mainContentRegion.show(appView);
+		});
+		Calipso.vent.on('session:created', function(userDetails) {
+			console.log("vent event session:created");
+			Calipso.session.userDetails = userDetails;
+			Calipso.app.headerRegion.show(new Calipso.view.HeaderView({
+				model : userDetails
+			}));
+
+			// send logged in user on their way
+			var fw = Calipso.app.fw ? Calipso.app.fw : "home";
+			console.log("session:created, update model: " + userDetails.get("email") + ", navigating to: " + fw);
+
+			Calipso.navigate(fw, {
+				trigger : true
+			});
+			//window.location = fw;
+		});
+		Calipso.vent.on('session:destroy', function(userDetails) {
+			Calipso.session.destroy();
+			Calipso.navigate("login", {
+				trigger : true
+			});
+		});
+		Calipso.vent.on('nav-menu:change', function(modelkey) {
+			console.log("vent event nav-menu:change");
+
+		});
+		Calipso.vent.on('modal:show', function(view) {
+			console.log("vent event modal:show");
+			Calipso.app.modal.show(view);
+		});
+		Calipso.vent.on('modal:close', function() {
+			console.log("vent event modal:close");
+			Calipso.app.modal.hideModal();
+		});
+
+	}
 
 	// //////////////////////////////////////
 	// Region
 	// //////////////////////////////////////
-	Calipso.view.ModalRegion = Marionette.Region.extend({
+	Calipso.view.ModalRegion = Marionette.Region.extend(/** @lends Calipso.view.ModalRegion.prototype */{
 		el : "#calipsoRegionModal",
 
 		onShow : function(view) {
@@ -80,7 +250,7 @@ define(function(require) {
 	// //////////////////////////////////////
 	// Collection
 	// //////////////////////////////////////
-	Calipso.collection.GenericCollection = Backbone.PageableCollection.extend({
+	Calipso.collection.GenericCollection = Backbone.PageableCollection.extend(/** @lends Calipso.collection.GenericCollection.prototype */{
 		mode : "server",
 		initialize : function(attributes, options) {
 			if (options.model) {
@@ -96,7 +266,6 @@ define(function(require) {
 			if (options.data) {
 				if (options.data[""] || options.data[""] == null) {
 					delete options.data[""];
-					console.log("GenericCollection#initialize, deletted empty key in given .data, source: " + options.data.toSource());
 				}
 				this.data = options.data;
 			}
@@ -163,9 +332,6 @@ define(function(require) {
 		// return resp.content;
 		// }
 		parse : function(response) {
-			// console.log("GenericCollection#parse, model:
-			// "+this.model.toSource()+", className:
-			// "+this.model.getTypeName());
 			_self = this;
 			this.total = response.totalElements;
 			this.totalPages = response.totalPages;
@@ -190,284 +356,6 @@ define(function(require) {
 			}
 			// _.each(response.content, function(modelItem) {});
 			return superModelAwareInstances;
-		}
-
-	});
-
-	// //////////////////////////////////////
-	// Controller
-	// //////////////////////////////////////
-
-	Calipso.controller.AbstractController = Marionette.Controller.extend({
-		constructor : function(options) {
-			console.log("AbstractController#constructor");
-			Marionette.Controller.prototype.constructor.call(this, options);
-			this.layout = new Calipso.view.AppLayoutView({
-				model : Calipso.session
-			});
-			Calipso.vent.trigger('app:show', this.layout);
-
-		},
-		home : function() {
-			console.log("AbstractController#home");
-			if (!session.isAuthenticated()) {
-				Backbone.history.navigate("client/login", {
-					trigger : true
-				});
-				return false;
-			}
-			this.layout.contentRegion.show(new HomeLayout());
-		},
-
-		login : function() {
-			var loginModel = new Calipso.model.UserModel({
-				email : session.get('email'),
-				issuer : session.get('issuer'),
-
-				getLayoutViewType : function() {
-					return Calipso.view.ModelDrivenBrowseLayout;
-				},
-			});
-
-			var view = new Calipso.view.LoginView({
-				model : loginModel
-			});
-
-			view.on('app:login', this.authenticate);
-			console.log("AbstractController#login, showing login view");
-			Calipso.vent.trigger('app:show', view);
-		},
-
-		authenticate : function(args) {
-			// console.log('MainController authenticate called');
-			var self = this;
-			var email = this.$('input[name="email"]').val();
-			var password = this.$('input[name="password"]').val();
-
-			$.when(this.model.authenticate(email, password)).then(function(model, response, options) {
-				session.save(model);
-				session.load();
-				// console.log('MainController authenticate navigating to home');
-				Backbone.history.navigate(Calipso.contextPath + "client/home", {
-					trigger : true
-				});
-			}, function(model, xhr, options) {
-				self.$el.find('.alert').show();
-			});
-		},
-
-		logout : function() {
-			session.destroy();
-			// this.login();
-			window.parent.close();
-		},
-		notFoundRoute : function(path) {
-			// console.log("notFoundRoute, path: "+path);
-			this.layout.contentRegion.show(new Calipso.view.NotFoundView());
-		},
-		/**
-		 * Get a model representing the current request.
-		 * 
-		 * For an example, consider the URL [api-root]/users/[some-id]. First,
-		 * a model class is loaded based on the URL fragment representing the
-		 * type, e.g. "users" for UserModel.
-		 * 
-		 * A model instance is then created using some-id if provided or
-		 * "search" otherwise. If a backbone supermodel instance is already
-		 * cached, it is reused.
-		 * 
-		 * In case of "search" a collection of the given model type is
-		 * initialized but, similarly to the model instance, it is not fetched
-		 * from the server.
-		 * 
-		 * @param {string}
-		 *           modelTypeKey the URL fragment representing the model type
-		 *           key, e.g. "users" for UserModel
-		 * @param {string}
-		 *           modelId the model identifier. The identifier may be either
-		 *           a primary or business key, depending on your server side
-		 *           implementation. The default property name in client side
-		 *           models is "name". You can override
-		 *           {@linkcode GenericModel.prototype.getBusinessKey} to
-		 *           define another property name.
-		 * @see (@link GenericModel.prototype.getBusinessKey}
-		 */
-		getModelForRoute : function(modelTypeKey, modelId, httpParams) {
-			console.log("AbstractController#getModelForRoute, modelTypeKey: " + modelTypeKey + ", modelId: " + modelId + ", httpParams: " + httpParams);
-			var ModelType;
-			if (Calipso.modelTypesMap[modelTypeKey]) {
-				ModelType = Calipso.modelTypesMap[modelTypeKey];
-			} else {
-				var modelForRoute;
-				var modelModuleId = "model/" + _.singularize(modelTypeKey);
-				if (!require.defined(modelModuleId)) {
-
-					require([ modelModuleId ], function(module) {
-						ModelType = module;
-					})
-				}
-				//					else{
-				ModelType = require(modelModuleId)
-				//					}
-
-			}
-			if (!ModelType) {
-				throw "No matching model type was found for key: " + modelModuleId;
-			}
-			console.log("AbstractController#getModelForRoute, modelModuleId:" + modelModuleId);
-
-			if (modelId) {
-				console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
-				// try cached models first
-				modelForRoute = new ModelType({
-					id : modelId
-				});// ModelType.all().get(modelId);
-				// otherwise create a transient instance and let the view load it
-				// from the server
-				if (!modelForRoute) {
-					console.log("AbstractController#getModelForRoute, model for id is not loaded, creating new");
-					modelForRoute = ModelType.create({
-						id : modelId,
-						url : session.getBaseUrl() + "/api/rest/" + modelModuleId + "/" + modelId
-					});
-					// modelForRoute.fetch({
-					// url : session.getBaseUrl() + "/api/rest/" + modelTypeKey + "/" + modelId
-					// });
-				}
-			} else {
-				// create a model to use as a wrapper for a collection of
-				// instances of the same type
-				modelForRoute = ModelType.create("search");
-			}
-			var collectionOptions = {
-				model : ModelType,
-				url : Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment()
-			};
-			if (httpParams) {
-				if (httpParams[""] || httpParams[""] == null) {
-					delete httpParams[""];
-					console.log("AbstractController#getModelForRoute, deletted empty key in given .data, source: " + httpParams.toSource());
-				}
-				collectionOptions.data = httpParams;
-			}
-			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], collectionOptions);
-			console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
-			return modelForRoute;
-
-		},
-		mainNavigationSearchRoute : function(mainRoutePart, queryString) {
-			console.log("AbstractController#mainNavigationSearchRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
-			for (var i = 0, j = arguments.length; i < j; i++) {
-				console.log("AbstractController#mainNavigationSearchRoute, argument: " + (arguments[i] + ' '));
-			}
-			var httpParams = this.getHttpUrlParams(window.location.search);
-			this.mainNavigationCrudRoute(mainRoutePart, null, httpParams);
-
-		},
-		mainNavigationCrudRoute : function(mainRoutePart, modelId, httpParams) {
-			// build the model instancde representing the current request
-			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", modelId: " + modelId);
-			var modelForRoute = this.getModelForRoute(mainRoutePart, modelId, httpParams);
-
-			// get the layout type corresponding to the requested model
-			var RequestedModelLayoutType = modelForRoute.getLayoutViewType();
-
-			// show the layout
-			// TODO: reuse layout if of the same type
-			var routeLayout = new RequestedModelLayoutType({
-				model : modelForRoute
-			});
-			Calipso.vent.trigger("app:show", routeLayout);
-
-			// update page header tabs etc.
-			this.syncMainNavigationState(modelForRoute);
-
-		},
-		notFoundRoute : function() {
-			// build the model instancde representing the current request
-			console.log("AbstractController#notFoundRoute");
-			Calipso.vent.trigger("app:show", new Calipso.view.NotFoundView());
-
-		},
-		decodeParam : function(s) {
-			return decodeURIComponent(s.replace(/\+/g, " "));
-		},
-		getHttpUrlParams : function(url) {
-			var urlParams = {};
-			var queryString = url.substring(url.indexOf("?") + 1);
-			var keyValuePairs = queryString.split('&');
-			for ( var i in keyValuePairs) {
-				var keyValuePair = keyValuePairs[i].split('=');
-				urlParams[this.decodeParam(keyValuePair[0])] = (keyValuePair.length > 1) ? this.decodeParam(keyValuePair[1]) : null;
-			}
-			return urlParams;
-		},
-		/*
-		 * TODO
-		 * 
-		 * initCrudLayout : function(routeHelper){ if((!this.layout) ||
-		 * this.layout.getTypeName() != "AppLayoutView"){ //
-		 * console.log("AbstractController#initCrudLayout, calling
-		 * this.ensureActiveLayout()"); this.ensureActiveLayout(); } else{ //
-		 * console.log("AbstractController#initCrudLayout, not updating
-		 * this.layout: "+this.layout.getTypeName()); } var _self = this;
-		 * 
-		 * var TabModel = Backbone.Model.extend(); var TabCollection =
-		 * Backbone.Collection.extend({ model: GenericModel, initialize:
-		 * function () { // console.log("AbstractController#initCrudLayout,
-		 * TabCollection initializing"); this.bind('add', this.onModelAdded,
-		 * this); this.bind('remove', this.onModelRemoved, this); },
-		 * onModelAdded: function(model, collection, options) {
-		 * _self.tabKeys[model.get("id")] = model; }, onModelRemoved: function
-		 * (model, collection, options) { _self.tabKeys[model.get("id")] =
-		 * null; }, }); this.tabs = new TabCollection([
-		 * (routeHelper.routeModel) ]); var tabLayout = new
-		 * TabLayout({collection: this.tabs});
-		 * 
-		 * vent.on("itemView:openGridRowInTab", function(itemModel) {
-		 * vent.trigger("openGridRowInTab", itemModel); });
-		 * vent.on("openGridRowInTab", function(itemModel) {
-		 * console.log("openGridRowInTab"); _self.tabs.add(itemModel);
-		 * vent.trigger("viewTab", itemModel); }); vent.on("viewTab",
-		 * function(itemModel) { this.layout.contentRegion.show(new
-		 * itemmodel.itemView(itemmodel)); //
-		 * Backbone.history.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), { //
-		 * trigger : false // }); _self.syncMainNavigationState(null,
-		 * itemModel.get("id")); });
-		 * 
-		 * this.layout.contentRegion.show(tabLayout); },
-		 */
-		syncMainNavigationState : function(modelForRoute) {
-			var mainRoutePart = modelForRoute.getPathFragment(), contentNavTabName = modelForRoute.get("id");
-			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: " + contentNavTabName);
-			// update active nav menu tab
-			if (mainRoutePart && mainRoutePart != this.lastMainNavTabName) {
-				$('.navbar-nav li.active').removeClass('active');
-				$('#mainNavigationTab-' + mainRoutePart).addClass('active');
-				this.lastMainNavTabName = mainRoutePart;
-			}
-			// update active content tab
-			if (contentNavTabName && contentNavTabName != this.lastContentNavTabName) {
-				$('#calipsoTabLabelsRegion li.active').removeClass('active');
-				$('#md-crud-layout-tab-label-' + contentNavTabName).addClass('active');
-				// show coressponding content
-				// console.log("show tab: "+contentNavTabName);
-				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');
-				$('#calipsoTabContentsRegion .tab-pane').addClass('hidden');
-				$('#tab-' + contentNavTabName).removeClass('hidden');
-				$('#tab-' + contentNavTabName).addClass('active');
-				this.lastContentNavTabName = contentNavTabName;
-			}
-		},
-		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart) {
-			if (typeof this[mainRoutePart] == 'function') {
-				// render explicit route
-				this[mainRoutePart](secondaryRoutePart);
-			}
-		},
-
-		editItem : function(item) {
-			console.log("MainController#editItem, item: " + item);
 		}
 
 	});
@@ -548,9 +436,7 @@ define(function(require) {
 	 * @augments module:Supermodel.Model
 	 */
 	Calipso.model.GenericModel = Supermodel.Model.extend(
-	/**
-	 * @lends module:models/generic-model~GenericModel.prototype
-	 */
+	/** @lends Calipso.model.GenericModel.prototype */
 	{
 		/**
 		 * Prefer the collection URL if any for more specific CRUD, fallback to
@@ -570,7 +456,7 @@ define(function(require) {
 		 * @returns the URL path fragment as a string
 		 */
 		getPathFragment : function() {
-			return this.prototype.getPathFragment();
+			return this.prototype.getPathFragment(this);
 		},
 		/**
 		 * Get the name of this class
@@ -581,57 +467,57 @@ define(function(require) {
 		},
 		/**
 		 * Get the layout view for this model. To specify a layout for your model under a static 
-		 * or instance context, override {@link GenericModel.prototype.getLayoutViewType} 
+		 * or instance context, override {@link Calipso.model.GenericModel.prototype.getLayoutViewType} 
 		 * or {@link getLayoutViewType} respectively in your subclass. 
 		 * 
 		 * Layout views defined this way are picked up by controllers.
 		 * 
-		 * @see {@link GenericModel.prototype.getLayoutViewType}
+		 * @see {@link Calipso.model.GenericModel.prototype.getLayoutViewType}
 		 */
 		getLayoutViewType : function() {
-			return this.prototype.getLayoutViewType();
+			return this.prototype.getLayoutViewType(this);
 		},
 		/**
 		 * Get the collection view type for collections of this model. To specify a collection 
 		 * view for your model under a static or instance context, override 
-		 * {@link GenericModel.prototype.getCollectionViewType} or 
+		 * {@link Calipso.model.GenericModel.prototype.getCollectionViewType} or 
 		 * {@link getCollectionViewType} respectively in your subclass.
 		 * 
 		 * Collection views defined this way are picked up by layout views..
 		 * 
-		 * @see {@link GenericModel.prototype.getCollectionViewType}
+		 * @see {@link Calipso.model.GenericModel.prototype.getCollectionViewType}
 		 */
 		getCollectionViewType : function() {
-			return this.prototype.getCollectionViewType();
+			return this.prototype.getCollectionViewType(this);
 		},
 		/**
 		 * Get the item view type for this model. To specify an item view for your model under a static 
-		 * or instance context, override {@link GenericModel.prototype.getItemViewType} 
+		 * or instance context, override {@link Calipso.model.GenericModel.prototype.getItemViewType} 
 		 * or {@link getItemViewType} respectively in your subclass.
 		 * 
 		 * Layout views defined this way are picked up by controllers.
 		 * 
-		 * @see {@link GenericModel.prototype.getItemViewType}
+		 * @see {@link Calipso.model.GenericModel.prototype.getItemViewType}
 		 */
 		getItemViewType : function() {
 
 			console.log("GenericModel.getItemViewType() called, will return GenericFormView");
-			return this.prototype.getItemViewType();
+			return this.prototype.getItemViewType(this);
 		},
 		/**
 		 * Get the item view template for this model. the template is picked up and 
 		 * used by item views like GenericView.  To specify an item view template for 
 		 * your model under a static or instance context, 
-		 * override {@link GenericModel.prototype.getItemViewTemplate} 
+		 * override {@link Calipso.model.GenericModel.prototype.getItemViewTemplate} 
 		 * or {@link getItemViewTemplate} respectively in your subclass.
 		 * 
 		 * Layout views defined this way are picked up by controllers.
 		 * 
-		 * @see {@link GenericModel.prototype.getItemViewType}
+		 * @see {@link Calipso.model.GenericModel.prototype.getItemViewType}
 		 */
 		getItemViewTemplate : function() {
 			console.log("GenericModel.getItemViewTemplate() called");
-			return this.prototype.getItemViewTemplate();
+			return this.prototype.getItemViewTemplate(this);
 		},
 		/**
 		 * Get the complete set of form schemas. You can also obtain the form schema for 
@@ -639,22 +525,22 @@ define(function(require) {
 		 * {@linkcode getFormSchema} instead. 
 		 * 
 		 * To define form schemas for your subclass under a static or instance context, override 
-		 * {@link GenericModel.prototype.getFormSchemas} or {@link getFormSchemas} respectively.
+		 * {@link Calipso.model.GenericModel.prototype.getFormSchemas} or {@link getFormSchemas} respectively.
 		 * 
 		 * Form schemas are picked up by form views like {@linkcode GenericFormView} or layout views
 		 * that use such form views in their regions.
 		 * 
-		 * @see {@link GenericModel.prototype.getFormSchema}
+		 * @see {@link Calipso.model.GenericModel.prototype.getFormSchema}
 		 */
 		getFormSchemas : function() {
 			console.log("GenericModel.getFormSchemas");
-			return this.prototype.getFormSchemas();
+			return this.prototype.getFormSchemas(this);
 		},
 		/**
 		 * Get the form schema for a specific action like "create", "update" or "search". 
 		 * 
 		 * To define form schemas for your subclass under a static or instance context, override 
-		 * {@link GenericModel.prototype.getFormSchemas} or {@link getFormSchemas} respectively.
+		 * {@link Calipso.model.GenericModel.prototype.getFormSchemas} or {@link getFormSchemas} respectively.
 		 * 
 		 * Form schemas are used by form views like {@linkcode GenericFormView} or layout views
 		 * that use such form views in their regions.
@@ -728,14 +614,14 @@ define(function(require) {
 	 * are required to implement this method. 
 	 * @returns the URL path fragment as a string
 	 */
-	Calipso.model.GenericModel.prototype.getPathFragment = function() {
+	Calipso.model.GenericModel.prototype.getPathFragment = function(instance) {
 		throw "Model subclasses must implement GenericModel.prototype.getPathFragment";
 	}
 	/**
 	 * Get the name of this class
 	 * @returns the class name as a string
 	 */
-	Calipso.model.GenericModel.prototype.getTypeName = function() {
+	Calipso.model.GenericModel.prototype.getTypeName = function(instance) {
 		return "GenericModel";
 	}
 
@@ -743,7 +629,7 @@ define(function(require) {
 	 * Override this to declaratively define 
 	 * grid views for your subclass
 	 */
-	Calipso.model.GenericModel.prototype.getGridSchema = function() {
+	Calipso.model.GenericModel.prototype.getGridSchema = function(instance) {
 		console.log("GenericModel.prototype.getSchemaForGrid() called, will return undefined");
 		return undefined;
 	}
@@ -752,7 +638,7 @@ define(function(require) {
 	 * Override this in your subclass to declaratively define 
 	 * form views for the default or custom actions
 	 */
-	Calipso.model.GenericModel.prototype.getFormSchemas = function() {
+	Calipso.model.GenericModel.prototype.getFormSchemas = function(instance) {
 		console.log("GenericModel.prototype.getFormSchema() called, will return undefined");
 		return undefined;
 	}
@@ -761,7 +647,7 @@ define(function(require) {
 	 * Override this to define a default layout view at a static context for your subclass, 
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
 	 */
-	Calipso.model.GenericModel.prototype.getLayoutViewType = function() {
+	Calipso.model.GenericModel.prototype.getLayoutViewType = function(instance) {
 		console.log("GenericModel.prototype.getLayoutViewType() called, will return ModelDrivenSearchLayout");
 		return Calipso.view.ModelDrivenSearchLayout;
 	}
@@ -772,7 +658,7 @@ define(function(require) {
 	 * at a static context for your subclass, 
 	 *@returns {@link ModelDrivenCollectionGridView}
 	 */
-	Calipso.model.GenericModel.prototype.getCollectionViewType = function() {
+	Calipso.model.GenericModel.prototype.getCollectionViewType = function(instance) {
 		console.log("GenericModel.prototype.getCollectionViewType() called, will return ModelDrivenCollectionGridView");
 		return Calipso.view.ModelDrivenCollectionGridView;
 	}
@@ -781,7 +667,7 @@ define(function(require) {
 	 * Override this to define a default layout view at a static context for your subclass, 
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
 	 */
-	Calipso.model.GenericModel.prototype.getItemViewType = function() {
+	Calipso.model.GenericModel.prototype.getItemViewType = function(instance) {
 		console.log("GenericModel.prototype.getItemViewType() called, will return GenericFormView");
 		return Calipso.view.GenericFormView;
 	}
@@ -789,7 +675,7 @@ define(function(require) {
 	 * Override this to define a default layout view at a static context for your subclass, 
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
 	 */
-	Calipso.model.GenericModel.prototype.getItemViewTemplate = function() {
+	Calipso.model.GenericModel.prototype.getItemViewTemplate = function(instance) {
 		console.log("GenericModel.prototype.getItemViewTemplate() called, will return null");
 		return null;
 	}
@@ -799,11 +685,13 @@ define(function(require) {
 	 * 
 	 * @returns the business key if one is defined by the model class, "name" otherwise
 	 */
-	Calipso.model.GenericModel.prototype.getBusinessKey = function() {
+	Calipso.model.GenericModel.prototype.getBusinessKey = function(instance) {
 		return "name";
 	}
 
-	Calipso.model.UserModel = Calipso.model.GenericModel.extend({
+	Calipso.model.UserModel = Calipso.model.GenericModel.extend(
+	/** @lends Calipso.model.UserModel.prototype */
+	{
 		urlRoot : "/api/rest/users"
 	}, {
 		// static members
@@ -814,13 +702,13 @@ define(function(require) {
 	 * Get the model class URL fragment corresponding this class
 	 * @returns the URL path fragment as a string
 	 */
-	Calipso.model.UserModel.prototype.getPathFragment = function() {
+	Calipso.model.UserModel.prototype.getPathFragment = function(instance) {
 		return "users";
 	}
-	Calipso.model.UserModel.prototype.getTypeName = function() {
+	Calipso.model.UserModel.prototype.getTypeName = function(instance) {
 		return "UserModel";
 	}
-	Calipso.model.UserModel.prototype.getFormSchemas = function() {
+	Calipso.model.UserModel.prototype.getFormSchemas = function(instance) {
 
 		return {//
 			userName : {
@@ -867,7 +755,7 @@ define(function(require) {
 
 	}
 
-	Calipso.model.UserModel.prototype.getGridSchema = function() {
+	Calipso.model.UserModel.prototype.getGridSchema = function(instance) {
 		return [ {
 			name : "userName",
 			label : "username",
@@ -897,16 +785,32 @@ define(function(require) {
 			name : "edit",
 			label : "",
 			editable : false,
-			cell : Calipso.components.EditInTabCell
+			cell : Calipso.components.EditRowCell
 		} ];
 	}
-	Calipso.model.UserDetailsModel = Backbone.Model.extend({
+	Calipso.model.UserModel.prototype.getOverviewSchema = function(instance) {
+		return [ {
+			member : "userName",
+			label : "username"
+		}, {
+			fetchUrl : "/api/rest/users",
+			// merge in this model if missing:
+			// modelType: Foobar,
+			member: "mergedAttribute",
+			label : "merged attribute",
+			viewType: Calipso.view.CollectionMemberGridView
+		} ];
+	}
 
-		url : baseUrl + '/api-auth',
-
+	Calipso.model.UserDetailsModel = Backbone.Model.extend(
+	/** @lends Calipso.model.UserDetailsModel.prototype */
+	{
 		sync : function(method, model, options) {
 			options = options || {};
 			options.timeout = 30000;
+			if(!options.url){
+				options.url = Calipso.session.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath");
+			}
 			// options.dataType = "jsonp"; // JSON is default.
 			return Backbone.sync(method, model, options);
 		}
@@ -924,25 +828,25 @@ define(function(require) {
 		return "UserDetailsModel";
 	}
 	//////////////////////////////////////////////////
-	// Layouts
+	// UI componenets
 	//////////////////////////////////////////////////
-	Calipso.components.ViewRowCell = Backgrid.StringCell.extend({
+	Calipso.components.ViewRowCell = Backgrid.StringCell.extend(
+	/** @lends Calipso.components.ViewRowCell.prototype */
+	{
 		className : "view-row-cell",
 		initialize : function(options) {
 			Backgrid.StringCell.prototype.initialize.apply(this, arguments);
-			this.viewRowEvent = "collectionView:viewItem";
+			this.viewRowEvent = "layout:viewModel";
 		},
 		events : {
 			"click" : "viewRow"
 		},
 		viewRow : function(e) {
 			console.log("ViewRowCell#viewRow, rowModel: " + this.model.getTypeName());
-			e.stopPropagation();
-			e.preventDefault();
-
+			Calipso.stopEvent(e);
 			Calipso.vent.trigger(this.viewRowEvent, this.model);
 			// var rowModel = this.model;
-			// Backbone.history.navigate("client/"+rowModel.get("apiUrlSegment")+"/"+rowModel.get("id"),
+			// Calipso.navigate(""+rowModel.get("apiUrlSegment")+"/"+rowModel.get("id"),
 			// {
 			// trigger : true
 			// });
@@ -961,7 +865,9 @@ define(function(require) {
 
 	});
 
-	Calipso.components.EditInTabCell = Backgrid.Cell.extend({
+	Calipso.components.EditRowCell = Backgrid.Cell.extend(
+	/** @lends Calipso.components.EditRowCell.prototype */
+	{
 		tagName : "td class='modal-button-cell modal-button-cell-edit'",
 		template : _.template('<button class="btn btn-xs btn-warning"><span class="glyphicon glyphicon-edit"></span></button>'),
 		events : {
@@ -970,11 +876,10 @@ define(function(require) {
 		editRow : function(e) {
 			//						var thisModal = this;
 			console.log("EditInTabCell#editRow ");
-			e.stopPropagation();
-			e.preventDefault();
+			Calipso.stopEvent(e);
 			var rowModel = this.model;
 			console.log("editRow, rowModel: " + rowModel.constructor.name);
-			CalipsoApp.vent.trigger("editItem", rowModel);
+			Calipso.vent.trigger("layout:editModel", rowModel);
 		},
 		render : function() {
 			this.$el.html(this.template());
@@ -985,7 +890,9 @@ define(function(require) {
 	//////////////////////////////////////////////////
 	// Layouts
 	//////////////////////////////////////////////////
-	Calipso.view.ModelDrivenBrowseLayout = Marionette.Layout.extend({
+	Calipso.view.ModelDrivenBrowseLayout = Marionette.Layout.extend(
+	/** @lends Calipso.view.ModelDrivenBrowseLayout.prototype */
+	{
 		tagName : 'div',
 		className : 'col-sm-12',
 		id : "calipsoModelDrivenBrowseLayout",
@@ -1000,7 +907,8 @@ define(function(require) {
 		initialize : function(options) {
 
 			Marionette.Layout.prototype.initialize.apply(this, arguments);
-
+			
+			var _this = this;
 			if (options.skipToSingleResult) {
 				this.skipToSingleResult = true;
 			}
@@ -1011,40 +919,48 @@ define(function(require) {
 				}
 			}
 
-			this.listenTo(Calipso.vent, "ViewInTabCell:viewGridRow", function(itemModel) {
-				//  get item view type for model
-				var ItemViewType = itemModel.getItemViewType();
-				console.log("ModelDrivenBrowseLayout on itemView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
-				// create new item view instance with model
-				var itemView = new ItemViewType({
-					formSchemaKey : "view",
-					model : itemModel
-				});
-				// TODO: register for close and return to results
+			// vent handling might be overriden by subclasses 
+			if(!options.dontListenTo){
+				this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
+					_this.showItemViewForModel(itemModel, "view")
+				}, this);
+				this.listenTo(Calipso.vent, "layout:editModel", function(itemModel) {
+					_this.showItemViewForModel(itemModel, "edit")
+				}, this);
+			}
 
-				// show item view
-				this.contentRegion.show(itemView);
-			}, this);
-
-			//				if(options.model){
-			//					this.model = options.model;
-			//				}
-			//				if(this.options.searchResultsCollection){
-			//					this.searchResultsCollection = options.searchResultsCollection;
-			//				}
-			//				console.log("GenericSearchLayout.initialize, model: " + (this.model ? this.model.getTypeName() : this.model));
-			//				console.log("GenericSearchLayout.initialize, searchResultsCollection: " + (this.searchResultsCollection ? this.searchResultsCollection.length : this.searchResultsCollection));
 		},
-		showViewForSelected : function() {
-
+		showItemViewForModel : function(itemModel, formSchemaKey) {
+			if(!formSchemaKey){
+				formSchemaKey = "view";
+			}
+		//  get item view type for model
+			var ItemViewType = itemModel.getItemViewType();
+			console.log("ModelDrivenBrowseLayout on itemView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
+			// create new item view instance with model
+			var itemView = new ItemViewType({
+				formSchemaKey : formSchemaKey,
+				model : itemModel
+			});
+			// show item view
+			this.contentRegion.show(itemView);
+			var navUrl = itemModel.getPathFragment() + "/" + itemModel.get("id");
+			if(formSchemaKey != "view"){
+				navUrl += "/" + formSchemaKey;
+			}
+			Calipso.navigate(navUrl, {
+				trigger : false
+			});
 		},
 		showContent : function(routeModel) {
 			var _this = this;
+			var modelId = routeModel.get("id");
+			var isSearch = (modelId.indexOf("search") == 0) || (routeModel.wrappedCollection && routeModel.wrappedCollection.length > 0);
 			console.log("ModelDrivenBrowseLayout.showContent: '" + routeModel.get("id") + "', skipToSingleResult: " + _this.skipToSingleResult + ", collection length: " + (routeModel.wrappedCollection ? routeModel.wrappedCollection.length : "none"));
 			// get the model collection view type
 			var ContentViewType;
 			var contentView;
-			if ((!routeModel.get("id")) || routeModel.get("id") == "search" || routeModel.wrappedCollection) {
+			if ((!routeModel.get("id")) || isSearch) {
 				console.log("GenericSearchLayout#showContent 1");
 				if (_this.skipToSingleResult && routeModel.wrappedCollection.length == 1) {
 					console.log("GenericSearchLayout#showContent 1.1");
@@ -1086,11 +1002,16 @@ define(function(require) {
 		}
 	});
 
-	Calipso.view.ModelDrivenSearchLayout = Calipso.view.ModelDrivenBrowseLayout.extend({
+	Calipso.view.ModelDrivenSearchLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
+	/** @lends Calipso.view.ModelDrivenSearchLayout.prototype */
+	{
 		tagName : 'div',
 		id : "calipsoModelDrivenSearchLayout",
 		template : require('hbs!template/md-search-layout'),
 		hideSidebarOnSearched : false,
+		onGenericFormSearched: function(options){
+			// override callbacl
+		},
 		initialize : function(options) {
 			var _this = this;
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
@@ -1103,13 +1024,13 @@ define(function(require) {
 			console.log("GenericSearchLayout.initialize, model: " + (this.model ? this.model.getTypeName() : this.model));
 			console.log("GenericSearchLayout.initialize, searchResultsCollection: " + (this.searchResultsCollection ? this.searchResultsCollection.length : this.searchResultsCollection));
 
-			// bind to collection item selection events (view/edit)
-			_this.listenTo(Calipso.vent, "collectionView:viewItem", function(itemModel) {
-				_this.viewItem(itemModel);
-			}, _this);
-			_this.listenTo(Calipso.vent, "collectionView:viewItemMaximized", function(itemModel) {
-				_this.viewItemMaximized(itemModel);
-			}, _this);
+//			// bind to collection item selection events (view/edit)
+//			_this.listenTo(Calipso.vent, "collectionView:viewItem", function(itemModel) {
+//				_this.viewItem(itemModel);
+//			}, _this);
+//			_this.listenTo(Calipso.vent, "collectionView:viewItemMaximized", function(itemModel) {
+//				_this.viewItemMaximized(itemModel);
+//			}, _this);
 
 			// bind to events coresponding to successful
 			// retreival of search results
@@ -1149,7 +1070,7 @@ define(function(require) {
 
 				// show the results				
 				_this.contentRegion.show(searchResultsView);
-				var searchedUrl = Calipso.contextPath + "client/" + wrapperModel.getPathFragment();
+				var searchedUrl = "" + wrapperModel.getPathFragment();
 				if (_this.searchResultsCollection && _this.searchResultsCollection.data) {
 					searchedUrl = searchedUrl + "?" + $.param(_this.searchResultsCollection.data);
 				} else {
@@ -1158,11 +1079,12 @@ define(function(require) {
 
 				console.log("genericFormSearched, changing url: " + searchedUrl);
 
-				Backbone.history.navigate(searchedUrl, {
+				Calipso.navigate(searchedUrl, {
 					trigger : false
 				});
-
+				_this.onGenericFormSearched();
 			}, this);
+			
 
 		},
 		regions : {
@@ -1184,36 +1106,154 @@ define(function(require) {
 			// show the search form
 			this.sidebarRegion.show(formView);
 		},
-		viewItem : function(itemModel) {
-			console.log("ModelDrivenSearchLayout caught 'collectionView:viewItem' event");
-
-			// get the itemView type for the given model
-			var ItemViewType = itemModel.getItemViewType();
-
-			// create a view instance for the given model
-			var itemView = new ItemViewType({
-				model : itemModel,
-				callCollectionFetch : true
-			});
-			// show the results				
-			this.contentRegion.show(itemView);
+		showItemViewForModel : function(itemModel, formSchemaKey) {
+			 Calipso.view.ModelDrivenBrowseLayout.prototype.showItemViewForModel.apply(this, arguments);
+			 this.hideSidebar();
 		},
 		hideSidebar : function() {
 			this.$el.find("#calipsoModelDrivenSearchLayout-sideBarRegion").hide();
 			this.$el.find("#calipsoModelDrivenSearchLayout-contentRegion").removeClass("col-sm-9").addClass("col-sm-12");
-		},
-		viewItemMaximized : function(itemModel) {
-			console.log("ModelDrivenSearchLayout caught 'collectionView:viewItemMaximized' event");
-			this.hideSidebar();
-			this.viewItem(itemModel);
 		}
 	}, {
 		getTypeName : function() {
 			return "ModelDrivenSearchLayout"
 		}
 	});
+/*
+	var ModelDrivenOverviewLayout = AbstractLayoutView.extend({
+		template : require('hbs!template/md-overview-layout'),
+		onShow : function() {
+			console.log("ModelDrivenOverviewLayout#onShow");
+			var tabLabelsView = new TabLabelsCollectionView({
+				collection : this.collection
+			});
+			var tabContentsView = new TabContentsCollectionView({
+				collection : this.collection
+			});
+			this.tabLabelsRegion.show(tabLabelsView);
+			this.tabContentsRegion.show(tabContentsView);
 
-	Calipso.view.NotFoundView = Marionette.ItemView.extend({
+		},
+	},
+	// static members
+	{
+ 		getTypeName: function(){return "ModelDrivenCrudLayout"}
+	});
+	
+	var ModelDrivenCrudLayout = AbstractLayoutView.extend({
+		template : tmpl,
+		tagName : "div",
+		className : "col-sm-12",
+		regions : {
+			tabLabelsRegion : '#calipsoTabLabelsRegion',
+			tabContentsRegion : '#calipsoTabContentsRegion'
+		},
+		initialize: function(options){
+			
+			Marionette.Layout.prototype.initialize.apply(this, arguments);
+			if(options.collection){
+				this.collection = options.collection;
+			}
+			else if(options.model && options.model.constructor.getTypeName() == "GenericCollectionWrapperModel"){
+					this.collection = options.model.wrappedCollection;
+			}
+			if(!this.collection){
+				throw "no collection or collection wrapper model was provided";
+			}
+			console.log("ModelDrivenCrudLayout.initialize, collection size: " + this.collection.length  +
+					", collection.model: "+this.collection.model.getTypeName());
+	  },
+		onShow : function() {
+			console.log("ModelDrivenCrudLayout#onShow");
+			var tabLabelsView = new TabLabelsCollectionView({
+				collection : this.collection
+			});
+			var tabContentsView = new TabContentsCollectionView({
+				collection : this.collection
+			});
+			this.tabLabelsRegion.show(tabLabelsView);
+			this.tabContentsRegion.show(tabContentsView);
+
+		},
+	},
+	// static members
+	{
+ 		getTypeName: function(){return "ModelDrivenCrudLayout"}
+	});
+
+	var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
+		className : 'nav nav-pills',
+		tagName : 'ul',
+		itemViewContainer : '.nav-tabs',
+		getItemView : function(item) {
+			return Backbone.Marionette.ItemView.extend({
+				tagName : 'li',
+				className : 'md-crud-layout-tab-label',
+				id : "md-crud-layout-tab-label-" + item.get("id"),
+				template : tmplTabLabel,
+
+				events : {
+					"click .show-tab": "viewTab",
+					"click .close-tab" : "closeTab"
+				},
+				 viewTab: function(e) {
+					 console.log("TabPaneCollectionView.itemView#viewTab");
+					 e.stopPropagation();
+					 e.preventDefault();
+					 vent.trigger("viewTab", this.model);
+				 },
+				closeTab : function(e) {
+					console.log("TabPaneCollectionView.itemView#closeTab");
+					e.stopPropagation();
+					e.preventDefault();
+//					this.model.collection.remove(this.model);
+					this.close();
+					vent.trigger("viewTab", {
+						id : "Search"
+					});
+				},
+			});
+		}
+	});
+
+	var TabContentsCollectionView = Backbone.Marionette.CollectionView.extend({
+		tagName : 'div',
+		getItemView : function(item) {
+			var ItemViewClass;
+			if(item){
+				if (item.get("itemView")) {
+					ItemViewClass = item.get("itemView");
+				} else {
+					ItemViewClass = GenericFormTabContentView;
+				}
+				console.log("TabContentsCollectionView#getItemView for item class " + item.constructor.getTypeName() + " returns: " + ItemViewClass.getTypeName());
+			}
+			return ItemViewClass;
+		},
+		buildItemView: function(item, ItemViewClass){
+			console.log("TabContentsCollectionView#buildItemView, ItemView: "+ItemViewClass.getTypeName()+", item: "+item.constructor.getTypeName() + ", wrapped collection: "+item.wrappedCollection);
+			if(item){
+				var options = {model: item};
+				if(item && item.wrappedCollection){
+					options.collection = item.wrappedCollection;
+				}
+			    // do custom stuff here
+	
+			    var view = new ItemViewClass(options);
+	
+			    // more custom code working off the view instance
+	
+			    return view;
+			}
+		  },
+	});
+	*/
+	///////////////////////////////////////////////////////
+	// Views
+	///////////////////////////////////////////////////////
+	Calipso.view.NotFoundView = Marionette.ItemView.extend(
+	/** @lends Calipso.view.NotFoundView.prototype */
+	{
 		className : 'container span8 home',
 		template : require('hbs!template/notfound'),
 
@@ -1226,12 +1266,29 @@ define(function(require) {
 			return "NotFoundView"
 		}
 	});
-	Calipso.view.HeaderView = Marionette.ItemView.extend({
-
+	Calipso.view.HeaderView = Marionette.ItemView.extend(
+	/** @lends Calipso.view.HeaderView.prototype */
+	{
 		template : require('hbs!template/header'),
 		id : "navbar-menu",
 		className : "col-sm-12",
+		events : {
+			"click a.login" : "login",
+			"click a.logout" : "logout"
+		},
 		initialize : function(options) {
+			_.bindAll(this);
+		},
+		logout : function(e) {
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("session:destroy");
+			_.bindAll(this);
+		},
+		login : function(e) {
+			Calipso.stopEvent(e);
+			Calipso.navigate("login", {
+				trigger : true
+			});
 			_.bindAll(this);
 		}
 	}, {
@@ -1239,7 +1296,9 @@ define(function(require) {
 			return "HeaderView"
 		}
 	});
-	Calipso.view.FooterView = Marionette.ItemView.extend({
+	Calipso.view.FooterView = Marionette.ItemView.extend(
+	/** @lends Calipso.view.FooterView.prototype */
+	{
 
 		template : require('hbs!template/footer'),
 		id : "navbar-menu",
@@ -1252,12 +1311,105 @@ define(function(require) {
 			return "FooterView"
 		}
 	});
+
+	Calipso.view.StackView = Marionette.View.extend(
+	/** @lends Calipso.view.StackView.prototype */
+	{
+
+		hasRootView : false,
+
+		// Define options for transitioning views in and out
+		defaults : {
+			inTransitionClass : 'slideInFromRight',
+			outTransitionClass : 'slideOutToRight',
+			animationClass : 'animated',
+			transitionDelay : 1000,
+			'class' : 'stacks',
+			itemClass : 'stack-item'
+		},
+
+		initialize : function(options) {
+			this.views = [];
+			options = options || {};
+			this.options = _.defaults({}, this.defaults, options);
+		},
+
+		setRootView : function(view) {
+			this.hasRootView = true;
+			this.views.push(view);
+			view.render();
+			view.$el.addClass(this.options.itemClass);
+			this.$el.append(view.$el);
+		},
+
+		render : function() {
+			this.$el.addClass(this.options['class']);
+			return this;
+		},
+
+		// Pop the top-most view off of the stack.
+		pop : function() {
+			var self = this;
+			if (this.views.length > (this.hasRootView ? 1 : 0)) {
+				var view = this.views.pop();
+				this.transitionViewOut(view);
+			}
+		},
+
+		// Push a new view onto the stack.
+		// The itemClass will be auto-added to the parent element.
+		push : function(view) {
+			this.views.push(view);
+			view.render();
+			view.$el.addClass(this.options.itemClass);
+			this.transitionViewIn(view);
+			//console.log(this.views);
+		},
+
+		// Transition the new view in.
+		// This is broken out as a method for convenient overriding of
+		// the default transition behavior. If you only want to change the 
+		// animation use the trasition class options instead.
+		transitionViewIn : function(view) {
+			//console.log('in', this.options);
+			this.trigger('before:transitionIn', this, view);
+			view.$el.addClass('hiddenToRight');
+			this.$el.append(view.$el);
+
+			// Wait a brief moment so it triggers the css transactions
+			// If we don't delay, at least in my minimal testing, Chrome
+			// does not animate the content but instead snaps-to-position.
+			_.delay(function() {
+				view.$el.addClass(this.options.animationClass);
+				view.$el.addClass(this.options.inTransitionClass);
+				_.delay(function() {
+					view.$el.removeClass('hiddenToRight');
+					this.trigger('transitionIn', this, view);
+				}.bind(this), this.options.transitionDelay);
+			}.bind(this), 1);
+		},
+
+		// Trastition a view out.
+		// This is broken out as a method for convenient overriding of
+		// the default transition behavior. If you only want to change the 
+		// animation use the trasition class options instead.
+		transitionViewOut : function(view) {
+			this.trigger('before:transitionOut', this, view);
+			view.$el.addClass(this.options.outTransitionClass);
+			_.delay(function() {
+				view.close();
+				this.trigger('transitionOut', this, view);
+				//console.log(this.views);
+			}.bind(this), this.options.transitionDelay);
+		}
+
+	});
 	Calipso.view.ModelDrivenCollectionGridView = Marionette.ItemView.extend(
 	/**
 	 * @param options object members: 
 	 *  - collection/wrappedCollection
 	 *  - callCollectionFetch: whether to fetch the collection from the server
-	 * @lends collection/GenericCollectionGridView.prototype 
+	 * @lends Calipso.view.GenericCollectionGridView.prototype 
 	 * */
 	{
 		events : {
@@ -1265,7 +1417,7 @@ define(function(require) {
 		},
 
 		back : function(e) {
-			e.preventDefault();
+			Calipso.stopEvent(e);
 			window.history.back();
 		},
 		initialize : function(options) {
@@ -1340,10 +1492,10 @@ define(function(require) {
 				if (_self.collection.data) {
 					if (_self.collection.data[""] || _self.collection.data[""] == null) {
 						delete _self.collection.data[""];
-						//console.log("GenericCollectionGridView.onShow, deletted empty key in given .data, source: "+_self.collection.data.toSource());
+						// toSource
 					}
 					fetchOptions.data = _self.collection.data;
-					//console.log("GenericCollectionGridView.onShow, fetchOptions.data: "+fetchOptions.data.toSource());
+					//
 				}
 				_self.collection.fetch(fetchOptions);
 				this.callCollectionFetch = false;
@@ -1396,7 +1548,6 @@ define(function(require) {
 
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			this.getTypeName() = "MainContentNavView";
 		},
 		onDomRefresh : function() {
 			console.log("MainContentTabsView onDomRefresh");
@@ -1417,7 +1568,7 @@ define(function(require) {
 		},
 
 		back : function(e) {
-			e.preventDefault();
+			Calipso.stopEvent(e);
 			window.history.back();
 		},
 		// dynamically set the id
@@ -1431,7 +1582,7 @@ define(function(require) {
 			}
 
 			this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
-			var modelUrl = session.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
+			var modelUrl = Calipso.session.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
 			console.log("GenericView#initialize, fetching model " + modelUrl);
 			this.model.fetch({
 				async : false,
@@ -1504,13 +1655,7 @@ define(function(require) {
 			}
 		},
 		commit : function(e) {
-			// TODO: make utility method
-			if (e.stopPropagation) {
-				e.stopPropagation();
-			} else {
-				e.returnValue = false;
-			}
-			e.preventDefault();
+			Calipso.stopEvent(e);
 			console.log(this.formSchemaKey + ".substring(0, 6): " + this.formSchemaKey.substring(0, 6));
 			if (window.Placeholders) {
 				Placeholders.disable();
@@ -1587,12 +1732,11 @@ define(function(require) {
 
 			if (Calipso.session.searchData && (!_self.searchResultsCollection.data)) {
 				console.log("GenericFormView#onShow, Adding session.searchData to form model");
-				_self.model.set(session.searchData);
-				_self.searchResultsCollection.data = session.searchData;
+				_self.model.set(Calipso.session.searchData);
+				_self.searchResultsCollection.data = Calipso.session.searchData;
 			} else {
 				console.log("GenericFormView#onShow, No session.searchData to add");
 			}
-			//console.log("GenericformView#onShow: " + schemaForAction.toSource());
 			var formOptions = {
 				model : _self.model,
 				schema : schemaForAction,
@@ -1663,14 +1807,18 @@ define(function(require) {
 
 	Calipso.view.AbstractLayoutView = Backbone.Marionette.Layout.extend({
 		getTypeName : function() {
-			return this.constructor.getTypeName();
+			return this.prototype.getTypeName();
 		}
 	}, {
 		getTypeName : function() {
 			return "AbstractLayoutView"
 		}
 	});
-
+	
+	Calipso.view.AbstractLayoutView.prototype.getTypeName = function() {
+		return "AbstractLayoutView"
+	}
+	
 	Calipso.view.AbstractLoginView = Marionette.ItemView.extend({
 
 		className : 'col-sm-12 calipsoAbstractLoginView',
@@ -1688,8 +1836,7 @@ define(function(require) {
 			"submit" : "commit"
 		},
 		commit : function(e) {
-			e.preventDefault();
-
+			Calipso.stopEvent(e);
 			var _this = this;
 			var userDetails = new UserModel({
 				email : this.$('.input-email').val(),
@@ -1699,7 +1846,7 @@ define(function(require) {
 			// was used for testing
 			// metadata: {"loginViewMetadatum":"true"}
 			});
-			session.save(userDetails);
+			Calipso.session.save(userDetails);
 
 		}
 	}, {
@@ -1713,6 +1860,69 @@ define(function(require) {
 	Calipso.view.AbstractLoginView.prototype.getTypeName = function() {
 		return "AbstractLoginView";
 	}
+	
+
+	/*
+	 * Default Login View implementation. Can be overriden with 
+	 * Calipso.initializeApp({loginViewType: Foobar})
+	 */
+	Calipso.view.LoginView = Calipso.view.AbstractLoginView.extend({
+		submitted: false,
+		/**
+		 * Get the name of this class
+		 * @returns the class name as a string
+		 */
+		getTypeName : function() {
+			return this.prototype.getTypeName();
+		},
+		events : {
+			"click button" : "commit",
+			"submit" : "commit"
+		},
+		commit : function(e){
+			Calipso.stopEvent(e);
+			if(!this.submitted){
+				this.submitted = true;
+				var _this = this;
+				var userDetails = new Calipso.model.UserModel({
+					email: this.$('.input-email').val(),
+					password: this.$('.input-password').val(),
+					newPassword: this.$('.new-password').val(),
+					newPasswordConfirm: this.$('.new-password-confirm').val(),
+					// was used for testing
+					metadata: {"loginViewMetadatum":"true"}
+				});
+				Calipso.session.save(userDetails);
+			}
+
+		},
+		onShow : function() {
+			// hide session info in nav bar
+			console.log("LoginView.onShow, hiding session-info");
+			$("#session-info").hide();
+			$("#changePassToggle").bind( "click", function() {
+				$("#changePassSection").toggleClass("tmpl-hint");
+				$("i").toggleClass("ion-ios7-arrow-thin-up");
+				});
+			
+			
+		},
+
+	},
+	{
+		
+	});
+
+	/**
+	 * Get the name of this class
+	 * @returns the class name as a string
+	 */
+	Calipso.view.LoginView.prototype.getTypeName = function() {
+		return "LoginView";
+	}
+	
+	
+	
 	Calipso.view.AppLayoutView = Calipso.view.AbstractLayoutView.extend({
 		tagName : "div",
 		template : require('hbs!template/applayout'),// _.template(templates.applayout),
@@ -1726,83 +1936,10 @@ define(function(require) {
 		}
 	});
 
-	Calipso.app = new Marionette.Application({
-		routers : {}
-	});
-	// application configuration
-	Calipso.app.addRegions({
-		headerRegion : "#calipsoHeaderRegion",
-		mainContentRegion : "#calipsoMainContentRegion",
-		modal : Calipso.view.ModalRegion,
-		footerRegion : "#calipsoFooterRegion"
-	});
-
-	Calipso.app.addInitializer(function(options) {
-		// we neeed to override loadTemplate because Marionette expect to recive only the template ID
-		// but actually it's the full template html (require + text plugin)
-		//			    Backbone.Marionette.TemplateCache.prototype.loadTemplate = function (templateId) {
-		//			      var template = templateId;
-		//			      // remove this comment if you want to make sure you have a template before trying to compile it
-		//			      /*
-		//			      if (!template || template.length === 0) {
-		//			        var msg = "Could not find template: '" + templateId + "'";
-		//			        var err = new Error(msg);
-		//			        err.name = "NoTemplateError";
-		//			        throw err;
-		//			      }*/
-		//
-		//			      return template;
-		//			    };
-
-		// init ALL app routers
-		_(options.routers).each(function(routerClass) {
-			console.log("initialize router type: " + router);
-			var router = new routerClass();
-			Calipso.app.routers[routerClass.getTypeName()] = router;
-			console.log("initialized router: " + router);
-		});
-
-		Calipso.modelTypesMap = {};
-		_(Calipso.model).each(function(ModelClass) {
-			var model = new ModelClass();
-			console.log("initialize model type: " + model.getTypeName());
-			if (model.getTypeName() != "GenericModel") {
-
-				Calipso.modelTypesMap[model.getPathFragment()] = ModelClass;
-				console.log("initialized model type: " + model.getTypeName() + " and key: " + model.getPathFragment());
-			}
-		});
-
-	});
-
-	////////////////////////////////
-	// vent and app events
-	////////////////////////////////
-	// initialize header, footer, history
-	Calipso.app.on("initialize:after", function() {
-		console.log("app event initialize:after");
-		//	try "remember me"
-		Calipso.session.load();
-		// render basic structure
-		Calipso.app.headerRegion.show(new Calipso.view.HeaderView({
-			model : Calipso.session.userDetails
-		}));
-		// app.mainContentNavRegion.show(new MainContentNavView());
-		Calipso.app.footerRegion.show(new Calipso.view.FooterView());
-
-		Backbone.history.start({
-			pushState : true,
-			hashChange : false,
-			root : "/",
-			useBackboneNavigate : true
-		});
-		// TODO: hostpages
-		// { pushState: true, hashChange: false, root: "/" }
-
-	});
-
-	Calipso.util.Vent = {};
-
+	//////////////////////////////////////////////////
+	// vent
+	//////////////////////////////////////////////////
+	console.log("Setting up Calipso.vent...");
 	Calipso.util.Vent = Backbone.Wreqr.EventAggregator.extend({
 
 		constructor : function(debug) {
@@ -1829,52 +1966,13 @@ define(function(require) {
 			return this.reqres.request.apply(this.reqres, args);
 		}
 	});
-
 	Calipso.vent = new Calipso.util.Vent();
-
-	Calipso.vent.on('app:show', function(appView) {
-		// console.log("vent event app:show, appView: "+appView.getTypeName());
-
-		Calipso.app.mainContentRegion.show(appView);
-	});
-	Calipso.vent.on('session:created', function(userDetails) {
-		console.log("vent event session:created");
-		Calipso.session.userDetails = userDetails;
-		Calipso.app.headerRegion.show(new Calipso.view.HeaderView({
-			model : userDetails
-		}));
-
-		// send logged in user on their way
-		var fw = Calipso.app.fw ? Calipso.app.fw : "/calipso/client/home";
-		console.log("session:created, update model: " + userDetails.get("email") + ", navigating to: " + fw);
-
-		Backbone.history.navigate(fw, {
-			trigger : true
-		});
-		//window.location = fw;
-	});
-	Calipso.vent.on('session:destroy', function(userDetails) {
-		Calipso.session.destroy();
-		Backbone.history.navigate("client/login", {
-			trigger : true
-		});
-	});
-	Calipso.vent.on('nav-menu:change', function(modelkey) {
-		console.log("vent event nav-menu:change");
-
-	});
-	Calipso.vent.on('modal:show', function(view) {
-		console.log("vent event modal:show");
-		Calipso.app.modal.show(view);
-	});
-	Calipso.vent.on('modal:close', function() {
-		console.log("vent event modal:close");
-		Calipso.app.modal.hideModal();
-	});
+	console.log("Calipso.vent has been configured");
 
 	//////////////////////////////////////////////////
 	// session
 	//////////////////////////////////////////////////
+
 	var baseUrl;
 	var calipsoMainScript = document.getElementById("calipso-script-main");
 	// calipso in host page
@@ -1893,7 +1991,25 @@ define(function(require) {
 		// Creating a new session instance will attempt to load
 		// the user using a "remember me" cookie token, if one exists.
 		initialize : function() {
-			this.load();
+			var _this = this;
+		//	this.load();
+			// register handlebars helpers
+
+			// register session related handlebars helpers
+			Handlebars.registerHelper("getUserDetailsProperty", function(propName, options){
+				var prop = "";
+				if(_this.userDetails && _this.userDetails.get){
+					prop = _this.userDetails.get(propName);
+				}
+				return (prop);
+			});
+			Handlebars.registerHelper("getUserDetailsMetadatum", function(metaName, options){
+				var metaValue = "";
+				if(_this.userDetails && _this.userDetails.get && _this.userDetails.get("metadata")){
+					metaValue = _this.userDetails.get("metadata")[metaName];
+				}
+				return (metaValue);
+			});
 		},
 
 		// Returns true if the user is authenticated.
@@ -1902,13 +2018,14 @@ define(function(require) {
 		},
 		ensureLoggedIn : function() {
 			if (!this.isAuthenticated()) {
-				this.fw = "/client/" + routeHelper.mainRoutePart;
-				// we do not need the Search suffix in the route path to match
-				if (routeHelper.contentNavTabName != "Search") {
-					this.fw += "/" + routeHelper.contentNavTabName;
-					// TODO: note HTTP params
-				}
-				Backbone.history.navigate("client/login", {
+				// TODO: save FW to redirect after loggingin
+//				this.fw = "/" + routeHelper.mainRoutePart;
+//				// we do not need the Search suffix in the route path to match
+//				if (routeHelper.contentNavTabName != "Search") {
+//					this.fw += "/" + routeHelper.contentNavTabName;
+//					// TODO: note HTTP params
+//				}
+				Calipso.navigate("login", {
 					trigger : true
 				});
 
@@ -1954,7 +2071,7 @@ define(function(require) {
 			console.log("session.save called");
 			var _self = this;
 			var userNameOrEmail = model.get('email') ? model.get('email') : model.get('username');
-			new UserDetailsModel().save({
+			new Calipso.model.UserDetailsModel().save({
 				email : userNameOrEmail,
 				password : model.get('password'),
 				metadata : model.get('metadata'),
@@ -1965,15 +2082,8 @@ define(function(require) {
 					// Also do post-successful login stuff, e.g. redirect to previous
 					// page.
 					_self.userDetails = model;
-					console.log("branch INFO pre: " + model);
 					if (model.get("id")) {
-						_self.createCookie("branch", _self.userDetails.get("metadata")["branch"], 1);
-						$("#header_branch").html(_self.userDetails.get("metadata")["branch"]);
-						_self.createCookie("branchDescription", _self.userDetails.get("metadata")["branchDescription"], 1);
 						Calipso.vent.trigger('session:created', _self.userDetails);
-
-						//TODO move this
-
 					}
 					// login failed, show error
 					else {
@@ -2001,7 +2111,7 @@ define(function(require) {
 			// Backbone.methodOverride = true;
 			new Calipso.model.UserDetailsModel().fetch({
 				async : false,
-				url : baseUrl + "/api-auth/userDetails/remembered",
+				url : baseUrl + Calipso.getConfigProperty("apiAuthPath") + "/userDetails/remembered",
 				success : function(model, response, options) {
 					//if (model.id) {
 					_self.userDetails = model;
@@ -2014,8 +2124,8 @@ define(function(require) {
 		// Logout the user here and on the server side.
 		destroy : function() {
 			if (this.userDetails) {
-				this.userDetails.url = baseUrl + "/api-auth/userDetails/logout";
-				this.userDetails.save({
+				this.userDetails.url = baseUrl +  Calipso.getConfigProperty("apiAuthPath") + "/userDetails/logout";
+				this.userDetails.save(null, {
 					success : function(model, response) {
 						this.userDetails = model;
 						Calipso.vent.trigger("session:destroy", this.userDetails);
@@ -2034,10 +2144,281 @@ define(function(require) {
 		getBaseUrl : function() {
 			return baseUrl;
 		}
+		
+		
 
 	});
 
-	Calipso.session = new Calipso.util.Session()
+	// //////////////////////////////////////
+	// Controller
+	// //////////////////////////////////////
+
+	Calipso.controller.AbstractController = Marionette.Controller.extend({
+		constructor : function(options) {
+			console.log("AbstractController#constructor");
+			Marionette.Controller.prototype.constructor.call(this, options);
+			this.layout = new Calipso.view.AppLayoutView({
+				model : Calipso.session
+			});
+			Calipso.vent.trigger('app:show', this.layout);
+
+		},
+		home : function() {
+			console.log("AbstractController#home");
+			if (!Calipso.session.isAuthenticated()) {
+				Calipso.navigate("login", {
+					trigger : true
+				});
+				return false;
+			}
+			this.layout.contentRegion.show(new HomeLayout());
+		},
+
+		login : function() {
+			var loginModel = new Calipso.model.UserModel({
+				email : Calipso.session.get('email'),
+				issuer : Calipso.session.get('issuer'),
+
+				getLayoutViewType : function() {
+					return Calipso.view.ModelDrivenBrowseLayout;
+				},
+			});
+
+			var view = new Calipso.config.loginViewType({
+				model : loginModel
+			});
+
+			view.on('app:login', this.authenticate);
+			console.log("AbstractController#login, showing login view");
+			Calipso.vent.trigger('app:show', view);
+		},
+
+		authenticate : function(args) {
+			// console.log('MainController authenticate called');
+			var self = this;
+			var email = this.$('input[name="email"]').val();
+			var password = this.$('input[name="password"]').val();
+
+			$.when(this.model.authenticate(email, password)).then(function(model, response, options) {
+				Calipso.session.save(model);
+				Calipso.session.load();
+				// console.log('MainController authenticate navigating to home');
+				Calipso.navigate("home", {
+					trigger : true
+				});
+			}, function(model, xhr, options) {
+				self.$el.find('.alert').show();
+			});
+		},
+
+		logout : function() {
+			Calipso.session.destroy();
+			// this.login();
+			window.parent.close();
+		},
+		notFoundRoute : function(path) {
+			// console.log("notFoundRoute, path: "+path);
+			this.layout.contentRegion.show(new Calipso.view.NotFoundView());
+		},
+		/**
+		 * Get a model representing the current request.
+		 * 
+		 * For an example, consider the URL [api-root]/users/[some-id]. First,
+		 * a model class is loaded based on the URL fragment representing the
+		 * type, e.g. "users" for UserModel.
+		 * 
+		 * A model instance is then created using some-id if provided or
+		 * "search" otherwise. If a backbone supermodel instance is already
+		 * cached, it is reused.
+		 * 
+		 * In case of "search" a collection of the given model type is
+		 * initialized but, similarly to the model instance, it is not fetched
+		 * from the server.
+		 * 
+		 * @param {string}
+		 *           modelTypeKey the URL fragment representing the model type
+		 *           key, e.g. "users" for UserModel
+		 * @param {string}
+		 *           modelId the model identifier. The identifier may be either
+		 *           a primary or business key, depending on your server side
+		 *           implementation. The default property name in client side
+		 *           models is "name". You can override
+		 *           {@linkcode Calipso.model.GenericModel.prototype.getBusinessKey} to
+		 *           define another property name.
+		 * @see Calipso.model.GenericModel.prototype.getBusinessKey
+		 */
+		getModelForRoute : function(modelTypeKey, modelId, httpParams) {
+			console.log("AbstractController#getModelForRoute, modelTypeKey: " + modelTypeKey + ", modelId: " + modelId + ", httpParams: " + httpParams);
+			var ModelType;
+			if (Calipso.modelTypesMap[modelTypeKey]) {
+				ModelType = Calipso.modelTypesMap[modelTypeKey];
+			} else {
+				var modelForRoute;
+				var modelModuleId = "model/" + _.singularize(modelTypeKey);
+				if (!require.defined(modelModuleId)) {
+
+					require([ modelModuleId ], function(module) {
+						ModelType = module;
+					})
+				}
+				//					else{
+				ModelType = require(modelModuleId)
+				//					}
+
+			}
+			if (!ModelType) {
+				throw "No matching model type was found for key: " + modelModuleId;
+			}
+			console.log("AbstractController#getModelForRoute, modelModuleId:" + modelModuleId);
+
+			if (modelId) {
+				console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
+				// try cached models first
+				modelForRoute = new ModelType({
+					id : modelId
+				});// ModelType.all().get(modelId);
+				// otherwise create a transient instance and let the view load it
+				// from the server
+				if (!modelForRoute) {
+					console.log("AbstractController#getModelForRoute, model for id is not loaded, creating new");
+					modelForRoute = ModelType.create({
+						id : modelId,
+						url : Calipso.session.getBaseUrl() + "/api/rest/" + modelModuleId + "/" + modelId
+					});
+					// modelForRoute.fetch({
+					// url : session.getBaseUrl() + "/api/rest/" + modelTypeKey + "/" + modelId
+					// });
+				}
+			} else {
+				// create a model to use as a wrapper for a collection of
+				// instances of the same type
+				modelForRoute = ModelType.create("search");
+			}
+			var collectionOptions = {
+				model : ModelType,
+				url : Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment()
+			};
+			if (httpParams) {
+				if (httpParams[""] || httpParams[""] == null) {
+					delete httpParams[""];
+				}
+				collectionOptions.data = httpParams;
+			}
+			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], collectionOptions);
+			console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
+			return modelForRoute;
+
+		},
+		mainNavigationSearchRoute : function(mainRoutePart, queryString) {
+			console.log("AbstractController#mainNavigationSearchRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
+			for (var i = 0, j = arguments.length; i < j; i++) {
+				console.log("AbstractController#mainNavigationSearchRoute, argument: " + (arguments[i] + ' '));
+			}
+			var httpParams = Calipso.getHttpUrlParams();
+			this.mainNavigationCrudRoute(mainRoutePart, null, httpParams);
+
+		},
+		mainNavigationCrudRoute : function(mainRoutePart, modelId, httpParams) {
+			var qIndex = modelId ? modelId.indexOf("?") : -1;
+			if(qIndex > -1){
+				modelId = modelId.substring(0, qIndex);
+			}
+			// build the model instancde representing the current request
+			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", modelId: " + modelId);
+			var modelForRoute = this.getModelForRoute(mainRoutePart, modelId, httpParams);
+
+			// get the layout type corresponding to the requested model
+			var RequestedModelLayoutType = modelForRoute.getLayoutViewType();
+
+			// show the layout
+			// TODO: reuse layout if of the same type
+			var routeLayout = new RequestedModelLayoutType({
+				model : modelForRoute
+			});
+			Calipso.vent.trigger("app:show", routeLayout);
+
+			// update page header tabs etc.
+			this.syncMainNavigationState(modelForRoute);
+
+		},
+		notFoundRoute : function() {
+			// build the model instancde representing the current request
+			console.log("AbstractController#notFoundRoute");
+			Calipso.vent.trigger("app:show", new Calipso.view.NotFoundView());
+
+		},
+		decodeParam : function(s) {
+			return decodeURIComponent(s.replace(/\+/g, " "));
+		},
+		/*
+		 * TODO
+		 * 
+		 * initCrudLayout : function(routeHelper){ if((!this.layout) ||
+		 * this.layout.getTypeName() != "AppLayoutView"){ //
+		 * console.log("AbstractController#initCrudLayout, calling
+		 * this.ensureActiveLayout()"); this.ensureActiveLayout(); } else{ //
+		 * console.log("AbstractController#initCrudLayout, not updating
+		 * this.layout: "+this.layout.getTypeName()); } var _self = this;
+		 * 
+		 * var TabModel = Backbone.Model.extend(); var TabCollection =
+		 * Backbone.Collection.extend({ model: GenericModel, initialize:
+		 * function () { // console.log("AbstractController#initCrudLayout,
+		 * TabCollection initializing"); this.bind('add', this.onModelAdded,
+		 * this); this.bind('remove', this.onModelRemoved, this); },
+		 * onModelAdded: function(model, collection, options) {
+		 * _self.tabKeys[model.get("id")] = model; }, onModelRemoved: function
+		 * (model, collection, options) { _self.tabKeys[model.get("id")] =
+		 * null; }, }); this.tabs = new TabCollection([
+		 * (routeHelper.routeModel) ]); var tabLayout = new
+		 * TabLayout({collection: this.tabs});
+		 * 
+		 * vent.on("itemView:openGridRowInTab", function(itemModel) {
+		 * vent.trigger("openGridRowInTab", itemModel); });
+		 * vent.on("openGridRowInTab", function(itemModel) {
+		 * console.log("openGridRowInTab"); _self.tabs.add(itemModel);
+		 * vent.trigger("viewTab", itemModel); }); vent.on("viewTab",
+		 * function(itemModel) { this.layout.contentRegion.show(new
+		 * itemmodel.itemView(itemmodel)); //
+		 * Calipso.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), { //
+		 * trigger : false // }); _self.syncMainNavigationState(null,
+		 * itemModel.get("id")); });
+		 * 
+		 * this.layout.contentRegion.show(tabLayout); },
+		 */
+		syncMainNavigationState : function(modelForRoute) {
+			var mainRoutePart = modelForRoute.getPathFragment(), contentNavTabName = modelForRoute.get("id");
+			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: " + contentNavTabName);
+			// update active nav menu tab
+			if (mainRoutePart && mainRoutePart != this.lastMainNavTabName) {
+				$('.navbar-nav li.active').removeClass('active');
+				$('#mainNavigationTab-' + mainRoutePart).addClass('active');
+				this.lastMainNavTabName = mainRoutePart;
+			}
+			// update active content tab
+			if (contentNavTabName && contentNavTabName != this.lastContentNavTabName) {
+				$('#calipsoTabLabelsRegion li.active').removeClass('active');
+//				$('#md-crud-layout-tab-label-' + contentNavTabName).addClass('active');
+				// show coressponding content
+				// console.log("show tab: "+contentNavTabName);
+				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');
+				$('#calipsoTabContentsRegion .tab-pane').addClass('hidden');
+				$('#tab-' + contentNavTabName).removeClass('hidden');
+				$('#tab-' + contentNavTabName).addClass('active');
+				this.lastContentNavTabName = contentNavTabName;
+			}
+		},
+		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart) {
+			if (typeof this[mainRoutePart] == 'function') {
+				// render explicit route
+				this[mainRoutePart](secondaryRoutePart);
+			}
+		},
+
+		editItem : function(item) {
+			console.log("MainController#editItem, item: " + item);
+		}
+
+	});
 
 	// AMD define happens at the end for compatibility with AMD loaders
 	// that don't enforce next-turn semantics on modules.

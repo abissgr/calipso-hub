@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>calipso-hub</artifactId>
 		<groupId>gr.abiss.calipso</groupId>
-        <version>1.2-SNAPSHOT</version>
+		<version>1.2-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -43,10 +43,15 @@
 				<artifactId>maven-resources-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
+				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty.version}</version>
+				<version>9.1.3.v20140225</version>
 				<configuration>
+					<resourceBases>
+						<resourceBase>src/main/webapp</resourceBase>
+						<resourceBase>${project.build.directory}/${project.name}-${project.version}</resourceBase>
+					</resourceBases>
+
 					<!-- We use non NIO connector in order to avoid read only static files 
 						under windows -->
 					<connectors>
@@ -57,9 +62,16 @@
 							<requestHeaderSize>30000</requestHeaderSize>
 						</connector>
 					</connectors>
+					<webApp>
+						<!-- 
+						
+						 -->
+						 <contextPath>/calipso</contextPath>
+					</webApp>
 					<webAppConfig>
+						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
 						<!--extraClasspath>${basedir}/target/classes/;${basedir}/etc/jetty/classes/</extraClasspath -->
-						<unpackOverlays>true</unpackOverlays>
+						<!--unpackOverlays>true</unpackOverlays -->
 					</webAppConfig>
 					<!--webAppSourceDirectory>${project.build.directory}/${project.name}${project.version}</webAppSourceDirectory -->
 					<!-- To run the optimized version of the webapp -->
@@ -67,32 +79,24 @@
 					<!-- webAppSourceDirectory>D:\\Workspaces\\resthub\\resthub-archetypes\\resthub-jpa-backbonejs-multi-archetype/target/resthub-jpa-backbonejs-multi-archetype-2.0-rc4</webAppSourceDirectory -->
 				</configuration>
 			</plugin>
-			
-            <plugin>
-                <groupId>com.github.phasebash</groupId>
-                <artifactId>jsdoc3-maven-plugin</artifactId>
-                <version>1.0.7</version>
-                <configuration>
-                    <recursive>true</recursive>
-                    <directoryRoots>
-                        <directoryRoot>${basedir}/src/main/webapp/js/collection</directoryRoot>
-                        <directoryRoot>${basedir}/src/main/webapp/js/component</directoryRoot>
-                        <directoryRoot>${basedir}/src/main/webapp/js/controllers</directoryRoot>
-                        <directoryRoot>${basedir}/src/main/webapp/js/model</directoryRoot>
-                        <directoryRoot>${basedir}/src/main/webapp/js/routers</directoryRoot>
-                        <directoryRoot>${basedir}/src/main/webapp/js/view</directoryRoot>
-                    </directoryRoots>
-                    
-                    <sourceFiles>
+			<plugin>
+				<groupId>com.github.phasebash</groupId>
+				<artifactId>jsdoc3-maven-plugin</artifactId>
+				<version>1.0.7</version>
+				<configuration>
+					<lenient>true</lenient>
+					<recursive>true</recursive>
+					<sourceFiles>
                         <sourceFile>${basedir}/src/main/webapp/js/app.js</sourceFile>
-                        <sourceFile>${basedir}/src/main/webapp/js/session.js</sourceFile>
-                        <sourceFile>${basedir}/src/main/webapp/js/vent.js</sourceFile>
-                    </sourceFiles>
-                </configuration>
-            </plugin>
+                        <sourceFile>${basedir}/src/main/webapp/js/main.js</sourceFile>
+                        <sourceFile>${basedir}/src/main/webapp/js/lib/calipso.js</sourceFile>
+					</sourceFiles>
+				</configuration>
+			</plugin>
 		</plugins>
-
 	</build>
+
+
 
 	<dependencies>
 		<dependency>
@@ -106,7 +110,7 @@
 			<artifactId>resthub-jpa</artifactId>
 			<version>${resthub.spring.stack.version}</version>
 		</dependency>
-		
+
 		<!-- URL Rewrite Filter -->
 
 		<dependency>

@@ -2,7 +2,7 @@ require.config({
 	// main.js is the application entry point
 	deps : [ 'main' ],
 
-	paths : {
+	paths : {//lib/calipso/view/md-search-layout
 		// folders
 		libs : 'lib',
 		// tmpl: '../../tmpl',
@@ -10,6 +10,13 @@ require.config({
 		// libs: no application code here
 		cookie : 'lib/jquery.cookie',
 		jquery : 'lib/jquery',
+		'metis-menu' : 'lib/metisMenu/jquery.metisMenu',
+		  'eve':          'lib/raphael/eve.0.3.4',
+		  'raphael.core': 'lib/raphael/raphael.2.1.0.core',
+		  'raphael.svg':  'lib/raphael/raphael.2.1.0.svg',
+		  'raphael.vml':  'lib/raphael/raphael.2.1.0.vml',
+		  'raphael':      'lib/raphael/raphael.2.1.0.amd',
+		morris : 'lib/morris/morris',
 		underscore : 'lib/underscore',
 		'underscore-string' : 'lib/underscore-string',
 		'underscore-inflection' : 'lib/underscore-inflection',
@@ -30,7 +37,7 @@ require.config({
 		'handlebars-orig' : 'lib/handlebars',
 		'handlebars' : 'lib/resthub/handlebars-helpers',
 		'backbone-queryparams' : 'lib/backbone-queryparams',
-		// 'backbone-datagrid': 'lib/backbone-datagrid',
+		// 'backbone-datagrid': 'lib/backbone-datagrid', lib/calipso/view
 		// 'backbone-paginator': 'lib/backbone-paginator',
 		// 'backbone-relational': 'lib/backbone-relational',
 		'backbone-pageable' : 'lib/backbone-pageable',
@@ -43,6 +50,7 @@ require.config({
 		console : 'lib/resthub/console',
 		backgrid : 'lib/backgrid/backgrid',
 		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
+		"calipso" : 'lib/calipso',
 		supermodel : 'lib/supermodel'
 	},
 
@@ -89,12 +97,8 @@ require.config({
 			exports : 'Backbone.Form'
 		},
 		'backbone-forms-bootstrap3' : {
-			deps : [ 'jquery', 'underscore', 'backbone', 'backbone-forms', 'backbone-forms' ],
+			deps : [ 'jquery', 'underscore', 'backbone', 'backbone-forms' ]
 		},
-		/*
-		 * 'backbone-forms-editor-markdown': { deps: ['backbone-forms'], exports:
-		 * 'Backbone.Form.editors.Markdown' },
-		 */
 		'backgrid-paginator' : {
 			deps : [ 'backgrid', 'backbone-pageable' ],
 			exports : 'Backgrid.Extension.Paginator'
@@ -106,7 +110,17 @@ require.config({
 			deps : [ 'jquery' ],
 			exports : 'Markdown'
 		},
-
+		'metis-menu' : {
+			deps : [ 'jquery', 'bootstrap' ],
+			exports : 'jquery'
+		},
+		'morris' : {
+			deps : [ 'jquery', 'raphael' ],
+			exports : 'jquery'
+		},
+		'raphael' : {
+			deps : [ 'eve' ]
+		},
 		// 'backbone-relational': {
 		// deps: [
 		// 'backbone'
@@ -117,6 +131,10 @@ require.config({
 		},
 		'async' : {
 			exports : 'async'
+		},
+		'calipso' : {
+			deps : [ 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'supermodel', 'metis-menu', 'morris' ],
+			exports : 'calipso'
 		},
 		cookie: { 
 			deps: ['jquery']

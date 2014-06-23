@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'backbone', 'model/generic-model', 'model/host' ],
-		function(Backbone, GenericModel, HostModel) {
-			var ResourceModel = GenericModel.extend({
+define([ 'calipso', 'component/backgrid-edit-in-tab-button-cell', 'backgrid-view-row-maximized-cell'],
+		function( Calipso, EditInTabCell, ViewRowCell) {
+			var ResourceModel = Calipso.model.GenericModel.extend({
 				modelKey: "resource",
 				apiPath : "/api/rest/resource/",
 				
 			},
 			// static members
 			{
-				parent: GenericModel
+				parent: Calipso.model.GenericModel
 			});
 
 			/**
@@ -40,7 +40,7 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 					"host" : {
 						"default": {
 							type: 'NestedModel',
-							model : HostModel,
+							model : Calipso.model.HostModel,
 						}
 					},
 					"name" : {
@@ -67,7 +67,7 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 							name : "name",
 							label : "name",
 							editable : false,
-							cell : ViewInTabCell
+							cell : ViewRowCell
 						},
 						{
 							name : "pathName",
@@ -82,4 +82,4 @@ define([ 'backbone', 'model/generic-model', 'model/host' ],
 						}];
 			}
 			return ResourceModel;
-		});
+});
