@@ -19,7 +19,9 @@
 package gr.abiss.calipso.spring;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,9 +48,15 @@ import org.springframework.stereotype.Component;
  */
 @Component("restAuthenticationEntryPoint")
 public final class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+	
 	@Override
-	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-			throws IOException {
-		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-	}
+	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+		 
+        response.setContentType("application/json");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        PrintWriter out = response.getWriter();
+        out.print("{\"message\":\"Full authentication is required to access this resource.\", \"access-denied\":true,\"cause\":\"NOT AUTHENTICATED\"}");
+        out.flush();
+        out.close();
+    }
 }

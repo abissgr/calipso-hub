@@ -39,16 +39,15 @@
         <sec:intercept-url pattern="/signup/**" access="permitAll"/>
         <sec:intercept-url pattern="/user/register/**" access="permitAll"/>
 		
-        <sec:intercept-url pattern="/api/**" access="permitAll" />
-		<!-- 
-		<sec:intercept-url pattern="/api/rest/user/**" method="POST" access="permitAll" />
-		<sec:intercept-url pattern="/api/rest/user/**" method="PUT" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/api/rest/users/**" method="POST" access="permitAll" />
+		<sec:intercept-url pattern="/api/rest/users/**" method="PUT" access="hasRole('ROLE_USER')" />
 		<sec:intercept-url pattern="/api/rest/**" method="DELETE" access="hasRole('ROLE_ADMIN')" />
 		<sec:intercept-url pattern="/api/rest/**" method="OPTIONS" access="hasRole('ROLE_ADMIN')" />
 		<sec:intercept-url pattern="/api/rest/**" method="POST" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
-		 -->
-		<sec:logout invalidate-session="true" />
+        <sec:intercept-url pattern="/api/rest/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
+        <sec:intercept-url pattern="/api/rest/hosts**" method="GET" access="hasRole('ROLE_USER')" />
+		
+        <sec:logout invalidate-session="true" />
 		
         <!-- Adds social authentication filter to the Spring Security filter chain. 
         <sec:custom-filter ref="socialAuthenticationFilter" before="PRE_AUTH_FILTER" />-->

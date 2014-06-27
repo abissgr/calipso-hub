@@ -49,7 +49,7 @@ pageContext.setAttribute("basePath", basePath);
 		<div id="calipsoFooterRegion">
 			<!-- -->
 		</div>
-	    <div id="calipsoRegionModal" class="modal hide fade"></div>
+	    <div id="calipsoModalRegion" class="modal hide fade"></div>
 	    
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script id="calipso-script-main" data-main="${basePath}/js/config" src="${basePath}/js/lib/require.js">

@@ -110,6 +110,8 @@ define("calipso", function(require) {
 		customConfig = customConfig || {};
 		var config = {
 			contextPath : "/",
+			headerViewType : Calipso.view.HeaderView,
+			footerViewType : Calipso.view.FooterView,
 			loginViewType : Calipso.view.LoginView,
 			sessionType : Calipso.util.Session,
 			apiAuthPath: "/api-auth"
@@ -168,12 +170,29 @@ define("calipso", function(require) {
 			console.log("app event initialize:after");
 			//	try "remember me"
 			Calipso.session.load();
+			
 			// render basic structure
-			Calipso.app.headerRegion.show(new Calipso.view.HeaderView({
+			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 				model : Calipso.session.userDetails
 			}));
+
+			  // TODO: move after loading the sidebar DOM
+				//Loads the correct sidebar on window load,
+				//collapses the sidebar on window resize.
+				$(function() {
+				    $(window).bind("load resize", function() {
+				        width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
+				        if (width < 768) {
+				            $('div.sidebar-collapse').addClass('collapse')
+				        } else {
+				            $('div.sidebar-collapse').removeClass('collapse')
+				        }
+				    })
+				})
+			
+			
 			// app.mainContentNavRegion.show(new MainContentNavView());
-			Calipso.app.footerRegion.show(new Calipso.view.FooterView());
+			Calipso.app.footerRegion.show(new Calipso.config.footerViewType());
 
 			var pushStateSupported = _.isFunction(history.pushState);
 			var contextPath =  Calipso.getConfigProperty("contextPath");
@@ -197,7 +216,7 @@ define("calipso", function(require) {
 		Calipso.vent.on('session:created', function(userDetails) {
 			console.log("vent event session:created");
 			Calipso.session.userDetails = userDetails;
-			Calipso.app.headerRegion.show(new Calipso.view.HeaderView({
+			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 				model : userDetails
 			}));
 
@@ -235,7 +254,7 @@ define("calipso", function(require) {
 	// Region
 	// //////////////////////////////////////
 	Calipso.view.ModalRegion = Marionette.Region.extend(/** @lends Calipso.view.ModalRegion.prototype */{
-		el : "#calipsoRegionModal",
+		el : "#calipsoModalRegion",
 
 		onShow : function(view) {
 			view.on("close", this.hideModal, this);
@@ -1441,6 +1460,9 @@ define("calipso", function(require) {
 		onCollectionFetched : function() {
 
 		},
+		onCollectionFetchFailed : function() {
+
+		},
 		// Define view template
 		template : require('hbs!template/md-collection-grid-view'),
 		onShow : function() {
@@ -1487,7 +1509,13 @@ define("calipso", function(require) {
 						_self.onCollectionFetched();
 						_self.$(".loading-indicator").hide();
 						_self.$(".loading-indicator-back").hide();
+					},
+					error : function() {
+						_self.onCollectionFetchFailed();
+						_self.$(".loading-indicator").hide();
+						_self.$(".loading-indicator-back").hide();
 					}
+				
 				};
 				if (_self.collection.data) {
 					if (_self.collection.data[""] || _self.collection.data[""] == null) {
@@ -1582,12 +1610,14 @@ define("calipso", function(require) {
 			}
 
 			this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
-			var modelUrl = Calipso.session.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
-			console.log("GenericView#initialize, fetching model " + modelUrl);
-			this.model.fetch({
-				async : false,
-				url : modelUrl
-			});
+			if(!options.skipFetch){
+				var modelUrl = Calipso.session.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
+				console.log("GenericView#initialize, fetching model " + modelUrl);
+				this.model.fetch({
+					async : false,
+					url : modelUrl
+				});
+			}
 		},
 		formSchemaKey : "view",
 	}, {
@@ -2347,9 +2377,9 @@ define("calipso", function(require) {
 			Calipso.vent.trigger("app:show", new Calipso.view.NotFoundView());
 
 		},
-		decodeParam : function(s) {
-			return decodeURIComponent(s.replace(/\+/g, " "));
-		},
+//		decodeParam : function(s) {
+//			return decodeURIComponent(s.replace(/\+/g, " "));
+//		},
 		/*
 		 * TODO
 		 * 
