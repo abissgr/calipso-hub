@@ -18,14 +18,15 @@
  */
 package gr.abiss.calipso.service;
 
-import java.util.Map;
-
 import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.userDetails.integration.LocalUserService;
 
-public interface UserService extends GenericService<User, String>, LocalUserService<String, User> {
+public interface RoleService extends GenericService<Role, String> {
 
-	User findByCredentials(String userNameOrEmail, String password, Map metadata);
+	Role findByIdOrName(String idOrName);
 
+	void saveMember(String roleId, User user);
+
+	void deleteMember(String roleId, String userId);
 }

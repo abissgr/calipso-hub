@@ -19,6 +19,7 @@ package gr.abiss.calipso.userDetails.controller;
 
 import gr.abiss.calipso.userDetails.controller.form.RegistrationForm;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
@@ -144,7 +145,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 
 		LOGGER.debug("registerUserAccount, No validation errors found. Continuing registration process.");
 
-		UserDetails registered = createUserAccount(userAccountData, result);
+		ICalipsoUserDetails registered = createUserAccount(userAccountData, result);
 		LOGGER.debug("registerUserAccount, registered: " + registered);
 		
 		//If email address was already found from the database, render the form view.
@@ -167,9 +168,9 @@ public class ProviderSignInController extends org.springframework.social.connect
 	* Creates a new user account by calling the service method. If the email address is found
 	* from the database, this method adds a field error to the email field of the form object.
 	*/
-	private UserDetails createUserAccount(RegistrationForm userAccountData, BindingResult result) {
+	private ICalipsoUserDetails createUserAccount(RegistrationForm userAccountData, BindingResult result) {
 		LOGGER.debug("createUserAccount, userAccountData: {}", userAccountData);
-		UserDetails registered = null;
+		ICalipsoUserDetails registered = null;
 
 		try {
 			SimpleLocalUser user = new SimpleLocalUser();

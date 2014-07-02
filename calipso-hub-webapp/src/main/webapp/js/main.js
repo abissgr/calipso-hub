@@ -91,6 +91,8 @@ $(document).on "click", "a[href^='/']", (event) ->
 		$(document.body).tooltip({ selector: "[data-toggle=tooltip]", html : true });
 	    
 	});
+ 
+  
 	//////////////////////////////////
 	// SB Admin 2 js
 	//////////////////////////////////
@@ -100,7 +102,7 @@ $(document).on "click", "a[href^='/']", (event) ->
 
 	});
 
-
+	$.ajaxSetu
 	//////////////////////////////////
 	// Start the app
 	//////////////////////////////////

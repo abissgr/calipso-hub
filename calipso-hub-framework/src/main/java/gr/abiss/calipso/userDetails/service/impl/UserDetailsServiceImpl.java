@@ -20,6 +20,8 @@ package gr.abiss.calipso.userDetails.service.impl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.integration.LocalUserService;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
@@ -88,9 +90,9 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	 * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
 	 */
 	@Override
-	public UserDetails loadUserByUsername(
+	public ICalipsoUserDetails loadUserByUsername(
 			String findByUserNameOrEmail) throws UsernameNotFoundException {
-		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
+		ICalipsoUserDetails userDetails = null;
 
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("loadUserByUsername using: " + findByUserNameOrEmail);
@@ -102,7 +104,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			LOGGER.debug("loadUserByUsername user: " + user);
 		}
 
-		userDetails = gr.abiss.calipso.userDetails.model.UserDetails
+		userDetails = UserDetails
 				.fromUser(user);
 
 
@@ -116,14 +118,14 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		return userDetails;
 	}
 
-	// @Transactional(readOnly = false)
+	@Transactional(readOnly = false)
 	@Override
-	public UserDetails create(final UserDetails tryUserDetails) {
+	public ICalipsoUserDetails create(final ICalipsoUserDetails tryUserDetails) {
 
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("Trying to login with: "+tryUserDetails);
+			LOGGER.debug("create, Trying to login with: "+tryUserDetails);
 		}
-		UserDetails userDetails = null;
+		ICalipsoUserDetails userDetails = null;
 		if (tryUserDetails != null) {
 			try {
 				String userNameOrEmail = tryUserDetails.getUsername();
@@ -131,7 +133,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					userNameOrEmail = tryUserDetails.getEmail();
 				}
 				String password = tryUserDetails.getPassword();
-				Map<String, String> metadata = tryUserDetails.getMetadata();
+				// TODO
+				Map<String, String> metadata = null;// tryUserDetails.getMetadata();
 
 				// make sure we have credentials to send
 				if (StringUtils.isNotBlank(userNameOrEmail)
@@ -141,32 +144,34 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					LocalUser localUser = this.localUserService
 							.findByCredentials(userNameOrEmail, password,
 									metadata);
-
+					if(LOGGER.isDebugEnabled()){
+						LOGGER.debug("create, Matched local user: "+localUser);
+					}
 					// convert to UserDetails if not null
 					userDetails = UserDetails.fromUser(localUser);
 
 					if(LOGGER.isDebugEnabled()){
-						LOGGER.debug("Creating user details from localUser...");
+						LOGGER.debug("create, Creating user details from localUser...");
 					}
 				}
 			} catch (RuntimeException e) {
-				LOGGER.error("Failed creating user details object", e);
+				LOGGER.error("create, failed creating user details object", e);
 			}
 
 		}
 
 
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("create testing returning null, userDetails: " + userDetails);
+			LOGGER.debug("create, testing returning null, userDetails: " + userDetails);
 		}
 		return userDetails;
 	}
 
 	@Override
 	@Transactional(readOnly = false)
-	public gr.abiss.calipso.userDetails.model.UserDetails confirmPrincipal(String confirmationToken) {
+	public ICalipsoUserDetails confirmPrincipal(String confirmationToken) {
 		Assert.notNull(confirmationToken);
-		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
+		ICalipsoUserDetails userDetails = null;
 		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
 		// convert to UserDetals if not null
 		userDetails = UserDetails.fromUser(localUser);
@@ -185,9 +190,9 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Override
 	@Transactional(readOnly = false)
-	public gr.abiss.calipso.userDetails.model.UserDetails resetPassword(String userNameOrEmail, String token, String newPassword) {
+	public ICalipsoUserDetails resetPassword(String userNameOrEmail, String token, String newPassword) {
 		Assert.notNull(userNameOrEmail);
-		gr.abiss.calipso.userDetails.model.UserDetails userDetails = null;
+		ICalipsoUserDetails userDetails = null;
 		LocalUser localUser = this.localUserService.handlePasswordResetToken(
 				userNameOrEmail, token, newPassword);
 		if (localUser == null) {
@@ -202,13 +207,13 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Override
-	public UserDetails getPrincipal() {
+	public ICalipsoUserDetails getPrincipal() {
 		return SecurityUtil.getPrincipal();
 	}
 
 	@Override
 	public LocalUser getPrincipalLocalUser() {
-		UserDetails principal = getPrincipal();
+		ICalipsoUserDetails principal = getPrincipal();
 		LocalUser user = null;
 		if (principal != null) {
 			String username = principal.getUsername();
@@ -227,12 +232,12 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Override
-	public gr.abiss.calipso.userDetails.model.UserDetails update(gr.abiss.calipso.userDetails.model.UserDetails resource) {
+	public ICalipsoUserDetails update(ICalipsoUserDetails resource) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void delete(gr.abiss.calipso.userDetails.model.UserDetails resource) {
+	public void delete(ICalipsoUserDetails resource) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -252,18 +257,18 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Override
-	public gr.abiss.calipso.userDetails.model.UserDetails findById(String id) {
+	public ICalipsoUserDetails findById(String id) {
 		// LOGGER.info("findById: " + id);
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public List<gr.abiss.calipso.userDetails.model.UserDetails> findAll() {
+	public List<ICalipsoUserDetails> findAll() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Page<gr.abiss.calipso.userDetails.model.UserDetails> findAll(Pageable pageRequest) {
+	public Page<ICalipsoUserDetails> findAll(Pageable pageRequest) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -288,7 +293,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			// user.getRoles());
 			// Role userRole = new Role(Role.ROLE_USER);
 			// user.addRole(userRole);
-			userDetails = gr.abiss.calipso.userDetails.model.UserDetails.fromUser(user);
+			userDetails = UserDetails.fromUser(user);
 
 		}
 
@@ -368,7 +373,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					}
 					socialUsername = socialUsername + increment;
 				}
-				user = new gr.abiss.calipso.userDetails.model.SimpleLocalUser();
+				user = new SimpleLocalUser();
 				user.setActive(true);
 				user.setEmail(socialEmail);
 				user.setUserName(socialUsername);
@@ -414,10 +419,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Override
-	public gr.abiss.calipso.userDetails.model.UserDetails createForImplicitSignup(
+	public ICalipsoUserDetails createForImplicitSignup(
 			LocalUser localUser) throws DuplicateEmailException {
 		LOGGER.debug("createForImplicitSignup, localUser: " + localUser);
-		return gr.abiss.calipso.userDetails.model.UserDetails
+		return UserDetails
 				.fromUser(this.localUserService
 						.createForImplicitSignup(localUser));
 	}

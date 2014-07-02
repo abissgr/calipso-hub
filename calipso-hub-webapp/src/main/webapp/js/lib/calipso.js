@@ -114,7 +114,7 @@ define("calipso", function(require) {
 			footerViewType : Calipso.view.FooterView,
 			loginViewType : Calipso.view.LoginView,
 			sessionType : Calipso.util.Session,
-			apiAuthPath: "/api-auth"
+			apiAuthPath: "/apiauth"
 		}
 		Calipso.config = _.defaults(customConfig, config);
 		
@@ -221,7 +221,7 @@ define("calipso", function(require) {
 			}));
 
 			// send logged in user on their way
-			var fw = Calipso.app.fw ? Calipso.app.fw : "home";
+			var fw = Calipso.app.fw ? Calipso.app.fw : Calipso.getConfigProperty("contextPath") + "client/home";
 			console.log("session:created, update model: " + userDetails.get("email") + ", navigating to: " + fw);
 
 			Calipso.navigate(fw, {
@@ -828,7 +828,7 @@ define("calipso", function(require) {
 			options = options || {};
 			options.timeout = 30000;
 			if(!options.url){
-				options.url = Calipso.session.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath");
+				options.url = Calipso.session.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails";
 			}
 			// options.dataType = "jsonp"; // JSON is default.
 			return Backbone.sync(method, model, options);
@@ -2044,7 +2044,9 @@ define("calipso", function(require) {
 
 		// Returns true if the user is authenticated.
 		isAuthenticated : function() {
-			return this.userDetails && this.userDetails.get && this.userDetails.get("id");
+			var isAuth = this.userDetails && this.userDetails.get && this.userDetails.get("id");
+			console.log("session#isAuthenticated: "+ isAuth);
+			return isAuth;
 		},
 		ensureLoggedIn : function() {
 			if (!this.isAuthenticated()) {
@@ -2233,7 +2235,7 @@ define("calipso", function(require) {
 				Calipso.session.save(model);
 				Calipso.session.load();
 				// console.log('MainController authenticate navigating to home');
-				Calipso.navigate("home", {
+				Calipso.navigate(Calipso.getConfigProperty("contextPath") + "client/home", {
 					trigger : true
 				});
 			}, function(model, xhr, options) {

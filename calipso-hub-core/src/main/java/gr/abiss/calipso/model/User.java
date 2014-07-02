@@ -24,18 +24,28 @@ import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.MD5Utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
 import org.springframework.security.core.GrantedAuthority;
@@ -116,14 +126,17 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	@Transient
 	private String redirectUrl;
+	
+	//@JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "user_roles", joinColumns = { @JoinColumn(name = "role_id") }, inverseJoinColumns = { @JoinColumn(name = "user_id") })
+	private List<Role> roles = new ArrayList<Role>(0);
 
 	public User() {
 	}
 	
 	public User(String email) {
 		this.email = email;
-		// TODO: remove when @PrePersist etc. works
-		// this.resetEmailHash();
 	}
 
 	@Override
@@ -149,10 +162,13 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).appendSuper(super.toString()).append("userName", this.getUserName())
-				.append("email", this.getEmail())
-.append("new", this.isNew())
-				.toString();
+		return new ToStringBuilder(this)
+			.appendSuper(super.toString())
+			.append("userName", this.getUserName())
+			.append("email", this.getEmail())
+			.append("new", this.isNew())
+			.append("roles", this.getRoles())
+			.toString();
 	}
 
 	/**
@@ -186,9 +202,28 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		}
 
 	}
-	
 
-	
+	/**
+	 * Add a role to this principal.
+	 * @param role the role to add
+	 */
+	public void addRole(Role role) {
+		if (CollectionUtils.isEmpty(roles)) {
+			this.roles = new LinkedList<Role>();
+		}
+		this.roles.add(role);
+	}
+
+	/**
+	 * Remove a role from this principal.
+	 * @param role the role to remove
+	 */
+	public void removeRole(Role role) {
+		if (!CollectionUtils.isEmpty(roles)) {
+			this.roles.remove(role);
+		}
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -365,8 +400,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	@Override
 	public Collection<? extends GrantedAuthority> getRoles() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.roles;
 	}
 
 

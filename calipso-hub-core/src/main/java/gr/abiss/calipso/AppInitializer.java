@@ -19,9 +19,11 @@
 package gr.abiss.calipso;
 
 import gr.abiss.calipso.model.Host;
+import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.service.HostService;
+import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.service.cms.TextService;
 import gr.abiss.calipso.utils.ConfigurationFactory;
@@ -48,22 +50,33 @@ public class AppInitializer {
 	@Inject
 	@Named("textService")
 	private TextService textService;
+	
+	@Inject
+	@Named("roleService")
+	private RoleService roleService;
 
 	@PostInitialize
 	public void init() {
 		Configuration config = ConfigurationFactory.getConfiguration();
 		boolean initData = config.getBoolean(ConfigurationFactory.INIT_DATA, true);
 		if(initData){
+			
+
+			Role adminRole = new Role(Role.ROLE_ADMIN);
+			adminRole = roleService.create(adminRole);
+			// this is added to users by user service, just creating it
+			Role userRole = new Role(Role.ROLE_USER);
+			userRole = roleService.create(userRole);
 
 			Date now = new Date();
 
 			Host h1 = new Host("www.abiss.gr");
 			h1.addAlias("abiss.gr");
-			hostService.create(h1);
+			h1 = hostService.create(h1);
 			Host h2 = new Host("dev.abiss.gr");
-			hostService.create(h2);
+			h2 = hostService.create(h2);
 			Host h3 = new Host("calipso.abiss.gr");
-			hostService.create(h3);
+			h3 = hostService.create(h3);
 
 			Text t1 = new Text("test2");
 			t1.setHost(h2);
@@ -87,7 +100,8 @@ public class AppInitializer {
 			u0.setUserName("admin");
 			u0.setUserPassword("admin");
 			u0.setLastVisit(now);
-			u0 = userService.create(u0);
+			u0.addRole(adminRole);
+			u0 = userService.createActive(u0);
 
 			User u1 = new User("manosi@abiss.gr");
 			u1.setFirstName("Manos");
@@ -95,7 +109,7 @@ public class AppInitializer {
 			u1.setUserName("manos");
 			u1.setUserPassword("manos");
 			u1.setLastVisit(now);
-			u1 = userService.create(u1);
+			u1 = userService.createActive(u1);
 			
 			for(int i = 0; i < 30; i++){
 				User u = new User("user"+i+"@abiss.gr");
@@ -104,7 +118,7 @@ public class AppInitializer {
 				u.setUserName("user"+i);
 				u.setUserPassword("user"+i);
 				u.setLastVisit(now);
-				u = userService.create(u);
+				u = userService.createActive(u);
 			}
 		
 		}

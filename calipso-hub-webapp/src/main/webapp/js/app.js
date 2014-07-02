@@ -17,15 +17,37 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define([ 'calipso'],
-	function( Calipso) {
+define([ 'calipso', 'modules-config'],
+	function( Calipso, modulesConfig) {
 
+
+	//////////////////////////////////
+	// Global backbone error handling
+	//////////////////////////////////
+	Backbone.ajax = function() {
+      // Invoke $.ajaxSetup in the context of Backbone.$
+      Backbone.$.ajaxSetup.call(Backbone.$, {
+         statusCode: {
+              401: function(){
+        			console.log("Backbone.$.ajaxSetup 401");
+                  // Redirect the to the login page.
+                 Backbone.history.navigate(Calipso.getConfigProperty("contextPath") + "client/login", true);
+              },
+              403: function() {
+          			console.log("Backbone.$.ajaxSetup 403");
+                  // 403 -- Access denied
+                 Backbone.history.navigate(Calipso.getConfigProperty("contextPath") + "client/login", true);
+              }
+	      
+        }
+      });
+      return Backbone.$.ajax.apply(Backbone.$, arguments);
+	}
+	
 	
 	// initialize/configure application
 	Calipso.initializeApp({
 		contextPath: "calipso/"
 	});
   
-  return Calipso.app;
-  
-});
+  return Calipso.app;});

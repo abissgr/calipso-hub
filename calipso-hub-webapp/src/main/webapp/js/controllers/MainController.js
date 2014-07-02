@@ -25,12 +25,12 @@ function(Calipso, _, Backbone, Marionette) {
 
 		home : function() {
 			console.log("AbstractController#home");
-//			if (!session.isAuthenticated()) {
-//				Backbone.history.navigate(Calipso.app.config.contextPath + "client/login", {
-//					trigger : true
-//				});
-//				return false;
-//			}
+			if (!Calipso.session.isAuthenticated()) {
+				Backbone.history.navigate(Calipso.app.config.contextPath + "client/login", {
+					trigger : true
+				});
+				return false;
+			}
 			var modelForRoute = Calipso.model.UserModel.create({id: "search"});
 			
 			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], {

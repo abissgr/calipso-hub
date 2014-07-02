@@ -16,16 +16,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service;
+package gr.abiss.calipso.repository;
 
-import java.util.Map;
+import java.util.List;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.userDetails.integration.LocalUserService;
+import gr.abiss.calipso.jpasearch.repository.BaseRepository;
+import gr.abiss.calipso.model.Role;
 
-public interface UserService extends GenericService<User, String>, LocalUserService<String, User> {
+import org.springframework.data.jpa.repository.Query;
 
-	User findByCredentials(String userNameOrEmail, String password, Map metadata);
+public interface RoleRepository extends BaseRepository<Role, String> {
 
+	@Query("select r from Role r where r.name = ?1")
+	public Role findByName(String name);
+
+	@Query("select r from Role r JOIN r.members m where m.id = ?1")
+	public List<Role> findByMemberId(String userId);
+
+	@Query("select r from Role r where (r.id = ?1 or r.name = ?1) ")
+	public Role findByIdOrName(String idOrEmail);
 }

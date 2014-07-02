@@ -19,6 +19,7 @@ package gr.abiss.calipso.userDetails.util;
 
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 
 import javax.servlet.http.Cookie;
@@ -43,14 +44,14 @@ public class SecurityUtil {
 	private static final String COOKIE_NAME_SESSION = "JSESSIONID";
 
 	public static void login(HttpServletRequest request, HttpServletResponse response, LocalUser user, UserDetailsConfig userDetailsConfig) {
-		UserDetails userDetails = UserDetails.fromUser(user);
+		ICalipsoUserDetails userDetails = UserDetails.fromUser(user);
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("login,  userDetails: "+userDetails);
 		}
 		login(request, response, userDetails, userDetailsConfig);
 	}
 
-	public static void login(HttpServletRequest request, HttpServletResponse response, UserDetails userDetails,
+	public static void login(HttpServletRequest request, HttpServletResponse response, ICalipsoUserDetails userDetails,
 			UserDetailsConfig userDetailsConfig) {
 		if(LOGGER.isDebugEnabled()){
 			if (userDetails != null){
@@ -143,7 +144,7 @@ public class SecurityUtil {
 		response.addCookie(cookie);
 	}
 
-	public static UserDetails getPrincipal() {
+	public static ICalipsoUserDetails getPrincipal() {
 		Object principal = null;
 		if (SecurityContextHolder.getContext() != null
 				&& SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -154,8 +155,8 @@ public class SecurityUtil {
 			LOGGER.debug("getPrincipal, principal: " + principal);
 		}
 		if (principal != null
-				&& UserDetails.class.isAssignableFrom(principal.getClass())) {
-			return (UserDetails) principal;
+				&& ICalipsoUserDetails.class.isAssignableFrom(principal.getClass())) {
+			return (ICalipsoUserDetails) principal;
 		} else {
 			return null;
 		}

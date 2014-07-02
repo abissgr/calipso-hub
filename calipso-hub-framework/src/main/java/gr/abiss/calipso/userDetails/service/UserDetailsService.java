@@ -18,24 +18,25 @@
 package gr.abiss.calipso.userDetails.service;
 
 import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
 import org.resthub.common.service.CrudService;
 
 
-public interface UserDetailsService extends CrudService<UserDetails, String> {
+public interface UserDetailsService extends CrudService<ICalipsoUserDetails, String> {
 
-	UserDetails resetPassword(String userNameOrEmail, String token, String newPassword);
+	ICalipsoUserDetails resetPassword(String userNameOrEmail, String token, String newPassword);
 
 	void handlePasswordResetRequest(String userNameOrEmail);
 
-	UserDetails confirmPrincipal(String confirmationToken);
+	ICalipsoUserDetails confirmPrincipal(String confirmationToken);
 
-	UserDetails createForImplicitSignup(LocalUser user)
+	ICalipsoUserDetails createForImplicitSignup(LocalUser user)
 			throws DuplicateEmailException;
 
-	UserDetails getPrincipal();
+	ICalipsoUserDetails getPrincipal();
 
 	LocalUser getPrincipalLocalUser();
 }

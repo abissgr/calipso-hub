@@ -18,9 +18,11 @@
  */
 package gr.abiss.calipso.service.impl;
 
+import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
+import gr.abiss.calipso.repository.RoleRepository;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.UserService;
@@ -38,16 +40,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 //@Named("userService")
 public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepository> 
-	implements UserService, LocalUserService<String, User> {
+	implements UserService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	private final StringKeyGenerator generator = KeyGenerators.string();
+	private RoleRepository roleRepository;
 
+	@Inject
+	public void setRoleRepository(RoleRepository roleRepository) {
+		this.roleRepository = roleRepository;
+	}
 	@Override
 	@Inject
 	public void setRepository(UserRepository userRepository) {
@@ -66,16 +74,30 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 		try {
 			user = this.repository.findByCredentials(userNameOrEmail, password);
 			LOGGER.error("findByCredentials: matched user: "+user);
-			if (user != null && !CollectionUtils.isEmpty(metadata)) {
-				List<Metadatum> saved = this.repository.addMetadata(user.getId(), metadata);
-				for (Metadatum meta : saved) {
-					user.addMetadatum((UserMetadatum) meta);
-				}
+			if (user != null) {
+				if (!CollectionUtils.isEmpty(metadata)) {
+					List<Metadatum> saved = this.repository.addMetadata(user.getId(), metadata);
+					for (Metadatum meta : saved) {
+						user.addMetadatum((UserMetadatum) meta);
+					}
 
+				}
 			}
 		} catch (RuntimeException e) {
 			LOGGER.error("failed finding user by credentials", e);
 		}
+		return user;
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public User createActive(User resource) {
+		resource.setActive(true);
+		Role userRole = roleRepository.findByName(Role.ROLE_USER);
+		resource.addRole(userRole);
+
+		User user = repository.save(resource);
+		roleRepository.save(userRole);
 		return user;
 	}
 

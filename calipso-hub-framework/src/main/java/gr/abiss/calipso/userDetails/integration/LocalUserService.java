@@ -24,7 +24,11 @@ import java.util.Map;
 
 
 
-
+/**
+ * 
+ * @param <T> The local user implementation type
+ * @param <ID> The local user implementation identifier type
+ */
 public interface LocalUserService<ID extends Serializable, T extends LocalUser> {
 
 	public T findByUserNameOrEmail(String userNameOrEmail);
@@ -53,5 +57,7 @@ public interface LocalUserService<ID extends Serializable, T extends LocalUser> 
 	public void handlePasswordResetRequest(String userNameOrEmail);
 
 	public T handlePasswordResetToken(String userNameOrEmail, String token, String newPassword);
+
+	public T createActive(T resource);
 
 }

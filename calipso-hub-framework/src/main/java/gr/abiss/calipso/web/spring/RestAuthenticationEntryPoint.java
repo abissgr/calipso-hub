@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.spring;
+package gr.abiss.calipso.web.spring;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,6 +25,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -49,9 +51,12 @@ import org.springframework.stereotype.Component;
 @Component("restAuthenticationEntryPoint")
 public final class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
+	
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-		 
+		authException.printStackTrace();
+		LOGGER.error("commence, authException: "+authException.getMessage(), authException);
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         PrintWriter out = response.getWriter();

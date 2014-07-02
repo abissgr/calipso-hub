@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "user_metadatum")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class UserMetadatum extends AbstractAuditabeMetadatum<User, User> {
 
 	private static final long serialVersionUID = 5885643690209874078L;

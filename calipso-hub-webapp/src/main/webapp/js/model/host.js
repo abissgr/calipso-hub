@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'calipso', 'component/backgrid-edit-in-tab-button-cell', 'backgrid-view-row-maximized-cell'],
-		function( Calipso, EditInTabCell, ViewRowCell) {
+define([ 'calipso'],
+		function( Calipso) {
 			var HostModel = Calipso.model.GenericModel.extend({
 			},
 			// static members
@@ -56,12 +56,14 @@ define([ 'calipso', 'component/backgrid-edit-in-tab-button-cell', 'backgrid-view
 					name : "domain",
 					label : "domain",
 					editable : false,
-					//cell : ViewRowCell
+					cell : Calipso.components.ViewRowCell
+				
 				}, {
 					name : "edit",
 					label : "",
 					editable : false,
-					//cell : EditInTabCell
+					cell : Calipso.components.ViewRowCell
+					
 				}];
 			}
 			return HostModel;

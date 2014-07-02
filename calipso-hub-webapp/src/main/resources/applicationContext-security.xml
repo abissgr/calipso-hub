@@ -8,6 +8,9 @@
     <!-- choose the default user controller -->
      <bean id="userController" 
         class="gr.abiss.calipso.controller.UserController" />
+    <!-- choose the default userDetails controller -->
+     <bean id="userDetailsController" 
+        class="gr.abiss.calipso.userDetails.controller.UserDetailsController" />
     <!-- Calipso UserDetailsService implementation -->
     <bean id="userDetailsService" 
     	class="gr.abiss.calipso.userDetails.service.impl.UserDetailsServiceImpl" 
@@ -39,7 +42,8 @@
         <sec:intercept-url pattern="/signup/**" access="permitAll"/>
         <sec:intercept-url pattern="/user/register/**" access="permitAll"/>
 		
-		<sec:intercept-url pattern="/api/rest/users/**" method="POST" access="permitAll" />
+        <sec:intercept-url pattern="/api/rest/users/**" method="GET" access="hasAuthority('ROLE_USER')" />
+        <sec:intercept-url pattern="/api/rest/users/**" method="POST" access="permitAll" />
 		<sec:intercept-url pattern="/api/rest/users/**" method="PUT" access="hasRole('ROLE_USER')" />
 		<sec:intercept-url pattern="/api/rest/**" method="DELETE" access="hasRole('ROLE_ADMIN')" />
 		<sec:intercept-url pattern="/api/rest/**" method="OPTIONS" access="hasRole('ROLE_ADMIN')" />
@@ -62,20 +66,20 @@
 	<!-- To enable Method Security Expressions and custom PermissionEvaluator
         we need to add the following 
     -->
-    <sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled">
+    <!-- sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled">
         <sec:expression-handler ref="expressionHandler" />
-    </sec:global-method-security>
-    <!--sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" /-->
+    </sec:global-method-security-->
+    <sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" />
     
     <!-- To use hasPermission() expressions, we have to configure a PermissionEvaluator -->
     <!-- See 15.3.2 Built-In Expression 
-            @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator 
+            @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator     
+    --> 
     <bean id="expressionHandler"
         class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
         <property name="permissionEvaluator" ref="customPermissionEvaluator" />
         <property name = "roleHierarchy" ref="roleHierarchy"/>
     </bean>
-    -->
     
     
     <!--

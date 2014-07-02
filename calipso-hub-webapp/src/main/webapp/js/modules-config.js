@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2007 - 2013 www.Abiss.gr
  *
  * This file is part of Calipso, a software platform by www.Abiss.gr.
@@ -16,16 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service;
-
-import java.util.Map;
-
-import gr.abiss.calipso.jpasearch.service.GenericService;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.userDetails.integration.LocalUserService;
-
-public interface UserService extends GenericService<User, String>, LocalUserService<String, User> {
-
-	User findByCredentials(String userNameOrEmail, String password, Map metadata);
-
-}
+define([ 'calipso', 'model/host', 'model/page', 'model/text'],
+function( Calipso, HostModel, PageModel, TextModel) {
+	
+});

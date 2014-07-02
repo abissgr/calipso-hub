@@ -16,9 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'calipso', 'bootstrap-markdown', 'component/backbone-forms-editor-markdown', 
-         'component/backgrid-edit-in-modal-button-cell'],
-		function( Calipso,  Markdown, BackboneFormMarkdown, EditInModalCell) {
+define([ 'calipso', 'model/resource'],
+		function( Calipso, ResourceModel) {
 			//Backbone.Form.editors.Markdown
 			var TextModel = ResourceModel.extend({
 				modelKey: "text",
