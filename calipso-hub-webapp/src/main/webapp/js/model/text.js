@@ -24,7 +24,9 @@ define([ 'calipso', 'model/resource'],
 			},
 			// static members
 			{
-				parent: ResourceModel
+				parent: ResourceModel,
+				showInMenu : true,
+				label : "Text"
 			});
 
 			/**

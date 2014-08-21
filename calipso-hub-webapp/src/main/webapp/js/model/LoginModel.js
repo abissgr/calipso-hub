@@ -39,6 +39,9 @@ define(['backbone', 'session'], function(Backbone, session) {
       return dfd.promise();
     }
 
-  });
+  },
+	showInMenu : false,
+	label : "LoginModel"
+  );
 
 });

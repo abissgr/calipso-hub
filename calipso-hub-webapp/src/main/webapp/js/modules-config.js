@@ -18,5 +18,8 @@
  */
 define([ 'calipso', 'model/host', 'model/page', 'model/text'],
 function( Calipso, HostModel, PageModel, TextModel) {
-	
+
+	Calipso.customModel[HostModel.prototype.getPathFragment()] = HostModel;
+	//Calipso.customModel[PageModel.prototype.getPathFragment()] = PageModel;
+	Calipso.customModel[TextModel.prototype.getPathFragment()] = TextModel;
 });

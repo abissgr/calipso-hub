@@ -17,14 +17,19 @@
  */
 package gr.abiss.calipso.model.entities;
 
+import gr.abiss.calipso.jpasearch.model.FormSchema;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.Persistable;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  * Abstract base class for all persistent entities.
@@ -33,15 +38,21 @@ import org.springframework.data.domain.Persistable;
 // @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
 // property = "id")
 
-public abstract class AbstractPersistable implements Persistable<String> {
+public abstract class AbstractPersistable implements FormSchemaAware, Persistable<String> {
 
 	private static final long serialVersionUID = 2131186735039838008L;
+	
+	public static interface FormSchemaAwareView {}
 	
 	@Id
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
 	@Column(name = "id", unique = true)
 	private String id;
+	
+	//@JsonView(FormSchemaAwareView.class)
+	@Transient
+	private FormSchema formSchema;
 
 	public AbstractPersistable() {
 		super();
@@ -66,9 +77,16 @@ public abstract class AbstractPersistable implements Persistable<String> {
 	 * Set the entity's primary key
 	 * @param id the id to set
 	 */
-	protected void setId(final String id) {
-
+	protected void setId(String id) {
 		this.id = id;
+	}
+
+	public FormSchema getFormSchema() {
+		return formSchema;
+	}
+
+	public void setFormSchema(FormSchema formSchema) {
+		this.formSchema = formSchema;
 	}
 
 	/**

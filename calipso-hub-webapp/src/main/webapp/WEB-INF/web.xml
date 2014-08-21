@@ -46,6 +46,10 @@
         <init-param>
             <param-name>logLevel</param-name>
             <param-value>slf4j</param-value>
+        </init-param> 
+        <init-param>
+	        <param-name>logLevel</param-name>
+	        <param-value>DEBUG</param-value>
         </init-param>
     </filter>
     <filter>
@@ -82,7 +86,9 @@
 	
     <filter-mapping>
         <filter-name>UrlRewriteFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/client/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
     
     <filter-mapping>
@@ -92,7 +98,7 @@
     
     <filter-mapping>
         <filter-name>restRequestNormalizerFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
     </filter-mapping>
 	
 	<filter-mapping>

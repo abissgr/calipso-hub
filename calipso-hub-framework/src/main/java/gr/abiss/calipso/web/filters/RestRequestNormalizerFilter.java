@@ -30,9 +30,9 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 
 	private String methodParam = DEFAULT_METHOD_PARAM;
 
-	protected UserDetailsConfig userDetailsConfig;// = new SimpleUserDetailsConfig();
+	protected UserDetailsConfig userDetailsConfig = new SimpleUserDetailsConfig();
 
-	@Autowired//(required = false)
+	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {
 		this.userDetailsConfig = userDetailsConfig;
 	}
@@ -67,16 +67,18 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 		}
 	}
 	
-	private String getSecurityToken(HttpServletRequest httpRequest) {
+	protected String getSecurityToken(HttpServletRequest httpRequest) {
 		String authToken = null;
 		Cookie[] cookies = httpRequest.getCookies();
 		String ssoCookieName = userDetailsConfig.getCookiesBasicAuthTokenName();
 		if (cookies != null) {
 			for (int i = 0; i < cookies.length; i++) {
 				Cookie cookie = cookies[i];
-				LOGGER.info("Found cookie '" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
+				LOGGER.debug("Found cookie '" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
 						+ ", domain: " + cookie.getDomain() + ", value: " + cookie.getValue());
 				if (cookie.getName().equalsIgnoreCase(ssoCookieName)) {
+					LOGGER.info("Matched calipso SSO cookie'" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
+							+ ", domain: " + cookie.getDomain() + ", value: " + cookie.getValue());
 					authToken = cookie.getValue();
 				}
 			}

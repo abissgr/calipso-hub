@@ -21,7 +21,6 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 	return Marionette.AppRouter.extend({
 
 		controller : new MainController(),
-//	   controller: MainController,
 
 		appRoutes : {
 

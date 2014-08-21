@@ -18,50 +18,71 @@
 package gr.abiss.calipso.jpasearch.model;
 
 import gr.abiss.calipso.jpasearch.json.serializer.FormSchemaSerializer;
+import gr.abiss.calipso.model.entities.FormSchemaAware;
 
 import org.springframework.data.domain.Persistable;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * A simple wrapper for domain entities, used for serializing those to JSON form
- * schemas without the need to associate the domain entity Class with a proper
- * JSON serializer.
+ * A simple wrapper for domain entity class information, used for serializing those to JSON form
+ * schemas for UI views.
  * 
- * The wrapper also carries the schema mode i.e. which one of CREATE, UPDATE,
- * SEARCH
+ * The wrapper also carries the schema mode e.g. CREATE, UPDATE,
+ * SEARCH or any custom value if a subset of the complete schema is used.
  */
 @JsonSerialize(using = FormSchemaSerializer.class)
 public class FormSchema {
+	
+	public static final String MODE_DEFAULT = "default";
+	public static final String MODE_CREATE = "create";
+	public static final String MODE_UPDATE = "update";
+	public static final String MODE_SEARCH = "search";
 
-	public static enum Type {
-		CREATE, UPDATE, SEARCH;
+
+	public static void setToInstance(FormSchemaAware formSchemaAware) {
+		setToInstance(formSchemaAware, false);
 	}
-
-	private Type type = Type.SEARCH;
-
-	public Class<? extends Persistable> domainClass = null;
-
-	public FormSchema(Class<? extends Persistable> domainClass) {
+	
+	public static void setToInstance(FormSchemaAware formSchemaAware, boolean updateExisting) {
+		if(updateExisting || formSchemaAware.getFormSchema() == null){
+			formSchemaAware.setFormSchema(new FormSchema(formSchemaAware.getClass()));
+		}
+	}
+	
+	private Class<? extends FormSchemaAware> domainClass = null;
+	private String json = null;
+	private String action = null;
+	
+	public FormSchema(Class<? extends FormSchemaAware> domainClass) {
 		this.domainClass = domainClass;
 	}
 
 	public FormSchema() {
 	}
 
-	public Type getType() {
-		return type;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
-	}
-
-	public Class<? extends Persistable> getDomainClass() {
+	public Class<? extends FormSchemaAware> getDomainClass() {
 		return domainClass;
 	}
 
-	public void setDomainClass(Class<? extends Persistable> domainClass) {
+	public void setDomainClass(Class<? extends FormSchemaAware> domainClass) {
 		this.domainClass = domainClass;
+	}
+
+
+	public String getJson() {
+		return json;
+	}
+
+	public void setJson(String json) {
+		this.json = json;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
 	}
 }

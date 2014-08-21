@@ -22,8 +22,11 @@ define([ 'calipso'],
 			},
 			// static members
 			{
-				parent: Calipso.model.GenericModel
+				parent : Calipso.model.GenericModel,
 			});
+
+			HostModel.prototype.showInMenu = true;
+			
 			/**
 			 * Get the model class URL fragment corresponding this class
 			 * @returns the URL path fragment as a string

@@ -51,9 +51,18 @@ pageContext.setAttribute("basePath", basePath);
 		</div>
 	    <div id="calipsoModalRegion" class="modal hide fade"></div>
 	    
-		<!-- Placed at the end of the document so the pages load faster -->
-		<script id="calipso-script-main" data-main="${basePath}/js/config" src="${basePath}/js/lib/require.js">
-		<!-- -->
-		</script>
+		<!-- Placed at the end of the document so the pages load faster 
+		 data-main="${basePath}/js/config"
+		 -->
+        <script id="calipso-script-main" src="${basePath}/js/lib/require.js">
+        <!-- -->
+        </script>
+        <script>
+        // load common shim etc. see github.com/requirejs/example-multipage-shim
+        require(['${basePath}/js/config.js'], function(config){
+      	  // load main app
+      	  require(['${basePath}/js/main.js']);
+        });
+        </script>
 	</body>
 </html>

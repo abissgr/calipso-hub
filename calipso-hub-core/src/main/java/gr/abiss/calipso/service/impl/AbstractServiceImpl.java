@@ -56,7 +56,22 @@ public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends 
 	public void setUserRepository(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
-	
+
+	protected User getPrincipalUserDetails() {
+		Object principal = null;
+		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
+			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		}
+		User user = null;
+		if(principal != null 
+				&& principal instanceof org.springframework.security.core.userdetails.User){
+			String username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
+			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
+				user = userRepository.findByUserNameOrEmail(username);
+			}
+		}
+		return user;
+	}
 	protected User getPrincipal() {
 		Object principal = null;
 		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {

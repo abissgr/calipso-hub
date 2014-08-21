@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import gr.abiss.calipso.userDetails.controller.UserDetailsController;
 
-@Controller
+//@Controller
 @RequestMapping(value = "/api-auth", produces = { "application/json", "application/xml" })
 public class CalipsoUserDetailsController extends UserDetailsController {
 

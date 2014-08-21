@@ -17,13 +17,18 @@
  */
 package gr.abiss.calipso.jpasearch.json.serializer;
 
-import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
+import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
+import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,89 +36,129 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
 //import org.apache.commons.beanutils.PropertyUtilsBean;
 
 public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FormSchemaSerializer.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FormSchemaSerializer.class);
+
+	private static final char quote = '\"';
+	private static final char space = ' ';
+	private static final char colon = ':';
+	private static final char comma = ',';
 
 	private static final HashMap<String, String> CONFIG_CACHE = new HashMap<String, String>();
 
+	private static List<String> ignoredFieldNames = new LinkedList<String>();
+	static{
+		ignoredFieldNames.add("new");
+		ignoredFieldNames.add("class");
+		ignoredFieldNames.add("metadataDomainClass");
+		
+		
+	}
+	
 	@Override
 	public void serialize(FormSchema schema, JsonGenerator jgen,
 			SerializerProvider provider) throws IOException,
 			JsonGenerationException {
-		Class domainClass = schema.getDomainClass();
+		try{
+			Class domainClass = schema.getDomainClass();
+			
+			if (null == domainClass) {
+				throw new RuntimeException("formSchema has no domain class set");
+			} else {
+				jgen.writeStartObject();
+			    
+			    
+				PropertyDescriptor[] descriptors = new PropertyUtilsBean()
+						.getPropertyDescriptors(domainClass);
 
-		if (null == domainClass) {
-			// write the word 'null' if there's no value available
-			jgen.writeNull();
-		} else {
+				for (int i = 0; i < descriptors.length; i++) {
 
-			// PropertyDescriptor[] descriptors = new PropertyUtilsBean()
-			// .getPropertyDescriptors(domainClass);
-			//
-			// StringBuffer buf = new StringBuffer("{\n");
-			//
-			// for (int i = 0; i < descriptors.length; i++) {
-			// PropertyDescriptor descriptor = descriptors[i];
-			// String name = descriptor.getName();
-			// String fieldValue = getFormFieldConfig(domainClass, name,
-			// schema.getType());
-			// if (fieldValue != null && !fieldValue.equalsIgnoreCase("skip")) {
-			// if (i > 0) {
-			// buf.append(",");
-			// }
-			// buf.append("\n   \"").append(name).append("\": ")
-			// .append(fieldValue);
-			// }
-			// }
-			// buf.append("}");
-			// jgen.writeRaw(buf.toString());
+					PropertyDescriptor descriptor = descriptors[i];
+					String name = descriptor.getName();
+					if(!ignoredFieldNames.contains(name)){
+						jgen.writeFieldName(name);
+						jgen.writeStartObject();
+					    
+//						
+						String fieldValue = getFormFieldConfig(domainClass, name);
+						if(StringUtils.isNotBlank(fieldValue)){
+							jgen.writeRaw(fieldValue);
+						}
+						
+						
+					    jgen.writeEndObject();
+					}
+					
+					
+					
+				    
+				}
+
+			    jgen.writeEndObject();
+				
+			}
+		
+		}
+		catch(Exception e){
+			LOGGER.error("Failed serializing form schema", e);
 		}
 	}
 
 	private static String getFormFieldConfig(Class domainClass,
-			String fieldName, FormSchema.Type type) {
+			String fieldName) {
+		String formSchemaJson = null;
 		Field field = null;
-		String formConfig = null;
+		StringBuffer formConfig = new StringBuffer();
 		String key = domainClass.getName() + "#" + fieldName;
-		formConfig = CONFIG_CACHE.get(key);
-
-		if (formConfig == null) {
+		String cached = CONFIG_CACHE.get(key);
+		if(StringUtils.isNotBlank(cached)){
+			formConfig.append(cached);
+		}else{
 			Class tmpClass = domainClass;
 			do {
 				for (Field tmpField : tmpClass.getDeclaredFields()) {
 					String candidateName = tmpField.getName();
 					if (candidateName.equals(fieldName)) {
-
 						field = tmpField;
-						FormSchemaEntry jsonConfig = null;
-						if (field.isAnnotationPresent(FormSchemaEntry.class)) {
-							jsonConfig = field.getAnnotation(FormSchemaEntry.class);
-							if (FormSchema.Type.CREATE.equals(type)) {
-								formConfig = jsonConfig.search();
-							} else if (FormSchema.Type.UPDATE.equals(type)) {
-								formConfig = jsonConfig.update();
-							} else {
-								formConfig = jsonConfig.search();
+						FormSchemas formSchemasAnnotation = null;
+						if (field.isAnnotationPresent(FormSchemas.class)) {
+							formSchemasAnnotation = field.getAnnotation(FormSchemas.class);
+							gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry[] formSchemas = formSchemasAnnotation.value();
+							LOGGER.info("getFormFieldConfig, formSchemas: "+formSchemas);
+							if(formSchemas != null){
+								for(int i=0; i < formSchemas.length; i++){
+									if(i > 0){
+										formConfig.append(comma);
+									}
+									gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry formSchemaAnnotation = formSchemas[i];
+									LOGGER.info("getFormFieldConfig, formSchemaAnnotation: "+formSchemaAnnotation);
+									appendFormFieldSchema(formConfig,formSchemaAnnotation.state(),formSchemaAnnotation.json());
+								}
 							}
-							// skip if flagged as such
-							formConfig = formConfig.equalsIgnoreCase("skip") ? null : formConfig;
+							//formConfig = formSchemasAnnotation.json();
 						}
 						else{
-							formConfig = "\"Text\"";
+							appendFormFieldSchema(formConfig,gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry.STATE_DEFAULT, gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry.TYPE_STRING);
 						}
 						break;
 					}
 				}
 				tmpClass = tmpClass.getSuperclass();
 			} while (tmpClass != null && field == null);
+			formSchemaJson = formConfig.toString();
+			CONFIG_CACHE.put(key, formSchemaJson);
 		}
 
-		// HashMap handles null values so we can use containsKey to cach
-		// invalid fields and hence skip the reflection scan
-		CONFIG_CACHE.put(key, formConfig);
-		return formConfig;
+		return formSchemaJson;
+	}
+
+	private static void appendFormFieldSchema(
+			StringBuffer formConfig,String state, String json) {
+		formConfig.append(quote).append(state).append(quote).append(colon).append(json);
 	}
 }

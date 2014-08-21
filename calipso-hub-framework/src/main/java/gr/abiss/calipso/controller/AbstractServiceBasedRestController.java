@@ -24,6 +24,8 @@ import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
+import gr.abiss.calipso.model.entities.AbstractPersistable;
+import gr.abiss.calipso.model.entities.FormSchemaAware;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -37,6 +39,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.resthub.common.exception.NotFoundException;
+import org.resthub.common.view.ResponseView;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,17 +165,41 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 
 	/**
-     * Find a resource by its identifier
+     * Find a resource by its identifier, include it's schema in the response if available
      *
      * @param id The identifier of the resouce to find
      * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
      * @throws NotFoundException
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    @ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
     @ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
 	public T findById(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
-		return super.findById(id);
+    	T resource = null;
+    	
+    	return super.findById(id);
+	}
+
+	/**
+     * Obtain a newly created resource instance.
+     * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
+     */
+    @RequestMapping(value = "new", method = RequestMethod.GET)
+    //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
+    @ResponseBody
+    @ApiOperation(value = "obtain new unpersisted instance", notes = "Instantiates and returns a new reszource object", httpMethod = "GET")
+	public T getSchemaWrapperInstance() {
+    	T resource = null;
+    	try {
+			resource = this.service.getDomainClass().newInstance();
+			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
+				FormSchema.setToInstance(((FormSchemaAware) resource));
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Failed creating new resource instance", e);
+		}
+    	return resource;
 	}
 
 
@@ -214,68 +241,36 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			@RequestBody Restriction restriction) {
 		return this.service.findAll(new RestrictionBackedPageRequest(restriction));
 	}
-    
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @Override
-	 * @RequestMapping(method = RequestMethod.GET)
-	 * @ResponseBody public Page<T> findPaginated(@RequestParam(value = "page",
-	 *               required = false, defaultValue = "1") Integer page,
-	 * @RequestParam(value = "size", required = false, defaultValue = "10")
-	 *                     Integer size,
-	 * @RequestParam(value = "direction", required = false, defaultValue =
-	 *                     "ASC") String direction,
-	 * @RequestParam(value = "properties", required = false, defaultValue =
-	 *                     "id") String properties) {
-	 * 
-	 *                     Assert.isTrue(page > 0,
-	 *                     "Page index must be greater than 0");
-	 *                     Assert.isTrue(direction
-	 *                     .equalsIgnoreCase(Sort.Direction.ASC.toString()) ||
-	 *                     direction
-	 *                     .equalsIgnoreCase(Sort.Direction.DESC.toString()),
-	 *                     "Direction should be ASC or DESC");
-	 *                     Assert.notNull(properties);
-	 * 
-	 *                     Page<T> resultPage = this.service .findAll(new
-	 *                     ParameterMapBackedPageRequest( request
-	 *                     .getParameterMap(), page - 1, size, new
-	 *                     Sort(Sort.Direction
-	 *                     .fromString(direction.toUpperCase()),
-	 *                     properties.split(",")))); LOGGER.info("resultPage: "
-	 *                     + resultPage.getClass()); return resultPage; }
-	 */
-	// TODO: refactor to OPTIONS on base path?
-	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
-	@ResponseBody
-    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "GET")
-	public FormSchema getSchema(
-			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
-		Assert.isTrue(mode == null 
-				|| mode.equalsIgnoreCase("SEARCH") 
-				|| mode.equalsIgnoreCase("CREATE") 
-				|| mode.equalsIgnoreCase("UPDATE"));
-		mode = mode.toUpperCase();
-		try {
-			FormSchema schema = new FormSchema();
-			schema.setDomainClass(
-					((GenericService<Persistable<ID>, ID>) this.service)
-							.getDomainClass());
-			schema.setType(FormSchema.Type.valueOf(mode));
-			return schema;
-		} catch (Exception e) {
-			throw new NotFoundException();
-		}
-	}
+//    
+//	// TODO: refactor to OPTIONS on base path?
+//	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
+//	@ResponseBody
+//    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "GET")
+//	public FormSchema getSchema(
+//			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
+//		mode = mode.toUpperCase();
+//		try {
+//			Class domainClass = ((GenericService<Persistable<ID>, ID>) this.service).getDomainClass();
+//			if(FormSchemaAware.class.isAssignableFrom(domainClass)){
+//				FormSchema.setToInstance(((FormSchemaAware) resource));
+//			}
+//			FormSchema schema = new FormSchema();
+//			schema.setDomainClass(
+//					();
+//			schema.setAction(mode);
+//			return schema;
+//		} catch (Exception e) {
+//			throw new NotFoundException();
+//		}
+//	}
 
-	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
-	@ResponseBody
-    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "OPTIONS")
-	public FormSchema getSchemas(
-			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
-		return this.getSchema(mode);
-	}
+//	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
+//	@ResponseBody
+//    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "OPTIONS")
+//	public FormSchema getSchemas(
+//			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
+//		return this.getSchema(mode);
+//	}
 
 //	@RequestMapping(value = "apidoc", produces = { "application/json" }, method = {
 //			RequestMethod.GET, RequestMethod.OPTIONS })

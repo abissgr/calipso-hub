@@ -25,7 +25,9 @@ define([ 'calipso'],
 			},
 			// static members
 			{
-				parent: Calipso.model.GenericModel
+				parent : Calipso.model.GenericModel,
+				showInMenu : false,
+				label : "User"
 			});
 
 			/**

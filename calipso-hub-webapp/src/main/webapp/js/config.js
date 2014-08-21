@@ -1,31 +1,32 @@
 require.config({
 	// main.js is the application entry point
-	deps : [ 'main' ],
-
+	//deps : [ 'main' ],
+	baseUrl : '/calipso/js/',
 	paths : {//lib/calipso/view/md-search-layout
 		// folders
-		libs : 'lib',
+//		libs : 'lib',
 		// tmpl: '../../tmpl',
 
 		// libs: no application code here
-		cookie : 'lib/jquery.cookie',
-		jquery : 'lib/jquery',
+		'cookie' : 'lib/jquery.cookie',
+		'jquery' : 'lib/jquery',
+		'q' : 'lib/q',
 		'metis-menu' : 'lib/metisMenu/jquery.metisMenu',
-		  'eve':          'lib/raphael/eve.0.3.4',
-		  'raphael.core': 'lib/raphael/raphael.2.1.0.core',
-		  'raphael.svg':  'lib/raphael/raphael.2.1.0.svg',
-		  'raphael.vml':  'lib/raphael/raphael.2.1.0.vml',
-		  'raphael':      'lib/raphael/raphael.2.1.0.amd',
-		morris : 'lib/morris/morris',
-		underscore : 'lib/underscore',
+		'eve':          'lib/raphael/eve.0.3.4',
+		'raphael.core': 'lib/raphael/raphael.2.1.0.core',
+		'raphael.svg':  'lib/raphael/raphael.2.1.0.svg',
+		'raphael.vml':  'lib/raphael/raphael.2.1.0.vml',
+		'raphael':      'lib/raphael/raphael.2.1.0.amd',
+		'morris' : 'lib/morris/morris',
+		'underscore' : 'lib/underscore',
 		'underscore-string' : 'lib/underscore-string',
 		'underscore-inflection' : 'lib/underscore-inflection',
-		backbone : 'lib/backbone',
-		resthub : 'lib/resthub/resthub',
-		localstorage : 'lib/localstorage',
-		text : 'lib/text',
-		i18n : 'lib/i18n',
-		pubsub : 'lib/resthub/pubsub',
+		'backbone' : 'lib/backbone',
+		'resthub' : 'lib/resthub/resthub',
+		'localstorage' : 'lib/localstorage',
+		'text' : 'lib/text',
+		'i18n' : 'lib/i18n',
+		'pubsub' : 'lib/resthub/pubsub',
 		'bootstrap' : 'lib/bootstrap',
 		'backbone-validation-orig' : 'lib/backbone-validation',
 		'backbone-bootstrap-modal' : 'lib/backbone-bootstrap-modal',
@@ -41,17 +42,23 @@ require.config({
 		// 'backbone-paginator': 'lib/backbone-paginator',
 		// 'backbone-relational': 'lib/backbone-relational',
 		'backbone-pageable' : 'lib/backbone-pageable',
-		async : 'lib/async',
-		keymaster : 'lib/keymaster',
-		hbs : 'lib/resthub/require-handlebars',
-		moment : 'lib/moment',
-		template : '../template',
-		json2 : 'lib/json2',
-		console : 'lib/resthub/console',
-		backgrid : 'lib/backgrid/backgrid',
+		'async' : 'lib/async',
+		'keymaster' : 'lib/keymaster',
+		'hbs' : 'lib/resthub/require-handlebars',
+		'moment' : 'lib/moment',
+		'template' : '../template',
+		'json2' : 'lib/json2',
+		'console' : 'lib/resthub/console',
+		'backgrid' : 'lib/backgrid/backgrid',
 		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
 		"calipso" : 'lib/calipso',
-		supermodel : 'lib/supermodel'
+		'supermodel' : 'lib/supermodel',
+		// Mocha testing
+		'mocha' : 'lib/mocha/mocha',
+		'chai' : 'lib/chai/chai',
+		//'chai-jquery' : 'lib/chai/chai-jquery',
+		'sinon' : 'lib/sinon/chai-jquery',
+			
 	},
 
 	shim : {
@@ -72,11 +79,11 @@ require.config({
 			deps : [ 'underscore', 'underscore-string', 'jquery' ],
 			exports : 'Backbone'
 		},
-		marionette : {
+		'marionette' : {
 			deps : [ 'jquery', 'underscore', 'backbone' ],
 			exports : 'Marionette'
 		},
-		supermodel : {
+		'supermodel' : {
 			deps : [ 'underscore', 'backbone' ],
 			exports : 'Supermodel'
 		},
@@ -133,15 +140,15 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'supermodel', 'metis-menu', 'morris' ],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'supermodel', 'metis-menu', 'morris' ],
 			exports : 'calipso'
 		},
-		cookie: { 
+		'cookie': { 
 			deps: ['jquery']
+		},
+		'chai-jquery': { 
+			deps: ['jquery', 'chai']
 		}
 	}
-
-// development only: cache bust
- //urlArgs: "bust=" + (new Date()).getTime());
 
 });

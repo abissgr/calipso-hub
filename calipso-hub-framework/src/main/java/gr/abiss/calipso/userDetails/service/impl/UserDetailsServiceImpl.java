@@ -134,7 +134,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				}
 				String password = tryUserDetails.getPassword();
 				// TODO
-				Map<String, String> metadata = null;// tryUserDetails.getMetadata();
+				Map<String, String> metadata = tryUserDetails.getMetadata();
 
 				// make sure we have credentials to send
 				if (StringUtils.isNotBlank(userNameOrEmail)

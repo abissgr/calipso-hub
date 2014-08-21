@@ -31,7 +31,7 @@ function(Calipso, _, Backbone, Marionette) {
 				});
 				return false;
 			}
-			var modelForRoute = Calipso.model.UserModel.create({id: "search"});
+			var modelForRoute = Calipso.model.UserModel.create({});
 			
 			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], {
 				model : Calipso.model.UserModel,

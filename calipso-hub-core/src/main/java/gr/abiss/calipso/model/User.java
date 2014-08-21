@@ -18,6 +18,8 @@
  */
 package gr.abiss.calipso.model;
 
+import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
+import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
@@ -46,6 +48,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
 import org.springframework.security.core.GrantedAuthority;
@@ -61,6 +64,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser {
 
 	private static final long serialVersionUID = -7942906897981646998L;
+	
 	@Formula("concat(first_name, ' ', last_name )")
 	private String name;
 	
@@ -86,6 +90,9 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	private String resetPasswordToken;
 
 	@Column(name = "password_changed")
+	@FormSchemas({
+			@FormSchemaEntry(json = FormSchemaEntry.TYPE_DATE)
+	})
 	private Date lastPassWordChangeDate;
 	
 	@Column(name = "email", unique = true, nullable = false)
@@ -98,6 +105,9 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	private String avatarUrl;
 
 	@Column(name = "birthday")
+	@FormSchemas({
+		@FormSchemaEntry(json = FormSchemaEntry.TYPE_DATE)
+	})
 	private Date birthDay;
 
 	@Column(name = "last_visit")
@@ -156,8 +166,11 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		if (!(obj instanceof User)) {
 			return false;
 		}
-		User that = (User) obj;
-		return null == this.getId() ? false : this.getId().equals(that.getId());
+		User other = (User) obj;
+		EqualsBuilder builder = new EqualsBuilder();
+        builder.append(getId(), other.getId());
+        builder.append(getName(), other.getName());
+        return builder.isEquals();
 	}
 
 	@Override

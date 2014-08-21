@@ -19,35 +19,6 @@
 
 define("calipso", function(require) {
 
-	// Baseline setup
-	// --------------
-
-	// Establish the root object, `window` in the browser, or `global` on the server.
-	var root = this;
-	// plumbing for handlebars template helpers 
-	Marionette.ItemView.prototype.mixinTemplateHelpers = function(target) {
-		var self = this;
-		var templateHelpers = Marionette.getOption(self, "templateHelpers");
-		var result = {};
-
-		target = target || {};
-
-		if (_.isFunction(templateHelpers)) {
-			templateHelpers = templateHelpers.call(self);
-		}
-
-		// This _.each block is what we're adding
-		_.each(templateHelpers, function(helper, index) {
-			if (_.isFunction(helper)) {
-				result[index] = helper.call(self);
-			} else {
-				result[index] = helper;
-			}
-		});
-
-		return _.extend(target, result);
-	};
-
 	/**
 	 * Calipso namespace
 	 * @namespace
@@ -58,6 +29,7 @@ define("calipso", function(require) {
 		components : {},
 		collection : {},
 		model : {},
+		customModel : {},
 		view : {},
 		controller : {}
 	};
@@ -73,7 +45,6 @@ define("calipso", function(require) {
 		if(!url){
 			url = window.location.href;
 		}
-		console.log("Calipso.getHttpUrlParams, URL");
 		var queryString = url.indexOf("?") > -1 ? url.substring(url.indexOf("?")+1) : url;
 		var keyValuePairs = queryString.split('&'); 
 		for(var i in keyValuePairs) {
@@ -84,7 +55,9 @@ define("calipso", function(require) {
 		
 		return urlParams; 
 	}
-	// utility method to stop events, covers IE8+
+	/**
+	 * Utility method to stop events, covers IE8+
+	 */
 	Calipso.stopEvent = function(e) {
 		var event = e ? e : window.event;
 		if (event.preventDefault) {
@@ -149,19 +122,41 @@ define("calipso", function(require) {
 			});
 
 			Calipso.modelTypesMap = {};
-			_(Calipso.model).each(function(ModelClass) {
-				var model = new ModelClass();
-				console.log("initialize model type: " + model.getTypeName());
+			var parseModel = function(ModelType) {
+				var model = new ModelType();
+				console.log("initialize model type: " + ModelType.prototype.getTypeName());
 				if (model.getTypeName() != "GenericModel") {
 
-					Calipso.modelTypesMap[model.getPathFragment()] = ModelClass;
+					Calipso.modelTypesMap[model.getPathFragment()] = ModelType;
 					console.log("initialized model type: " + model.getTypeName() + " and key: " + model.getPathFragment());
 				}
-			});
-
+			}
+			_(Calipso.model).each(parseModel);
+			_(Calipso.customModel).each(parseModel);
 		});
 		console.log("Calipso.app has been configured");
 
+		// register calipso handlebars helper 
+		Handlebars.registerHelper("menuEntries", function(){
+			console.log("menu entries...");
+			
+			var menuEntries = {};	
+			var modelTypesMap = Calipso.modelTypesMap;
+			var modelType;
+			for (var modelKey in modelTypesMap){
+				modelType = modelTypesMap[modelKey];
+				console.log("Add menu entrie for  model type: " + modelType.prototype.getTypeName() + " and key: " + modelType.prototype.getPathFragment() + ", showInMenu: " + modelType.prototype.showInMenu);
+				//				if(modelType.prototype.showInMenu){
+				if(true){
+					menuEntries[modelType.prototype.getPathFragment()] = {
+						label: modelType.label,
+						modelKey: modelType.modelKey
+					};
+				}
+			}
+			return (menuEntries);
+		});
+		
 		////////////////////////////////
 		// app init/events
 		////////////////////////////////
@@ -191,7 +186,6 @@ define("calipso", function(require) {
 				})
 			
 			
-			// app.mainContentNavRegion.show(new MainContentNavView());
 			Calipso.app.footerRegion.show(new Calipso.config.footerViewType());
 
 			var pushStateSupported = _.isFunction(history.pushState);
@@ -201,12 +195,11 @@ define("calipso", function(require) {
 			}
 			var startRoot = "/" + contextPath + "client/"
 			
-			if(pushStateSupported){
-				Backbone.history.start({ pushState: true, hashChange: false, useBackboneNavigate: true });
-			}
-			else{
-				Backbone.history.start({pushState: false});
-			}
+			Backbone.history.start({ 
+				root: startRoot, 
+				pushState: pushStateSupported 
+			});
+			
 		});
 			
 
@@ -239,7 +232,7 @@ define("calipso", function(require) {
 			console.log("vent event nav-menu:change");
 
 		});
-		Calipso.vent.on('modal:show', function(view) {
+		Calipso.vent.on('modal:show', function(view) { 
 			console.log("vent event modal:show");
 			Calipso.app.modal.show(view);
 		});
@@ -272,24 +265,27 @@ define("calipso", function(require) {
 	Calipso.collection.GenericCollection = Backbone.PageableCollection.extend(/** @lends Calipso.collection.GenericCollection.prototype */{
 		mode : "server",
 		initialize : function(attributes, options) {
-			if (options.model) {
-				this.model = options.model.searchModel ? options.model.searchModel : options.model;
-				this.modelClass = this.model;
-			}
-
-			// use given grid columns if provided, or the
-			// default model columns otherwise
-			if (options.schemaForGrid) {
-				this.schemaForGrid = options.schemaForGrid;
-			}
-			if (options.data) {
-				if (options.data[""] || options.data[""] == null) {
-					delete options.data[""];
+			if(options){
+				if (options.model) {
+					this.model = options.model.searchModel ? options.model.searchModel : options.model;
+					this.modelClass = this.model;
 				}
-				this.data = options.data;
-			}
-			if (options.url) {
-				this.url = options.url;
+
+				// use given grid columns if provided, or the
+				// default model columns otherwise
+				if (options.schemaForGrid) {
+					this.schemaForGrid = options.schemaForGrid;
+				}
+				if (options.data) {
+					if (options.data[""] || options.data[""] == null) {
+						delete options.data[""];
+					}
+					this.data = options.data;
+				}
+				if (options.url) {
+					this.url = options.url;
+				}
+			
 			}
 		},
 		// Initial pagination states
@@ -399,7 +395,9 @@ define("calipso", function(require) {
 	 * 	// static members
 	 * 	{
 	 * 		// REQUIRED: the model superclass
-	 * 		parent: GenericModelrties and functions here
+	 * 		parent: GenericModel,
+	 * 		// OPTIONAL: set the form schema cache behavior
+	 * 		formSchemaCache : this.FORM_SCHEMA_CACHE_CLIENT
 	 * 	});
 	 * 
 	 * 	// REQUIRED: our subclass name
@@ -417,7 +415,7 @@ define("calipso", function(require) {
 	 * 		//...
 	 * 	}
 	 * 	// REQUIRED: our subclass form schema
-	 * 	PersonModel.prototype.getFormSchemas = function() {
+	 * 	PersonModel.prototype.getPrototypeFormSchemas = function() {
 	 * 		//...
 	 * 	}
 	 * 
@@ -443,7 +441,7 @@ define("calipso", function(require) {
 	 * 	// OPTIONAL: our subclass business key, 
 	 * 	// used to check if the model has been loaded from the server. 
 	 * 	// defaults to "name" 
-	 * 	PersonModel.prototype.GenericModel.prototype.getBusinessKey = function() {
+	 * 	PersonModel.prototype.getBusinessKey = function() {
 	 * 		//...
 	 * 	}
 	 * 
@@ -463,6 +461,7 @@ define("calipso", function(require) {
 		 */
 		url : function() {
 			var sUrl = this.collection ? _.result(this.collection, 'url') : _.result(this, 'urlRoot') || urlError();
+			consle.log("GenericModel#url, sUrl: "+sUrl);
 			if (!this.isNew()) {
 				sUrl = sUrl + (sUrl.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.get("id"));
 			}
@@ -543,23 +542,42 @@ define("calipso", function(require) {
 		 * a specific action like "create", "update" or "search" using 
 		 * {@linkcode getFormSchema} instead. 
 		 * 
-		 * To define form schemas for your subclass under a static or instance context, override 
-		 * {@link Calipso.model.GenericModel.prototype.getFormSchemas} or {@link getFormSchemas} respectively.
+		 * To define form schemas for your subclass under a static or instance context on the client-side, override 
+		 * {@link Calipso.model.GenericMogetPrototypeFormSchemasgetPrototypeFormSchemas} or {@link getFormSchemas} respectively.
+		 * 
+		 * This method will attempt to retrieve the model schema in the following order:
+		 * 	<ul><li>Schema set to the model by the server</li>
+		 * 	<li>schemas defined by the model's prototype object</li>
+		 * 	</ul>  
 		 * 
 		 * Form schemas are picked up by form views like {@linkcode GenericFormView} or layout views
 		 * that use such form views in their regions.
 		 * 
-		 * @see {@link Calipso.model.GenericModel.prototype.getFormSchema}
+		 * @see {@link Calipso.model.GenericModel.prototype.getPrototypeFormSchemas}
 		 */
 		getFormSchemas : function() {
+		
 			console.log("GenericModel.getFormSchemas");
-			return this.prototype.getFormSchemas(this);
+			var formSchema;
+
+			console.log("GenericModel.getFormSchemas, schema mode: " + this.formSchemaCacheMode);
+			if(this.formSchemaCacheMode == this.FORM_SCHEMA_CACHE_CLIENT){
+				formSchema = this.getPrototypeFormSchemas(this);
+			}
+			if(formSchema){
+				console.log("GenericModel.getFormSchemas, returning server-defined schemas: " + formSchema.toSource());	
+			}
+			else{
+				formSchema = this.getPrototypeFormSchemas(this);
+				console.log("GenericModel.getFormSchemas, returning client-defined schemas: " + formSchema.toSource());	
+			}
+			return formSchema;
 		},
 		/**
 		 * Get the form schema for a specific action like "create", "update" or "search". 
 		 * 
 		 * To define form schemas for your subclass under a static or instance context, override 
-		 * {@link Calipso.model.GenericModel.prototype.getFormSchemas} or {@link getFormSchemas} respectively.
+		 * {@link Calipso.model.GenericModel.prototype.getPrototypeFormSchemas} or {@link getFormSchemas} respectively.
 		 * 
 		 * Form schemas are used by form views like {@linkcode GenericFormView} or layout views
 		 * that use such form views in their regions.
@@ -570,7 +588,6 @@ define("calipso", function(require) {
 		 */
 		getFormSchema : function(actionName) {
 			// decide based on model persistence state if no action was given
-			console.log("GenericModel.getFormSchema, actionName: " + actionName);
 			if (!actionName) {
 				console.log("GenericModel.prototype.schema, this: " + this);
 				console.log("GenericModel.prototype.schema, caller is " + arguments.callee.caller.toString());
@@ -579,9 +596,9 @@ define("calipso", function(require) {
 			// the schema to build for the selected action
 			var formSchema = {};
 			// get the complete schema to filter out from
+			console.log("GenericModel#getFormSchema calling : this.getFormSchemas()");
 			var formSchemas = this.getFormSchemas();
-			// console.log("GenericModel#schema actionName: "+actionName+",
-			// formSchemas: "+formSchemas);
+			console.log("GenericModel#getFormSchema this.getFormSchemas returned "+ formSchemas.toSource());
 
 			// for each property, select the appropriate schema entry for the given
 			// action
@@ -609,8 +626,7 @@ define("calipso", function(require) {
 				propertySchema = false;
 				propertySchemaForAction = false;
 			}
-			// console.log("GenericModel#schema formSchema:
-			// "+formSchema);
+			console.log("GenericModel#getFormSchema actionName: "+actionName+", formSchema: "+formSchema.toSource());
 			return formSchema;
 		},
 		initialize : function() {
@@ -624,9 +640,21 @@ define("calipso", function(require) {
 		}
 	}, {
 		// static members
-		typeName : "GenericModel"
+		/** (Default) 0Do not retrieve the form schema from the server */
+		FORM_SCHEMA_CACHE_CLIENT : "FORM_SCHEMA_CACHE_CLIENT", 
+		/** Retrieve the form schema only once for all model instances */
+		FORM_SCHEMA_CACHE_STATIC : "FORM_SCHEMA_CACHE_STATIC", 
+		/** Retrieve the form schema only once per model instance */
+		FORM_SCHEMA_CACHE_INSTANCE : "FORM_SCHEMA_CACHE_INSTANCE",
+		/** Retrieve the form schema every time it is accessed */
+		FORM_SCHEMA_CACHE_NONE: "FORM_SCHEMA_CACHE_NONE",
+		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_CLIENT,
+		typeName : "GenericModel",
+		label : "GenericModel",
+		
 	});
 
+	Calipso.model.GenericModel.prototype.showInMenu = false;
 	/**
 	 * Get the model class URL fragment corresponding to your server 
 	 * side controller, e.g. "users" for UserModel. Model subclasses 
@@ -657,7 +685,7 @@ define("calipso", function(require) {
 	 * Override this in your subclass to declaratively define 
 	 * form views for the default or custom actions
 	 */
-	Calipso.model.GenericModel.prototype.getFormSchemas = function(instance) {
+	Calipso.model.GenericModel.prototype.getPrototypeFormSchemas = function(instance) {
 		console.log("GenericModel.prototype.getFormSchema() called, will return undefined");
 		return undefined;
 	}
@@ -714,9 +742,12 @@ define("calipso", function(require) {
 		urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		parent : Calipso.model.GenericModel
+		parent : Calipso.model.GenericModel,
+		label : "User",
+		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC
 	});
 
+	Calipso.model.UserModel.prototype.showInMenu = true;
 	/**
 	 * Get the model class URL fragment corresponding this class
 	 * @returns the URL path fragment as a string
@@ -727,9 +758,13 @@ define("calipso", function(require) {
 	Calipso.model.UserModel.prototype.getTypeName = function(instance) {
 		return "UserModel";
 	}
-	Calipso.model.UserModel.prototype.getFormSchemas = function(instance) {
-
-		return {//
+	
+	Calipso.model.UserModel.prototype.getPrototypeFormSchemas = function(instance) {
+		console.log("UserModel.prototype.getPrototypeFormSchemas");
+		var schemas = instance.get("formSchema");
+		console.log("JUserMdel.prototype.getPrototypeFormSchemas, schemas: " + schemas.toSource);
+		return schemas ? schemas :
+		{//
 			userName : {
 				"search" : {
 					type : 'Text'
@@ -864,11 +899,6 @@ define("calipso", function(require) {
 			console.log("ViewRowCell#viewRow, rowModel: " + this.model.getTypeName());
 			Calipso.stopEvent(e);
 			Calipso.vent.trigger(this.viewRowEvent, this.model);
-			// var rowModel = this.model;
-			// Calipso.navigate(""+rowModel.get("apiUrlSegment")+"/"+rowModel.get("id"),
-			// {
-			// trigger : true
-			// });
 		},
 		render : function() {
 			this.$el.empty();
@@ -909,13 +939,80 @@ define("calipso", function(require) {
 	//////////////////////////////////////////////////
 	// Layouts
 	//////////////////////////////////////////////////
+
+	Calipso.view.AbstractLayout = Backbone.Marionette.Layout.extend({
+		getTypeName : function() {
+			return this.prototype.getTypeName();
+		}
+	}, {
+		getTypeName : function() {
+			return "AbstractLayout"
+		}
+	});
+	
+	Calipso.view.HeaderView = Calipso.view.AbstractLayout.extend(
+	/** @lends Calipso.view.HeaderView.prototype */
+	{
+		template : require('hbs!template/header'),
+		id : "navbar-menu",
+		className : "col-sm-12",
+		events : {
+			"click a.login" : "login",
+			"click a.logout" : "logout"
+		},
+		regions : {
+			menuRegion : "#calipsoHeaderView-menuRegion"
+		},
+		onShow : function(){
+			var menuModel = [
+					{
+						url: "users",
+						label: "Users"
+					},
+					{
+						url: "hosts",
+						label: "Hosts"
+					}
+			];// header-menu-item
+			var MenuItemView = Backbone.Marionette.ItemView.extend({
+				tagName : "li",
+				template : require('hbs!template/header-menuitem')
+			});
+
+			var MenuCollectionView = Backbone.Marionette.CollectionView.extend({
+				tagName : "ul",
+				template : require('hbs!template/header-menuitem'),
+				 childView: MenuItemView
+			});
+			this.menuRegion.show(new MenuCollectionView(menuModel));
+		},
+//		initialize : function(options) {
+//			_.bindAll(this);
+//		},
+		logout : function(e) {
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("session:destroy");
+			_.bindAll(this);
+		},
+		login : function(e) {
+			Calipso.stopEvent(e);
+			Calipso.navigate("login", {
+				trigger : true
+			});
+			_.bindAll(this);
+		}
+	}, {
+		getTypeName : function() {
+			return "HeaderView"
+		}
+	});
 	Calipso.view.ModelDrivenBrowseLayout = Marionette.Layout.extend(
 	/** @lends Calipso.view.ModelDrivenBrowseLayout.prototype */
 	{
 		tagName : 'div',
 		className : 'col-sm-12',
 		id : "calipsoModelDrivenBrowseLayout",
-		template : require('hbs!template/md-browse-layout'),// _.template(templates.applayout),
+		template : require('hbs!template/md-browse-layout'),
 		skipToSingleResult : true,
 		regions : {
 			contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion"
@@ -974,13 +1071,13 @@ define("calipso", function(require) {
 		showContent : function(routeModel) {
 			var _this = this;
 			var modelId = routeModel.get("id");
-			var isSearch = (modelId.indexOf("search") == 0) || (routeModel.wrappedCollection && routeModel.wrappedCollection.length > 0);
+			var isSearch = (routeModel.wrappedCollection && routeModel.wrappedCollection.length > 0);
 			console.log("ModelDrivenBrowseLayout.showContent: '" + routeModel.get("id") + "', skipToSingleResult: " + _this.skipToSingleResult + ", collection length: " + (routeModel.wrappedCollection ? routeModel.wrappedCollection.length : "none"));
 			// get the model collection view type
 			var ContentViewType;
 			var contentView;
 			if ((!routeModel.get("id")) || isSearch) {
-				console.log("GenericSearchLayout#showContent 1");
+				console.log("ModelDrivenBrowseLayout#showContent 1");
 				if (_this.skipToSingleResult && routeModel.wrappedCollection.length == 1) {
 					console.log("GenericSearchLayout#showContent 1.1");
 					// show single result: 
@@ -991,7 +1088,7 @@ define("calipso", function(require) {
 						model : routeModel.wrappedCollection.first()
 					});
 				} else {
-					console.log("GenericSearchLayout#showContent 1.2");
+					console.log("ModelDrivenBrowseLayout#showContent 1.2");
 					ContentViewType = routeModel.getCollectionViewType();
 					contentView = new ContentViewType({
 						model : routeModel,
@@ -1000,7 +1097,7 @@ define("calipso", function(require) {
 				}
 
 			} else {
-				console.log("GenericSearchLayout#showContent 2");
+				console.log("ModelDrivenBrowseLayout#showContent 2");
 				ContentViewType = routeModel.getItemViewType();
 				// create a new collection instance
 				contentView = new ContentViewType({
@@ -1040,17 +1137,7 @@ define("calipso", function(require) {
 			if (this.options.searchResultsCollection) {
 				this.searchResultsCollection = options.searchResultsCollection;
 			}
-			console.log("GenericSearchLayout.initialize, model: " + (this.model ? this.model.getTypeName() : this.model));
-			console.log("GenericSearchLayout.initialize, searchResultsCollection: " + (this.searchResultsCollection ? this.searchResultsCollection.length : this.searchResultsCollection));
-
-//			// bind to collection item selection events (view/edit)
-//			_this.listenTo(Calipso.vent, "collectionView:viewItem", function(itemModel) {
-//				_this.viewItem(itemModel);
-//			}, _this);
-//			_this.listenTo(Calipso.vent, "collectionView:viewItemMaximized", function(itemModel) {
-//				_this.viewItemMaximized(itemModel);
-//			}, _this);
-
+			
 			// bind to events coresponding to successful
 			// retreival of search results
 			this.listenTo(Calipso.vent, "genericFormSearched", function(wrapperModel) {
@@ -1139,7 +1226,7 @@ define("calipso", function(require) {
 		}
 	});
 /*
-	var ModelDrivenOverviewLayout = AbstractLayoutView.extend({
+	var ModelDrivenOverviewLayout = AbstractLayout.extend({
 		template : require('hbs!template/md-overview-layout'),
 		onShow : function() {
 			console.log("ModelDrivenOverviewLayout#onShow");
@@ -1159,7 +1246,7 @@ define("calipso", function(require) {
  		getTypeName: function(){return "ModelDrivenCrudLayout"}
 	});
 	
-	var ModelDrivenCrudLayout = AbstractLayoutView.extend({
+	var ModelDrivenCrudLayout = AbstractLayout.extend({
 		template : tmpl,
 		tagName : "div",
 		className : "col-sm-12",
@@ -1270,6 +1357,54 @@ define("calipso", function(require) {
 	///////////////////////////////////////////////////////
 	// Views
 	///////////////////////////////////////////////////////
+	
+	// plumbing for handlebars template helpers 
+	// Marionette.ItemView.prototype.mixinTemplateHelpers = function(target) {
+	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
+		var self = this;
+		var templateHelpers = Marionette.getOption(self, "templateHelpers");
+		var result = {};
+
+		target = target || {};
+
+		if (_.isFunction(templateHelpers)) {
+			templateHelpers = templateHelpers.call(self);
+		}
+
+		// This _.each block is what we're adding
+		_.each(templateHelpers, function(helper, index) {
+			if (_.isFunction(helper)) {
+				result[index] = helper.call(self);
+			} else {
+				result[index] = helper;
+			}
+		});
+
+		return _.extend(target, result);
+	};
+	// The recursive tree view
+//	var TreeView = Backbone.Marionette.CompositeView.extend({
+//	    template: "#node-template",
+//	    
+//	    tagName: "li",
+//	    
+//	    initialize: function(){
+//	        // grab the child collection from the parent model
+//	        // so that we can render the collection as children
+//	        // of this parent node
+//	        this.collection = this.model.nodes;
+//	    },
+//	    
+//	    appendHtml: function(cv, iv){
+//	        cv.$("ul:first").append(iv.el);
+//	    },
+//	    onRender: function() {
+//	        if(_.isUndefined(this.collection)){
+//	            this.$("ul:first").remove();
+//	        }
+//	    }
+//	});
+//
 	Calipso.view.NotFoundView = Marionette.ItemView.extend(
 	/** @lends Calipso.view.NotFoundView.prototype */
 	{
@@ -1283,36 +1418,6 @@ define("calipso", function(require) {
 	}, {
 		getTypeName : function() {
 			return "NotFoundView"
-		}
-	});
-	Calipso.view.HeaderView = Marionette.ItemView.extend(
-	/** @lends Calipso.view.HeaderView.prototype */
-	{
-		template : require('hbs!template/header'),
-		id : "navbar-menu",
-		className : "col-sm-12",
-		events : {
-			"click a.login" : "login",
-			"click a.logout" : "logout"
-		},
-		initialize : function(options) {
-			_.bindAll(this);
-		},
-		logout : function(e) {
-			Calipso.stopEvent(e);
-			Calipso.vent.trigger("session:destroy");
-			_.bindAll(this);
-		},
-		login : function(e) {
-			Calipso.stopEvent(e);
-			Calipso.navigate("login", {
-				trigger : true
-			});
-			_.bindAll(this);
-		}
-	}, {
-		getTypeName : function() {
-			return "HeaderView"
 		}
 	});
 	Calipso.view.FooterView = Marionette.ItemView.extend(
@@ -1423,12 +1528,30 @@ define("calipso", function(require) {
 		}
 
 	});
+	
+
+	Calipso.view.ModelDrivenCollectionView = Marionette.ItemView.extend(
+	/**
+	 * @param options object members: 
+	 *  - collection/wrappedCollection
+	 *  - callCollectionFetch: whether to fetch the collection from the server
+	 * @lends Calipso.view.ModelDrivenCollectionView.prototype 
+	 */
+	{
+		
+	},
+	// static members
+	{
+		getTypeName : function() {
+			return "ModelDrivenCollectionView";
+		}
+	});
 	Calipso.view.ModelDrivenCollectionGridView = Marionette.ItemView.extend(
 	/**
 	 * @param options object members: 
 	 *  - collection/wrappedCollection
 	 *  - callCollectionFetch: whether to fetch the collection from the server
-	 * @lends Calipso.view.GenericCollectionGridView.prototype 
+	 * @lends Calipso.view.ModelDrivenCollectionGridView.prototype 
 	 * */
 	{
 		events : {
@@ -1454,8 +1577,8 @@ define("calipso", function(require) {
 			if (options.callCollectionFetch) {
 				this.callCollectionFetch = options.callCollectionFetch;
 			}
-			console.log("GenericCollectionGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
-			console.log("GenericCollectionGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
+			console.log("ModelDrivenCollectionGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
+			console.log("ModelDrivenCollectionGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
 		},
 		onCollectionFetched : function() {
 
@@ -1467,9 +1590,9 @@ define("calipso", function(require) {
 		template : require('hbs!template/md-collection-grid-view'),
 		onShow : function() {
 			var _self = this;
-			console.log("GenericCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
+			console.log("ModelDrivenCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
 
-			// console.log("GenericCollectionGridView onShow, this.collection:
+			// console.log("ModelDrivenCollectionGridView onShow, this.collection:
 			// "+this.collection + ", gridCollection: "+gridCollection);
 			var backgrid = new Backgrid.Grid({
 				columns : _self.collection.getGridSchema(),
@@ -1499,7 +1622,7 @@ define("calipso", function(require) {
 			});
 
 			this.$('.backgrid-paginator-container').append(paginator.render().el);
-			//						console.log("GenericCollectionGridView.onShow, collection url: "+);
+			//						console.log("ModelDrivenCollectionGridView.onShow, collection url: "+);
 
 			if (this.callCollectionFetch) {
 				var fetchOptions = {
@@ -1534,7 +1657,7 @@ define("calipso", function(require) {
 			}
 			// this.collection.fetch();main info
 
-			// console.log("GenericCollectionGridView showed");
+			// console.log("ModelDrivenCollectionGridView showed");
 
 		},
 		showFixedHeader : function() {
@@ -1553,9 +1676,9 @@ define("calipso", function(require) {
 				});
 				origThead.hide();
 				table_clone.removeAttr('style');
-				console.log("GenericCollectionGridView showFixedHeader, added header");
+				console.log("ModelDrivenCollectionGridView showFixedHeader, added header");
 			} else {
-				console.log("GenericCollectionGridView showFixedHeader, skipped adding header");
+				console.log("ModelDrivenCollectionGridView showFixedHeader, skipped adding header");
 			}
 
 			//tableOrig.find('thead').first().hide();
@@ -1636,7 +1759,6 @@ define("calipso", function(require) {
 			}
 		},
 		initialize : function(options) {
-			console.log("GenericFormView#initialize, model: " + this.model.getTypeName());
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 
 			// set schema action/key
@@ -1646,12 +1768,6 @@ define("calipso", function(require) {
 				this.formSchemaKey = this.model.isNew() ? "create" : "view";
 			} else {
 				this.formSchemaKey = "search";
-			}
-			console.log("GenericFormView#initialize, formSchemaKey: " + this.formSchemaKey);
-
-			// ensure we can use some sort of unique form id
-			if (!this.model.get("id")) {
-				this.model.set("id", this.formSchemaKey);
 			}
 
 			// grab a handle for the search results collection if any
@@ -1663,7 +1779,7 @@ define("calipso", function(require) {
 
 			this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
 
-			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + ",  searchResultsCollection: " + " of type " + this.model.getTypeName());
+			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + ", type " + this.model.getTypeName());
 
 			// console.log("GenericFormView#onShow, formSchemaKey:
 			// "+formSchemaKey+", model:
@@ -1742,12 +1858,41 @@ define("calipso", function(require) {
 			var _self = this;
 			// get appropriate schema
 			//					console.log("GenericFormView.onShow, this.formSchemaKey: "+this.formSchemaKey);
+			//var schemaForAction = this.model.getFormSchema(this.formSchemaKey);
+			//console.log("GenericFormView#onShow, formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: " + schemaForAction.toSource());
 
-			var selector = '#generic-form-' + this.formSchemaKey + "-" + this.model.get("id");
-			var schemaForAction = this.model.getFormSchema(this.formSchemaKey);
-
-			console.log("GenericFormView#onShow, selector: " + selector + ", formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: " + schemaForAction);
-
+			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering) 
+			if(false){//schemaForAction && _.size(schemaForAction) > 0){
+				this.renderForm();
+			}
+			else{
+				var fetchScemaUrl = Calipso.session.getBaseUrl() + _self.model.urlRoot + '/' + ( _self.model.isNew() ? "new" :  _self.model.get("id"));
+				console.log("GenericFormView#onShow, fetching model from server to obtain form schema from: "+fetchScemaUrl);
+				
+				 this.model.fetch({
+					 url :  fetchScemaUrl,
+					 success : function(model, response, options){
+						 console.log("Fetched model from server");
+						 _self.renderForm();
+					 },
+					 error : function(model, response, options){
+						 console.log("Error fetching model from server");
+						 alert("Error fetching model from server");
+					 }
+				 });
+			}
+			
+			
+		},
+		renderForm : function(){
+			var _self = this;
+			console.log("GenericFormView#renderForm called, schema key: "+_self.formSchemaKey);
+			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
+			console.log("GenericFormView#renderForm, form schema: "+ formSchema.toSource());
+			console.log("GenericFormView#renderForm, model: "+ _self.model.attributes.toSource());
+			var selector = '#generic-form-' + this.formSchemaKey;
+			console.log("GenericFormView#renderForm, selector: "+ selector);
+			
 			// render form
 			var JsonableForm = Backbone.Form.extend({
 				toJson : function() {
@@ -1769,7 +1914,7 @@ define("calipso", function(require) {
 			}
 			var formOptions = {
 				model : _self.model,
-				schema : schemaForAction,
+				schema :  formSchema,
 				template : _self.formTemplate
 			};
 			this.form = new JsonableForm(formOptions).render();
@@ -1835,18 +1980,8 @@ define("calipso", function(require) {
 		}
 	});
 
-	Calipso.view.AbstractLayoutView = Backbone.Marionette.Layout.extend({
-		getTypeName : function() {
-			return this.prototype.getTypeName();
-		}
-	}, {
-		getTypeName : function() {
-			return "AbstractLayoutView"
-		}
-	});
-	
-	Calipso.view.AbstractLayoutView.prototype.getTypeName = function() {
-		return "AbstractLayoutView"
+	Calipso.view.AbstractLayout.prototype.getTypeName = function() {
+		return "AbstractLayout"
 	}
 	
 	Calipso.view.AbstractLoginView = Marionette.ItemView.extend({
@@ -1918,9 +2053,7 @@ define("calipso", function(require) {
 					email: this.$('.input-email').val(),
 					password: this.$('.input-password').val(),
 					newPassword: this.$('.new-password').val(),
-					newPasswordConfirm: this.$('.new-password-confirm').val(),
-					// was used for testing
-					metadata: {"loginViewMetadatum":"true"}
+					newPasswordConfirm: this.$('.new-password-confirm').val()
 				});
 				Calipso.session.save(userDetails);
 			}
@@ -1953,7 +2086,7 @@ define("calipso", function(require) {
 	
 	
 	
-	Calipso.view.AppLayoutView = Calipso.view.AbstractLayoutView.extend({
+	Calipso.view.AppLayout = Calipso.view.AbstractLayout.extend({
 		tagName : "div",
 		template : require('hbs!template/applayout'),// _.template(templates.applayout),
 		regions : {
@@ -1962,9 +2095,159 @@ define("calipso", function(require) {
 		}
 	}, {
 		getTypeName : function() {
-			return "AppLayoutView"
+			return "AppLayout"
 		}
 	});
+	
+	// Tab Layout
+	Calipso.model.TabModel = Calipso.model.GenericModel.extend({
+		getPathFragment : function(){
+			return null;
+		}
+	});
+	
+	Calipso.collection.TabCollection = Backbone.Collection.extend({
+		model: Calipso.model.GenericModel, 
+		initialize: function () { 
+			this.listenTo('add', this.onModelAdded, this); 
+			this.listenTo('remove', this.onModelRemoved, this); 
+		},
+		onModelAdded: function(model, collection, options) {
+			//_self.tabKeys[model.get("id")] = model; 
+		}, 
+		onModelRemoved: function(model, collection, options) { 
+			//_self.tabKeys[model.get("id")] = null; 
+		}, 
+	});
+	Calipso.model.TabModel.prototype.getTypeName = function(instance) {
+		return "TabModel";
+	}
+
+	
+	Calipso.view.TabLayout = Backbone.Marionette.Layout.extend({
+		template : require('hbs!template/generic-crud-layout'),
+		tagName : "div",
+		className : "col-sm-12",
+		regions : {
+			tabLabelsRegion : '#calipsoTabLabelsRegion',
+			tabContentsRegion : '#calipsoTabContentsRegion'
+		},
+		onShow : function() {
+			console.log("TabLayout#onShow");
+			var tabLabelsView = new TabLabelsCollectionView({
+				collection : this.collection
+			});
+			var tabContentsView = new TabContentsCollectionView({
+				collection : this.collection
+			});
+			this.tabLabelsRegion.show(tabLabelsView);
+			this.tabContentsRegion.show(tabContentsView);
+
+		},
+	},
+	// static members
+	{
+		typeName : "TabLayout",
+	});
+	
+	Calipso.view.TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
+		className : 'nav nav-pills',
+		tagName : 'ul',
+		itemTemplate : require('hbs!template/tab-label'),
+		itemViewContainer : '.nav-tabs',
+		initialize : function(options) {
+			Marionette.CollectionView.prototype.initialize.apply(this, arguments);
+			
+		},
+		getItemView : function(item) {
+			var _this = this;
+			return Backbone.Marionette.ItemView.extend({
+				tagName : 'li',
+				className : 'calipso-tab-label',
+				id : "calipso-tab-label-" + item.get("id"),
+				template : _this.itemTemplate,
+				events : {
+					"click .show-tab": "viewTab",
+					"click .close-tab" : "closeTab"
+				},
+				/**
+				 this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
+					_this.showItemViewForModel(itemModel, "view")
+				}, this);
+				 */
+				 viewTab: function(e) {
+					 console.log("TabLabelsCollectionView.itemView#viewTab");
+					 Calipso.stopEvent(e);
+					 CalipsoApp.vent.trigger("viewTab", this.model);
+				 },
+				closeTab : function(e) {
+					console.log("TabLabelsCollectionView.itemView#closeTab");
+					 Calipso.stopEvent(e);
+//					this.model.collection.remove(this.model);
+					this.close();
+					CalipsoApp.vent.trigger("viewTab", {
+						id : "Search"
+					});
+				},
+			});
+		}
+	});
+	
+	Calipso.view.TabContentsCollectionView = Backbone.Marionette.CollectionView.extend({
+		tagName : 'div',
+		getItemView : function(item) {
+			var someItemSpecificView = item.getItemViewType ? item.getItemViewType() : null;
+			if(!someItemSpecificView){
+				someItemSpecificView = Calipso.view.GenericFormView;
+			}
+			console.log("TabContentsCollectionView#getItemView for item class " + item.className + " returns: " + someItemSpecificView.className);
+			return someItemSpecificView;
+		},
+		buildItemView: function(item, ItemViewClass){
+			console.log("TabContentsCollectionView#buildItemView, ItemView: "+ItemViewClass.className+", item: "+item.getClassName());
+			
+			var options = {model: item};
+			if(item && item.wrappedCollection){
+				console.log("item.wrappedCollection: "+item.wrappedCollection.length);
+				options.searchResultsCollection = item.wrappedCollection;
+			}
+		    // do custom stuff here
+
+		    var view = new ItemViewClass(options);
+
+		    // more custom code working off the view instance
+
+		    return view;
+		  },
+	});
+//	this.tabs = new TabCollection([
+//		 * (routeHelper.routeModel) ]);
+	/*
+	 * TODO
+	 * 
+	 * initCrudLayout : function(routeHelper){ if((!this.layout) ||
+	 * this.layout.getTypeName() != "AppLayout"){ //
+	 * console.log("AbstractController#initCrudLayout, calling
+	 * this.ensureActiveLayout()"); this.ensureActiveLayout(); } else{ //
+	 * console.log("AbstractController#initCrudLayout, not updating
+	 * this.layout: "+this.layout.getTypeName()); } var _self = this;
+	 * 
+	 *   var tabLayout = new
+	 * TabLayout({collection: this.tabs});
+	 * 
+	 * vent.on("itemView:openGridRowInTab", function(itemModel) {
+	 * vent.trigger("openGridRowInTab", itemModel); });
+	 * vent.on("openGridRowInTab", function(itemModel) {
+	 * console.log("openGridRowInTab"); _self.tabs.add(itemModel);
+	 * vent.trigger("viewTab", itemModel); }); vent.on("viewTab",
+	 * function(itemModel) { this.layout.contentRegion.show(new
+	 * itemmodel.itemView(itemmodel)); //
+	 * Calipso.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), { //
+	 * trigger : false // }); _self.syncMainNavigationState(null,
+	 * itemModel.get("id")); });
+	 * 
+	 * this.layout.contentRegion.show(tabLayout); },
+	 */
 
 	//////////////////////////////////////////////////
 	// vent
@@ -2189,7 +2472,7 @@ define("calipso", function(require) {
 		constructor : function(options) {
 			console.log("AbstractController#constructor");
 			Marionette.Controller.prototype.constructor.call(this, options);
-			this.layout = new Calipso.view.AppLayoutView({
+			this.layout = new Calipso.view.AppLayout({
 				model : Calipso.session
 			});
 			Calipso.vent.trigger('app:show', this.layout);
@@ -2235,7 +2518,7 @@ define("calipso", function(require) {
 				Calipso.session.save(model);
 				Calipso.session.load();
 				// console.log('MainController authenticate navigating to home');
-				Calipso.navigate(Calipso.getConfigProperty("contextPath") + "client/home", {
+				Calipso.navigate("home", {
 					trigger : true
 				});
 			}, function(model, xhr, options) {
@@ -2382,41 +2665,7 @@ define("calipso", function(require) {
 //		decodeParam : function(s) {
 //			return decodeURIComponent(s.replace(/\+/g, " "));
 //		},
-		/*
-		 * TODO
-		 * 
-		 * initCrudLayout : function(routeHelper){ if((!this.layout) ||
-		 * this.layout.getTypeName() != "AppLayoutView"){ //
-		 * console.log("AbstractController#initCrudLayout, calling
-		 * this.ensureActiveLayout()"); this.ensureActiveLayout(); } else{ //
-		 * console.log("AbstractController#initCrudLayout, not updating
-		 * this.layout: "+this.layout.getTypeName()); } var _self = this;
-		 * 
-		 * var TabModel = Backbone.Model.extend(); var TabCollection =
-		 * Backbone.Collection.extend({ model: GenericModel, initialize:
-		 * function () { // console.log("AbstractController#initCrudLayout,
-		 * TabCollection initializing"); this.bind('add', this.onModelAdded,
-		 * this); this.bind('remove', this.onModelRemoved, this); },
-		 * onModelAdded: function(model, collection, options) {
-		 * _self.tabKeys[model.get("id")] = model; }, onModelRemoved: function
-		 * (model, collection, options) { _self.tabKeys[model.get("id")] =
-		 * null; }, }); this.tabs = new TabCollection([
-		 * (routeHelper.routeModel) ]); var tabLayout = new
-		 * TabLayout({collection: this.tabs});
-		 * 
-		 * vent.on("itemView:openGridRowInTab", function(itemModel) {
-		 * vent.trigger("openGridRowInTab", itemModel); });
-		 * vent.on("openGridRowInTab", function(itemModel) {
-		 * console.log("openGridRowInTab"); _self.tabs.add(itemModel);
-		 * vent.trigger("viewTab", itemModel); }); vent.on("viewTab",
-		 * function(itemModel) { this.layout.contentRegion.show(new
-		 * itemmodel.itemView(itemmodel)); //
-		 * Calipso.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), { //
-		 * trigger : false // }); _self.syncMainNavigationState(null,
-		 * itemModel.get("id")); });
-		 * 
-		 * this.layout.contentRegion.show(tabLayout); },
-		 */
+		
 		syncMainNavigationState : function(modelForRoute) {
 			var mainRoutePart = modelForRoute.getPathFragment(), contentNavTabName = modelForRoute.get("id");
 			console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: " + contentNavTabName);
