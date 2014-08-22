@@ -57,7 +57,7 @@ public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends 
 		this.userRepository = userRepository;
 	}
 
-	protected User getPrincipalUserDetails() {
+	public User getPrincipalUserDetails() {
 		Object principal = null;
 		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
 			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -72,7 +72,8 @@ public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends 
 		}
 		return user;
 	}
-	protected User getPrincipal() {
+
+	public User getPrincipal() {
 		Object principal = null;
 		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
 			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

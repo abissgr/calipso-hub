@@ -105,4 +105,9 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public void setAuthorities(Collection<? extends GrantedAuthority> authorities);
 
+	public Long getNotificationCount();
+	
+	public void setNotificationCount(Long notificationCount);
+	
+
 }

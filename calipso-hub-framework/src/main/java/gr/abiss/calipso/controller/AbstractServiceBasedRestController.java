@@ -77,7 +77,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceBasedRestController.class);
  
 	@Autowired
-	private HttpServletRequest request;
+	protected HttpServletRequest request;
 
 	@Autowired
 	private RequestMappingHandlerMapping requestMappingHandlerMapping;
@@ -106,16 +106,23 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
 			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
 
-		Assert.isTrue(page > 0, "Page index must be greater than 0");
+		Map<String, String[]> paramsMap = request.getParameterMap();
+		
+		return findPaginated(page, size, sort, direction, paramsMap);
+	}
 
+
+
+	protected Page<T> findPaginated(Integer page, Integer size, String sort,
+			String direction, Map<String, String[]> paramsMap) {
+		Assert.isTrue(page > 0, "Page index must be greater than 0");
 		Order order = new Order(
 				direction.equalsIgnoreCase("ASC") ? Sort.Direction.ASC
 						: Sort.Direction.DESC, sort);
 		List<Order> orders = new ArrayList<Order>(1);
 		orders.add(order);
 		return this.service.findAll(
-				new ParameterMapBackedPageRequest(request
-				.getParameterMap(), page - 1, size, new Sort(orders)));
+				new ParameterMapBackedPageRequest(paramsMap, page - 1, size, new Sort(orders)));
 	}
 	
 	

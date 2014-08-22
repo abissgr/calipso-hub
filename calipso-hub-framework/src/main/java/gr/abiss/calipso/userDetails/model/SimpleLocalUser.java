@@ -103,6 +103,19 @@ public class SimpleLocalUser implements LocalUser {
 	public Serializable getId() {
 		return this.id;
 	}
+	
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setRoles(Collection<? extends GrantedAuthority> roles) {
+		this.roles = roles;
+	}
+
+	public void setMetadata(Map<String, ? extends Metadatum> metadata) {
+		this.metadata = metadata;
+	}
 
 	@Override
 	public String getUserName() {

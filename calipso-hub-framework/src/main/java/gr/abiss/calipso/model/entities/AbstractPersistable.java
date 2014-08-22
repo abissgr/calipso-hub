@@ -77,7 +77,7 @@ public abstract class AbstractPersistable implements FormSchemaAware, Persistabl
 	 * Set the entity's primary key
 	 * @param id the id to set
 	 */
-	protected void setId(String id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

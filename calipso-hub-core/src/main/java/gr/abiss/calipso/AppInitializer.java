@@ -22,6 +22,9 @@ import gr.abiss.calipso.model.Host;
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.cms.Text;
+import gr.abiss.calipso.notification.model.BaseNotification;
+import gr.abiss.calipso.notification.model.NotificationType;
+import gr.abiss.calipso.notification.service.BaseNotificationsService;
 import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
@@ -35,10 +38,15 @@ import javax.inject.Named;
 
 import org.apache.commons.configuration.Configuration;
 import org.resthub.common.util.PostInitialize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 //@Named("sampleInitializer")
 public class AppInitializer {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AppInitializer.class);
+			
 	@Inject
 	@Named("userService")
 	private UserService userService;
@@ -50,10 +58,14 @@ public class AppInitializer {
 	@Inject
 	@Named("textService")
 	private TextService textService;
-	
+
 	@Inject
 	@Named("roleService")
 	private RoleService roleService;
+	
+	@Inject
+	@Named("baseNotificationService")
+	private BaseNotificationsService baseNotificationService;
 
 	@PostInitialize
 	public void init() {
@@ -110,7 +122,7 @@ public class AppInitializer {
 			u1.setUserPassword("manos");
 			u1.setLastVisit(now);
 			u1 = userService.createActive(u1);
-			
+
 			for(int i = 0; i < 30; i++){
 				User u = new User("user"+i+"@abiss.gr");
 				u.setFirstName("First"+i);
@@ -119,7 +131,13 @@ public class AppInitializer {
 				u.setUserPassword("user"+i);
 				u.setLastVisit(now);
 				u = userService.createActive(u);
+
+				// notify the admin for each user creation to test notifications
+				baseNotificationService.create(new BaseNotification(u, u0, null, now));
 			}
+			
+			LOGGER.info("Admin has " + this.baseNotificationService.countUnseen(u0) + " notifications");
+			
 		
 		}
 		

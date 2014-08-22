@@ -29,6 +29,8 @@ public interface LocalUser {
 
 	Boolean getActive();
 
+	void setId(String id);
+	
 	void setActive(Boolean b);
 
 	void setConfirmationToken(String confirmationToken);

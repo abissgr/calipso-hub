@@ -24,6 +24,8 @@ import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
+import gr.abiss.calipso.notification.service.BaseNotificationsService;
+
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
@@ -73,6 +75,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	private LocalUserService<? extends Serializable, ? extends LocalUser> localUserService;
 	
+	private BaseNotificationsService baseNotificationService;
+	
 	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {
 		this.userDetailsConfig = userDetailsConfig;
@@ -82,6 +86,11 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	public void setLocalUserService(
 			LocalUserService<? extends Serializable, ? extends LocalUser> localUserService) {
 		this.localUserService = localUserService;
+	}
+
+	@Autowired(required = true)
+	public void setBaseNotificationsService(BaseNotificationsService baseNotificationsService) {
+		this.baseNotificationService = baseNotificationsService;
 	}
 
 	/**
@@ -104,9 +113,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			LOGGER.debug("loadUserByUsername user: " + user);
 		}
 
-		userDetails = UserDetails
-				.fromUser(user);
-
+		userDetails = UserDetails.fromUser(user);
+		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("loadUserByUsername returns userDetails: " + userDetails
@@ -115,9 +123,14 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + findByUserNameOrEmail);
 		}
+		
+		
 		return userDetails;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Transactional(readOnly = false)
 	@Override
 	public ICalipsoUserDetails create(final ICalipsoUserDetails tryUserDetails) {
@@ -149,7 +162,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					}
 					// convert to UserDetails if not null
 					userDetails = UserDetails.fromUser(localUser);
-
+					userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 					if(LOGGER.isDebugEnabled()){
 						LOGGER.debug("create, Creating user details from localUser...");
 					}
@@ -175,7 +188,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
 		// convert to UserDetals if not null
 		userDetails = UserDetails.fromUser(localUser);
-
+		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
 		}
@@ -201,6 +214,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		localUser.setConfirmationToken(null);
 		localUser.setUserPassword(newPassword);
 		userDetails = UserDetails.fromUser(localUser);
+		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 		// LOGGER.info("create returning loggedInUserDetails: " +
 		// loggedInUserDetails);
 		return userDetails;
@@ -282,7 +296,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	 */
 	@Override
 	public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException, DataAccessException {
-		SocialUserDetails userDetails = null;
+		ICalipsoUserDetails userDetails = null;
 
 		// LOGGER.info("loadUserByUserId using: " + userId);
 		LocalUser user = this.localUserService.findByUserNameOrEmail(userId);
@@ -294,7 +308,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			// Role userRole = new Role(Role.ROLE_USER);
 			// user.addRole(userRole);
 			userDetails = UserDetails.fromUser(user);
-
+			userDetails.setNotificationCount(this.baseNotificationService.countUnseen(user));
 		}
 
 		if (user == null) {
@@ -422,9 +436,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	public ICalipsoUserDetails createForImplicitSignup(
 			LocalUser localUser) throws DuplicateEmailException {
 		LOGGER.debug("createForImplicitSignup, localUser: " + localUser);
-		return UserDetails
-				.fromUser(this.localUserService
-						.createForImplicitSignup(localUser));
+		ICalipsoUserDetails userDetails = UserDetails
+				.fromUser(this.localUserService	.createForImplicitSignup(localUser));
+		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
+		return userDetails;
 	}
 
 	//@Override

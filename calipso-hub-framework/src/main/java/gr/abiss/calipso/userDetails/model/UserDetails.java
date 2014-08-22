@@ -51,8 +51,11 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 
 	private String id;
+	
 	@JsonProperty(value = "username")
 	private String username;
+	
+	private Long notificationCount;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	@JsonProperty(value = "password")
@@ -173,6 +176,23 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@Override
 	public String getFirstName() {
 		return firstName;
+	}
+
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setNotificationCount()
+	 */
+	@Override
+	public Long getNotificationCount() {
+		return notificationCount;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setNotificationCount(Long)
+	 */
+	@Override
+	public void setNotificationCount(Long notificationCount) {
+		this.notificationCount = notificationCount;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package gr.abiss.calipso.model.notifications;
+package gr.abiss.calipso.notification.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

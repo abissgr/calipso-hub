@@ -1,4 +1,4 @@
-package gr.abiss.calipso.model.notifications;
+package gr.abiss.calipso.notification.model;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.entities.AbstractPersistable;
@@ -19,10 +19,13 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- *Base nitification class
+ * Base notification class, corresponds to a Log Table that aggregates basic information for all 
+ * notifications.  
  */
 @Entity
 @Table(name = "base_notification")
@@ -32,12 +35,20 @@ public class BaseNotification extends AbstractPersistable {
 	
 	private static final long serialVersionUID = -473785131521745319L;
 
+
+	@Column(name = "url", nullable = true)
+	private String url;
+	
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "actor", referencedColumnName = "id", nullable = false, updatable = false)
 	private User actor;
 
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
-	@JoinColumn(name = "type", referencedColumnName = "id", nullable = false, updatable = false)
+	@JoinColumn(name = "recepient", referencedColumnName = "id", nullable = false, updatable = false)
+	private User recepient;
+
+	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
+	@JoinColumn(name = "type", referencedColumnName = "id", nullable = true, updatable = false)
 	private NotificationType type;
 	
 	@Column(name = "seen", nullable = false)
@@ -56,11 +67,15 @@ public class BaseNotification extends AbstractPersistable {
 		this.setId(id);
 	}
 
-	public BaseNotification(User actor, NotificationType type, Boolean seen, Date timestamp) {
+	public BaseNotification(User actor, User recepient, NotificationType type) {
+		this(actor, recepient, type, new Date());
+	}
+	
+	public BaseNotification(User actor, User recepient, NotificationType type, Date timestamp) {
 		super();
 		this.actor = actor;
+		this.recepient = recepient;
 		this.type = type;
-		this.seen = seen;
 		this.timestamp = timestamp;
 	}
 
@@ -76,8 +91,23 @@ public class BaseNotification extends AbstractPersistable {
 		if (!(obj instanceof BaseNotification)) {
 			return false;
 		}
-		BaseNotification that = (BaseNotification) obj;
-		return null == this.getId() ? false : this.getId().equals(that.getId());
+		BaseNotification other = (BaseNotification) obj;
+		EqualsBuilder builder = new EqualsBuilder();
+        builder.append(this.getId(), other.getId());
+        builder.append(this.getActor(), other.getActor());
+        builder.append(this.getRecepient(), other.getRecepient());
+        
+        return builder.isEquals();
+	}
+
+	
+	
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public User getActor() {
@@ -88,11 +118,20 @@ public class BaseNotification extends AbstractPersistable {
 		this.actor = actor;
 	}
 
-	public NotificationType getAction() {
+
+	public User getRecepient() {
+		return recepient;
+	}
+
+	public void setRecepient(User recepient) {
+		this.recepient = recepient;
+	}
+
+	public NotificationType getType() {
 		return type;
 	}
 
-	public void setAction(NotificationType type) {
+	public void setType(NotificationType type) {
 		this.type = type;
 	}
 
