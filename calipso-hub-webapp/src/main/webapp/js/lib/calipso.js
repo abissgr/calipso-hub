@@ -72,6 +72,19 @@ define("calipso", function(require) {
 			event.cancelBubble = true;
 		}
 	}
+	
+	Calipso.updateBadges = function(selector,  text){
+		// e.g. update visual notification counters 
+		console.log("Notifications count: "+text);
+		if(text){
+			console.log("Showing notification counters...");
+			$(selector).text(text).removeClass("hidden").show();
+		}
+		else{
+			console.log("Hiding notification counters...");
+			$(selector).text(text).hide();
+		}
+	}
 
 	Calipso.getConfigProperty = function(propertyName) {
 		return Calipso.config[propertyName];
@@ -206,8 +219,16 @@ define("calipso", function(require) {
 		Calipso.vent.on('app:show', function(appView) {
 			Calipso.app.mainContentRegion.show(appView);
 		});
+
+		
 		Calipso.vent.on('session:created', function(userDetails) {
 			console.log("vent event session:created");
+			// update otification counters 
+			var count = userDetails ? userDetails.get("notificationCount") : 0;
+
+			Calipso.updateBadges(".badge-notifications-count", 
+					userDetails ? userDetails.get("notificationCount") : 0);
+			
 			Calipso.session.userDetails = userDetails;
 			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 				model : userDetails
@@ -961,7 +982,8 @@ define("calipso", function(require) {
 			"click a.logout" : "logout"
 		},
 		regions : {
-			menuRegion : "#calipsoHeaderView-menuRegion"
+			menuRegion : "#calipsoHeaderView-menuRegion",
+			notificationsRegion : "#calipsoHeaderView-notificationsRegion"
 		},
 		onShow : function(){
 			var menuModel = [
@@ -985,6 +1007,9 @@ define("calipso", function(require) {
 				 childView: MenuItemView
 			});
 			this.menuRegion.show(new MenuCollectionView(menuModel));
+
+			Calipso.updateBadges(".badge-notifications-count", 
+					Calipso.session.userDetails ? Calipso.session.userDetails.get("notificationCount") : 0);
 		},
 //		initialize : function(options) {
 //			_.bindAll(this);
@@ -2428,14 +2453,15 @@ define("calipso", function(require) {
 				async : false,
 				url : baseUrl + Calipso.getConfigProperty("apiAuthPath") + "/userDetails/remembered",
 				success : function(model, response, options) {
-					//if (model.id) {
-					_self.userDetails = model;
-
-					//}
+					if (model.id) {
+						_self.userDetails = model;
+						Calipso.vent.trigger('session:created', _self.userDetails);
+					}
 				}
 			});
 
 		},
+		
 		// Logout the user here and on the server side.
 		destroy : function() {
 			if (this.userDetails) {
