@@ -1,6 +1,6 @@
-package gr.abiss.calipso.jpasearch.repository.acl;
+package gr.abiss.calipso.acl.repository;
 
-import gr.abiss.calipso.model.acl.AclClass;
+import gr.abiss.calipso.acl.model.AclClass;
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 
 public interface AclClassRepository extends BaseRepository<AclClass, Long> {

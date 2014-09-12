@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.service.acl;
+package gr.abiss.calipso.acl.service;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

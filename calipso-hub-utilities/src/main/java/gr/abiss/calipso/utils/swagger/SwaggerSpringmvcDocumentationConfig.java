@@ -1,48 +1,43 @@
 package gr.abiss.calipso.utils.swagger;
 
-import com.mangofactory.swagger.EndpointComparator;
-import com.mangofactory.swagger.OperationComparator;
-import com.mangofactory.swagger.configuration.DocumentationConfig;
-import com.wordnik.swagger.core.DocumentationEndPoint;
-import com.wordnik.swagger.core.DocumentationOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.ComponentScan;
+
+import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
+import com.mangofactory.swagger.plugin.EnableSwagger;
+import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 
 /**
- * Custom documentation configuration for swagger-springmvc, see 
- * <a href="https://github.com/martypitt/swagger-springmvc">https://github.com/martypitt/swagger-springmvc</a>
+ * Custom documentation configuration for swagger-springmvc, see <a
+ * href="https://github.com/martypitt/swagger-springmvc"
+ * >https://github.com/martypitt/swagger-springmvc</a>
  * 
  * @author manos
- *
+ * 
  */
-@Configuration
-@Import(DocumentationConfig.class)
+@EnableSwagger
+// @ComponentScan("gr.abiss.calipso")
 public class SwaggerSpringmvcDocumentationConfig {
-    @Bean
-    public EndpointComparator endPointComparator() {
-        return new NameEndPointComparator();
-    }
+	private SpringSwaggerConfig springSwaggerConfig;
 
-    @Bean
-    public OperationComparator operationComparator() {
-        return new NameOperationComparator();
-    }
+	/**
+	 * Required to autowire SpringSwaggerConfig
+	 */
+	@Autowired
+	public void setSpringSwaggerConfig(SpringSwaggerConfig springSwaggerConfig) {
+		this.springSwaggerConfig = springSwaggerConfig;
+	}
+
+	/**
+	 * Every SwaggerSpringMvcPlugin bean is picked up by the swagger-mvc
+	 * framework - allowing for multiple swagger groups i.e. same code base
+	 * multiple swagger resource listings.
+	 */
+	@Bean
+	public SwaggerSpringMvcPlugin customImplementation() {
+		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
+				.includePatterns("/api/rest*");
+	}
 }
 
-@Component
-class NameEndPointComparator implements EndpointComparator {
-    @Override
-    public int compare(DocumentationEndPoint first, DocumentationEndPoint second) {
-        return first.getPath().compareTo(second.getPath());
-    }
-}
-
-@Component
-class NameOperationComparator implements OperationComparator {
-    @Override
-    public int compare(DocumentationOperation first, DocumentationOperation second) {
-        return first.getNickname().compareTo(second.getNickname());
-    }
-}

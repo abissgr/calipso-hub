@@ -57,6 +57,13 @@
         <dependency>
             <groupId>org.resthub</groupId>
             <artifactId>resthub-jpa</artifactId>
+            
+            <exclusions>
+                 <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.resthub</groupId>
@@ -137,11 +144,22 @@
 		</dependency>
 		
 		
+    <dependency>
+        
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>com.mangofactory</groupId>
 			<artifactId>swagger-springmvc</artifactId>
+
+            <exclusions>
+                 <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
-		
 		<!-- elastisearch -->
 		<dependency>
 		    <groupId>org.springframework.data</groupId>
@@ -176,8 +194,6 @@
 			<groupId>org.jodah</groupId>
 			<artifactId>typetools</artifactId>
 		</dependency>
-            
-            
 		
     	<!-- OWASP HTML filtering -->
     	<dependency>

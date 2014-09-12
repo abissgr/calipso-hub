@@ -1,10 +1,10 @@
 package gr.abiss.calipso.notification.model;
 
+import java.util.Date;
+
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
-
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,14 +20,17 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  * Base notification class, corresponds to a Log Table that aggregates basic information for all 
  * notifications.  
  */
 @Entity
+@ApiModel
 @Table(name = "base_notification")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class BaseNotification extends AbstractPersistable {
@@ -54,10 +57,8 @@ public class BaseNotification extends AbstractPersistable {
 	@Column(name = "seen", nullable = false)
 	private Boolean seen = false;
 
-	@Column(name = "timestamp", nullable = false, updatable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
-	private Date timestamp;
+//	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
+//	private Date createdDate;
 
 	public BaseNotification() {
 		super();
@@ -71,12 +72,12 @@ public class BaseNotification extends AbstractPersistable {
 		this(actor, recepient, type, new Date());
 	}
 	
-	public BaseNotification(User actor, User recepient, NotificationType type, Date timestamp) {
+	public BaseNotification(User actor, User recepient, NotificationType type, Date createdDate) {
 		super();
 		this.actor = actor;
 		this.recepient = recepient;
 		this.type = type;
-		this.timestamp = timestamp;
+		//this.createdDate = createdDate;
 	}
 
 	@Override
@@ -144,12 +145,12 @@ public class BaseNotification extends AbstractPersistable {
 		this.seen = seen;
 	}
 
-	public Date getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
+//	public Date getTimestamp() {
+//		return createdDate;
+//	}
+//
+//	public void setTimestamp(Date createdDate) {
+//		this.createdDate = createdDate;
+//	}
 
 }

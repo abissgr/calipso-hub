@@ -23,6 +23,9 @@ import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
+import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.io.Serializable;
 
@@ -57,34 +60,25 @@ public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends 
 		this.userRepository = userRepository;
 	}
 
-	public User getPrincipalUserDetails() {
-		Object principal = null;
-		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
-			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		}
-		User user = null;
-		if(principal != null 
-				&& principal instanceof org.springframework.security.core.userdetails.User){
-			String username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
-			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
-				user = userRepository.findByUserNameOrEmail(username);
-			}
-		}
-		return user;
+	public ICalipsoUserDetails getPrincipal() {
+		return SecurityUtil.getPrincipal();
 	}
 
-	public User getPrincipal() {
-		Object principal = null;
-		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
-			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		}
-		User user = null;
-		if(principal != null 
-				&& principal instanceof org.springframework.security.core.userdetails.User){
-			String username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
-			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
-				user = userRepository.findByUserNameOrEmail(username);
+	public LocalUser getPrincipalLocalUser() {
+		ICalipsoUserDetails principal = getPrincipal();
+		LocalUser user = null;
+		if (principal != null) {
+			String username = principal.getUsername();
+			if(StringUtils.isBlank(username)){
+				username = principal.getEmail();
 			}
+			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
+				user = this.userRepository.findByUserNameOrEmail(username);
+			}
+		}
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("getPrincipalUser, user: " + user);
 		}
 		return user;
 	}

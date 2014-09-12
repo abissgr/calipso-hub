@@ -57,10 +57,12 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  */
 @Entity
+@ApiModel(description = "Human users")
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser {

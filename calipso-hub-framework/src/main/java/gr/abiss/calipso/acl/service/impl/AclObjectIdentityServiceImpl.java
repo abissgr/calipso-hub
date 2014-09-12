@@ -1,8 +1,9 @@
-package gr.abiss.calipso.jpasearch.service.impl;
+package gr.abiss.calipso.acl.service.impl;
 
-import gr.abiss.calipso.model.acl.AclObjectIdentity;
-import gr.abiss.calipso.jpasearch.repository.acl.AclObjectIdentityRepository;
-import gr.abiss.calipso.jpasearch.service.acl.AclObjectIdentityService;
+import gr.abiss.calipso.acl.model.AclObjectIdentity;
+import gr.abiss.calipso.acl.repository.AclObjectIdentityRepository;
+import gr.abiss.calipso.acl.service.AclObjectIdentityService;
+import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;

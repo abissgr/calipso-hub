@@ -29,8 +29,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.wordnik.swagger.annotations.Api;
+
 
 @Controller
+@Api(value = "Hosts")
 @RequestMapping(value = "/api/rest/hosts", produces = { "application/json", "application/xml" })
 public class HostController extends AbstractServiceBasedRestController<Host, String, HostService> {
 

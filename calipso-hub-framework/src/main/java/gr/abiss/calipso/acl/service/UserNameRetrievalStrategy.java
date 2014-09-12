@@ -1,4 +1,4 @@
-package gr.abiss.calipso.jpasearch.service.acl;
+package gr.abiss.calipso.acl.service;
 
 import gr.abiss.calipso.userDetails.model.UserDetails;
 

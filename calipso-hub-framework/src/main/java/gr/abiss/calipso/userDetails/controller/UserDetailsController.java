@@ -17,20 +17,26 @@
  */
 package gr.abiss.calipso.userDetails.controller;
 
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
+import com.wordnik.swagger.annotations.Api;
+
 
 
 
 //@Controller
+//@Api(value = "Logged-in user details")
+@ApiIgnore
 @RequestMapping(value = "/apiauth", produces = { "application/json", "application/xml" })
 public class UserDetailsController extends AbstractUserDetailsController<UserDetailsService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsController.class);
-
-
+	
+	
 }

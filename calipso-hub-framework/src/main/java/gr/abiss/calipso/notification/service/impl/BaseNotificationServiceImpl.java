@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Named("baseNotificationService")
 public class BaseNotificationServiceImpl extends AbstractServiceImpl<BaseNotification, String, BaseNotificationRepository> 
@@ -63,7 +64,7 @@ public class BaseNotificationServiceImpl extends AbstractServiceImpl<BaseNotific
 
 		ParameterMapBackedPageRequest mapBackedPageable = (ParameterMapBackedPageRequest) pageable;	
 		Map<String, String[]> paramsMapOrig = mapBackedPageable.getParameterMap();
-
+		
 		// if no exlicit recepient is given, use the current principal
 		if(!paramsMapOrig.containsKey(RECEPIENT)){
 			Map<String, String[]> paramsMap = new HashMap<String, String[]>();

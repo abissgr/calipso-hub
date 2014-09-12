@@ -5,4 +5,4 @@
  * @author manos
  *
  */
-package gr.abiss.calipso.model.acl;
+package gr.abiss.calipso.acl.model;
