@@ -985,11 +985,10 @@ define("calipso", function(require) {
 			return "Calipso.view.TemplateBasedItemView"
 		}
 	});
-	Calipso.view.TemplateBasedCollectionView = Marionette.CollectionView.extend(
+	Calipso.view.TemplateBasedCollectionView = Marionette.CompositeView.extend(
 	/** @lends Calipso.view.TemplateBasedCollectionView.prototype */
 	{
 		template : require("hbs!template/templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
-		
 		tagName : "ul",
 		itemView : Calipso.view.TemplateBasedItemView,
 		childView : Calipso.view.TemplateBasedItemView,
@@ -997,13 +996,32 @@ define("calipso", function(require) {
 			tagName : "li",
 		},
 		initialize : function(models, options) {
-			Marionette.CollectionView.prototype.initialize.apply(this, arguments);
+			Marionette.CompositeView.prototype.initialize.apply(this, arguments);
+			if (!this.collection && options.model.wrappedCollection) {
+				this.collection = options.model.wrappedCollection;
+				console.log("TemplateBasedCollectionLayout#initialize, got options.model.wrappedCollection: " + this.collection + ", url: " + this.collection.url);
+			}
 			console.log("TemplateBasedCollectionView#initialize, collection: " + this.collection);
 		},
-		onAfterItemAdded: function (itemView) {
-			console.log("TemplateBasedCollectionView#onAfterItemAdded, itemView: "+itemView);
-         this.$el.append(itemView.el);
-      },
+		onShow : function(){
+			var _self = this;
+			// fetch collection?
+			if(!this.options.skipFetch){
+				console.log("TemplateBasedCollectionView#onShow, collecion size: "+this.collection.length);
+				_self.collection.fetch({
+					url : _self.collection.url,
+					success : function(collection, response, options){
+						console.log("TemplateBasedCollectionView#onShow#renderCollectionItems, collecion size: " + collection.length);
+						//Marionette.CollectionView.prototype.onShow.apply(this);
+					},
+					error : function(collection, response, options){alert("failed fetching collection");}
+				});
+			}
+			else{
+				//Marionette.CollectionView.prototype.onShow.apply(this);
+			}
+			
+		},
 		/** use the template defined by the child if any */
 		getChildView: function(child, ChildViewClass, childViewOptions){
 			  var options = _.extend({}, childViewOptions);
@@ -1016,96 +1034,6 @@ define("calipso", function(require) {
 	}, {
 		getTypeName : function() {
 			return "Calipso.view.TemplateBasedCollectionView"
-		}
-	});
-	/**
-	 
-	 * @example 
-	 * 	// define our person model subclass
-	 * 	var notificationsView = new TemplateBasedCollectionLayout({
-	 * 		collection: notificationsCollection, 
-	 * 		childViewoptions : {
-	 * 			template : OptionalCustomItemTemplate
-	 * 		}
-	 * 	});
-	 * 	notificationsRegion.show(notificationsView);
-	 */
-	Calipso.view.TemplateBasedCollectionLayout = Backbone.Marionette.Layout.extend(
-		/** @lends Calipso.view.TemplateBasedCollectionLayout.prototype */{
-		tagName : "ul",
-		className : "TemplateBasedCollectionLayout",
-		template : require("hbs!template/templateBasedCollectionLayout"), //_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
-		collectionView : Calipso.view.TemplateBasedCollectionView,
-		collectionViewOptions : {},
-
-		regions : {
-			notificationsRegion: "div#calipsoTemplateBasedCollectionLayout-notificationsRegion"
-		},
-		onShow : function(){
-			var _self = this;
-			var notificationsRegion = _self.notificationsRegion;
-			var renderCollectionItemsError = function(collection, response, options){
-				alert("error fetching collection")
-			}
-			
-			// fetch notifications
-			console.log("TemplateBasedCollectionLayout#onShow, collecion size: "+this.collection.length);
-			_self.collection.fetch({
-				url : _self.collection.url,
-				success : function(collection, response, options){
-					console.log("TemplateBasedCollectionLayout#onShow#renderCollectionItems, collecion size: " + collection.length);
-					_self.collectionViewOptions.collection = collection;
-					var collectionView = new Calipso.view.TemplateBasedCollectionView/*this.collectionView*/(_self.collectionViewOptions);
-					notificationsRegion.show(collectionView);
-				},
-				error : renderCollectionItemsError
-			});
-		},
-		
-		initialize : function(options) {
-			var _this = this;
-			Backbone.Marionette.Layout.prototype.initialize.apply(this, arguments);
-			
-			// ensure we haqve a collection to render	
-			if (options.collection) {
-				this.collection = options.collection;
-				console.log("TemplateBasedCollectionLayout#initialize, got options.collection: " + this.collection + ", url: " + this.collection.url);
-			}
-			else if (options.model.wrappedCollection) {
-				this.collection = options.model.wrappedCollection;
-				console.log("TemplateBasedCollectionLayout#initialize, got options.model.wrappedCollection: " + this.collection + ", url: " + this.collection.url);
-			}
-			else{
-				throw "Calipso.view.TemplateBasedCollectionLayout requires either a wrapper model or a collection option."
-			}
-			// childViewOptions may be given at first level VS within collectionViewOptions
-			if(options.childViewOptions){
-				this.collectionViewOptions.childViewOptions = options.childViewOptions;
-			}
-			// merge collection view options
-			if(options.collectionViewOptions){
-				$.extend(this.collectionViewOptions, options.collectionViewOptions);
-			}
-			
-			// collection/item views
-			if(options.collectionView){
-				this.collectionView = options.collectionView;
-			}
-			if(options.childView){
-				this.collectionViewOptions.childView = options.childView;
-			}
-			
-			// put the collection in collection view's options
-			this.collectionViewOptions.collection = this.collection;
-				
-			
-		},
-		getTypeName : function() {
-			return this.prototype.getTypeName();
-		}
-	}, {
-		getTypeName : function() {
-			return "AbstractLayout"
 		}
 	});
 	
@@ -1155,16 +1083,14 @@ define("calipso", function(require) {
 			 });
 
 			console.log("HeaderView, created notifications collection: " + notifications + ", url: " + notifications.url);
-			var notificationsView = new Calipso.view.TemplateBasedCollectionLayout({
-				 collection: notifications, 
-				 collectionViewOptions : {
-					 className : "dropdown-menu dropdown-alerts",
-				 }
-//				 childViewoptions : {
-//					 template : OptionalCustomItemTemplate
-//				 }
-			 });
-			 this.notificationsRegion.show(notificationsView);
+			var notificationsView = new Calipso.view.TemplateBasedCollectionView({
+				tagName: "span",
+				className : "dropdown",
+				itemViewContainer: "ul",
+				template  : require("hbs!template/headerNotifications"),
+				collection: notifications, 
+			});
+			this.notificationsRegion.show(notificationsView);
 		},
 //		initialize : function(options) {
 //			_.bindAll(this);
