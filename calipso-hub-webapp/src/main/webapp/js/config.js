@@ -60,7 +60,6 @@ require.config({
 		'sinon' : 'lib/sinon/chai-jquery',
 			
 	},
-
 	shim : {
 
 		'underscore' : {

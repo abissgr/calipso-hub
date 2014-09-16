@@ -285,6 +285,9 @@ define("calipso", function(require) {
 	// //////////////////////////////////////
 	Calipso.collection.GenericCollection = Backbone.PageableCollection.extend(/** @lends Calipso.collection.GenericCollection.prototype */{
 		mode : "server",
+		getTypeName : function() {
+			return this.prototype.getTypeName();
+		},
 		initialize : function(attributes, options) {
 			if(options){
 				if (options.model) {
@@ -396,6 +399,144 @@ define("calipso", function(require) {
 
 	});
 
+	/**
+	 * Get the name of this class
+	 * @returns the class name as a string
+	 */
+	Calipso.collection.GenericCollection.prototype.getTypeName = function(instance) {
+		return "Calipso.collection.GenericCollection";
+	}
+	
+	/**
+	 *
+	 * backbone-polling v1.0.0
+	 * https://github.com/pedrocatre/backbone-polling
+	 *
+	 * Copyright (c) 2013 Pedro Catré
+	 *
+	 * Licensed under the MIT License
+	 */
+	Calipso.collection.PollingCollection = Calipso.collection.GenericCollection.extend(/** @lends Calipso.collection.PollingCollection.prototype */{
+
+      /**
+       * Id returned by the setTimeout function that the plugin uses to specify a delay between fetch requests to the
+       * data source
+       */
+      _backbonePollTimeoutId: undefined,
+
+      /**
+       * Control variable used to stop fetch requests
+       */
+      _backbonePollEnabled: false,
+
+      /**
+       * Default settings for the plugin
+       */
+      _backbonePollSettings: {
+          refresh: 1000,                      // rate at which the plugin fetches data
+          fetchOptions: {},                   // options for the fetch request
+          retryRequestOnFetchFail: true       // automatically retry request on fetch failure
+      },
+
+      /**
+       * Specify custom options for the plugin
+       * @param pollOptions object used to customize the plugin’s behavior
+       */
+      configure: function(pollOptions){
+          this._backbonePollSettings = $.extend(true, {}, this._backbonePollSettings, pollOptions);
+      },
+
+      /**
+       * Starts the process of polling data from the server
+       * @returns {*}
+       */
+      startFetching: function() {
+          this._backbonePollEnabled = true;
+          this._refresh(1);
+          return this;
+      },
+
+      /**
+       * Periodically fetch data from a data source
+       * @param refreshRateMs rate in milliseconds at which the plugin fetches data
+       * @returns {*}
+       * @private
+       */
+      _refresh: function (refreshRateMs) {
+          this._backbonePollTimeoutId = setTimeout(_.bind(function() {
+              if (this._backbonePollTimeoutId) {
+                  clearTimeout(this._backbonePollTimeoutId);
+              }
+              // Return if _refresh was called but the fetching is stopped
+              // should not go this far since the timeout is cleared when fetching is stopped.
+              if(!this._backbonePollEnabled) { return; }
+
+              this.fetchRequest = this.fetch(this._backbonePollSettings.fetchOptions);
+
+              this.fetchRequest.done(_.bind(function() {
+                      this.trigger('refresh:loaded');
+                      this._refresh(this._backbonePollSettings.refresh);
+                  }, this)).fail(_.bind(function() {
+                      this.trigger('refresh:fail');
+
+                      // If retryRequestOnFetchFail is true automatically retry request
+                      if(this._backbonePollSettings.retryRequestOnFetchFail) {
+                          this._refresh(this._backbonePollSettings.refresh);
+                      } else {
+                          this.stopFetching();
+                      }
+                  }, this)).always(_.bind(function() {
+                      this.trigger('refresh:always');
+                  }, this));
+          }, this), refreshRateMs);
+          return this;
+      },
+
+      /**
+       * Abort pending fetch requests
+       * @returns {*}
+       */
+      abortPendingFetchRequests: function() {
+          if(!_.isUndefined(this.fetchRequest) && !_.isUndefined(this.fetchRequest['abort'])) {
+              this.fetchRequest.abort();
+          }
+          return this;
+      },
+
+      /**
+       * Checks to see if the plugin is polling data from a data source
+       * @returns {boolean} true if is fetching, false if it is not fetching
+       */
+      isFetching: function() {
+          return !(_.isUndefined(this._backbonePollTimeoutId));
+      },
+
+      /**
+       * Stops the process of polling data from the server
+       * @returns {*}
+       */
+      stopFetching: function() {
+          this._backbonePollEnabled = false;
+          if(this.isFetching()) {
+              if (this._backbonePollTimeoutId) {
+                  clearTimeout(this._backbonePollTimeoutId);
+              }
+              this._backbonePollTimeoutId = undefined;
+          }
+          this.abortPendingFetchRequests();
+          return this;
+      }
+
+  
+	});
+
+	/**
+	 * Get the name of this class
+	 * @returns the class name as a string
+	 */
+	Calipso.collection.PollingCollection.prototype.getTypeName = function(instance) {
+		return "Calipso.collection.PollingCollection";
+	}
 	//////////////////////////////////////////
 	// Model
 	//////////////////////////////////////////
@@ -1005,8 +1146,21 @@ define("calipso", function(require) {
 		},
 		onShow : function(){
 			var _self = this;
+			// poll collection?
+			if(this.collection.getTypeName && this.collection.getTypeName() == "Calipso.collection.PollingCollection"){
+				if(this.options.pollOptions){
+					// Specify custom options for the plugin.
+					// You can also call this function inside the collection's initialize function and pass the
+					// options for the plugin when instantiating a new collection.
+					this.collection.configure(this.options.pollOptions);					
+				}
+				// initialize polling if needed 
+				if(!this.collection.isFetching()){
+					this.collection.startFetching();	
+				}
+			}  
 			// fetch collection?
-			if(!this.options.skipFetch){
+			else if(!this.options.skipFetch){
 				console.log("TemplateBasedCollectionView#onShow, collecion size: "+this.collection.length);
 				_self.collection.fetch({
 					url : _self.collection.url,
@@ -1074,11 +1228,8 @@ define("calipso", function(require) {
 			});
 			this.menuRegion.show(new MenuCollectionView(menuModel));
 
-			Calipso.updateBadges(".badge-notifications-count", 
-					Calipso.session.userDetails ? Calipso.session.userDetails.get("notificationCount") : 0);
-			
 			// load and render notifications list
-			var notifications = new Calipso.collection.GenericCollection([], {
+			var notifications = new Calipso.collection.PollingCollection([], {
 				 url: Calipso.session.getBaseUrl() + "/api/rest/baseNotifications"
 			 });
 
@@ -1091,6 +1242,10 @@ define("calipso", function(require) {
 				collection: notifications, 
 			});
 			this.notificationsRegion.show(notificationsView);
+			// update counter badges
+			Calipso.updateBadges(".badge-notifications-count", 
+					Calipso.session.userDetails ? Calipso.session.userDetails.get("notificationCount") : 0);
+			
 		},
 //		initialize : function(options) {
 //			_.bindAll(this);

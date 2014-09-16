@@ -57,8 +57,9 @@ public class BaseNotification extends AbstractPersistable {
 	@Column(name = "seen", nullable = false)
 	private Boolean seen = false;
 
-//	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
-//	private Date createdDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
+	private Date createdDate;
 
 	public BaseNotification() {
 		super();
@@ -77,7 +78,7 @@ public class BaseNotification extends AbstractPersistable {
 		this.actor = actor;
 		this.recepient = recepient;
 		this.type = type;
-		//this.createdDate = createdDate;
+		this.createdDate = createdDate;
 	}
 
 	@Override
@@ -145,12 +146,12 @@ public class BaseNotification extends AbstractPersistable {
 		this.seen = seen;
 	}
 
-//	public Date getTimestamp() {
-//		return createdDate;
-//	}
-//
-//	public void setTimestamp(Date createdDate) {
-//		this.createdDate = createdDate;
-//	}
+	public DateTime getCreatedDate() {
+		return null == createdDate ? null : new DateTime(createdDate);
+	}
+
+	public void setCreatedDate(final DateTime createdDate) {
+		this.createdDate = null == createdDate ? null : createdDate.toDate();
+	}
 
 }
