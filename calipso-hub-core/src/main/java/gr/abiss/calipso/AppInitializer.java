@@ -133,7 +133,7 @@ public class AppInitializer {
 				u = userService.createActive(u);
 
 				// notify the admin for each user creation to test notifications
-				baseNotificationService.create(new BaseNotification(u, u0, null, now));
+				baseNotificationService.create(new BaseNotification(u, u0, null, now, (i % 2 == 0) ? true : false));
 			}
 			
 			LOGGER.info("Admin has " + this.baseNotificationService.countUnseen(u0) + " notifications");

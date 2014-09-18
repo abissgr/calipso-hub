@@ -174,8 +174,8 @@ define("calipso", function(require) {
 		// app init/events
 		////////////////////////////////
 		// initialize header, footer, history
-		Calipso.app.on("initialize:after", function() {
-			// console.log("app event initialize:after");
+		Calipso.app.on("start", function() {
+			// console.log("app event start");
 			//	try "remember me"
 			Calipso.session.load();
 			
@@ -257,8 +257,8 @@ define("calipso", function(require) {
 			// console.log("vent event modal:show");
 			Calipso.app.modal.show(view);
 		});
-		Calipso.vent.on('modal:close', function() {
-			// console.log("vent event modal:close");
+		Calipso.vent.on('modal:destroy', function() {
+			// console.log("vent event modal:destroy");
 			Calipso.app.modal.hideModal();
 		});
 
@@ -271,7 +271,7 @@ define("calipso", function(require) {
 		el : "#calipsoModalRegion",
 
 		onShow : function(view) {
-			view.on("close", this.hideModal, this);
+			view.on("destroy", this.hideModal, this);
 			this.$el.modal('show');
 		},
 
@@ -433,7 +433,7 @@ define("calipso", function(require) {
        * Default settings for the plugin
        */
       _backbonePollSettings: {
-          refresh: 1000,                      // rate at which the plugin fetches data
+          refresh: 60000,                      // rate at which the plugin fetches data, default one minute
           fetchOptions: {},                   // options for the fetch request
           retryRequestOnFetchFail: true       // automatically retry request on fetch failure
       },
@@ -1101,7 +1101,7 @@ define("calipso", function(require) {
 	// Layouts
 	//////////////////////////////////////////////////
 
-	Calipso.view.AbstractLayout = Backbone.Marionette.Layout.extend({
+	Calipso.view.AbstractLayout = Backbone.Marionette.LayoutView.extend({
 		getTypeName : function() {
 			return this.prototype.getTypeName();
 		}
@@ -1112,84 +1112,6 @@ define("calipso", function(require) {
 	});
 	
 
-	Calipso.view.TemplateBasedItemView = Marionette.ItemView.extend(
-	/** @lends Calipso.view.TemplateBasedItemView.prototype */
-	{
-		template : require("hbs!template/templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
-		tagName : "li",
-		initialize : function(options) {
-			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			console.log("TemplateBasedItemView#initialize, item: " + this.model);
-		}
-	}, {
-		getTypeName : function() {
-			return "Calipso.view.TemplateBasedItemView"
-		}
-	});
-	Calipso.view.TemplateBasedCollectionView = Marionette.CompositeView.extend(
-	/** @lends Calipso.view.TemplateBasedCollectionView.prototype */
-	{
-		template : require("hbs!template/templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
-		tagName : "ul",
-		itemView : Calipso.view.TemplateBasedItemView,
-		childView : Calipso.view.TemplateBasedItemView,
-		childViewOptions : {
-			tagName : "li",
-		},
-		initialize : function(models, options) {
-			Marionette.CompositeView.prototype.initialize.apply(this, arguments);
-			if (!this.collection && options.model.wrappedCollection) {
-				this.collection = options.model.wrappedCollection;
-				console.log("TemplateBasedCollectionLayout#initialize, got options.model.wrappedCollection: " + this.collection + ", url: " + this.collection.url);
-			}
-			console.log("TemplateBasedCollectionView#initialize, collection: " + this.collection);
-		},
-		onShow : function(){
-			var _self = this;
-			// poll collection?
-			if(this.collection.getTypeName && this.collection.getTypeName() == "Calipso.collection.PollingCollection"){
-				if(this.options.pollOptions){
-					// Specify custom options for the plugin.
-					// You can also call this function inside the collection's initialize function and pass the
-					// options for the plugin when instantiating a new collection.
-					this.collection.configure(this.options.pollOptions);					
-				}
-				// initialize polling if needed 
-				if(!this.collection.isFetching()){
-					this.collection.startFetching();	
-				}
-			}  
-			// fetch collection?
-			else if(!this.options.skipFetch){
-				console.log("TemplateBasedCollectionView#onShow, collecion size: "+this.collection.length);
-				_self.collection.fetch({
-					url : _self.collection.url,
-					success : function(collection, response, options){
-						console.log("TemplateBasedCollectionView#onShow#renderCollectionItems, collecion size: " + collection.length);
-						//Marionette.CollectionView.prototype.onShow.apply(this);
-					},
-					error : function(collection, response, options){alert("failed fetching collection");}
-				});
-			}
-			else{
-				//Marionette.CollectionView.prototype.onShow.apply(this);
-			}
-			
-		},
-		/** use the template defined by the child if any */
-		getChildView: function(child, ChildViewClass, childViewOptions){
-			  var options = _.extend({}, childViewOptions);
-			  options.model = child;
-			  if(child.itemViewTemplate){
-				  options.template = child.itemViewTemplate; 
-			  }
-			  return new ChildViewClass(options);
-			}
-	}, {
-		getTypeName : function() {
-			return "Calipso.view.TemplateBasedCollectionView"
-		}
-	});
 	
 	Calipso.view.HeaderView = Calipso.view.AbstractLayout.extend(
 	/** @lends Calipso.view.HeaderView.prototype */
@@ -1237,8 +1159,11 @@ define("calipso", function(require) {
 			var notificationsView = new Calipso.view.TemplateBasedCollectionView({
 				tagName: "span",
 				className : "dropdown",
-				itemViewContainer: "ul",
-				template  : require("hbs!template/headerNotifications"),
+				childViewContainer: "ul",
+				template  : require("hbs!template/headerNotificationsCollectionView"),
+				childViewOptions : {
+					template  : require("hbs!template/headerNotificationsItemView"),
+				},
 				collection: notifications, 
 			});
 			this.notificationsRegion.show(notificationsView);
@@ -1247,27 +1172,22 @@ define("calipso", function(require) {
 					Calipso.session.userDetails ? Calipso.session.userDetails.get("notificationCount") : 0);
 			
 		},
-//		initialize : function(options) {
-//			_.bindAll(this);
-//		},
 		logout : function(e) {
 			Calipso.stopEvent(e);
 			Calipso.vent.trigger("session:destroy");
-			_.bindAll(this);
 		},
 		login : function(e) {
 			Calipso.stopEvent(e);
 			Calipso.navigate("login", {
 				trigger : true
 			});
-			_.bindAll(this);
 		}
 	}, {
 		getTypeName : function() {
 			return "HeaderView"
 		}
 	});
-	Calipso.view.ModelDrivenBrowseLayout = Marionette.Layout.extend(
+	Calipso.view.ModelDrivenBrowseLayout = Marionette.LayoutView.extend(
 	/** @lends Calipso.view.ModelDrivenBrowseLayout.prototype */
 	{
 		tagName : 'div',
@@ -1283,7 +1203,7 @@ define("calipso", function(require) {
 		},
 		initialize : function(options) {
 
-			Marionette.Layout.prototype.initialize.apply(this, arguments);
+			Marionette.LayoutView.prototype.initialize.apply(this, arguments);
 			
 			var _this = this;
 			if (options.skipToSingleResult) {
@@ -1313,14 +1233,14 @@ define("calipso", function(require) {
 			}
 		//  get item view type for model
 			var ItemViewType = itemModel.getItemViewType();
-			// console.log("ModelDrivenBrowseLayout on itemView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
+			// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
 			// create new item view instance with model
-			var itemView = new ItemViewType({
+			var childView = new ItemViewType({
 				formSchemaKey : formSchemaKey,
 				model : itemModel
 			});
 			// show item view
-			this.contentRegion.show(itemView);
+			this.contentRegion.show(childView);
 			var navUrl = itemModel.getPathFragment() + "/" + itemModel.get("id");
 			if(formSchemaKey != "view"){
 				navUrl += "/" + formSchemaKey;
@@ -1517,7 +1437,7 @@ define("calipso", function(require) {
 		},
 		initialize: function(options){
 			
-			Marionette.Layout.prototype.initialize.apply(this, arguments);
+			Marionette.LayoutView.prototype.initialize.apply(this, arguments);
 			if(options.collection){
 				this.collection = options.collection;
 			}
@@ -1551,7 +1471,7 @@ define("calipso", function(require) {
 	var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
 		className : 'nav nav-pills',
 		tagName : 'ul',
-		itemViewContainer : '.nav-tabs',
+		childViewContainer : '.nav-tabs',
 		getItemView : function(item) {
 			return Backbone.Marionette.ItemView.extend({
 				tagName : 'li',
@@ -1561,20 +1481,20 @@ define("calipso", function(require) {
 
 				events : {
 					"click .show-tab": "viewTab",
-					"click .close-tab" : "closeTab"
+					"click .destroy-tab" : "destroyTab"
 				},
 				 viewTab: function(e) {
-					 console.log("TabPaneCollectionView.itemView#viewTab");
+					 console.log("TabPaneCollectionView.childView#viewTab");
 					 e.stopPropagation();
 					 e.preventDefault();
 					 vent.trigger("viewTab", this.model);
 				 },
-				closeTab : function(e) {
-					console.log("TabPaneCollectionView.itemView#closeTab");
+				destroyTab : function(e) {
+					console.log("TabPaneCollectionView.childView#destroyTab");
 					e.stopPropagation();
 					e.preventDefault();
 //					this.model.collection.remove(this.model);
-					this.close();
+					this.destroy();
 					vent.trigger("viewTab", {
 						id : "Search"
 					});
@@ -1588,8 +1508,8 @@ define("calipso", function(require) {
 		getItemView : function(item) {
 			var ItemViewClass;
 			if(item){
-				if (item.get("itemView")) {
-					ItemViewClass = item.get("itemView");
+				if (item.get("childView")) {
+					ItemViewClass = item.get("childView");
 				} else {
 					ItemViewClass = GenericFormTabContentView;
 				}
@@ -1674,17 +1594,91 @@ define("calipso", function(require) {
 			return "ItemView"
 		}
 	});
-	
+
+	Calipso.view.TemplateBasedItemView = Marionette.ItemView.extend(
+	/** @lends Calipso.view.TemplateBasedItemView.prototype */
+	{
+		template : require("hbs!template/templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
+		tagName : "li",
+		initialize : function(options) {
+			Marionette.ItemView.prototype.initialize.apply(this, arguments);
+			console.log("TemplateBasedItemView#initialize, item: " + this.model);
+		}
+	}, {
+		getTypeName : function() {
+			return "Calipso.view.TemplateBasedItemView"
+		}
+	});
+	Calipso.view.TemplateBasedCollectionView = Marionette.CompositeView.extend(
+	/** @lends Calipso.view.TemplateBasedCollectionView.prototype */
+	{
+		template : require("hbs!template/templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
+		tagName : "ul",
+		childView : Calipso.view.TemplateBasedItemView,
+		childView : Calipso.view.TemplateBasedItemView,
+		childViewOptions : {
+			tagName : "li",
+		},
+		initialize : function(models, options) {
+			Marionette.CompositeView.prototype.initialize.apply(this, arguments);
+			if (!this.collection && options.model.wrappedCollection) {
+				this.collection = options.model.wrappedCollection;
+				console.log("TemplateBasedCollectionLayout#initialize, got options.model.wrappedCollection: " + this.collection + ", url: " + this.collection.url);
+			}
+			console.log("TemplateBasedCollectionView#initialize, collection: " + this.collection);
+		},
+		onShow : function(){
+			var _self = this;
+			// poll collection?
+			if(this.collection.getTypeName && this.collection.getTypeName() == "Calipso.collection.PollingCollection"){
+				if(this.options.pollOptions){
+					// Specify custom options for the plugin.
+					// You can also call this function inside the collection's initialize function and pass the
+					// options for the plugin when instantiating a new collection.
+					this.collection.configure(this.options.pollOptions);					
+				}
+				// initialize polling if needed 
+				if(!this.collection.isFetching()){
+					this.collection.startFetching();	
+				}
+			}  
+			// fetch collection?
+			else if(!this.options.skipFetch){
+				console.log("TemplateBasedCollectionView#onShow, collecion size: "+this.collection.length);
+				_self.collection.fetch({
+					url : _self.collection.url,
+					success : function(collection, response, options){
+						console.log("TemplateBasedCollectionView#onShow#renderCollectionItems, collecion size: " + collection.length);
+						//Marionette.CollectionView.prototype.onShow.apply(this);
+					},
+					error : function(collection, response, options){alert("failed fetching collection");}
+				});
+			}
+			else{
+				//Marionette.CollectionView.prototype.onShow.apply(this);
+			}
+			
+		},
+		/** use the template defined by the child if any 
+		buildChildView: function(child, ChildViewClass, childViewOptions){
+			  var options = _.extend({}, childViewOptions);
+			  options.model = child;
+			  console.log("buildChildView, childViewOptions.template: "+childViewOptions.template);
+			  if(child.childViewTemplate){
+				  options.template = child.childViewTemplate; 
+			  }
+			  return new ChildViewClass(options);
+			}*/
+	}, {
+		getTypeName : function() {
+			return "Calipso.view.TemplateBasedCollectionView"
+		}
+	});
 	Calipso.view.NotFoundView = Marionette.ItemView.extend(
 			/** @lends Calipso.view.NotFoundView.prototype */
 			{
 				className : 'container span8 home',
-				template : require('hbs!template/notfound'),
-
-				initialize : function(options) {
-					_.bindAll(this);
-				}
-
+				template : require('hbs!template/notfound')
 			}, {
 				getTypeName : function() {
 					return "NotFoundView"
@@ -1696,10 +1690,7 @@ define("calipso", function(require) {
 
 		template : require('hbs!template/footer'),
 		id : "navbar-menu",
-		className : "col-sm-12",
-		initialize : function(options) {
-			_.bindAll(this);
-		}
+		className : "col-sm-12"
 	}, {
 		getTypeName : function() {
 			return "FooterView"
@@ -1791,7 +1782,7 @@ define("calipso", function(require) {
 			this.trigger('before:transitionOut', this, view);
 			view.$el.addClass(this.options.outTransitionClass);
 			_.delay(function() {
-				view.close();
+				view.destroy();
 				this.trigger('transitionOut', this, view);
 				//console.log(this.views);
 			}.bind(this), this.options.transitionDelay);
@@ -1825,7 +1816,7 @@ define("calipso", function(require) {
 	 * */
 	{
 		events : {
-			"click button.btn-windowcontrols-close" : "back"
+			"click button.btn-windowcontrols-destroy" : "back"
 		},
 
 		back : function(e) {
@@ -1985,7 +1976,7 @@ define("calipso", function(require) {
 		tagName : 'div',
 		className : "calipsoView",
 		events : {
-			"click button.close" : "back"
+			"click button.destroy" : "back"
 		},
 
 		back : function(e) {
@@ -1997,9 +1988,9 @@ define("calipso", function(require) {
 
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			this.$el.prop("id", "tab-" + this.model.get("id"));
-			var itemViewTemplate = this.model.getItemViewTemplate();
-			if (itemViewTemplate) {
-				this.tmpl = itemViewTemplate;
+			var childViewTemplate = this.model.getItemViewTemplate();
+			if (childViewTemplate) {
+				this.tmpl = childViewTemplate;
 			}
 
 			this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
@@ -2394,7 +2385,7 @@ define("calipso", function(require) {
 	}
 
 	
-	Calipso.view.TabLayout = Backbone.Marionette.Layout.extend({
+	Calipso.view.TabLayout = Backbone.Marionette.LayoutView.extend({
 		template : require('hbs!template/generic-crud-layout'),
 		tagName : "div",
 		className : "col-sm-12",
@@ -2424,7 +2415,7 @@ define("calipso", function(require) {
 		className : 'nav nav-pills',
 		tagName : 'ul',
 		itemTemplate : require('hbs!template/tab-label'),
-		itemViewContainer : '.nav-tabs',
+		childViewContainer : '.nav-tabs',
 		initialize : function(options) {
 			Marionette.CollectionView.prototype.initialize.apply(this, arguments);
 			
@@ -2438,7 +2429,7 @@ define("calipso", function(require) {
 				template : _this.itemTemplate,
 				events : {
 					"click .show-tab": "viewTab",
-					"click .close-tab" : "closeTab"
+					"click .destroy-tab" : "destroyTab"
 				},
 				/**
 				 this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
@@ -2446,15 +2437,15 @@ define("calipso", function(require) {
 				}, this);
 				 */
 				 viewTab: function(e) {
-					 console.log("TabLabelsCollectionView.itemView#viewTab");
+					 console.log("TabLabelsCollectionView.childView#viewTab");
 					 Calipso.stopEvent(e);
 					 CalipsoApp.vent.trigger("viewTab", this.model);
 				 },
-				closeTab : function(e) {
-					console.log("TabLabelsCollectionView.itemView#closeTab");
+				destroyTab : function(e) {
+					console.log("TabLabelsCollectionView.childView#destroyTab");
 					 Calipso.stopEvent(e);
 //					this.model.collection.remove(this.model);
-					this.close();
+					this.destroy();
 					CalipsoApp.vent.trigger("viewTab", {
 						id : "Search"
 					});
@@ -2505,13 +2496,13 @@ define("calipso", function(require) {
 	 *   var tabLayout = new
 	 * TabLayout({collection: this.tabs});
 	 * 
-	 * vent.on("itemView:openGridRowInTab", function(itemModel) {
+	 * vent.on("childView:openGridRowInTab", function(itemModel) {
 	 * vent.trigger("openGridRowInTab", itemModel); });
 	 * vent.on("openGridRowInTab", function(itemModel) {
 	 * console.log("openGridRowInTab"); _self.tabs.add(itemModel);
 	 * vent.trigger("viewTab", itemModel); }); vent.on("viewTab",
 	 * function(itemModel) { this.layout.contentRegion.show(new
-	 * itemmodel.itemView(itemmodel)); //
+	 * itemmodel.childView(itemmodel)); //
 	 * Calipso.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), { //
 	 * trigger : false // }); _self.syncMainNavigationState(null,
 	 * itemModel.get("id")); });
@@ -2800,7 +2791,7 @@ define("calipso", function(require) {
 		logout : function() {
 			Calipso.session.destroy();
 			// this.login();
-			window.parent.close();
+			window.parent.destroy();
 		},
 		notFoundRoute : function(path) {
 			// console.log("notFoundRoute, path: "+path);

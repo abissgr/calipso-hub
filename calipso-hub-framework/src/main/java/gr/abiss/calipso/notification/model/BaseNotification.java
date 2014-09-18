@@ -74,11 +74,16 @@ public class BaseNotification extends AbstractPersistable {
 	}
 	
 	public BaseNotification(User actor, User recepient, NotificationType type, Date createdDate) {
+		this(actor, recepient, type, createdDate, false);
+	}
+	
+	public BaseNotification(User actor, User recepient, NotificationType type, Date createdDate, Boolean seen) {
 		super();
 		this.actor = actor;
 		this.recepient = recepient;
 		this.type = type;
 		this.createdDate = createdDate;
+		this.seen = seen;
 	}
 
 	@Override
