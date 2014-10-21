@@ -170,6 +170,31 @@ define("calipso", function(require) {
 			return (menuEntries);
 		});
 		
+		// register comparison helper
+		Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+
+		    switch (operator) {
+		        case '==':
+		            return (v1 == v2) ? options.fn(this) : options.inverse(this);
+		        case '===':
+		            return (v1 === v2) ? options.fn(this) : options.inverse(this);
+		        case '<':
+		            return (v1 < v2) ? options.fn(this) : options.inverse(this);
+		        case '<=':
+		            return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+		        case '>':
+		            return (v1 > v2) ? options.fn(this) : options.inverse(this);
+		        case '>=':
+		            return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+		        case '&&':
+		            return (v1 && v2) ? options.fn(this) : options.inverse(this);
+		        case '||':
+		            return (v1 || v2) ? options.fn(this) : options.inverse(this);
+		        default:
+		            return options.inverse(this);
+		    }
+		});
+		
 		////////////////////////////////
 		// app init/events
 		////////////////////////////////
@@ -566,7 +591,7 @@ define("calipso", function(require) {
 	 * 		return "PersonModel";
 	 * 	}
 	 * 	// REQUIRED: our subclass URL path fragment, 
-	 * 	// e.g. "users" for UserModel
+	 * 	// e.g. "persons" for PersonModel
 	 * 	PersonModel.prototype.getPathFragment = function() {
 	 * 		//...
 	 * 	}
@@ -1252,7 +1277,7 @@ define("calipso", function(require) {
 		showContent : function(routeModel) {
 			var _this = this;
 			var modelId = routeModel.get("id");
-			var isSearch = (routeModel.wrappedCollection && routeModel.wrappedCollection.length > 0);
+			var isSearch = (modelId && routeModel.wrappedCollection && routeModel.wrappedCollection.length > 0);
 			// console.log("ModelDrivenBrowseLayout.showContent: '" + routeModel.get("id") + "', skipToSingleResult: " + _this.skipToSingleResult + ", collection length: " + (routeModel.wrappedCollection ? routeModel.wrappedCollection.length : "none"));
 			// get the model collection view type
 			var ContentViewType;
@@ -2042,10 +2067,6 @@ define("calipso", function(require) {
 
 			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + ", type " + this.model.getTypeName());
 
-			// console.log("GenericFormView#onShow, formSchemaKey:
-			// "+formSchemaKey+", model:
-			// "+this.model.constructor.name+this.model.constructor);
-
 		},
 		formSchemaKey : "view",
 
@@ -2119,11 +2140,11 @@ define("calipso", function(require) {
 			var _self = this;
 			// get appropriate schema
 			//					console.log("GenericFormView.onShow, this.formSchemaKey: "+this.formSchemaKey);
-			//var schemaForAction = this.model.getFormSchema(this.formSchemaKey);
+			var schemaForAction = this.model.getFormSchema(this.formSchemaKey);
 			//console.log("GenericFormView#onShow, formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: " + schemaForAction.toSource());
 
 			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering) 
-			if(false){//schemaForAction && _.size(schemaForAction) > 0){
+			if(schemaForAction && _.size(schemaForAction) > 0){
 				this.renderForm();
 			}
 			else{
@@ -2149,10 +2170,6 @@ define("calipso", function(require) {
 			var _self = this;
 			console.log("GenericFormView#renderForm called, schema key: "+_self.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-			console.log("GenericFormView#renderForm, form schema: "+ formSchema.toSource());
-			console.log("GenericFormView#renderForm, model: "+ _self.model.attributes.toSource());
-			var selector = '#generic-form-' + this.formSchemaKey;
-			console.log("GenericFormView#renderForm, selector: "+ selector);
 			
 			// render form
 			var JsonableForm = Backbone.Form.extend({
@@ -2179,7 +2196,7 @@ define("calipso", function(require) {
 				template : _self.formTemplate
 			};
 			this.form = new JsonableForm(formOptions).render();
-			$(selector).append(this.form.el);
+			this.$el.find(".generic-form").append(this.form.el);
 			//					$(selector + ' textarea[data-provide="markdown"]').each(function() {
 			//						var $this = $(this);
 			//
@@ -2583,6 +2600,23 @@ define("calipso", function(require) {
 					metaValue = _this.userDetails.get("metadata")[metaName];
 				}
 				return (metaValue);
+			});
+
+			/**
+			 * Format a date using Moment.js
+			 * http://momentjs.com/
+			 * @example {{momentFormat someDate "MMMM YYYY"}}
+			 */
+			Handlebars.registerHelper('momentFormat', function(date, pattern) {
+				return window.moment ? moment(date).format(pattern) : date;
+			});
+
+			/**
+			 * Calculate "from" now using the given date
+			 * @example {{momentFromNow someDate}}
+			 */
+			Handlebars.registerHelper('momentFromNow', function(date) {
+				return window.moment ? moment(date).fromNow() : date;
 			});
 		},
 

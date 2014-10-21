@@ -191,7 +191,6 @@ define(['handlebars-orig', 'moment', 'underscore-string'], function(Handlebars, 
         }
         return momentDate.format(outputPattern);
     });
-   
     return Handlebars;
 
 });

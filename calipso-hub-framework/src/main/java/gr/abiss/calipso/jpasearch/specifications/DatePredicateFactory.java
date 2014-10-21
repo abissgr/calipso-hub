@@ -40,9 +40,9 @@ public class DatePredicateFactory implements IPredicateFactory<Date> {
 	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
 			String[] propertyValues) {
 		Predicate predicate = null;
-		if (!Number.class.isAssignableFrom(fieldType)) {
+		if (!Date.class.isAssignableFrom(fieldType)) {
 			throw new IllegalArgumentException(fieldType
-					+ " is not a subclass of Date for field: " + propertyName);
+					+ " is not a subclass of java.util.Date for field: " + propertyName);
 		}
 
 		if (propertyValues.length == 1) {

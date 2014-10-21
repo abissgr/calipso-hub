@@ -27,6 +27,9 @@ define([ 'calipso', 'modules-config'],
 	Backbone.ajax = function() {
       // Invoke $.ajaxSetup in the context of Backbone.$
       Backbone.$.ajaxSetup.call(Backbone.$, {
+      	// use traditional HTTP params
+      	traditional: true,
+      	// handle status codes 
          statusCode: {
               401: function(){
         			console.log("Backbone.$.ajaxSetup 401");
