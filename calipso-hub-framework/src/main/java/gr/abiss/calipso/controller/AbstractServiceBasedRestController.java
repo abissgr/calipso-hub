@@ -179,7 +179,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
      * @throws NotFoundException
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    @ResponseView(AbstractPersistable.FormSchemaAwareView.class)
+    //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
     @ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
 	public T findById(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {

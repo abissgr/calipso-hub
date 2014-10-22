@@ -282,6 +282,14 @@ define("calipso", function(require) {
 			// console.log("vent event modal:show");
 			Calipso.app.modal.show(view);
 		});
+		/**
+		 * @example Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"}); 
+		 */
+		Calipso.vent.on('modal:showInLayout', function(properties) { 
+			// console.log("vent event modal:show");
+			Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"});
+			Calipso.app.modal.show(view);
+		});
 		Calipso.vent.on('modal:destroy', function() {
 			// console.log("vent event modal:destroy");
 			Calipso.app.modal.hideModal();
@@ -1135,6 +1143,45 @@ define("calipso", function(require) {
 			return "AbstractLayout"
 		}
 	});
+
+	Calipso.view.ModalLayout = Calipso.view.AbstractLayout.extend({
+		template : require('hbs!template/modal-layout'),
+		events : {
+			"click a.modal-close" : "closeModal"
+		},
+		regions : {
+			modalBodyRegion : ".modal-body"
+		},
+		childView : null,
+		title : null,
+		initialize : function(options) {
+			Calipso.view.AbstractLayout.initialize.apply(this, arguments);
+			var _this = this;
+			if (options.childView) {
+				this.childView = options.childView;
+			}
+			if (options.title) {
+				this.title = options.title;
+			}
+		},
+		onShow : function(){
+			// render title
+			if(this.title){
+				this.$el.find("modal-header").append(this.title);
+			}
+			// render child view
+			this.modalBodyRegion.show(this.childView);
+		},
+		closeModal : function(e){
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("modal:close");
+		}
+	
+	}, {
+		getTypeName : function() {
+			return "AbstractLayout"
+		}
+	});
 	
 
 	
@@ -1878,8 +1925,6 @@ define("calipso", function(require) {
 			var _self = this;
 			console.log("ModelDrivenCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
 
-			// console.log("ModelDrivenCollectionGridView onShow, this.collection:
-			// "+this.collection + ", gridCollection: "+gridCollection);
 			var backgrid = new Backgrid.Grid({
 				columns : _self.collection.getGridSchema(),
 				collection : _self.collection,
