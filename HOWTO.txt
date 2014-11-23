@@ -10,56 +10,70 @@
 # 2: Run in this directory: mvn clean install
 # 3: cd calipso-hub-webapp
 # 4: Run in the calipso-hub-webapp directory: mvn clean install jetty:run
-# 5: http://localhost:8080/
+# 5: Point your browser to http://localhost:8080/calipso/client
+# 6: Login with username: admin, password: admin
 #
 #
 # CONFIG PROPERTIES
 # ----------------------------------------------
-calipso.domain=localhost
-calipso.site.default=localhost
-calipso.cookies.httpOnly=false
-calipso.cookies.secure=false
+build.calipso.baseurl=http://localhost:8080/calipso
+build.calipso.initData=true
+# leave empty to use the request's local hostname
+build.calipso.domain=localhost
+build.calipso.cookies.httpOnly=false
+build.calipso.cookies.secure=false
 
 # Email
-mail.server.host=MAIL.YOU.COM
-mail.server.port=2525
-mail.server.protocol=smtp
-mail.server.from=YOU@YOU.YOU
-mail.server.username=USERNAME
-mail.server.password=PASSWORD
+build.mail.server.host=MAIL.YOU.COM
+build.mail.server.port=2525
+build.mail.server.protocol=smtp
+build.mail.server.from=YOU@YOU.YOU
+build.mail.server.username=USERNAME
+build.mail.server.password=PASSWORD
 
 # H2 Database
 # RESThub JPA default properties are:
-dataSource.driverClassName=org.h2.Driver
-dataSource.url=jdbc:h2:mem:resthub;DB_CLOSE_DELAY=-1;MVCC=TRUE
-dataSource.maxActive=50
-dataSource.maxWait=1000
-dataSource.poolPreparedStatements=true
-dataSource.username=sa
-dataSource.password =
-dataSource.validationQuery=SELECT 1
-hibernate.dialect=org.hibernate.dialect.H2Dialect
-hibernate.show_sql=false
-hibernate.format_sql=true
-hibernate.hbm2ddl.auto=update
-hibernate.cache.use_second_level_cache=true
-hibernate.cache.provider_class=net.sf.ehcache.hibernate.SingletonEhCacheProvider
-hibernate.id.new_generator_mappings=true
+build.dataSource.driverClassName=org.h2.Driver
+build.dataSource.url=jdbc:h2:mem:resthub;DB_CLOSE_DELAY=-1;MVCC=TRUE
+build.dataSource.maxActive=50
+build.dataSource.maxWait=1000
+build.dataSource.poolPreparedStatements=true
+build.dataSource.username=sa
+build.dataSource.password =
+build.dataSource.validationQuery=SELECT 1
+build.hibernate.dialect=org.hibernate.dialect.H2Dialect
+build.hibernate.show_sql=false
+build.hibernate.format_sql=true
+build.hibernate.hbm2ddl.auto=update
+build.hibernate.cache.use_second_level_cache=true
+build.hibernate.cache.provider_class=net.sf.ehcache.hibernate.SingletonEhCacheProvider
+build.hibernate.id.new_generator_mappings=true
 
 
 # MySQL Database (it needs to be created first!)
-#dataSource.driverClassName=com.mysql.jdbc.Driver
-#dataSource.url =jdbc:mysql://localhost:3306/YOURS?characterEncoding=UTF-8
-#dataSource.maxActive=50
-#dataSource.maxWait=1000
-#dataSource.poolPreparedStatements=true
-#dataSource.username=root
-#dataSource.password=YOURS
-#dataSource.validationQuery=SELECT 1
-#hibernate.dialect =org.hibernate.dialect.MySQL5InnoDBDialect
-#hibernate.show_sql=false
-#hibernate.format_sql=true
-#hibernate.hbm2ddl.auto=update
-#hibernate.cache.use_second_level_cache=true
-#hibernate.cache.provider_class=net.sf.ehcache.hibernate.SingletonEhCacheProvider
-#hibernate.id.new_generator_mappings=true
+#build.dataSource.driverClassName=com.mysql.jdbc.Driver
+#build.dataSource.url =jdbc:mysql://localhost:3306/YOURS?characterEncoding=UTF-8
+#build.dataSource.maxActive=50
+#build.dataSource.maxWait=1000
+#build.dataSource.poolPreparedStatements=true
+#build.dataSource.username=root
+#build.dataSource.password=YOURS
+#build.dataSource.validationQuery=SELECT 1
+#build.hibernate.dialect =org.hibernate.dialect.MySQL5InnoDBDialect
+#build.hibernate.show_sql=false
+#build.hibernate.format_sql=true
+#build.hibernate.hbm2ddl.auto=update
+#build.hibernate.cache.use_second_level_cache=true
+#build.hibernate.cache.provider_class=net.sf.ehcache.hibernate.SingletonEhCacheProvider
+#build.hibernate.id.new_generator_mappings=true
+
+
+# social APIs
+build.github.clientId=
+build.github.clientSecret=
+build.facebook.clientId=
+build.facebook.clientSecret=
+build.twitter.consumerKey=
+build.twitter.consumerSecret=
+build.linkedin.consumerKey=
+build.linkedin.consumerSecret=

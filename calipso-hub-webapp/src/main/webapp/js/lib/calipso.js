@@ -286,9 +286,22 @@ define("calipso", function(require) {
 		 * @example Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"}); 
 		 */
 		Calipso.vent.on('modal:showInLayout', function(properties) { 
-			// console.log("vent event modal:show");
-			Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"});
-			Calipso.app.modal.show(view);
+			console.log("vent event modal:showInLayout");
+			// make sure a view is provided 
+			if(!properties.view){
+				throw "A 'view' property is required on vent trigger 'modal:showInLayout'."
+			}
+			// assemble properties
+			var layoutProperties = {
+				childView : properties.view,
+				title     : properties.title
+			};
+			if(!properties.template){
+				layoutProperties.template = properties.template;
+			}
+			// show modal
+			var modalLayoutView = new Calipso.view.ModalLayout(layoutProperties);
+			Calipso.app.modal.show(modalLayoutView);
 		});
 		Calipso.vent.on('modal:destroy', function() {
 			// console.log("vent event modal:destroy");
@@ -1155,7 +1168,7 @@ define("calipso", function(require) {
 		childView : null,
 		title : null,
 		initialize : function(options) {
-			Calipso.view.AbstractLayout.initialize.apply(this, arguments);
+			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
 			var _this = this;
 			if (options.childView) {
 				this.childView = options.childView;
@@ -1167,7 +1180,7 @@ define("calipso", function(require) {
 		onShow : function(){
 			// render title
 			if(this.title){
-				this.$el.find("modal-header").append(this.title);
+				this.$el.find("modal-title").empty().append(this.title);
 			}
 			// render child view
 			this.modalBodyRegion.show(this.childView);
@@ -1687,7 +1700,6 @@ define("calipso", function(require) {
 		template : require("hbs!template/templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
 		tagName : "ul",
 		childView : Calipso.view.TemplateBasedItemView,
-		childView : Calipso.view.TemplateBasedItemView,
 		childViewOptions : {
 			tagName : "li",
 		},
@@ -2064,7 +2076,7 @@ define("calipso", function(require) {
 			}
 
 			this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
-			if(!options.skipFetch){
+			if(!_this.model.isNew() && !options.skipFetch){
 				var modelUrl = Calipso.session.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
 				console.log("GenericView#initialize, fetching model " + modelUrl);
 				this.model.fetch({
@@ -2142,7 +2154,9 @@ define("calipso", function(require) {
 			// Case: create/update
 			if (_this.formSchemaKey == "create" || _this.formSchemaKey == "update") {
 				// persist changes
-				//this.model.save();
+				_this.model.save(null, {
+					url: _this.url ? _this.url : _this.model.get("url")
+				});
 				// signal save event for the model
 				Calipso.vent.trigger("genericFormSave", _this.model);
 			}

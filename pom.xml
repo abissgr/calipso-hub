@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>8</version>
     </parent>
     <name>calipso-hub</name>
     <inceptionYear>2005</inceptionYear>
@@ -617,11 +617,11 @@
     </profiles>
 
     <repositories>
-        <!-- Contains all RESThub artifacts and transitive dependencies -->
+        <!-- Contains all RESThub artifacts and transitive dependencies 
         <repository>
             <id>resthub</id>
             <url>http://nexus.pullrequest.org/content/groups/resthub</url>
-        </repository>
+        </repository>-->
 
         <repository>
             <id>org.springframework.maven.release</id>
@@ -655,14 +655,14 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <!-- Contains all RESThub snasphot artifacts - uncomment to use -->
+        <!-- Contains all RESThub snasphot artifacts - uncomment to use
         <repository>
             <id>resthub snapshots</id>
             <url>http://nexus.pullrequest.org/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository>
+        </repository> -->
         <repository>
             <id>sonatype-snapshot</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
