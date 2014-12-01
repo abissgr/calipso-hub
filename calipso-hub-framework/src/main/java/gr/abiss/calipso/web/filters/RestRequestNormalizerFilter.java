@@ -54,11 +54,13 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		LOGGER.info("doFilterInternal, path: " + httpRequest.getContextPath());
 		
 		String requestMethodOverride = getMethodOverride(httpRequest);
 		String authToken = getSecurityToken(httpRequest);
-		
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("doFilterInternal, path: " + httpRequest.getContextPath() + ", method override: " + requestMethodOverride  + ", authToken: " + authToken );
+		}
 		if (!StringUtils.isEmpty(requestMethodOverride) || !StringUtils.isEmpty(authToken) ) {
 			HttpServletRequest wrapper = new RestRequestNormalizerRequestWrapper(request, requestMethodOverride, authToken);
 			filterChain.doFilter(wrapper, response);
@@ -80,7 +82,12 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 					LOGGER.info("Matched calipso SSO cookie'" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
 							+ ", domain: " + cookie.getDomain() + ", value: " + cookie.getValue());
 					authToken = cookie.getValue();
+					break;
 				}
+			}
+			if(LOGGER.isDebugEnabled() && authToken == null){
+				LOGGER.debug("Found no calipso SSO cookie with name: '" + ssoCookieName);
+				
 			}
 		}
 		return authToken;
