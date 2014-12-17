@@ -25,14 +25,16 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 		appRoutes : {
 
 			'' : 'home',
-			'calipso/client/' : 'home',
-			'calipso/client/home' : 'home',
-			'calipso/client/login' : 'login',
-			'calipso/client/logout' : 'logout',
+			'home' : 'home',
+			'login' : 'login',
+			'logout' : 'logout',
+//			'/home' : 'home',
+//			'/login' : 'login',
+//			'/logout' : 'logout',
 //			'users' : 'mainNavigationRoute',
-			'calipso/client/:mainRoutePart' : 'mainNavigationSearchRoute',
-			'calipso/client/:mainRoutePart?*queryString' : 'mainNavigationSearchRoute',
-			'calipso/client/:mainRoutePart/:modelId' : 'mainNavigationCrudRoute',
+			'/:mainRoutePart' : 'mainNavigationSearchRoute',
+			'/:mainRoutePart?*queryString' : 'mainNavigationSearchRoute',
+			'/:mainRoutePart/:modelId' : 'mainNavigationCrudRoute',
 			'*path':  'notFoundRoute'
 		}
 

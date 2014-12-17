@@ -4,13 +4,14 @@
 - [Browse Calipso](#browse-calipso)
 - [Browse the Database Console](#browse-the-database-console)
 - [Use a custom database](#use-a-custom-database)
+- [Create a RESTful service](#create-a-service)
 
 ## Modules
 - calipso-hub (this one)
     - [calipso-hub-core]: application-specific components
     - [calipso-hub-framework]: development framework components
     - [calipso-hub-utilities]: utility components
-    - [calipso-hub-webapp]: WAR
+    - [calipso-hub-webapp]: deployable web application (WAR)
 
 ## Howto Build
 
@@ -60,6 +61,26 @@ The database console is available at:
 You can use a database like MySQL by commenting out the H2 database section in your dev.properties, 
 then uncommenting the MySQL section. Other databases can be also be used.  
     
+
+## Create a RESTful service
+
+1) Create a domain/entity class, something like:
+
+    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/model/Role.java
+
+2) Create a repository class, something like:
+
+    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/repository/RoleRepository.java
+    
+3) Create a service interface, something like:
+
+    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/service/RoleService.java    
+    
+   
+4) Create a service implementation, something like:
+
+    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/service/impl/RoleServiceImpl.java
+
 [calipso-hub-core]:calipso-hub-core
 [calipso-hub-framework]:calipso-hub-framework
 [calipso-hub-utilities]:calipso-hub-utilities

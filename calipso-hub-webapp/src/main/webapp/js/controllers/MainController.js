@@ -19,16 +19,14 @@
 define(['calipso', 'underscore', 'backbone', 'marionette'],
 
 function(Calipso, _, Backbone, Marionette) {
-
+//this.layout.contentRegion.show(new HomeLayout());
 
 	var MainController = Calipso.controller.AbstractController.extend({
 
 		home : function() {
-			console.log("AbstractController#home");
+			console.log("MainController#home");
 			if (!Calipso.session.isAuthenticated()) {
-				Backbone.history.navigate(Calipso.app.config.contextPath + "client/login", {
-					trigger : true
-				});
+				this._redir("login");
 				return false;
 			}
 			var modelForRoute = Calipso.model.UserModel.create({});

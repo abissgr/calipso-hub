@@ -58,7 +58,7 @@
     </filter>
     <filter>
         <filter-name>restRequestNormalizerFilter</filter-name>
-        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <filter-class>gr.abiss.calipso.web.filters.RestRequestNormalizerFilter</filter-class>
     </filter>
 	
 	<filter>
@@ -99,6 +99,8 @@
     <filter-mapping>
         <filter-name>restRequestNormalizerFilter</filter-name>
         <url-pattern>/api/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
 	
 	<filter-mapping>

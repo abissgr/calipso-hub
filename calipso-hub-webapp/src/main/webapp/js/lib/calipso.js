@@ -667,7 +667,7 @@ define("calipso", function(require) {
 		 * own otherwise
 		 */
 		url : function() {
-			var sUrl = this.collection ? _.result(this.collection, 'url') : _.result(this, 'urlRoot') || urlError();
+			var sUrl = this.collection && _.result(this.collection, 'url') ? _.result(this.collection, 'url') : _.result(this, 'urlRoot') || urlError();
 			consle.log("GenericModel#url, sUrl: "+sUrl);
 			if (!this.isNew()) {
 				sUrl = sUrl + (sUrl.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.get("id"));
@@ -2660,6 +2660,20 @@ define("calipso", function(require) {
 				}
 				return (metaValue);
 			});
+			Handlebars.registerHelper("ifLoggedIn", function(options){
+				var loggedIn = false;
+				if(_this.userDetails && _this.userDetails.get && _this.userDetails.get("id")){
+					loggedIn = true;
+				}
+				return loggedIn ? options.fn(this) : options.inverse(this);
+			});
+			Handlebars.registerHelper("ifLoggedOut", function(options){
+				var loggedOut = true;
+				if(_this.userDetails && _this.userDetails.get && _this.userDetails.get("id")){
+					loggedOut = false;
+				}
+				return loggedOut ? options.fn(this) : options.inverse(this);
+			});
 
 			/**
 			 * Format a date using Moment.js
@@ -2836,12 +2850,19 @@ define("calipso", function(require) {
 		home : function() {
 			console.log("AbstractController#home");
 			if (!Calipso.session.isAuthenticated()) {
-				Calipso.navigate("login", {
-					trigger : true
-				});
-				return false;
+				return this._redir("login");;
 			}
 			this.layout.contentRegion.show(new HomeLayout());
+		},
+
+		_redir : function(firstLevelFragment) {
+			var url = Calipso.app.config.contextPath + "client/" + firstLevelFragment;
+
+			console.log("AbstractController#_redir to "+url);
+			Calipso.navigate(firstLevelFragment, {
+				trigger : true
+			});
+			return false;
 		},
 
 		login : function() {
@@ -2989,6 +3010,9 @@ define("calipso", function(require) {
 
 		},
 		mainNavigationCrudRoute : function(mainRoutePart, modelId, httpParams) {
+			if (!Calipso.session.isAuthenticated()) {
+				return this._redir("login");;
+			}
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if(qIndex > -1){
 				modelId = modelId.substring(0, qIndex);

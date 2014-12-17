@@ -62,14 +62,18 @@ public class BaseNotificationServiceImpl extends AbstractServiceImpl<BaseNotific
 	@Override
 	public Page<BaseNotification> findAll(Pageable pageable) {
 
-		ParameterMapBackedPageRequest mapBackedPageable = (ParameterMapBackedPageRequest) pageable;	
-		Map<String, String[]> paramsMapOrig = mapBackedPageable.getParameterMap();
+		ParameterMapBackedPageRequest mapBackedPageable = (ParameterMapBackedPageRequest) pageable;
+
+		ICalipsoUserDetails principal = this.getPrincipal();
 		
 		// if no exlicit recepient is given, use the current principal
-		if(!paramsMapOrig.containsKey(RECEPIENT)){
+		if(principal != null){
+
+			Map<String, String[]> paramsMapOrig = mapBackedPageable.getParameterMap();
+			
 			Map<String, String[]> paramsMap = new HashMap<String, String[]>();
 			paramsMap.putAll(paramsMapOrig);
-			String[] ids = {this.getPrincipal().getId()};
+			String[] ids = {principal.getId()};
 			paramsMap.put(RECEPIENT, ids);
 			mapBackedPageable.setParameterMap(paramsMap);
 		}
