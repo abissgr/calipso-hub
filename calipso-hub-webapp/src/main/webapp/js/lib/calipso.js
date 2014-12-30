@@ -228,11 +228,26 @@ define("calipso", function(require) {
 
 			var pushStateSupported = _.isFunction(history.pushState);
 			var contextPath =  Calipso.getConfigProperty("contextPath");
+
+			console.log("Calipso.app.on start, contextPath: " + contextPath);
 			if(contextPath.length > 1){
-				contextPath = "/" + contextPath;
+				// add leading slash if missing
+				if(contextPath.indexOf("/") != 0){
+
+					console.log("Calipso.app.on start, adding slash prefix");
+					contextPath = "/" + contextPath;
+				}
+
+				// add ending slash if missing
+				if (contextPath.substr(-1) != '/'){
+
+					console.log("Calipso.app.on start, adding slash suffix");
+					url += '/';
+				}
+				
 			}
-			var startRoot = "/" + contextPath + "client/"
-			
+			var startRoot = contextPath + "client/"
+			console.log("Calipso.app.on start, startRoot: " + startRoot);
 			Backbone.history.start({ 
 				root: startRoot, 
 				pushState: pushStateSupported 
@@ -260,7 +275,7 @@ define("calipso", function(require) {
 			}));
 
 			// send logged in user on their way
-			var fw = Calipso.app.fw ? Calipso.app.fw : Calipso.getConfigProperty("contextPath") + "client/home";
+			var fw = Calipso.app.fw ? Calipso.app.fw : "home";
 			// console.log("session:created, update model: " + userDetails.get("email") + ", navigating to: " + fw);
 
 			Calipso.navigate(fw, {
@@ -1213,6 +1228,7 @@ define("calipso", function(require) {
 			notificationsRegion : "#calipsoHeaderView-notificationsRegion"
 		},
 		onShow : function(){
+			
 			var menuModel = [
 					{
 						url: "users",
@@ -2648,28 +2664,36 @@ define("calipso", function(require) {
 			// register session related handlebars helpers
 			Handlebars.registerHelper("getUserDetailsProperty", function(propName, options){
 				var prop = "";
-				if(_this.userDetails && _this.userDetails.get){
+				if(_this.isAuthenticated()){
 					prop = _this.userDetails.get(propName);
 				}
 				return (prop);
 			});
 			Handlebars.registerHelper("getUserDetailsMetadatum", function(metaName, options){
 				var metaValue = "";
-				if(_this.userDetails && _this.userDetails.get && _this.userDetails.get("metadata")){
+				if(_this.isAuthenticated() && _this.userDetails.get("metadata")){
 					metaValue = _this.userDetails.get("metadata")[metaName];
 				}
 				return (metaValue);
 			});
+			/**
+			 * @example
+			 * {{#ifLoggedIn}} <p>User is logged in! </p>{{/ifLoggedIn}}
+			 */
 			Handlebars.registerHelper("ifLoggedIn", function(options){
 				var loggedIn = false;
-				if(_this.userDetails && _this.userDetails.get && _this.userDetails.get("id")){
+				if(_this.isAuthenticated()){
 					loggedIn = true;
 				}
 				return loggedIn ? options.fn(this) : options.inverse(this);
 			});
+			/**
+			 * @example
+			 * {{#ifLoggedOut}} <p>User is NOT logged in!</p> {{/ifLoggedOut}}
+			 */
 			Handlebars.registerHelper("ifLoggedOut", function(options){
 				var loggedOut = true;
-				if(_this.userDetails && _this.userDetails.get && _this.userDetails.get("id")){
+				if(_this.isAuthenticated()){
 					loggedOut = false;
 				}
 				return loggedOut ? options.fn(this) : options.inverse(this);

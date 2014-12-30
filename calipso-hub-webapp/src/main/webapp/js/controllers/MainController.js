@@ -29,20 +29,8 @@ function(Calipso, _, Backbone, Marionette) {
 				this._redir("login");
 				return false;
 			}
-			var modelForRoute = Calipso.model.UserModel.create({});
 			
-			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], {
-				model : Calipso.model.UserModel,
-				url : Calipso.session.getBaseUrl() + "/api/rest/users",
-				data: {foobar: true}
-				
-			});
-			console.log("Tryiung to show home with client layout");
-			var LayoutType = Calipso.model.UserModel.prototype.getLayoutViewType();
-			Calipso.vent.trigger('app:show', new LayoutType({
-				model: modelForRoute,
-				hideSidebarOnSearched: true
-			}));
+			Calipso.navigate('users', {trigger:true});
 		}
 
 	});
