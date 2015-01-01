@@ -46,7 +46,7 @@ MainRouter) {
 		console.log("Cought link: " + href);
 		// if (href && href.match(/^\/.*/) && $(this).attr("target") !==
 		// "_blank") {
-		if (href && href.indexOf("/") != 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+		if (href && href.indexOf("/") != 0 && !event.currentTarget.hasClass("dropdown-toggle") && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
 			event.preventDefault();
 			console.log("stopped link: " + href);
 			Backbone.history.navigate(href, true);

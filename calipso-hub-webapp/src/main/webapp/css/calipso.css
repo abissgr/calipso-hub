@@ -21,7 +21,10 @@ body {
   /* Pad bottom by footer height */
   padding: 60px 0 60px;
 }
-
+.navbar-static-side{
+	left:0px;
+	top: 0px;
+}
 /* Set the fixed height of the footer here */
 #footer {
   height: 60px;

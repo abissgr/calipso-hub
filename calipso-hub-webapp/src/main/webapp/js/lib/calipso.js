@@ -2245,7 +2245,8 @@ define("calipso", function(require) {
 			var _self = this;
 			console.log("GenericFormView#renderForm called, schema key: "+_self.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-			
+
+			console.log("GenericFormView#renderForm called, schema: "+formSchema.toSource());
 			// render form
 			var JsonableForm = Backbone.Form.extend({
 				toJson : function() {
@@ -2271,7 +2272,7 @@ define("calipso", function(require) {
 				template : _self.formTemplate
 			};
 			this.form = new JsonableForm(formOptions).render();
-			this.$el.find(".generic-form").append(this.form.el);
+			this.$el.find(".generic-form-view").append(this.form.el);// generic-form-view
 			//					$(selector + ' textarea[data-provide="markdown"]').each(function() {
 			//						var $this = $(this);
 			//
@@ -2964,6 +2965,7 @@ define("calipso", function(require) {
 		 */
 		getModelForRoute : function(modelTypeKey, modelId, httpParams) {
 			console.log("AbstractController#getModelForRoute, modelTypeKey: " + modelTypeKey + ", modelId: " + modelId + ", httpParams: " + httpParams);
+			// load model Type
 			var ModelType;
 			if (Calipso.modelTypesMap[modelTypeKey]) {
 				ModelType = Calipso.modelTypesMap[modelTypeKey];
@@ -2986,6 +2988,8 @@ define("calipso", function(require) {
 			}
 			console.log("AbstractController#getModelForRoute, modelModuleId:" + modelModuleId);
 
+			// Obtain a model for the view:
+			// if a model id is present, load themodel
 			if (modelId) {
 				console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
 				// try cached models first
@@ -3006,8 +3010,8 @@ define("calipso", function(require) {
 				}
 			} else {
 				// create a model to use as a wrapper for a collection of
-				// instances of the same type
-				modelForRoute = ModelType.create("search");
+				// instances of the same type, fill it with any given search criteria
+				modelForRoute = ModelType.create(httpParams);
 			}
 			var collectionOptions = {
 				model : ModelType,
@@ -3024,12 +3028,16 @@ define("calipso", function(require) {
 			return modelForRoute;
 
 		},
+		/**
+		 * 
+		 */
 		mainNavigationSearchRoute : function(mainRoutePart, queryString) {
 			console.log("AbstractController#mainNavigationSearchRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
-			for (var i = 0, j = arguments.length; i < j; i++) {
-				console.log("AbstractController#mainNavigationSearchRoute, argument: " + (arguments[i] + ' '));
-			}
+//			for (var i = 0, j = arguments.length; i < j; i++) {
+//				console.log("AbstractController#mainNavigationSearchRoute, argument: " + (arguments[i] + ' '));
+//			}
 			var httpParams = Calipso.getHttpUrlParams();
+//			console.log("AbstractController#mainNavigationSearchRoute, httpParams: " + httpParams.toSource());
 			this.mainNavigationCrudRoute(mainRoutePart, null, httpParams);
 
 		},

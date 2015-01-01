@@ -33,6 +33,8 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 //			'/logout' : 'logout',
 //			'users' : 'mainNavigationRoute',
 			':mainRoutePart' : 'mainNavigationSearchRoute',
+			':mainRoutePart/' : 'mainNavigationSearchRoute',
+			':mainRoutePart/?*queryString' : 'mainNavigationSearchRoute',
 			':mainRoutePart?*queryString' : 'mainNavigationSearchRoute',
 			':mainRoutePart/:modelId' : 'mainNavigationCrudRoute',
 			'*path':  'notFoundRoute'
