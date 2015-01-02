@@ -103,7 +103,7 @@ define("calipso", function(require) {
 			apiAuthPath: "/apiauth"
 		}
 		Calipso.config = _.defaults(customConfig, config);
-		
+		console.log("Calipso.initializeApp config: " + Calipso.config.toSource());
 
 
 		// console.log("Setting up Calipso.session...");
@@ -682,8 +682,10 @@ define("calipso", function(require) {
 		 * own otherwise
 		 */
 		url : function() {
-			var sUrl = this.collection && _.result(this.collection, 'url') ? _.result(this.collection, 'url') : _.result(this, 'urlRoot') || urlError();
-			consle.log("GenericModel#url, sUrl: "+sUrl);
+			var sUrl = this.collection && _.result(this.collection, 'url') 
+				? _.result(this.collection, 'url') 
+				: Calipso.session.getBaseUrl() + '/api/rest/' + this.getPathFragment()/*_.result(this, 'urlRoot')*/ || urlError();
+			console.log("GenericModel#url, sUrl: "+sUrl);
 			if (!this.isNew()) {
 				sUrl = sUrl + (sUrl.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.get("id"));
 			}
@@ -961,7 +963,7 @@ define("calipso", function(require) {
 	Calipso.model.UserModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.UserModel.prototype */
 	{
-		urlRoot : "/api/rest/users"
+		//urlRoot : "/api/rest/users"
 	}, {
 		// static members
 		parent : Calipso.model.GenericModel,
@@ -1743,7 +1745,7 @@ define("calipso", function(require) {
 				}
 			}  
 			// fetch collection?
-			else if(!this.options.skipFetch){
+			else if(this.options.forceFetch){
 				console.log("TemplateBasedCollectionView#onShow, collecion size: "+this.collection.length);
 				_self.collection.fetch({
 					url : _self.collection.url,
@@ -2092,7 +2094,7 @@ define("calipso", function(require) {
 			}
 
 			this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
-			if(!_this.model.isNew() && !options.skipFetch){
+			if(!_this.model.isNew() && options.forceFetch){
 				var modelUrl = Calipso.session.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
 				console.log("GenericView#initialize, fetching model " + modelUrl);
 				this.model.fetch({
@@ -2213,20 +2215,22 @@ define("calipso", function(require) {
 		},
 		onShow : function() {
 			var _self = this;
+
+
 			// get appropriate schema
 			//					console.log("GenericFormView.onShow, this.formSchemaKey: "+this.formSchemaKey);
-			var schemaForAction = this.model.getFormSchema(this.formSchemaKey);
+			var schemaForAction = _self.model.getFormSchema(_self.formSchemaKey);
 			//console.log("GenericFormView#onShow, formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: " + schemaForAction.toSource());
 
 			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering) 
 			if(schemaForAction && _.size(schemaForAction) > 0){
-				this.renderForm();
+				_self.renderForm();
 			}
 			else{
-				var fetchScemaUrl = Calipso.session.getBaseUrl() + _self.model.urlRoot + '/' + ( _self.model.isNew() ? "new" :  _self.model.get("id"));
+				var fetchScemaUrl = Calipso.session.getBaseUrl() + _self.model.getPathFragment() + '/' + ( _self.model.isNew() ? "new" :  _self.model.get("id"));
 				console.log("GenericFormView#onShow, fetching model from server to obtain form schema from: "+fetchScemaUrl);
 				
-				 this.model.fetch({
+				_self.model.fetch({
 					 url :  fetchScemaUrl,
 					 success : function(model, response, options){
 						 console.log("Fetched model from server");
@@ -2240,6 +2244,8 @@ define("calipso", function(require) {
 			}
 			
 			
+		
+		
 		},
 		renderForm : function(){
 			var _self = this;
@@ -2937,6 +2943,34 @@ define("calipso", function(require) {
 			this.layout.contentRegion.show(new Calipso.view.NotFoundView());
 		},
 		/**
+		 * Get the model type corresponding to the given
+		 * business key/URI componenent 
+		 */
+		getModelType : function(modelTypeKey){
+		// load model Type
+			var ModelType;
+			if (Calipso.modelTypesMap[modelTypeKey]) {
+				ModelType = Calipso.modelTypesMap[modelTypeKey];
+			} else {
+				var modelForRoute;
+				var modelModuleId = "model/" + _.singularize(modelTypeKey);
+				if (!require.defined(modelModuleId)) {
+
+					require([ modelModuleId ], function(module) {
+						ModelType = module;
+					})
+				}
+				else{
+					ModelType = require(modelModuleId)
+				}
+
+			}
+			if (!ModelType) {
+				throw "No matching model type was found for key: " + modelModuleId;
+			}
+			return ModelType;
+		},
+		/**
 		 * Get a model representing the current request.
 		 * 
 		 * For an example, consider the URL [api-root]/users/[some-id]. First,
@@ -2963,59 +2997,34 @@ define("calipso", function(require) {
 		 *           define another property name.
 		 * @see Calipso.model.GenericModel.prototype.getBusinessKey
 		 */
-		getModelForRoute : function(modelTypeKey, modelId, httpParams) {
-			console.log("AbstractController#getModelForRoute, modelTypeKey: " + modelTypeKey + ", modelId: " + modelId + ", httpParams: " + httpParams);
-			// load model Type
-			var ModelType;
-			if (Calipso.modelTypesMap[modelTypeKey]) {
-				ModelType = Calipso.modelTypesMap[modelTypeKey];
-			} else {
-				var modelForRoute;
-				var modelModuleId = "model/" + _.singularize(modelTypeKey);
-				if (!require.defined(modelModuleId)) {
-
-					require([ modelModuleId ], function(module) {
-						ModelType = module;
-					})
-				}
-				//					else{
-				ModelType = require(modelModuleId)
-				//					}
-
-			}
-			if (!ModelType) {
-				throw "No matching model type was found for key: " + modelModuleId;
-			}
-			console.log("AbstractController#getModelForRoute, modelModuleId:" + modelModuleId);
+		getModelForRoute : function(ModelType, modelId, httpParams) {
+			console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams);
+			
 
 			// Obtain a model for the view:
-			// if a model id is present, load themodel
+			// if a model id is present, obtain a promise 
+			// for the corresponding instance 
+			var modelForRoute;
 			if (modelId) {
 				console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
-				// try cached models first
-				modelForRoute = new ModelType({
-					id : modelId
-				});// ModelType.all().get(modelId);
-				// otherwise create a transient instance and let the view load it
-				// from the server
-				if (!modelForRoute) {
-					console.log("AbstractController#getModelForRoute, model for id is not loaded, creating new");
+				if (modelForRoute = ModelType.all().get(modelId)) {
+					console.log("getModelForRoute, cached model: " + modelForRoute);
+				} else {
 					modelForRoute = ModelType.create({
 						id : modelId,
-						url : Calipso.session.getBaseUrl() + "/api/rest/" + modelModuleId + "/" + modelId
+						//url : Calipso.session.getBaseUrl() + "/api/rest/" + modelModuleId + "/" + id
 					});
-					// modelForRoute.fetch({
-					// url : session.getBaseUrl() + "/api/rest/" + modelTypeKey + "/" + modelId
-					// });
+
+					console.log("getModelForRoute, created model: " + modelForRoute);
 				}
 			} else {
 				// create a model to use as a wrapper for a collection of
 				// instances of the same type, fill it with any given search criteria
-				modelForRoute = ModelType.create(httpParams);
+				modelForRoute = new ModelType(httpParams);
 			}
 			var collectionOptions = {
 				model : ModelType,
-				url : Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment()
+				url : Calipso.session.getBaseUrl() + "/api/rest/" + ModelType.prototype.getPathFragment()
 			};
 			if (httpParams) {
 				if (httpParams[""] || httpParams[""] == null) {
@@ -3024,7 +3033,7 @@ define("calipso", function(require) {
 				collectionOptions.data = httpParams;
 			}
 			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], collectionOptions);
-			console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
+			//console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.prototype.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
 			return modelForRoute;
 
 		},
@@ -3045,26 +3054,35 @@ define("calipso", function(require) {
 			if (!Calipso.session.isAuthenticated()) {
 				return this._redir("login");;
 			}
+			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if(qIndex > -1){
 				modelId = modelId.substring(0, qIndex);
 			}
-			// build the model instancde representing the current request
-			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", modelId: " + modelId);
-			var modelForRoute = this.getModelForRoute(mainRoutePart, modelId, httpParams);
+			// build the model instance representing the current request
 
-			// get the layout type corresponding to the requested model
-			var RequestedModelLayoutType = modelForRoute.getLayoutViewType();
+			var ModelType = this.getModelType(mainRoutePart);
+			var modelForRoute = this.getModelForRoute(ModelType, modelId, httpParams);
+			// decide whether we are fetching a model or a collection
+			var fetchable = modelForRoute.get("id") ? modelForRoute : modelForRoute.wrappedCollection;
+			// promise to fetch then render
+			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id"));
+			fetchable.fetch().then(function(){
 
-			// show the layout
-			// TODO: reuse layout if of the same type
-			var routeLayout = new RequestedModelLayoutType({
-				model : modelForRoute
+				// get the layout type corresponding to the requested model
+				console.log(modelForRoute);
+				var RequestedModelLayoutType = modelForRoute.getLayoutViewType();
+
+				// show the layout
+				// TODO: reuse layout if of the same type
+				var routeLayout = new RequestedModelLayoutType({
+					model : modelForRoute
+				});
+				Calipso.vent.trigger("app:show", routeLayout);
+
+				// update page header tabs etc.
+				_self.syncMainNavigationState(modelForRoute);
 			});
-			Calipso.vent.trigger("app:show", routeLayout);
-
-			// update page header tabs etc.
-			this.syncMainNavigationState(modelForRoute);
 
 		},
 		notFoundRoute : function() {

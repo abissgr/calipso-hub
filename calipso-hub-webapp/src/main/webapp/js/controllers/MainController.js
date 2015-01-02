@@ -21,7 +21,7 @@ define(['calipso', 'underscore', 'backbone', 'marionette'],
 function(Calipso, _, Backbone, Marionette) {
 //this.layout.contentRegion.show(new HomeLayout());
 
-	var MainController = Calipso.controller.AbstractController.extend({
+ 	var MainController = Calipso.controller.AbstractController.extend({
 
 		home : function() {
 			console.log("MainController#home");
