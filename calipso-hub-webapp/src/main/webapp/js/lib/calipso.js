@@ -2684,6 +2684,25 @@ define("calipso", function(require) {
 				return (metaValue);
 			});
 			/**
+			 * @example 
+			 * {{#ifUserInRole "ROLE_ADMIN"}} <p>User is an Administrator! </p>{{/ifUserInRole}}
+			 */
+			Handlebars.registerHelper("ifUserInRole", function(role, options){
+				//console.log("ifHasRole, role: " + role);
+				var hasRole = false;
+				if(role && _this.isAuthenticated()){
+					//console.log("ifHasRole, is authenticated");
+					for(i = 0; i < _this.userDetails.get("roles").length; i++){
+						//console.log("ifHasRole, comparing to role name: " + _this.userDetails.get("roles")[i].name);
+						if(role == _this.userDetails.get("roles")[i].name){
+							hasRole = true;
+							break;
+						}
+					}
+				}
+				return hasRole ? options.fn(this) : options.inverse(this);
+			});
+			/**
 			 * @example
 			 * {{#ifLoggedIn}} <p>User is logged in! </p>{{/ifLoggedIn}}
 			 */
