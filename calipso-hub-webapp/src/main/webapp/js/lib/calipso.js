@@ -41,7 +41,7 @@ define("calipso", function(require) {
 		return decodeURIComponent(s.replace(Calipso.decodeParamRexex, " ")); 
 	}
 	Calipso.getHttpUrlParams = function(url){
-		var urlParams  = {};
+		var urlParams  = {};	
 		if(!url){
 			url = window.location.href;
 		}
@@ -320,7 +320,7 @@ define("calipso", function(require) {
 		});
 		Calipso.vent.on('modal:destroy', function() {
 			// console.log("vent event modal:destroy");
-			Calipso.app.modal.hideModal();
+			Calipso.app.modal.closeModal();
 		});
 
 	}
@@ -335,9 +335,12 @@ define("calipso", function(require) {
 			view.on("destroy", this.hideModal, this);
 			this.$el.modal('show');
 		},
-
 		hideModal : function() {
 			this.$el.modal('hide');
+		},
+		closeModal : function() {
+			this.hideModal();
+			this.reset();
 		}
 	});
 
@@ -694,18 +697,26 @@ define("calipso", function(require) {
 		},
 
 		/**
-		 * Get the URL path fragment for this model
+		 * Get the URL path fragment for this model. Calls the prototype method with the same name. 
 		 * @returns the URL path fragment as a string
 		 */
 		getPathFragment : function() {
 			return this.prototype.getPathFragment(this);
 		},
 		/**
-		 * Get the name of this class
+		 * Get the name of this class. Calls the prototype method with the same name.
+		 * TODO: switch to named constructors 
 		 * @returns the class name as a string
 		 */
 		getTypeName : function() {
 			return this.prototype.getTypeName();
+		},
+		/**
+		 *  Check if the model wants search result collections of it's type to be cached.
+		 *  Calls the prototype method with the same name.
+		 */
+		isCollectionCachable  : function() {
+			return this.prototype.isCollectionCachable && this.prototype.isCollectionCachable();
 		},
 		/**
 		 * Get the layout view for this model. To specify a layout for your model under a static 
@@ -2900,6 +2911,82 @@ define("calipso", function(require) {
 	});
 
 	// //////////////////////////////////////
+	// Search cache
+	// //////////////////////////////////////
+	Calipso.util.cache = {
+			collections : {},
+			/**
+			 * Obtain a cached collecion for the given model type, criteria and use case.
+			 * The method will return the cached collection if a match is available 
+			 * with the same search criteria or a new one otherwise. 
+			 * 
+			 * The cache keys are build as 
+			 * <code>collectionOptions.model.getPathFragment + "/" + (collectionOptions.useCase ? collectionOptions.useCase : "search")</code>
+			 * @param collectionOptions the options used to create the collection
+			 * @return the collection created or matching the given options
+			 */
+			getCollection : function(collectionOptions){
+				var key = collectionOptions.model.getPathFragment + "/" + 
+					(collectionOptions.useCase?collectionOptions.useCase:"search");
+				var collection = this.collections[key];
+				// create a fresh collection when no cache entry is found,
+				// or when the model doesn't want caching for it's collections,
+				// or when the criteria have changed
+				if(!collection || !collectionOptions.model.isCollectionCachable() 
+						|| !this.compareSearchCriteria(collection.data, collectionOptions.data)){
+					collection = new Calipso.collection.GenericCollection([], collectionOptions);
+					this.collections[key] = collection;
+				}
+				return collection;
+			},
+			/**
+			 * Remove a collection entry from the cache if a match is found. The 
+			 * cache key is build as 
+			 * <code>collectionOptions.model.getPathFragment + "/" + (collectionOptions.useCase ? collectionOptions.useCase : "search")</code>
+			 * @param collectionOptions the options used to create the collection
+			 * @return the removed collection, if any
+			 */
+			removeCollection : function(collectionOptions){
+				var key = collectionOptions.model.getPathFragment + "/" + (collectionOptions.useCase?collectionOptions.useCase:"search");
+				var collection = this.collections[key];
+				if(collection){
+					this.collections[key] = null;
+				}
+				return collection;
+			},
+			/**
+			 * Create a fresh collection with the given options and replace the 
+			 * corresponding cache entry if one exists.
+			 * @param collectionOptions the options used to create the collection
+			 */
+			getFreshCollection : function(options){
+				this.removeCollection(options);
+				return this.getCollection(options);
+			},
+			/**
+			 * Perform a single-level property comparison 
+			 * of objects that correspond to HTTP parameters
+			 */
+			compareSearchCriteria = function(o1, o2){
+			    for(var p in o1){
+			        if(o1.hasOwnProperty(p)){
+			            if(o1[p] !== o2[p]){
+			                return false;
+			            }
+			        }
+			    }
+			    for(var p in o2){
+			        if(o2.hasOwnProperty(p)){
+			            if(o1[p] !== o2[p]){
+			                return false;
+			            }
+			        }
+			    }
+			    return true;
+			}
+	}
+	
+	// //////////////////////////////////////
 	// Controller
 	// //////////////////////////////////////
 
@@ -3067,7 +3154,7 @@ define("calipso", function(require) {
 				}
 				collectionOptions.data = httpParams;
 			}
-			modelForRoute.wrappedCollection = new Calipso.collection.GenericCollection([], collectionOptions);
+			modelForRoute.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
 			//console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.prototype.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
 			return modelForRoute;
 
@@ -3102,7 +3189,7 @@ define("calipso", function(require) {
 			var fetchable = modelForRoute.get("id") ? modelForRoute : modelForRoute.wrappedCollection;
 			// promise to fetch then render
 			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id"));
-			fetchable.fetch().then(function(){
+			var renderFetchable = function(){
 
 				// get the layout type corresponding to the requested model
 				console.log(modelForRoute);
@@ -3117,7 +3204,13 @@ define("calipso", function(require) {
 
 				// update page header tabs etc.
 				_self.syncMainNavigationState(modelForRoute);
-			});
+			};
+			if(fetchable.length == 0){
+				fetchable.fetch().then(renderFetchable);
+			}
+			else{
+				renderFetchable();
+			}
 
 		},
 		notFoundRoute : function() {

@@ -17,7 +17,9 @@
  */
 package gr.abiss.calipso.jpasearch.specifications;
 
+import gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.lang.reflect.Field;
 import java.util.Date;
@@ -36,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.CollectionUtils;
 
 
@@ -51,8 +54,6 @@ public class GenericSpecifications {
 	private static final HashMap<String, Field> FIELD_CACHE = new HashMap<String, Field>();
 	protected static final String SEARCH_MODE = "_searchmode";
 
-	private static final ManyToOnePredicateFactory manyToOnePredicateFactory = new ManyToOnePredicateFactory();
-
 	private static final StringPredicateFactory stringPredicateFactory = new StringPredicateFactory();
 	private static final BooleanPredicateFactory booleanPredicateFactory = new BooleanPredicateFactory();
 	private static final DatePredicateFactory datePredicateFactory = new DatePredicateFactory();
@@ -62,6 +63,9 @@ public class GenericSpecifications {
 	private static final NumberPredicateFactory<Long> longPredicateFactory = new NumberPredicateFactory<Long>(Long.class);
 	private static final NumberPredicateFactory<Double> doublePredicateFactory = new NumberPredicateFactory<Double>(Double.class);
 
+	private static final ManyToOnePredicateFactory manyToOnePredicateFactory = new ManyToOnePredicateFactory();
+	private static final CurrentPrincipalPredicateFactory currentPrincipalPredicateFactory = new CurrentPrincipalPredicateFactory();
+	
 	private static final HashMap<Class, IPredicateFactory> factoryForClassMap = new HashMap<Class, IPredicateFactory>();
 
 	protected static final String OR = "OR";
@@ -78,11 +82,17 @@ public class GenericSpecifications {
 		factoryForClassMap.put(Double.class, doublePredicateFactory);
 	}
 
-	private static IPredicateFactory<?> getPredicateFactoryForClass(Class clazz) {
+	private static IPredicateFactory<?> getPredicateFactoryForClass(Field field) {
+		Class clazz = field.getType();
 		if (clazz.isEnum()) {
 			return new EnumStringPredicateFactory(clazz);
 		} else if (Persistable.class.isAssignableFrom(clazz)) {
-			return manyToOnePredicateFactory;
+			if (field.isAnnotationPresent(UserDetailsCriterion.class)) {
+				return currentPrincipalPredicateFactory;
+			}
+			else{
+				return manyToOnePredicateFactory;
+			}
 		} else {
 			return factoryForClassMap.get(clazz);
 		}
@@ -170,6 +180,7 @@ public class GenericSpecifications {
 		}
 	}
 
+	@Deprecated
 	protected static Predicate getPredicate(final Class clazz,
 			final Restriction searchTerms, Root<Persistable> root,
 			CriteriaBuilder cb) {
@@ -205,14 +216,15 @@ public class GenericSpecifications {
 			String propertyName) {
 		Field field = GenericSpecifications.getField(clazz,
 				propertyName);
+		LOGGER.info("addPredicate, property: " + propertyName);
 		if (field != null) {
 			Class fieldType = field.getType();
-			IPredicateFactory predicateFactory = getPredicateFactoryForClass(fieldType);
+			IPredicateFactory predicateFactory = getPredicateFactoryForClass(field);
+			LOGGER.info("addPredicate, predicateFactory: " + predicateFactory);
 			if (predicateFactory != null) {
 				predicates.add(predicateFactory.getPredicate(root, cb,
 						propertyName, fieldType, propertyValues));
 			}
-
 		}
 	}
 

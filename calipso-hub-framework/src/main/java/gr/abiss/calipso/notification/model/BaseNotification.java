@@ -2,6 +2,7 @@ package gr.abiss.calipso.notification.model;
 
 import java.util.Date;
 
+import gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
@@ -48,6 +49,7 @@ public class BaseNotification extends AbstractPersistable {
 
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "recepient", referencedColumnName = "id", nullable = false, updatable = false)
+	@UserDetailsCriterion
 	private User recepient;
 
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
