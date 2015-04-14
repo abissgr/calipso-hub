@@ -1,6 +1,6 @@
 package gr.abiss.calipso.model.cms;
 
-import gr.abiss.calipso.model.base.ResourceCategory;
+import gr.abiss.calipso.model.base.AbstractCategory;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,7 +11,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "content_tag")
-public class Tag extends ResourceCategory<Tag> {
+public class Tag extends AbstractCategory<Tag> {
+
+	public Tag(String name) {
+		super(name);
+		// TODO Auto-generated constructor stub
+	}
 
 	private static final long serialVersionUID = -3020367940457381316L;
 

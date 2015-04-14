@@ -18,6 +18,8 @@
 package gr.abiss.calipso.model.entities;
 
 import gr.abiss.calipso.jpasearch.model.FormSchema;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.base.AuditableResource;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -25,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.Persistable;
@@ -102,7 +105,22 @@ public abstract class AbstractPersistable implements FormSchemaAware, Persistabl
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public abstract boolean equals(Object obj);
+	public boolean equals(Object obj) {
+		if (null == obj) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof User)) {
+			return false;
+		}
+		AbstractPersistable other = (AbstractPersistable) obj;
+		EqualsBuilder builder = new EqualsBuilder();
+		builder.append(this.getId(), other.getId());
+		return builder.isEquals();
+	}
 
 	/**
 	 *  @see java.lang.Object#hashCode()

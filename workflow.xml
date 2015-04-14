@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow>
+    <roles>
+	    <role id="anonymous" />
+	    <role id="user" />
+	    <role id="support"></role>
+    </roles>
+    <states>
+        <state id="new"></state>
+        <state id="open" />
+        <state id="closed">
+            
+            <detail-field name="field1" type="options">
+            <option id="rejected" />
+            <option id="accepted" />
+            </detail-field>
+        </state>
+    </states>
+    <fields>
+        <field name="field1" type="" update-mode="add/append/replace/tokens/list?"/>
+    </fields>
+    <field-permissions>
+        <!-- match most accurate -->
+        <case field="default"  role="default" state="default" state-to="default" permission-default="protected"></case>
+        <case field="default"  role="default" state="default" state-to="closed" permission-default="mandatory">
+           <permission-overrides>
+                <override permission="readonly" condition="casePersisted.fieldName.value != ''" />
+           </permission-overrides>
+           <validations>
+                <validation mode="replace" condition="true" expression="js code" />
+           </validations>
+        </case>
+        <case field="default"  role="default" state="new" permission="update"></case>
+    </field-permissions>
+</workflow>
