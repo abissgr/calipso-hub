@@ -41,6 +41,17 @@ To build Calipso you need a Java Development Kit and Apache Maven installed.
 
     $ mvn clean install jetty:run
     
+This assumes you have set the eclipse jetty plugin in your maven settings (~/.m2/settings.xml) as:
+
+    <!-- ... -->
+    
+        <pluginGroups>
+            <pluginGroup>org.eclipse.jetty</pluginGroup>
+        </pluginGroups>
+    
+    </settings>
+
+    
 ## Browse Calipso
 
 After you complete the steps above, you can access Calipso using your web browser: 
