@@ -27,6 +27,9 @@ public abstract class AbstractCategory<T extends AbstractCategory<T>> extends Au
 
 	private static final long serialVersionUID = -1329254539598110186L;
 
+	public AbstractCategory() {
+		super();
+	}
 	public AbstractCategory(String name) {
 		super(name);
 	}

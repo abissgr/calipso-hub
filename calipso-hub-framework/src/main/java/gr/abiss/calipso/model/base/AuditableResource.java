@@ -32,7 +32,7 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 	/**
 	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
 	 */
-	@Column(name = "name", nullable = false)
+	@Column(name = "name", length = 500, nullable = false)
 	private String name;
 
 	/**
@@ -59,7 +59,10 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 	@JsonIgnore
 	@OneToMany(mappedBy = "parent", /* cascade=CascadeType.ALL, */ fetch=FetchType.LAZY)
 	private List<T> children = new ArrayList<T>(0);
-	
+
+	public AuditableResource() {
+		super();
+	}
 	public AuditableResource(String name) {
 		this.setName(name);
 	}
