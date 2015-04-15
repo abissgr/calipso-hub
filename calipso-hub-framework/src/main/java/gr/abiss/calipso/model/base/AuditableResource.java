@@ -38,7 +38,7 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 	/**
 	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
 	 */
-	@Column(name = "path", nullable = false)
+	@Column(name = "path", length = 500, nullable = false)
 	private String path;
 	
 	/**
