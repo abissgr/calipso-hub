@@ -2249,7 +2249,7 @@ define("calipso", function(require) {
 				_self.renderForm();
 			}
 			else{
-				var fetchScemaUrl = Calipso.session.getBaseUrl() + _self.model.getPathFragment() + '/' + ( _self.model.isNew() ? "new" :  _self.model.get("id"));
+				var fetchScemaUrl = Calipso.session.getBaseUrl() + "/" + _self.model.getPathFragment() + '/' + ( _self.model.isNew() ? "new" : _self.model.get("id"));
 				console.log("GenericFormView#onShow, fetching model from server to obtain form schema from: "+fetchScemaUrl);
 				
 				_self.model.fetch({
