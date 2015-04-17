@@ -45,7 +45,7 @@ define("calipso", function(require) {
 		if(!url){
 			url = window.location.href;
 		}
-		var queryString = url.indexOf("?") > -1 ? url.substring(url.indexOf("?")+1) : url;
+		var queryString = url.indexOf("?") > -1 ? url.substring(url.indexOf("?")+1) : "";
 		var keyValuePairs = queryString.split('&'); 
 		for(var i in keyValuePairs) {
 			var keyValuePair = keyValuePairs[i].split('=');
