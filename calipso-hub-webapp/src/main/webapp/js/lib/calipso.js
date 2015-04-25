@@ -149,7 +149,8 @@ define("calipso", function(require) {
 		});
 		// console.log("Calipso.app has been configured");
 
-		// register calipso handlebars helper 
+		// register a handlebars helper for menuentries
+		
 		Handlebars.registerHelper("menuEntries", function(){
 			// console.log("menu entries...");
 			
@@ -1742,6 +1743,7 @@ define("calipso", function(require) {
 		template : require("hbs!template/templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
 		tagName : "ul",
 		childView : Calipso.view.TemplateBasedItemView,
+		pollCollectionAfterDestroy: false,
 		childViewOptions : {
 			tagName : "li",
 		},
@@ -1785,6 +1787,20 @@ define("calipso", function(require) {
 			}
 			
 		},
+		/**
+		 * Stop polling the collection if appropriate 
+		 */
+		onBeforeDestroy: function(){
+		    if(!this.pollCollectionAfterDestroy){
+    		    if(this.collection.getTypeName && this.collection.getTypeName() == "Calipso.collection.PollingCollection"){
+                    console.log("TemplateBasedCollectionView#onBeforeDestroy, stop polling for collection URL: " + 
+                        this.collection.url);
+                    this.collection.stopFetching();
+                    this.collection.reset();
+                    this.collection = null;
+                }
+            }
+		}
 		/** use the template defined by the child if any 
 		buildChildView: function(child, ChildViewClass, childViewOptions){
 			  var options = _.extend({}, childViewOptions);
@@ -2139,9 +2155,9 @@ define("calipso", function(require) {
 		// Define view template
 		template : require('hbs!template/GenericFormView'),
 		templateHelpers : {
-			formSchemaKey : function() {
-				return this.formSchemaKey;
-			}
+            formSchemaKey : function() {
+                return this.formSchemaKey;
+            }
 		},
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
@@ -2170,7 +2186,8 @@ define("calipso", function(require) {
 		formSchemaKey : "view",
 
 		events : {
-			"click button.submit" : "commit",
+            "click button.submit" : "commit",
+            "click button.cancel" : "cancel",
 			"submit" : "commitOnEnter",
 			"keypress input[type=text]" : "commitOnEnter"
 		},
@@ -2240,6 +2257,9 @@ define("calipso", function(require) {
 				}
 			}
 			// search entities?
+		},
+		cancel : function(){
+		    window.history.back();
 		},
 		onShow : function() {
 			var _self = this;
@@ -2685,6 +2705,7 @@ define("calipso", function(require) {
 		baseUrl = window.location.protocol + "//" + window.location.host;
 	}
 	console.log("session, base URL:" + baseUrl);
+	
 
 	//
 	Calipso.util.Session = Backbone.Model.extend({

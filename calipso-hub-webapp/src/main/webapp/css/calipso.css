@@ -35,6 +35,9 @@ body {
 .modal-button-cell{
 	text-align:right!important;
 }
+.btn-cancel-search{
+    display: none;
+}
 
 /*
   backgrid
