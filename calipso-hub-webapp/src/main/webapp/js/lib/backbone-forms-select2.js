@@ -16,7 +16,7 @@
  */
 define(['jquery', 'underscore', 'backbone', 'select2', 'backbone-forms'], function($, _, Backbone, select2) {
 
-    Backbone.Form.editors.Select2 = Backbone.Form.editors.Select.extend({
+     Backbone.Form.editors.Select2= Backbone.Form.editors.Select.extend({
         render : function() {
             this.setOptions(this.schema.options);
             var multiple = this.schema.multiple;

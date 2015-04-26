@@ -59,7 +59,7 @@ require.config({
 		//'chai-jquery' : 'lib/chai/chai-jquery',
 		'sinon' : 'lib/sinon/chai-jquery',
         'select2' : 'lib/select2',
-        'backbone-forms-select2' : 'lib/backgrid/extensions/backbone-forms-select2'
+        'backbone-forms-select2' : 'lib/backbone-forms-select2'
 			
 	},
 	shim : {
