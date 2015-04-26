@@ -22,9 +22,11 @@ import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,6 +72,7 @@ public class GenericSpecifications {
 
 	protected static final String OR = "OR";
 	protected static final String AND = "AND";
+	private static List<String> IGNORED_FIELD_NAMES;
 
 	static {
 		factoryForClassMap.put(String.class, stringPredicateFactory);
@@ -80,6 +83,13 @@ public class GenericSpecifications {
 		factoryForClassMap.put(Integer.class, integerPredicateFactory);
 		factoryForClassMap.put(Long.class, longPredicateFactory);
 		factoryForClassMap.put(Double.class, doublePredicateFactory);
+		
+		// init ignore list
+		String[] ignoredFieldNames = {"page", "direction", "size"};
+		IGNORED_FIELD_NAMES = new ArrayList<String>(ignoredFieldNames.length);
+		for(int i = 0; i < ignoredFieldNames.length; i++){
+			IGNORED_FIELD_NAMES.add(ignoredFieldNames[i]);
+		}
 	}
 
 	private static IPredicateFactory<?> getPredicateFactoryForClass(Field field) {
@@ -100,35 +110,38 @@ public class GenericSpecifications {
 
 	private static Field getField(Class<?> clazz, String fieldName) {
 		Field field = null;
-		String key = clazz.getName() + "#" + fieldName;
-		field = FIELD_CACHE.get(key);
+		if(!IGNORED_FIELD_NAMES.contains(fieldName)){
 
-		// find it if not cached
-		if (field == null && !FIELD_CACHE.containsKey(key)) {
-			Class<?> tmpClass = clazz;
-			do {
-				for (Field tmpField : tmpClass.getDeclaredFields()) {
-					String candidateName = tmpField.getName();
-					if (candidateName.equals(fieldName)) {
-						// field.setAccessible(true);
-						FIELD_CACHE.put(key, tmpField);
-						field = tmpField;
-						break;
+			String key = clazz.getName() + "#" + fieldName;
+			field = FIELD_CACHE.get(key);
+
+			// find it if not cached
+			if (field == null && !FIELD_CACHE.containsKey(key)) {
+				Class<?> tmpClass = clazz;
+				do {
+					for (Field tmpField : tmpClass.getDeclaredFields()) {
+						String candidateName = tmpField.getName();
+						if (candidateName.equals(fieldName)) {
+							// field.setAccessible(true);
+							FIELD_CACHE.put(key, tmpField);
+							field = tmpField;
+							break;
+						}
 					}
-				}
-				tmpClass = tmpClass.getSuperclass();
-			} while (tmpClass != null && field == null);
+					tmpClass = tmpClass.getSuperclass();
+				} while (tmpClass != null && field == null);
+			}
+			if (field == null) {
+				LOGGER.warn("Field '" + fieldName + "' not found on class " + clazz);
+				// HashMap handles null values so we can use containsKey to cach
+				// invalid fields and hence skip the reflection scan
+				FIELD_CACHE.put(key, null);
+			}
+			// throw new RuntimeException("Field '" + fieldName +
+			// "' not found on class " + clazz);
 		}
-		if (field == null) {
-			LOGGER.warn("Field '" + fieldName + "' not found on class " + clazz);
-			// HashMap handles null values so we can use containsKey to cach
-			// invalid fields and hence skip the reflection scan
-			FIELD_CACHE.put(key, null);
-		}
-		return field;
 
-		// throw new RuntimeException("Field '" + fieldName +
-		// "' not found on class " + clazz);
+		return field;
 	}
 
 	protected static Predicate getPredicate(final Class clazz,
@@ -216,8 +229,8 @@ public class GenericSpecifications {
 			String propertyName) {
 		Field field = GenericSpecifications.getField(clazz,
 				propertyName);
-		LOGGER.info("addPredicate, property: " + propertyName);
 		if (field != null) {
+			LOGGER.info("addPredicate, property: " + propertyName);
 			Class fieldType = field.getType();
 			IPredicateFactory predicateFactory = getPredicateFactoryForClass(field);
 			LOGGER.info("addPredicate, predicateFactory: " + predicateFactory);

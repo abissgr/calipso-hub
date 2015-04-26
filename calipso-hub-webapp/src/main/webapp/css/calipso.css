@@ -4,7 +4,7 @@
 
 /* Sticky footer styles
 -------------------------------------------------- */
-/*.tmpl-hint{display:none}*/
+.tmpl-hint{display:none}
 .hidden{display:none}
 html,
 body {
@@ -38,7 +38,7 @@ body {
 .btn-cancel-search{
     display: none;
 }
-th.backgrid-create-new-header-cell{
+.backgrid th.backgrid-create-new-header-cell{
     text-align: right;
 }
 /*

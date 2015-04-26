@@ -981,6 +981,9 @@ define("calipso", function(require) {
 	Calipso.model.UserModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.UserModel.prototype */
 	{
+	    toString : function(){
+	        return this.get("userName");
+	    }
 		//urlRoot : "/api/rest/users"
 	}, {
 		// static members
@@ -1104,6 +1107,10 @@ define("calipso", function(require) {
 	Calipso.model.UserDetailsModel = Backbone.Model.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
+	    // YTODO
+        toString : function(){
+            return this.get("username");
+        },
 		sync : function(method, model, options) {
 			options = options || {};
 			options.timeout = 30000;
@@ -1181,7 +1188,22 @@ define("calipso", function(require) {
 			return this;
 		}
 	});
-
+	
+    Calipso.components.ChildStringAttributeCell = Backgrid.StringCell.extend({
+        render: function() {
+            var parameters = this.column.get("name").split(".");
+            var parent = this.model.get(parameters[0]);
+            if (parameters.length > 2) {
+                for (i = 1; i < parameters.length-1; i++) {
+                    parent = parent[parameters[i]];
+                }
+            }
+            var value = parent ? this.formatter.fromRaw(parent[parameters[parameters.length-1]]) : "";
+            this.$el.text(value);
+            this.delegateEvents();
+            return this;
+        }
+    });
     Calipso.components.CreateNewHeaderCell = Backgrid.HeaderCell.extend({
         
         tagName : "th class='renderable backgrid-create-new-header-cell'", 
