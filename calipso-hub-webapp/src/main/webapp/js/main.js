@@ -96,6 +96,11 @@ MainRouter) {
 
 	});
 
+    //////////////////////////////////
+    // Use POST instead of PUT/PATCH/DELETE
+    //////////////////////////////////
+    Backbone.emulateHTTP = true;
+    
 	//////////////////////////////////
 	// Start the app
 	//////////////////////////////////
@@ -109,7 +114,7 @@ MainRouter) {
 		label: "Hosts",
 		url: "hosts"
 	} ];
-
+	
 	CalipsoApp.start(options);
 
 });

@@ -1083,7 +1083,8 @@ define("calipso", function(require) {
 			name : "edit",
 			label : "",
 			editable : false,
-			cell : Calipso.components.EditRowCell
+			cell : Calipso.components.EditRowCell,
+			headerCell : Calipso.components.CreateNewHeaderCell
 		} ];
 	};
 	Calipso.model.UserModel.prototype.getOverviewSchema = function(instance) {
@@ -1161,8 +1162,8 @@ define("calipso", function(require) {
 	Calipso.components.EditRowCell = Backgrid.Cell.extend(
 	/** @lends Calipso.components.EditRowCell.prototype */
 	{
-		tagName : "td class='modal-button-cell modal-button-cell-edit'",
-		template : _.template('<button class="btn btn-xs btn-warning"><span class="glyphicon glyphicon-edit"></span></button>'),
+		tagName : "td class='modal-button-cell modal-button-cell-edit'", 
+		template : _.template('<button class="btn btn-xs btn-info"><i class="glyphicon glyphicon-edit"></i></button>'),
 		events : {
 			"click" : "editRow"
 		},
@@ -1172,7 +1173,7 @@ define("calipso", function(require) {
 			Calipso.stopEvent(e);
 			var rowModel = this.model;
 			// console.log("editRow, rowModel: " + rowModel.constructor.name);
-			Calipso.vent.trigger("layout:editModel", rowModel);
+			Calipso.vent.trigger("layout:updateModel", rowModel);
 		},
 		render : function() {
 			this.$el.html(this.template());
@@ -1180,6 +1181,31 @@ define("calipso", function(require) {
 			return this;
 		}
 	});
+
+    Calipso.components.CreateNewHeaderCell = Backgrid.HeaderCell.extend({
+        
+        tagName : "th class='renderable backgrid-create-new-header-cell'", 
+        events : {
+            "click" : "newRow"
+        },
+        newRow : function(e) {
+            console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
+            Calipso.stopEvent(e);
+            var newModel = this.collection.model.create();
+            newModel.collection = this.collection;
+            Calipso.vent.trigger("layout:createModel", newModel);
+        },
+        render : function() {
+            this.$el.empty();
+            var column = this.column;
+            var label = $("<button title='' class='btn btn-xs btn-success'><i class='glyphicon glyphicon-asterisk'></i></button>");
+            this.$el.append(label);
+            this.delegateEvents();
+            return this;
+        }
+    }); 
+
+
 	//////////////////////////////////////////////////
 	// Layouts
 	//////////////////////////////////////////////////
@@ -1348,11 +1374,14 @@ define("calipso", function(require) {
 
 			// vent handling might be overriden by subclasses 
 			if(!options.dontListenTo){
-				this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
-					_this.showItemViewForModel(itemModel, "view");
-				}, this);
-				this.listenTo(Calipso.vent, "layout:editModel", function(itemModel) {
-					_this.showItemViewForModel(itemModel, "edit");
+                this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
+                    _this.showItemViewForModel(itemModel, "view");
+                }, this);
+                this.listenTo(Calipso.vent, "layout:createModel", function(itemModel) {
+                    _this.showItemViewForModel(itemModel, "create");
+                }, this);
+				this.listenTo(Calipso.vent, "layout:updateModel", function(itemModel) {
+					_this.showItemViewForModel(itemModel, "update");
 				}, this);
 			}
 
@@ -1447,7 +1476,10 @@ define("calipso", function(require) {
 				this.searchResultsCollection = options.searchResultsCollection;
 			}
 			
-			// bind to events coresponding to successful
+            this.listenTo(Calipso.vent, "genericFormSaved", function(savedModel) {
+                console.log("genericFormSaved, model: " + savedModel);
+                window.history.back();
+            });
 			// retreival of search results
 			this.listenTo(Calipso.vent, "genericFormSearched", function(wrapperModel) {
 				var _this = this;
@@ -2216,11 +2248,21 @@ define("calipso", function(require) {
 				// Case: create/update
 				if (_this.formSchemaKey == "create" || _this.formSchemaKey == "update") {
 					// persist changes
+                    console.log("commit _this.url: "+_this.url);
+                    console.log("commit model url: "+_this.model.get("url"));
 					_this.model.save(null, {
-						url: _this.url ? _this.url : _this.model.get("url")
+						//url: _this.url ? _this.url : _this.model.get("url"),
+						success : function() {
+                            // signal successful save/update
+                            // for the currently active layout to handle pres
+                            Calipso.vent.trigger("genericFormSaved", _this.model);
+                        },
+
+                        // Generic error, show an alert.
+                        error : function(model, response) {
+                            alert("Failed persisting changes");
+                        }
 					});
-					// signal save event for the model
-					Calipso.vent.trigger("genericFormSave", _this.model);
 				}
 				// Case: search 
 				else if (this.formSchemaKey.substring(0, 6) == "search") {

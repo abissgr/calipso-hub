@@ -160,12 +160,15 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					if(LOGGER.isDebugEnabled()){
 						LOGGER.debug("create, Matched local user: "+localUser);
 					}
-					// convert to UserDetails if not null
-					userDetails = UserDetails.fromUser(localUser);
-					userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
-					if(LOGGER.isDebugEnabled()){
-						LOGGER.debug("create, Creating user details from localUser...");
+					if(localUser != null && localUser.getId() != null){
+						if(LOGGER.isDebugEnabled()){
+							LOGGER.debug("create, Creating user details from localUser...");
+						}
+						// convert to UserDetails if not null
+						userDetails = UserDetails.fromUser(localUser);
+						userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 					}
+					
 				}
 			} catch (RuntimeException e) {
 				LOGGER.error("create, failed creating user details object", e);
