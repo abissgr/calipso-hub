@@ -1213,9 +1213,7 @@ define("calipso", function(require) {
         newRow : function(e) {
             console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
             Calipso.stopEvent(e);
-            var newModel = this.collection.model.create();
-            newModel.collection = this.collection;
-            Calipso.vent.trigger("layout:createModel", newModel);
+            Calipso.vent.trigger("layout:createModel", this.collection.model);
         },
         render : function() {
             this.$el.empty();
@@ -1399,8 +1397,8 @@ define("calipso", function(require) {
                 this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
                     _this.showItemViewForModel(itemModel, "view");
                 }, this);
-                this.listenTo(Calipso.vent, "layout:createModel", function(itemModel) {
-                    _this.showItemViewForModel(itemModel, "create");
+                this.listenTo(Calipso.vent, "layout:createModel", function(itemModelType) {
+                    _this.showItemViewForModel(itemModelType.create(), "create");
                 }, this);
 				this.listenTo(Calipso.vent, "layout:updateModel", function(itemModel) {
 					_this.showItemViewForModel(itemModel, "update");
@@ -1422,7 +1420,7 @@ define("calipso", function(require) {
 			});
 			// show item view
 			this.contentRegion.show(childView);
-			var navUrl = itemModel.getPathFragment() + "/" + itemModel.get("id");
+			var navUrl = itemModel.getPathFragment() + "/" + (itemModel.isNew() ? "new" : itemModel.get("id"));
 			if(formSchemaKey != "view"){
 				navUrl += "/" + formSchemaKey;
 			}
