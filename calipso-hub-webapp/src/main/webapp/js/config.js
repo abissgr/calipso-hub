@@ -59,7 +59,7 @@ require.config({
 		//'chai-jquery' : 'lib/chai/chai-jquery',
 		'sinon' : 'lib/sinon/chai-jquery',
         'select2' : 'lib/select2',
-        'backgrid-select2' : 'lib/backgrid/extensions/backgrid-select2'
+        'backbone-forms-select2' : 'lib/backgrid/extensions/backbone-forms-select2'
 			
 	},
 	shim : {
@@ -141,7 +141,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'backgrid-select2', 'supermodel', 'metis-menu', 'morris' ],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris' ],
 			exports : 'calipso'
 		},
 		'cookie': { 
