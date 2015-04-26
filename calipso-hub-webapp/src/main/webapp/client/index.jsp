@@ -24,9 +24,9 @@ pageContext.setAttribute("basePath", basePath);
 	    <!-- SB Admin CSS - Include with every page -->
 	    <link href="${basePath}/css/sb-admin.css" rel="stylesheet" />
 		
-		
-		
-		<link href="${basePath}/css/bootstrap-markdown.css" rel="stylesheet" />
+        <link href="${basePath}/css/bootstrap-markdown.css" rel="stylesheet" />
+        <link href="${basePath}/css/select2.css" rel="stylesheet" />
+        <link href="${basePath}/css/bootstrap-select2.css" rel="stylesheet" />
 		<link href="${basePath}/css/calipso.css" rel="stylesheet" />
 		<link href="${basePath}/css/style.css" rel="stylesheet" />
 		<!--[if lt IE 9]>

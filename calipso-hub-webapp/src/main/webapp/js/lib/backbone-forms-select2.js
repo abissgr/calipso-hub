@@ -34,5 +34,6 @@ define(['jquery', 'underscore', 'backbone', 'select2', 'backbone-forms'], functi
             return this;
         }
     });
+    $.fn.select2.defaults.set( "theme", "bootstrap" );
 
 }); 
