@@ -41,7 +41,7 @@ define(['jquery', 'underscore', 'backbone', 'select2', 'backbone-forms'], functi
      * schema.multiple: sets 'multiple' property on the HTML <select>
      *
      * Example:
-     * schema: {title: {type:'Select2', options:['Mr','Mrs',Ms], config: {}, multiple: false}
+     * schema: {title: {type:'Select2', options:myCollection, config: {}, multiple: false}
      */
     Backbone.Form.editors.ModelSelect2 = Backbone.Form.editors.SimpleTypeSelect2.extend({
         //  select a model VS a string value.
