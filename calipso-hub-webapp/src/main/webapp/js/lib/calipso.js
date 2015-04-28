@@ -348,7 +348,8 @@ define("calipso", function(require) {
 	// //////////////////////////////////////
 	// Collection
 	// //////////////////////////////////////
-	Calipso.collection.GenericCollection = Backbone.PageableCollection.extend(/** @lends Calipso.collection.GenericCollection.prototype */{
+	Calipso.collection.GenericCollection = Backbone.PageableCollection.extend(
+	    /** @lends Calipso.collection.GenericCollection.prototype */{
 		mode : "server",
 		getTypeName : function() {
 			return this.prototype.getTypeName();
@@ -437,24 +438,29 @@ define("calipso", function(require) {
 		// }
 		parse : function(response) {
 			_self = this;
-			this.total = response.totalElements;
-			this.totalPages = response.totalPages;
+			var itemsArray = response;
+			if(response.content){
+			    itemsArray = response.content;
+			    this.total = response.totalElements;
+             this.totalPages = response.totalPages;
+			}
+			else{
+			    this.total = itemsArray.length;
+             this.totalPages = 1;
+			}
+			
 			superModelAwareInstances = [];
-			// console.log("GenericCollection#parse, items:
-			// "+response.content.length);
+			console.log("GenericCollection#parse, items: " + itemsArray.length);
 			var modelItem;
 			var superModelAwareInstance;
-			for (var i = 0; i < response.content.length; i++) {
-				modelItem = response.content[i];
+			for (var i = 0; i < itemsArray.length; i++) {
+				modelItem = itemsArray[i];
 				if (modelItem) {
 					// make Backbone Supermodel aware of this item
-					// console.log("GenericCollection#parse model:
-					// "+modelItem.id);
 					superModelAwareInstance = _self.model && _self.model.create ? _self.model.create(modelItem) : Calipso.model.GenericModel.create(modelItem);
 					superModelAwareInstance.collection = _self;
 					// add to results
-					// console.log("GenericCollection#parse adding:
-					// "+superModelAwareInstance.get("id"));
+					console.log("GenericCollection#parse adding: " + superModelAwareInstance.get("id"));
 					superModelAwareInstances.push(superModelAwareInstance);
 				}
 			}
@@ -463,7 +469,6 @@ define("calipso", function(require) {
 		}
 
 	});
-
 	/**
 	 * Get the name of this class
 	 * @returns the class name as a string
@@ -472,6 +477,28 @@ define("calipso", function(require) {
 		return "Calipso.collection.GenericCollection";
 	};
 	
+
+	Calipso.collection.AllCollection = Backbone.Collection.extend({
+		initialize : function(attributes, options) {
+			if (options) {
+				if (options.url) {
+					this.url = options.url;
+				}
+			}
+		},
+		fetch : function(options) {
+			options || (options = {});
+			var data = (options.data || {});
+			options.data = {
+				page : "no"
+			};
+			return Backbone.Collection.prototype.fetch.call(this, options);
+		}
+
+	});
+	Calipso.collection.AllCollection.prototype.getTypeName = function(instance) {
+		return "Calipso.collection.AllCollection";
+	};
 	/**
 	 *
 	 * backbone-polling v1.0.0

@@ -82,7 +82,7 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 				path.append(this.getParent().getPath());
 			}
 			path.append('/');
-			path.append(URLEncoder.encode(this.getName(), "UTF-8"));
+			path.append(this.getName());
 			this.setPath(path.toString());
 		}
 		// set path level
