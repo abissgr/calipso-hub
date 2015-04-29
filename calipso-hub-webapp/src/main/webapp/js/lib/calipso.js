@@ -103,7 +103,6 @@ define("calipso", function(require) {
 			apiAuthPath: "/apiauth"
 		};
 		Calipso.config = _.defaults(customConfig, config);
-		console.log("Calipso.initializeApp config: " + Calipso.config.toSource());
 
 
 		// console.log("Setting up Calipso.session...");
@@ -2389,7 +2388,6 @@ define("calipso", function(require) {
 			console.log("GenericFormView#renderForm called, schema key: "+_self.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 
-			console.log("GenericFormView#renderForm called, schema: "+formSchema.toSource());
 			// render form
 			var JsonableForm = Backbone.Form.extend({
 				toJson : function() {

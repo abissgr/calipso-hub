@@ -17,7 +17,7 @@ pageContext.setAttribute("basePath", basePath);
 		<meta name="description" content="" />
 		<meta name="author" content="" />
 		<link href="${basePath}/css/bootstrap.css" rel="stylesheet" />
-		<link href="${basePath}/font-awesome/css/font-awesome.css" rel="stylesheet" />
+		<link href="${basePath}/css/font-awesome/css/font-awesome.css" rel="stylesheet" />
         <!-- SB Admin -->
 	    <link href="${basePath}/css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet" />
 	    <link href="${basePath}/css/plugins/timeline/timeline.css" rel="stylesheet" />
