@@ -58,8 +58,12 @@ require.config({
 		'chai' : 'lib/chai/chai',
 		//'chai-jquery' : 'lib/chai/chai-jquery',
 		'sinon' : 'lib/sinon/chai-jquery',
-        'select2' : 'lib/select2',
-        'backbone-forms-select2' : 'lib/backbone-forms-select2'
+      'select2' : 'lib/select2',
+      'backbone-forms-select2' : 'lib/backbone-forms-select2',
+      //'typeahead': "lib/bootstrap3-typeahead"
+      'typeahead' : 'lib/typeahead.jquery',
+      'bloodhound': 'lib/bloodhound',
+      
 			
 	},
 	shim : {
@@ -118,6 +122,7 @@ require.config({
 			deps : [ 'jquery' ],
 			exports : 'Markdown'
 		},
+		
 		'metis-menu' : {
 			deps : [ 'jquery', 'bootstrap' ],
 			exports : 'jquery'
@@ -141,7 +146,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris' ],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead'],
 			exports : 'calipso'
 		},
 		'cookie': { 
@@ -149,7 +154,15 @@ require.config({
 		},
 		'chai-jquery': { 
 			deps: ['jquery', 'chai']
-		}
+		},
+//		'typeahead': {
+//         'deps': ['jquery'],
+//         'exports': 'jquery' // Make sure the noconflict configuration of jquery doesn't break this extension
+//     },
+//     'bloodhound':{
+//         'deps': ['jquery'],
+//         'exports': 'Bloodhound' // Make sure the noconflict configuration of jquery doesn't break this extension
+//     },
 	}
 
 });

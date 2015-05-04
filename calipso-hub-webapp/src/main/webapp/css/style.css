@@ -86,7 +86,6 @@ label {
 body, html {
   background: #f8f8f8;
   height: 100%;
-  overflow: hidden; 
   
   /* provide a 2-column container
    * with no padding or margins for 
