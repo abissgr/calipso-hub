@@ -58,7 +58,7 @@
 			<id>dev</id>
 			<activation>
 				<file>
-					<exists>${project.basedir}/dev.properties</exists>
+					<exists>${basedir}/dev.properties</exists>
 				</file>
 			</activation>
 			<properties>
@@ -569,7 +569,7 @@
 	</reporting>
 	<build>
 		<filters>
-			<filter>${project.parent.basedir}/dev.properties</filter>
+			<filter>${project.parent.basedir}/${build.profile.filters}</filter>
 		</filters>
 		<resources>
 			<resource>
