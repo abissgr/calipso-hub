@@ -464,7 +464,6 @@ a:hover, a:focus {
   /* IE6, IE7 */
   clip: rect(1px, 1px, 1px, 1px);
   padding: 0;
-  border: 0;
   height: 1px;
   width: 1px;
   overflow: hidden;
@@ -478,13 +477,10 @@ a:hover, a:focus {
     overflow: auto;
   }
 }
-.responsive-table thead th {
-  background-color: #1d96b2;
-  border: 1px solid #1d96b2;
+./*responsive-table thead th {
   font-weight: normal;
   text-align: center;
-  color: white;
-}
+}*/
 .responsive-table thead th:first-of-type {
   text-align: left;
 }
@@ -559,7 +555,6 @@ a:hover, a:focus {
 }
 .responsive-table tbody tr {
   margin-bottom: 1em;
-  border: 2px solid #1d96b2;
 }
 @media (min-width: 48em) {
   .responsive-table tbody tr {
@@ -581,8 +576,6 @@ a:hover, a:focus {
 }
 @media (min-width: 48em) {
   .responsive-table tbody th[scope="row"] {
-    background-color: transparent;
-    color: #5e5d52;
     text-align: left;
   }
 }
@@ -591,7 +584,6 @@ a:hover, a:focus {
 }
 @media (min-width: 30em) {
   .responsive-table tbody td {
-    border-bottom: 1px solid #1d96b2;
   }
 }
 @media (min-width: 48em) {

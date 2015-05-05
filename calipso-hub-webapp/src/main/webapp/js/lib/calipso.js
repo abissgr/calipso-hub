@@ -270,7 +270,11 @@ define("calipso", function(require) {
 			}));
 
 			// send logged in user on their way
-			var fw = Calipso.app.fw ? Calipso.app.fw : "home";
+			var fw = "home";
+			if(Calipso.app.fw){
+				fw = Calipso.app.fw;
+				Calipso.app.fw = null;
+			}
 			// console.log("session:created, update model: " + userDetails.get("email") + ", navigating to: " + fw);
 
 			Calipso.navigate(fw, {
@@ -1360,8 +1364,10 @@ define("calipso", function(require) {
 
 			this.listenTo(Calipso.vent, "header:hideSidebar", function() {
 				this.$el.find(".navbar-static-side").hide();
+				$("#page-wrapper").attr( "style", "margin:0 0 0 0" );
 			});
 			this.listenTo(Calipso.vent, "header:showSidebar", function() {
+				$("#page-wrapper").css( "margin", "0 0 0 250px" );
 				this.$el.find(".navbar-static-side").show();
 			});
 
@@ -2533,11 +2539,8 @@ define("calipso", function(require) {
 				password : this.$('.input-password').val(),
 				newPassword : this.$('.new-password').val(),
 				newPasswordConfirm : this.$('.new-password-confirm').val(),
-			// was used for testing
-			// metadata: {"loginViewMetadatum":"true"}
 			});
 			Calipso.session.save(userDetails);
-
 		}
 	}, {
 
@@ -3171,9 +3174,9 @@ define("calipso", function(require) {
 			this.layout.contentRegion.show(new HomeLayout());
 		},
 
-		_redir : function(firstLevelFragment) {
+		_redir : function(firstLevelFragment, forwardAfter) {
 			var url = Calipso.app.config.contextPath + "client/" + firstLevelFragment;
-
+			Calipso.app.fw = forwardAfter;
 			console.log("AbstractController#_redir to " + url);
 			Calipso.navigate(firstLevelFragment, {
 				trigger : true
@@ -3337,7 +3340,6 @@ define("calipso", function(require) {
 		mainNavigationCrudRoute : function(mainRoutePart, modelId, httpParams) {
 			if (!Calipso.session.isAuthenticated()) {
 				return this._redir("login");
-				;
 			}
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
