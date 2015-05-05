@@ -13,7 +13,7 @@
     - [calipso-hub-utilities]: utility components
     - [calipso-hub-webapp]: deployable web application (WAR)
 
-## Howto Build
+## Howto Build [![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
 
 To build Calipso you need a Java Development Kit and Apache Maven installed. 
 
