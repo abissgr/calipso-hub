@@ -1,4 +1,4 @@
 language: java
 jdk:
   - oraclejdk7
-install: ./travis-install-step.sh
+before_install: ./travis-install-step.sh
