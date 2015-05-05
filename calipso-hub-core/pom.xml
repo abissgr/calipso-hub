@@ -16,10 +16,9 @@
 	<properties>
 		<project.parent.basedir>../</project.parent.basedir>
 	</properties>
-
 	<build>
 		<filters>
-			<filter>${project.parent.basedir}/dev.properties</filter>
+            <filter>${project.parent.basedir}/${build.profile.filters}</filter>
 		</filters>
 		<resources>
 			<resource>
