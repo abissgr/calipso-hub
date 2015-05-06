@@ -114,7 +114,6 @@ define("calipso", function(require) {
 			config : Calipso.config,
 			routers : {}
 		});
-
 		// application configuration
 		Calipso.app.addRegions({
 			headerRegion : "#calipsoHeaderRegion",
@@ -257,6 +256,53 @@ define("calipso", function(require) {
 			Calipso.app.mainContentRegion.show(appView);
 		});
 
+		Calipso.vent.on('session:social', function(providerId) {
+			// remove any pre-existing form
+			$("#calipso-social-signin-form").remove();
+			var oForm = document.getElementById("calipso-social-signin-form");
+			var wrapper = $('#hiddenWrapper');
+			// create form if it doesn't exist
+			if(!oForm){
+				var formHtml = "<form id='calipso-social-signin-form' action='"+window.calipsoBasePath+"/signin/" + providerId +"'  method='POST' role='form'>" + 
+				//"<input type='hidden' name='scope' value='email' />" + 
+				//"<input type='hidden' name='scope' value='emailure' />" + 
+				"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" + 
+					"</form>";
+				console.log(formHtml);
+				wrapper.append(formHtml);
+				oForm = document.getElementById("calipso-social-signin-form");
+			}
+			// figure out position
+			var w = 500;
+			var h = 400;
+			// Fixes dual-screen position for most browsers
+			var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+			var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+			var left = ((screen.width / 2) - (w / 2)) + dualScreenLeft;
+			var top = ((screen.height / 2) - (h / 2)) + dualScreenTop;
+			// open popup window and POST to it
+			var calipsoSocialSignInWin = window.open("", "SignIn", "width="+w+",height="+h+",toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0,left=" + left + ",top=" + top);
+			
+		    var interval = window.setInterval(function() {
+		    	//console.log("in interval");
+		        try {
+		            if (calipsoSocialSignInWin == null || calipsoSocialSignInWin.closed) {
+		            	//console.log("window closed");
+		                window.clearInterval(interval);
+		                //closeCallback(win);
+		                calipso.tryRememberMe();
+		            }
+		        }
+		        catch (e) {
+		        }
+		    }, 1000);
+
+			calipsoSocialSignInWin.focus();
+			oForm.submit();
+			// remove form
+			$("#calipso-social-signin-form").remove();
+			return false;
+		});
 		Calipso.vent.on('session:created', function(userDetails) {
 			// console.log("vent event session:created");
 			// update otification counters 
@@ -1293,6 +1339,49 @@ define("calipso", function(require) {
 			return this;
 		}
 	});
+	Calipso.components.backboneform.TypeaheadObject = Calipso.components.backboneform.Typeahead.extend({
+		tagName: 'div',
+		initialize : function(options) {
+			Calipso.components.backboneform.Typeahead.prototype.initialize.call(this, options);
+			this.$el.removeAttr( "id class name type autocomplete" );
+			this.$el.html('<input type="hidden" id="'+this.id+'" name="'+this.getName()+'" />' +
+					'<input type="text" class="form-control" id="'+this.id+'Typeahead" name="'+this.getName()+'Typeahead" autocomplete="off" />');
+		},
+		/**
+		 * Adds the editor to the DOM
+		 */
+		render : function() {
+			//Backbone.Form.editors.Text.prototype.render.call(this);
+			var _this = this;
+			console.log("Calipso.components.backboneform.TypeaheadObject#render");
+		
+			function create() {
+		        console.log("Calipso.components.backboneform.TypeaheadObject#render#create, select: "+_this.$el.find("#"+_this.id+"Typeahead"));
+				_this.$el.find("#"+_this.id+"Typeahead").typeahead({
+					minLength : 0,
+					highlight : true,
+					hint : false
+				}, {
+					displayKey : _this.typeaheadDisplayKey,
+					source : _this.typeaheadSource
+				}).on('typeahead:selected', function (e, suggestion, name) {
+			        console.log("typeahead:selected typeahead:selected typeahead:selected");
+			        console.log(suggestion);
+			        console.log(name);
+			        _this.setValue(suggestion);
+			    });;
+			}
+			// apply typeahead after the field has been added to the DOM
+			setTimeout(create, 250);
+			return this;
+		}, 
+		setValue: function(value) {
+			console.log("setValue: "+value);
+	      console.log(value);
+			this.$el.find("#"+this.id).attr("value", (value.id?value.id:value));
+			this.value = value;
+		},
+	});
 	//////////////////////////////////////////////////
 	// Layouts
 	//////////////////////////////////////////////////
@@ -1364,10 +1453,10 @@ define("calipso", function(require) {
 
 			this.listenTo(Calipso.vent, "header:hideSidebar", function() {
 				this.$el.find(".navbar-static-side").hide();
-				$("#page-wrapper").attr( "style", "margin:0 0 0 0" );
+				$("#page-wrapper").attr("id", "page-wrapper-toggled");
 			});
 			this.listenTo(Calipso.vent, "header:showSidebar", function() {
-				$("#page-wrapper").css( "margin", "0 0 0 250px" );
+				$("#page-wrapper-toggled").attr("id", "page-wrapper");
 				this.$el.find(".navbar-static-side").show();
 			});
 
