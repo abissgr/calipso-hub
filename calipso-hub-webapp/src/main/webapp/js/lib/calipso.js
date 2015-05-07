@@ -1366,7 +1366,6 @@ define("calipso", function(require) {
 					displayKey : _this.typeaheadDisplayKey,
 					source : _this.typeaheadSource
 				});
-				//_this.$el.typeahead('val', _this.value);
 			}
 			// apply typeahead after the field has been added to the DOM
 			setTimeout(create, 250);
@@ -1386,7 +1385,6 @@ define("calipso", function(require) {
 		 * Adds the editor to the DOM
 		 */
 		render : function() {
-			//Backbone.Form.editors.Text.prototype.render.call(this);
 			var _this = this;
 			function create() {
 		      _this.$el.find("#"+_this.id+"Typeahead").typeahead({
@@ -1399,8 +1397,8 @@ define("calipso", function(require) {
 				}).on('typeahead:selected', function (e, suggestion, name) {
 			        _this.setValue(suggestion);
 			    });
-
-		        _this.setValue(this.value);
+				_this.$el.find("#"+_this.id).val(_this.value.id?_this.value.id:_this.value);
+				_this.$el.find("#"+_this.id+"Typeahead").typeahead('val', _this.value.name);
 			}
 			// apply typeahead after the field has been added to the DOM
 			setTimeout(create, 250);
@@ -1410,11 +1408,8 @@ define("calipso", function(require) {
 			var _this = this;
 
 			this.value = value;
-		   this.$el.find("#"+this.id).val(value && value.id ? value.id : value);
-		   this.$el.find("#"+this.id+"Typeahead").typeahead('val', value?value[_this.typeaheadDisplayKey]:value);
 		}, 
 		getValue: function() {
-			var _this = this;
 	      return this.value;
 		},
 	});
