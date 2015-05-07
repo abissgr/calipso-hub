@@ -29,12 +29,13 @@ pageContext.setAttribute("basePath", basePath);
         <link href="${basePath}/css/bootstrap-select2.css" rel="stylesheet" />
 		<link href="${basePath}/css/calipso.css" rel="stylesheet" />
 		<link href="${basePath}/css/style.css" rel="stylesheet" />
+        <link href="${basePath}/css/bootstrap-datetimepicker.css" rel="stylesheet" />
 		<!--[if lt IE 9]>
       	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     	<![endif]-->
 	</head>
 	<body class="page-sidebar-fixed page-footer-fixed">
-        <div id="wrapper">
+        <div id="container">
 
 	    	<nav id="calipsoHeaderRegion" style="margin-bottom: 0" role="navigation" class="navbar navbar-default navbar-fixed-top">
 				<!-- -->

@@ -253,6 +253,13 @@ define("calipso", function(require) {
 		});
 
 		Calipso.vent.on('app:show', function(appView) {
+			var $wrapper = $("#container");
+			console.log("app:show, container: " + $wrapper);
+			console.log("app:show, appView.containerClass: " + appView.containerClass);
+			console.log("app:show, container class: " + $wrapper.attr("class"));
+			if(appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")){
+				$wrapper.attr("class", appView.containerClass);
+			}
 			Calipso.app.mainContentRegion.show(appView);
 		});
 
@@ -1413,11 +1420,23 @@ define("calipso", function(require) {
 	      return this.value;
 		},
 	});
+	
+	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
+	Calipso.components.backboneform.Datetimepicker = Backbone.Form.editors.Text.extend({
+			render: function() {
+				Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
+				this.$el.datetimepicker({
+					locale: 'en'
+				});
+				return this;
+			},
+		});
 	//////////////////////////////////////////////////
 	// Layouts
 	//////////////////////////////////////////////////
 
 	Calipso.view.AbstractLayout = Backbone.Marionette.LayoutView.extend({
+		containerClass: "container-fluid",
 		getTypeName : function() {
 			return this.prototype.getTypeName();
 		}
@@ -1665,6 +1684,7 @@ define("calipso", function(require) {
 		tagName : 'div',
 		id : "calipsoModelDrivenSearchLayout",
 		template : require('hbs!template/md-search-layout'),
+      sidebarFormSchemaKey: "search",
 		hideSidebarOnSearched : false,
 		onGenericFormSearched : function(options) {
 			// override callbacl
@@ -1747,8 +1767,9 @@ define("calipso", function(require) {
 		showSidebar : function(routeModel) {
 			var _this = this;
 			// create the search form view
+			console.log("Creating sidebar search form with formSchemaKey " + _this.sidebarFormSchemaKey);
 			var formView = new Calipso.view.GenericFormView({
-				formSchemaKey : "search",
+				formSchemaKey : _this.sidebarFormSchemaKey,
 				model : routeModel
 			});
 

@@ -33,6 +33,7 @@ require.config({
 		'backbone-forms' : 'lib/backbone-forms',
 		'backbone-forms-bootstrap3' : 'lib/backbone-forms-bootstrap3',
 		'bootstrap-markdown' : 'lib/bootstrap-markdown',
+		'bootstrap-datetimepicker' : 'lib/bootstrap-datetimepicker',
 		'backbone-validation' : 'lib/resthub/backbone-validation-ext',
 		'marionette' : 'lib/backbone.marionette',
 		'handlebars-orig' : 'lib/handlebars',
@@ -146,7 +147,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead'],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker'],
 			exports : 'calipso'
 		},
 		'cookie': { 
