@@ -56,7 +56,7 @@ define(['jquery', 'underscore', 'backbone', 'select2', 'backbone-forms'], functi
         },
         // https://github.com/powmedia/backbone-forms/issues/291
         setValue : function(value) {
-      	  var modelId;
+      	  var modelId = value;
            if(value && value.id){
          	  console.log("setValue, picking up id: " + value.id);
          	  modelId = value.id;
