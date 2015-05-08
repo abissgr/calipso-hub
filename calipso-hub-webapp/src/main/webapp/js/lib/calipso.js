@@ -257,7 +257,7 @@ define("calipso", function(require) {
 			console.log("app:show, container: " + $wrapper);
 			console.log("app:show, appView.containerClass: " + appView.containerClass);
 			console.log("app:show, container class: " + $wrapper.attr("class"));
-			if(appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")){
+			if (appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")) {
 				$wrapper.attr("class", appView.containerClass);
 			}
 			Calipso.app.mainContentRegion.show(appView);
@@ -269,12 +269,11 @@ define("calipso", function(require) {
 			var oForm = document.getElementById("calipso-social-signin-form");
 			var wrapper = $('#hiddenWrapper');
 			// create form if it doesn't exist
-			if(!oForm){
-				var formHtml = "<form id='calipso-social-signin-form' action='"+window.calipsoBasePath+"/signin/" + providerId +"'  method='POST' role='form'>" + 
+			if (!oForm) {
+				var formHtml = "<form id='calipso-social-signin-form' action='" + window.calipsoBasePath + "/signin/" + providerId + "'  method='POST' role='form'>" +
 				//"<input type='hidden' name='scope' value='email' />" + 
 				//"<input type='hidden' name='scope' value='emailure' />" + 
-				"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" + 
-					"</form>";
+				"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" + "</form>";
 				console.log(formHtml);
 				wrapper.append(formHtml);
 				oForm = document.getElementById("calipso-social-signin-form");
@@ -288,21 +287,20 @@ define("calipso", function(require) {
 			var left = ((screen.width / 2) - (w / 2)) + dualScreenLeft;
 			var top = ((screen.height / 2) - (h / 2)) + dualScreenTop;
 			// open popup window and POST to it
-			var calipsoSocialSignInWin = window.open("", "SignIn", "width="+w+",height="+h+",toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0,left=" + left + ",top=" + top);
-			
-		    var interval = window.setInterval(function() {
-		    	//console.log("in interval");
-		        try {
-		            if (calipsoSocialSignInWin == null || calipsoSocialSignInWin.closed) {
-		            	//console.log("window closed");
-		                window.clearInterval(interval);
-		                //closeCallback(win);
-		                calipso.tryRememberMe();
-		            }
-		        }
-		        catch (e) {
-		        }
-		    }, 1000);
+			var calipsoSocialSignInWin = window.open("", "SignIn", "width=" + w + ",height=" + h + ",toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0,left=" + left + ",top=" + top);
+
+			var interval = window.setInterval(function() {
+				//console.log("in interval");
+				try {
+					if (calipsoSocialSignInWin == null || calipsoSocialSignInWin.closed) {
+						//console.log("window closed");
+						window.clearInterval(interval);
+						//closeCallback(win);
+						calipso.tryRememberMe();
+					}
+				} catch (e) {
+				}
+			}, 1000);
 
 			calipsoSocialSignInWin.focus();
 			oForm.submit();
@@ -324,7 +322,7 @@ define("calipso", function(require) {
 
 			// send logged in user on their way
 			var fw = "home";
-			if(Calipso.app.fw){
+			if (Calipso.app.fw) {
 				fw = Calipso.app.fw;
 				Calipso.app.fw = null;
 			}
@@ -979,34 +977,45 @@ define("calipso", function(require) {
 		throw "Model subclasses must implement GenericModel.prototype.getPathFragment";
 	};
 
-	Calipso.model.GenericModel.prototype.typeaheadQuery = "?name=%25wildcard%25";
-	Calipso.model.GenericModel.prototype.typeaheadSource = false;
-	Calipso.model.GenericModel.prototype.getTypeaheadSource = function() {
+	/**
+	 * Stores a map acting as a typeahead sources cache. Uses source config (pathFragment, query and wildcard) as the key;
+	 */
+	Calipso.model.GenericModel.prototype.typeaheadSources = {};
+	Calipso.model.GenericModel.prototype.getTypeaheadSource = function(options) {
 		var _thisProto = this;
+		var config = {
+				query: "?name=%25wildcard%25",
+				wildcard : "wildcard",
+				pathFragment : _thisProto.getPathFragment(),
+		};
+		_.extend(config, options);
+		var sourceKey = config.pathFragment + config.wildcard + config.query;
+		console.log("Calipso.model.GenericModel.prototype.getTypeaheadSource, key: " + sourceKey);
 		// if not lready created
-		if (!_thisProto.typeaheadSource) {
-			console.log(_thisProto.getTypeName()+"#getTypeaheadSource creating new source for " + _thisProto.getPathFragment());
+		if (!_thisProto.typeaheadSources[sourceKey]) {
+			console.log(_thisProto.getTypeName() + "#getTypeaheadSource creating new source for " + config.pathFragment);
 			var bloodhound = new Bloodhound({
-//				],
 				remote : {
-					url : Calipso.session.getBaseUrl() + "/api/rest/"+_thisProto.getPathFragment()+_thisProto.typeaheadQuery,
-					wildcard : "wildcard",
-					transform: function(response) {
-					    console.log(_thisProto.getTypeName()+' transform', response.content);
-					    return response.content;
+					url : Calipso.session.getBaseUrl() + "/api/rest/" + config.pathFragment + config.query,
+					wildcard : config.wildcard,
+					transform : function(response) {
+						console.log(_thisProto.getTypeName() + ' transform', response.content);
+						return response.content;
 					}
 				},
 				identify : function(obj) {
 					return obj.id;
 				},
 				queryTokenizer : Bloodhound.tokenizers.whitespace,
-				datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.name);},
+				datumTokenizer : function(d) {
+					return Bloodhound.tokenizers.whitespace(d.name);
+				},
 			});
 			bloodhound.initialize();
-			_thisProto.typeaheadSource = bloodhound.ttAdapter();
-		} 
+			_thisProto.typeaheadSources[sourceKey] = bloodhound.ttAdapter();
+		}
 
-		return _thisProto.typeaheadSource;
+		return _thisProto.typeaheadSources[sourceKey];
 	};
 	/**
 	 * Get the name of this class
@@ -1340,20 +1349,27 @@ define("calipso", function(require) {
 	 */
 	Calipso.components.backboneform.Typeahead = Backbone.Form.editors.Text.extend({
 		//className: "form-control",
-		tagName: 'input',
-		typeaheadDisplayKey : null,
+		tagName : 'input',
+		displayKey : null,
 		typeaheadSource : null,
+		displayKey: "name",
+		minLength: 3,
 		initialize : function(options) {
 			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
 			// set the display key for option rendering
-			this.typeaheadDisplayKey = this.schema.typeaheadDisplayKey || "name";
 			// set the options source
 			if (this.schema && this.schema.typeaheadSource) {
 				this.typeaheadSource = this.schema.typeaheadSource;
 			} else {
 				throw "Missing required option: 'typeaheadSource'";
 			}
-			if(this.tagName == "input"){
+			if (this.schema.displayKey) {
+				this.displayKey = this.schema.displayKey;
+			}
+			if (this.schema.minLength) {
+				this.minLength = this.schema.minLength;
+			}
+			if (this.tagName == "input") {
 				this.$el.attr('autocomplete', 'off');
 			}
 		},
@@ -1362,15 +1378,14 @@ define("calipso", function(require) {
 		 */
 		render : function() {
 			//Backbone.Form.editors.Text.prototype.render.call(this);
-
 			var _this = this;
 			function create() {
 				_this.$el.typeahead({
-					minLength : 0,
+					minLength : _this.minLength,
 					highlight : true,
 					hint : false
 				}, {
-					displayKey : _this.typeaheadDisplayKey,
+					displayKey :_this.displayKey,
 					source : _this.typeaheadSource
 				});
 			}
@@ -1380,13 +1395,12 @@ define("calipso", function(require) {
 		}
 	});
 	Calipso.components.backboneform.TypeaheadObject = Calipso.components.backboneform.Typeahead.extend({
-		tagName: 'div',
+		tagName : 'div',
 		initialize : function(options) {
 
 			Calipso.components.backboneform.Typeahead.prototype.initialize.call(this, options);
-			this.$el.removeAttr( "id class name type autocomplete" );
-			this.$el.html('<input type="hidden" id="'+this.id+'" name="'+this.getName()+'" />' +
-					'<input type="text" class="form-control" id="'+this.id+'Typeahead" name="'+this.getName()+'Typeahead" autocomplete="off" />');
+			this.$el.removeAttr("id class name type autocomplete");
+			this.$el.html('<input type="hidden" id="' + this.id + '" name="' + this.getName() + '" />' + '<input type="text" class="form-control" id="' + this.id + 'Typeahead" name="' + this.getName() + 'Typeahead" autocomplete="off" />');
 		},
 		/**
 		 * Adds the editor to the DOM
@@ -1394,49 +1408,49 @@ define("calipso", function(require) {
 		render : function() {
 			var _this = this;
 			function create() {
-		      _this.$el.find("#"+_this.id+"Typeahead").typeahead({
-					minLength : 0,
+				_this.$el.find("#" + _this.id + "Typeahead").typeahead({
+					minLength : _this.minLength,
 					highlight : true,
 					hint : true
 				}, {
-					displayKey : _this.typeaheadDisplayKey,
+					displayKey : _this.displayKey,
 					source : _this.typeaheadSource
-				}).on('typeahead:selected', function (e, suggestion, name) {
-			        _this.setValue(suggestion);
-			    });
-				_this.$el.find("#"+_this.id).val(_this.value.id?_this.value.id:_this.value);
-				_this.$el.find("#"+_this.id+"Typeahead").typeahead('val', _this.value.name);
+				}).on('typeahead:selected', function(e, suggestion, name) {
+					_this.setValue(suggestion);
+				});
+				_this.$el.find("#" + _this.id).val(_this.value.id ? _this.value.id : _this.value);
+				_this.$el.find("#" + _this.id + "Typeahead").typeahead('val', _this.value.name);
 			}
 			// apply typeahead after the field has been added to the DOM
 			setTimeout(create, 250);
 			return this;
-		}, 
-		setValue: function(value) {
+		},
+		setValue : function(value) {
 			var _this = this;
 
 			this.value = value;
-		}, 
-		getValue: function() {
-	      return this.value;
+		},
+		getValue : function() {
+			return this.value;
 		},
 	});
-	
+
 	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
 	Calipso.components.backboneform.Datetimepicker = Backbone.Form.editors.Text.extend({
-			render: function() {
-				Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
-				this.$el.datetimepicker({
-					locale: 'en'
-				});
-				return this;
-			},
-		});
+		render : function() {
+			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
+			this.$el.datetimepicker({
+				locale : 'en'
+			});
+			return this;
+		},
+	});
 	//////////////////////////////////////////////////
 	// Layouts
 	//////////////////////////////////////////////////
 
 	Calipso.view.AbstractLayout = Backbone.Marionette.LayoutView.extend({
-		containerClass: "container-fluid",
+		containerClass : "container-fluid",
 		getTypeName : function() {
 			return this.prototype.getTypeName();
 		}
@@ -1569,7 +1583,6 @@ define("calipso", function(require) {
 	/** @lends Calipso.view.ModelDrivenBrowseLayout.prototype */
 	{
 		tagName : 'div',
-		className : 'col-sm-12',
 		id : "calipsoModelDrivenBrowseLayout",
 		template : require('hbs!template/md-browse-layout'),
 		skipToSingleResult : false,
@@ -1684,7 +1697,7 @@ define("calipso", function(require) {
 		tagName : 'div',
 		id : "calipsoModelDrivenSearchLayout",
 		template : require('hbs!template/md-search-layout'),
-      sidebarFormSchemaKey: "search",
+		sidebarFormSchemaKey : "search",
 		hideSidebarOnSearched : false,
 		onGenericFormSearched : function(options) {
 			// override callbacl
@@ -2413,6 +2426,7 @@ define("calipso", function(require) {
 
 	Calipso.view.GenericFormView = Marionette.ItemView.extend({
 		// Define view template
+		className: "row", 
 		template : require('hbs!template/GenericFormView'),
 		templateHelpers : {
 			formSchemaKey : function() {

@@ -610,3 +610,7 @@ a:hover, a:focus {
     content: none;
   }
 }
+
+.footer-nav, .footer-logo{
+	float: left
+}
