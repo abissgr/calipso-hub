@@ -1351,7 +1351,7 @@ define("calipso", function(require) {
 		tagName : 'div',
 		//className: "form-control",
 		typeaheadSource : null,
-		minLength: 3,
+		minLength: 2,
 		initialize : function(options) {
 			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
 			// set the options source
