@@ -1298,7 +1298,7 @@ define("calipso", function(require) {
 			Calipso.stopEvent(e);
 			var rowModel = this.model;
 			// console.log("editRow, rowModel: " + rowModel.constructor.name);
-			Calipso.vent.trigger("layout:updateModel", rowModel);
+			Calipso.vent.trigger("genericShowContent", rowModel);
 		},
 		render : function() {
 			this.$el.html(this.template());
@@ -1507,14 +1507,14 @@ define("calipso", function(require) {
 			notificationsRegion : "#calipsoHeaderView-notificationsRegion"
 		},
 		onShow : function() {
-
+			// TODO:find whos triggering and change
 			this.listenTo(Calipso.vent, "header:hideSidebar", function() {
-				this.$el.find(".navbar-static-side").hide();
-				$("#page-wrapper").attr("id", "page-wrapper-toggled");
+//				this.$el.find(".navbar-static-side").hide();
+//				$("#page-wrapper").attr("id", "page-wrapper-toggled");
 			});
 			this.listenTo(Calipso.vent, "header:showSidebar", function() {
-				$("#page-wrapper-toggled").attr("id", "page-wrapper");
-				this.$el.find(".navbar-static-side").show();
+//				$("#page-wrapper-toggled").attr("id", "page-wrapper");
+//				this.$el.find(".navbar-static-side").show();
 			});
 
 			var menuModel = [ {
@@ -1600,13 +1600,17 @@ define("calipso", function(require) {
 //				}
 			}
 
-			this.listenTo(Calipso.vent, "genericFormSaved", function() {
+			this.listenTo(Calipso.vent, "genericFormSaved", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSaved");
 				_this.showContent(_this.model);
 			}, this);
 			this.listenTo(Calipso.vent, "genericFormSearched", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched");
 				_this.showContent(_this.model);
+			});
+			this.listenTo(Calipso.vent, "genericShowContent", function(model) {
+				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched");
+				_this.showContent(model);
 			});
 			// vent handling might be overriden by subclasses 
 			if (!options.dontListenTo) {
@@ -1616,34 +1620,35 @@ define("calipso", function(require) {
 				this.listenTo(Calipso.vent, "layout:createModel", function(itemModelType) {
 					_this.showItemViewForModel(itemModelType.create(), "create");
 				}, this);
-				this.listenTo(Calipso.vent, "layout:updateModel", function(itemModel) {
-					_this.showItemViewForModel(itemModel, "update");
-				}, this);
+//				this.listenTo(Calipso.vent, "layout:updateModel", function(itemModel) {
+//					_this.showItemViewForModel(itemModel, "update");
+//				}, this);
 			}
 
 		},
-		showItemViewForModel : function(itemModel, formSchemaKey) {
-			if (!formSchemaKey) {
-				formSchemaKey = "view";
-			}
-			//  get item view type for model
-			var ItemViewType = itemModel.getItemViewType();
-			// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
-			// create new item view instance with model
-			var childView = new ItemViewType({
-				formSchemaKey : formSchemaKey,
-				model : itemModel
-			});
-			// show item view
-			this.contentRegion.show(childView);
-			var navUrl = itemModel.getPathFragment() + "/" + (itemModel.isNew() ? "new" : itemModel.get("id"));
-			if (formSchemaKey != "view") {
-				navUrl += "/" + formSchemaKey;
-			}
-			Calipso.navigate(navUrl, {
-				trigger : false
-			});
-		},
+		// TODO: remove
+//		showItemViewForModel : function(itemModel, formSchemaKey) {
+//			if (!formSchemaKey) {
+//				formSchemaKey = "view";
+//			}
+//			//  get item view type for model
+//			var ItemViewType = itemModel.getItemViewType();
+//			// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
+//			// create new item view instance with model
+//			var childView = new ItemViewType({
+//				formSchemaKey : formSchemaKey,
+//				model : itemModel
+//			});
+//			// show item view
+//			this.contentRegion.show(childView);
+//			var navUrl = itemModel.getPathFragment() + "/" + (itemModel.isNew() ? "new" : itemModel.get("id"));
+//			if (formSchemaKey != "view") {
+//				navUrl += "/" + formSchemaKey;
+//			}
+//			Calipso.navigate(navUrl, {
+//				trigger : false
+//			});
+//		},
 		showContent : function(routeModel) {
 			var _this = this;
 			var isSearch = routeModel.get("isSearchModel");
@@ -1655,9 +1660,9 @@ define("calipso", function(require) {
 			var ContentViewType;
 			var contentView;
 			if (isSearch) {
-				if (_this.hideSidebarOnSearched) {
-					_this.hideSidebar();
-				} 
+//				if (_this.hideSidebarOnSearched) {
+//					_this.hideSidebar();
+//				} 
 				// console.log("ModelDrivenBrowseLayout#showContent 1");
 				if (_this.skipToSingleResult && routeModel.wrappedCollection.length == 1) {
 					// console.log("GenericSearchLayout#showContent 1.1");
@@ -1669,6 +1674,7 @@ define("calipso", function(require) {
 						model : routeModel.wrappedCollection.first()
 					});
 				} else {
+					_this.showSidebar(routeModel);
 					// console.log("ModelDrivenBrowseLayout#showContent 1.2");
 					ContentViewType = routeModel.getCollectionViewType();
 					contentView = new ContentViewType({
@@ -1691,7 +1697,7 @@ define("calipso", function(require) {
 				contentView = new ContentViewType({
 					model : routeModel
 				});
-
+				_this.hideSidebar();
 			}
 			// console.log("ModelDrivenBrowseLayout.showContent, ContentViewType: " + ContentViewType.getTypeName());
 
@@ -1714,17 +1720,19 @@ define("calipso", function(require) {
 		isSubmitted : false,
 		sidebarFormSchemaKey : "search",
 		hideSidebarOnSearched : false,
+		forceFormSubmitOnly : false,
 		onGenericFormSearched : function(options) {
 			// override callbacl
 		},
 		initialize : function(options) {
 			var _this = this;
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
+			// TODO
 			if (options.hideSidebarOnSearched) {
-				this.hideSidebarOnSearched = true;
+				//this.hideSidebarOnSearched = true;
 			}
 			if (options.forceFormSubmitOnly) {
-				this.forceFormSubmitOnly = true;
+				//this.forceFormSubmitOnly = true;
 			}
 //			// TODO: add forceFormSubmitIfEmptyResult
 //			if (this.options.searchResultsCollection) {
@@ -1761,8 +1769,9 @@ define("calipso", function(require) {
 			this.sidebarRegion.show(formView);
 		},
 		showItemViewForModel : function(itemModel, formSchemaKey) {
-			Calipso.view.ModelDrivenBrowseLayout.prototype.showItemViewForModel.apply(this, arguments);
-			this.hideSidebar();
+			console.log("SHOULD NOT BE CALLED: showItemViewForModel");
+//			Calipso.view.ModelDrivenBrowseLayout.prototype.showItemViewForModel.apply(this, arguments);
+//			this.hideSidebar();
 		},
 		hideSidebar : function() {
 			this.$el.find("#calipsoModelDrivenSearchLayout-sideBarRegion").hide();
@@ -2409,19 +2418,23 @@ define("calipso", function(require) {
 			}
 		},
 		initialize : function(options) {
-			formSchemaKey : "view",
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			console.log("GenericFormView#initialize, this.model: ");
 			console.log(this.model);
 			console.log("GenericFormView#initialize, options.model: ");
 			console.log(options.model);
 			
+			if (options.model) {
+				this.model = options.model;
+			}
+			if (!this.model) {
+				throw new "GenericFormView: a 'model' option is required";
+			}
 			// set schema action/key
 			if (options.formSchemaKey) {
 				this.formSchemaKey = options.formSchemaKey;
-			} else if (this.model) {
-				this.formSchemaKey = this.model.isNew() ? "create" : "view";
-			} else {
+			} 
+			else {
 				this.formSchemaKey = "search";
 			}
 
