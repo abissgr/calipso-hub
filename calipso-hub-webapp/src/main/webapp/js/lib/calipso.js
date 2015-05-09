@@ -1602,12 +1602,12 @@ define("calipso", function(require) {
 
 			this.listenTo(Calipso.vent, "genericFormSaved", function() {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSaved");
-				Backbone.history.history.back()
+				_this.showContent(_this.model);
 			}, this);
-			this.listenTo(Calipso.vent, "genericFormSearched", function() {
+			this.listenTo(Calipso.vent, "genericFormSearched", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched");
-				Backbone.history.history.back()
-			}, this);
+				_this.showContent(_this.model);
+			});
 			// vent handling might be overriden by subclasses 
 			if (!options.dontListenTo) {
 				this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
@@ -1678,6 +1678,9 @@ define("calipso", function(require) {
 					if (_this.model.wrappedCollection && _this.model.wrappedCollection.data) {
 						searchedUrl = searchedUrl + "?" + $.param(_this.model.wrappedCollection.data);
 					}
+					Calipso.navigate(searchedUrl, {
+						trigger : false
+					});
 				
 				}
 
