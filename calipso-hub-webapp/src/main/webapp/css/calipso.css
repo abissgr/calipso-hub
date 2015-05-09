@@ -349,7 +349,10 @@ button[class^="btn-cancel-search-"], button[class*=" btn-cancel-search-"] {
 // Forms
 //////////////////////////////////////////////*/
 .generic-form-view label{
-	font-size:80%;
+    font-size:80%;
+}
+.generic-form-view fieldset{
+    padding-top:10.5px
 }
 
 /*//////////////////////////////////////////////
@@ -589,7 +592,7 @@ a:hover, a:focus {
 }
 @media (min-width: 48em) {
   .responsive-table tbody td {
-    text-align: center;
+   /* text-align: center;*/
   }
 }
 .responsive-table tbody td[data-type=currency] {
