@@ -21,6 +21,7 @@ import gr.abiss.calipso.model.interfaces.Metadatum;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -61,7 +62,7 @@ public interface LocalUser {
 
 	String getRedirectUrl();
 
-	Collection<? extends GrantedAuthority> getRoles();
+	List<? extends GrantedAuthority> getRoles();
 
 	Map<String, ? extends Metadatum> getMetadata();
 

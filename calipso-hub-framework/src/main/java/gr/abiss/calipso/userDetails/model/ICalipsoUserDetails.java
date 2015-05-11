@@ -2,6 +2,7 @@ package gr.abiss.calipso.userDetails.model;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -105,7 +106,7 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public void setPassword(String password);
 
-	public void setAuthorities(Collection<? extends GrantedAuthority> authorities);
+	public void setAuthorities(List<? extends GrantedAuthority> authorities);
 
 	public Long getNotificationCount();
 	

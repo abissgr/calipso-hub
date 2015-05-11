@@ -207,17 +207,18 @@ HttpServletRequest request,
 	@RequestMapping(value = "userDetails/logout", method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST})
 	@ResponseBody
 	public void logout(HttpServletRequest request,
-			HttpServletResponse response, @RequestBody UserDetails resource) {
+			HttpServletResponse response) {
 		// logout
-		this.delete(request, response, resource);
+		this.delete(request, response);
 	}
 	
 	@RequestMapping(value = "userDetails", method = RequestMethod.DELETE)
 	@ResponseBody
 	public void delete(HttpServletRequest request,
-			HttpServletResponse response, @RequestBody UserDetails resource) {
+			HttpServletResponse response) {
 		// logout
 		SecurityUtil.logout(request, response, userDetailsConfig);
+		
 	}
 
 

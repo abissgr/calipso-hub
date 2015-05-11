@@ -24,6 +24,7 @@ import gr.abiss.calipso.userDetails.integration.LocalUser;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -92,7 +93,7 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private boolean isModerator = false;
 
 	@JsonProperty(value = "roles")
-	private Collection<? extends GrantedAuthority> authorities;
+	private List<? extends GrantedAuthority> authorities;
 	private Map<String, String> metadata;
 	
 	@JsonSerialize(using = SkipPropertySerializer.class)
@@ -560,7 +561,7 @@ public class UserDetails implements  ICalipsoUserDetails{
 	 */
 	@Override
 	public void setAuthorities(
-			Collection<? extends GrantedAuthority> authorities) {
+			List<? extends GrantedAuthority> authorities) {
 		this.authorities = authorities;
 	}
 

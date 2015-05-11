@@ -1937,6 +1937,8 @@ var Row = Backgrid.Row = Backbone.View.extend({
      @return {Backgrid.Cell}
   */
   makeCell: function (column) {
+//	  console.log("makeCell, column: "+JSON.stringify(column));
+//	  console.log("makeCell, this.model: "+ this.model);
     return new (column.get("cell"))({
       column: column,
       model: this.model

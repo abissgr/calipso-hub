@@ -2,14 +2,14 @@
 *  Your specific application stylesheet
 **/
 
-/* Sticky footer styles
+/* Sticky footer styles calipsoMainContentRegion
 -------------------------------------------------- */
 .tmpl-hint{display:none}
 .hidden{display:none}
 html,
 body {
   height: 100%;
-  
+  background-color: #ffffff;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   /* The html and body elements cannot have any padding or margin. */
@@ -44,6 +44,38 @@ button[class^="btn-cancel-search-"], button[class*=" btn-cancel-search-"] {
 }
 .backgrid th.backgrid-create-new-header-cell{
     text-align: right;
+}
+
+div#navbar-menu div.navbar-default{
+    background-color: transparent;
+}
+
+div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link,
+div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:link,
+div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:hover{
+	display:block;
+	text-decoration: none;
+	font-size:smaller;;
+}
+div#sidebar-collapse-accordion,
+
+#calipsoMainContentRegion {
+    padding-top: 10.5px;
+}
+div#sidebar-collapse-accordion div.panel-body{
+    padding-top:0px;
+    padding-right:0px;
+    padding-bottom:0px;
+    padding-left:0px;
+}
+div#sidebar-collapse-accordion div.panel-heading,
+div#sidebar-collapse-accordion h4.panel-title,
+div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link,
+div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:link,
+div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:hover,
+div#sidebar-collapse-accordion div.panel div.panel-body .nav > li > a:hover{
+    background-color: #f8f8f8;
+    color: #777777;
 }
 /*
   backgrid
@@ -571,7 +603,7 @@ a:hover, a:focus {
 }
 @media (min-width: 48em) {
   .responsive-table tbody tr:nth-of-type(even) {
-    background-color: rgba(94, 93, 82, 0.1);
+    background-color: #f8f8f8;
   }
 }
 .responsive-table tbody th[scope="row"] {
@@ -584,7 +616,6 @@ a:hover, a:focus {
   }
 }
 .responsive-table tbody td {
-  text-align: right;
 }
 @media (min-width: 30em) {
   .responsive-table tbody td {

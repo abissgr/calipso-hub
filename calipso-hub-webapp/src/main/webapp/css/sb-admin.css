@@ -27,12 +27,12 @@ body {
 }
 
 @media(min-width:768px) {
-    #page-wrapper {
+    #page-wrapper.loggedIn {
         position: inherit;
         margin-left: 250px;
        
         min-height: 1300px;
-        border-left: 1px solid #e7e7e7;
+        /*border-left: 1px solid #e7e7e7;*/
     }
 }
 

@@ -225,7 +225,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	 * @param role the role to add
 	 */
 	public void addRole(Role role) {
-		if (CollectionUtils.isEmpty(roles)) {
+		if (this.roles == null) {
 			this.roles = new LinkedList<Role>();
 		}
 		this.roles.add(role);
@@ -416,7 +416,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	}
 
 	@Override
-	public Collection<? extends GrantedAuthority> getRoles() {
+	public List<? extends GrantedAuthority> getRoles() {
 		return this.roles;
 	}
 

@@ -20,6 +20,7 @@ import gr.abiss.calipso.userDetails.integration.LocalUser;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -36,7 +37,7 @@ public class SimpleLocalUser implements LocalUser {
 	private String lastName;
 	private Serializable id;
 	private String redirectUrl;
-	private Collection<? extends GrantedAuthority> roles;
+	private List<? extends GrantedAuthority> roles;
 	private Map<String, ? extends Metadatum> metadata;
 
 	@Override
@@ -109,7 +110,7 @@ public class SimpleLocalUser implements LocalUser {
 		this.id = id;
 	}
 
-	public void setRoles(Collection<? extends GrantedAuthority> roles) {
+	public void setRoles(List<? extends GrantedAuthority> roles) {
 		this.roles = roles;
 	}
 
@@ -133,7 +134,7 @@ public class SimpleLocalUser implements LocalUser {
 	}
 
 	@Override
-	public Collection<? extends GrantedAuthority> getRoles() {
+	public List<? extends GrantedAuthority> getRoles() {
 		return this.roles;
 	}
 

@@ -16,58 +16,55 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'calipso'],
-		function( Calipso) {
-			var HostModel = Calipso.model.GenericModel.extend({
-			},
-			// static members
-			{
-				parent : Calipso.model.GenericModel,
-			});
+define([ 'calipso' ], function(Calipso) {
+	var HostModel = Calipso.model.GenericModel.extend({},
+	// static members
+	{
+		parent : Calipso.model.GenericModel,
+	});
 
-			HostModel.prototype.showInMenu = true;
-			
-			/**
-			 * Get the model class URL fragment corresponding this class
-			 * @returns the URL path fragment as a string
-			 */
-			HostModel.prototype.getPathFragment = function() {
-				return "hosts";
-			}
-		
-			HostModel.prototype.getTypeName = function() {
-			 		return "HostModel";
-			}
-			HostModel.prototype.getLayoutViewType = function() {
-				return Calipso.view.ModelDrivenSearchLayout
-			}
-			HostModel.prototype.getFormSchemas = function() {
-				console.log("HostModel.prototype.getFormSchemas() called, will return undefined");
-				return {//
-					domain : {
-						"search": 'Text',
-						"default": {
-							type: 'Text',
-							validators : [ 'required' ]
-						}
-					},
-				};
-			}
-			HostModel.prototype.getGridSchema = function() {
-				return [
-				{
-					name : "domain",
-					label : "domain",
-					editable : false,
-					cell : Calipso.components.ViewRowCell
-				
-				}, {
-					name : "edit",
-					label : "",
-					editable : false,
-					cell : Calipso.components.ViewRowCell
-					
-				}];
-			}
-			return HostModel;
-		});
+	HostModel.prototype.showInMenu = true;
+
+	/**
+	 * Get the model class URL fragment corresponding this class
+	 * @returns the URL path fragment as a string
+	 */
+	HostModel.prototype.getPathFragment = function() {
+		return "hosts";
+	}
+
+	HostModel.prototype.getTypeName = function() {
+		return "HostModel";
+	}
+	HostModel.prototype.getLayoutViewType = function() {
+		return Calipso.view.ModelDrivenSearchLayout
+	}
+	HostModel.prototype.getFormSchemas = function() {
+		console.log("HostModel.prototype.getFormSchemas() called, will return undefined");
+		return {//
+			domain : {
+				"search" : 'Text',
+				"default" : {
+					type : 'Text',
+					validators : [ 'required' ]
+				}
+			},
+		};
+	}
+	HostModel.prototype.getGridSchema = function() {
+		return [ {
+			name : "domain",
+			label : "domain",
+			editable : false,
+			cell : Calipso.components.backgrid.ViewRowCell
+
+		}, {
+			name : "edit",
+			label : "edit",
+			editable : false,
+			cell : Calipso.components.backgrid.EditRowCell,
+			headerCell : Calipso.components.backgrid.CreateNewHeaderCell
+		} ];
+	}
+	return HostModel;
+});
