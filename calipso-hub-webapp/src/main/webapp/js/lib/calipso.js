@@ -1805,8 +1805,8 @@ define("calipso", function(require) {
 		},
 		initialize : function(options) {
 			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
-			console.log("Calipso.view.ModelDrivenBrowseLayout#initialize");
-
+			console.log("Calipso.view.ModelDrivenBrowseLayout#initialize, scrolling to top");
+			$(window).scrollTop(0);
 			var _this = this;
 			
 
