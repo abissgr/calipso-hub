@@ -866,6 +866,9 @@ define("calipso", function(require) {
 		getLayoutViewType : function() {
 			return this.prototype.getLayoutViewType(this);
 		},
+		getLayoutOptions : function() {
+			return this.prototype.getLayoutOptions(this);
+		},
 		/**
 		 * Get the collection view type for collections of this model. To specify a collection 
 		 * view for your model under a static or instance context, override 
@@ -1032,7 +1035,10 @@ define("calipso", function(require) {
 		label : "GenericModel",
 
 	});
-	
+
+	Calipso.model.GenericModel.prototype.getLayoutOptions = function(){
+		return {};
+	};
 	Calipso.model.GenericModel.prototype.isPublic = function(){
 		return false;
 	};
@@ -1541,6 +1547,90 @@ define("calipso", function(require) {
 
 	Calipso.view.AbstractLayout = Backbone.Marionette.LayoutView.extend({
 		containerClass : "container-fluid",
+		/** Stores the final configuration */
+		config : null,
+		/**
+		 * Get the default config.
+		 */
+		getDefaultConfig : function(){
+			var defaultConfig = {};
+			// superDefaultConfig = _.result(**SuperClassHere**.prototype, 'getDefaultConfig')
+			// _.extend(superDefaultConfig, defaultConfig);
+			return defaultConfig;
+		},
+		/**
+		 * Get an array of required option names. An error will be thrown 
+		 * during initialization if anyone is undefined or null.  
+		 */
+		getRequiredOptionNames : function(){
+			return [];
+		}, 
+		/**
+		 * Validate the final configuration. Called during initialization 
+		 * by {Calipso.view.AbstractLayout#configure}. Internal use only.
+		 */
+		_validateConfiguration : function(){
+			var missing = [];
+			var requiredOptionNames = this.getRequiredOptionNames();
+			if(requiredOptionNames && requiredOptionNames.length > 0){
+				for(var i=0; i < requiredOptionNames.length; i++){
+					var requiredOptionName = requiredOptionNames[i];
+					var finalOption = this.config.option[requiredOptionName];
+					if(finalOption == undefined || finalOption == null){
+						missing.push(requiredOptionName);
+					}
+				}
+			}
+			if(missing.length > 0){
+				throw this.prototype.getTypeName() + 
+					"#validateConfiguration ERROR: missing required options" + 
+					missing.toString();
+			}
+		},
+		/**
+		 * (Re) Configure by overwriting this.config with according to 
+		 * this.model.getLayoutOptions and then by relevant options only.
+		 * Finally, validate configuration for missing required options.
+		 */
+		configure : function(options){
+			if (options.model) {
+				this.model = options.model;
+				if (this.model.wrappedCollection) {
+					this.searchResultsCollection = this.model.wrappedCollection;
+				}
+			}
+			// initialize config using defaults 
+			console.log("Calipso.view.AbstractLayout#configure, options ");
+			console.log(options);
+			this.config = this.getDefaultConfig();
+			console.log("Calipso.view.AbstractLayout#configure, default config ");
+			console.log(this.config);
+			console.log("Calipso.view.AbstractLayout#configure, this.model:");
+			console.log(this.model);
+			// (re) configure according to this.model.getLayoutOptions 
+//			_.extend(this.config, this.model.prototype.getLayoutOptions(this.model));
+			console.log("Calipso.view.AbstractLayout#configure, config with layout options:");
+			console.log(this.config);
+			// and then again by relevant options only
+			options = options || {};
+			_.extendOwn(this.config, options);
+			console.log("Calipso.view.AbstractLayout#configure, final config with options:");
+			console.log(this.config);
+			// validate config
+			this._validateConfiguration();
+		},
+		onBeforeRender: function(){
+			// set up final bits just before rendering the view's `el`
+			console.log("Calipso.view.AbstractLayout#onBeforeRender: this.options: ");
+			console.log(this.options);
+			console.log("Calipso.view.AbstractLayout#onBeforeRender: this.model: ");
+			console.log(this.model);
+			this.configure(this.options);
+		},
+		initialize : function(options){
+			Backbone.Marionette.LayoutView.prototype.initialize.apply(this, arguments);
+			// TODO move this method call into non-public marionette API?
+		},
 		getTypeName : function() {
 			return this.prototype.getTypeName();
 		}
@@ -1603,6 +1693,14 @@ define("calipso", function(require) {
 			menuRegion : "#calipsoHeaderView-menuRegion",
 			notificationsRegion : "#calipsoHeaderView-notificationsRegion"
 		},
+		// TODO: investigate
+//		serializeData: function(){
+//			var _this = this;
+//			return {
+//				model: _this.model,
+//				message: "serializeData works",
+//			}
+//		},
 		onShow : function() {
 			// TODO:find whos triggering and change
 			this.listenTo(Calipso.vent, "header:hideSidebar", function() {
@@ -1671,13 +1769,21 @@ define("calipso", function(require) {
 			return "HeaderView";
 		}
 	});
-	Calipso.view.ModelDrivenBrowseLayout = Marionette.LayoutView.extend(
+	Calipso.view.ModelDrivenBrowseLayout = Calipso.view.AbstractLayout.extend(
 	/** @lends Calipso.view.ModelDrivenBrowseLayout.prototype */
 	{
 		tagName : 'div',
 		id : "calipsoModelDrivenBrowseLayout",
 		template : require('hbs!template/md-browse-layout'),
-		skipToSingleResult : false,
+		/**
+		 * Get the default config. Overwrites {Calipso.view.AbstractLayout#getDefaultConfig}
+		 */
+		getDefaultConfig : function(){
+			var defaultConfig = Calipso.view.AbstractLayout.prototype.getDefaultConfig.apply(this);
+			// now set this class' default config
+			defaultConfig.skipToSingleResult = false;
+			return defaultConfig;
+		},
 		regions : {
 			contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion"
 		},
@@ -1686,18 +1792,10 @@ define("calipso", function(require) {
 		},
 		initialize : function(options) {
 
-			Marionette.LayoutView.prototype.initialize.apply(this, arguments);
+			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
 
 			var _this = this;
-			if (options.skipToSingleResult) {
-				this.skipToSingleResult = true;
-			}
-			if (options.model) {
-				this.model = options.model;
-//				if (this.model.wrappedCollection) {
-//					this.searchResultsCollection = this.model.wrappedCollection;
-//				}
-			}
+			
 
 			this.listenTo(Calipso.vent, "genericFormSaved", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSaved, showing this.model: "+_this.model);
@@ -1706,6 +1804,8 @@ define("calipso", function(require) {
 			this.listenTo(Calipso.vent, "genericFormSearched", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched, showing this.model: "+_this.model);
 				_this.showContent(_this.model);
+				_this.$el.find("#collapseOne").collapse('hide');
+				_this.$el.find("#collapseTwo").collapse('show');
 			});
 			this.listenTo(Calipso.vent, "genericShowContent", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched, showing given model: "+model);
@@ -1754,8 +1854,8 @@ define("calipso", function(require) {
 			console.log("ModelDrivenBrowseLayout#showContent, isSearch: " + isSearch);
 		// get content view
 			var singleResultType = !isSearch
-				|| ( _this.skipToSingleResult && searchResultsCollection.length == 1);
-			// console.log("ModelDrivenBrowseLayout.showContent: '" + routeModel.get("id") + "', skipToSingleResult: " + _this.skipToSingleResult + ", collection length: " + (routeModel.wrappedCollection ? routeModel.wrappedCollection.length : "none"));
+				|| ( _this.config.skipToSingleResult && searchResultsCollection.length == 1);
+			// console.log("ModelDrivenBrowseLayout.showContent: '" + routeModel.get("id") + "', _this.config.skipToSingleResult: " + _this.config.skipToSingleResult + ", collection length: " + (routeModel.wrappedCollection ? routeModel.wrappedCollection.length : "none"));
 			// get the model collection view type
 			var ContentViewType;
 			var contentView;
@@ -1780,7 +1880,7 @@ define("calipso", function(require) {
 			var _this = this;
 			var searchResultsView;
 			var ContentViewType;
-			if (_this.skipToSingleResult && routeModel.wrappedCollection.length == 1) {
+			if (_this.config.skipToSingleResult && routeModel.wrappedCollection.length == 1) {
 				var singleModel = routeModel.wrappedCollection.first();
 				console.log("ModelDrivenBrowseLayout#getSearchResultsViewForModel, building ItemView for single result: " + singleModel.getTypeName() + '#' + singleModel.get("id"));
 				ContentViewType = routeModel.getItemViewType();
@@ -1818,29 +1918,29 @@ define("calipso", function(require) {
 		tagName : 'div',
 		id : "calipsoModelDrivenSearchLayout",
 		template : require('hbs!template/md-search-layout'),
-		isSubmitted : false,
-		sidebarFormSchemaKey : "search",
-		hideSidebarOnSearched : false,
-		forceFormSubmitOnly : false,
+		/**
+		 * Get the default config. Overwrites {Calipso.view.AbstractLayout#getDefaultConfig}
+		 */
+		getDefaultConfig : function(){
+			var defaultConfig =Calipso.view.ModelDrivenBrowseLayout.prototype.getDefaultConfig.apply(this);
+			// now set this class' default config
+			defaultConfig.hideSidebarOnSearched = false;
+			defaultConfig.skipInitialResultsIfNoCriteria = true;
+			return defaultConfig;
+		},
 		onGenericFormSearched : function(options) {
 			// override callbacl
 		},
 		initialize : function(options) {
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
 			var _this = this;
-			// TODO
-			if (options.hideSidebarOnSearched) {
-				//this.hideSidebarOnSearched = true;
-			}
-			if (options.forceFormSubmitOnly) {
-				this.forceFormSubmitOnly = true;
-				this.hideContent();
-			}
-//			// TODO: add forceFormSubmitIfEmptyResult
-//			if (this.options.searchResultsCollection) {
-//				this.searchResultsCollection = options.searchResultsCollection;
-//			}
 
+			if (this.options.searchResultsCollection) {
+				this.searchResultsCollection = options.searchResultsCollection;
+			}
+			else{
+				this.searchResultsCollection = this.model.wrappedCollection;
+			}
 		},
 		regions : {
 			sidebarRegion : "#calipsoModelDrivenSearchLayout-sideBarRegion",
@@ -1848,27 +1948,31 @@ define("calipso", function(require) {
 		},
 		onShow : function() {
 			var _this = this;
+			var hasCriteria =  _.size(this.searchResultsCollection.data) > 0;
+			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, hasCriteria = " + hasCriteria);
+			var bShowSidebar = !this.config.hideSidebarOnSearched && hasCriteria;
+			var bShowContent = !this.config.skipInitialResultsIfNoCriteria || !hasCriteria;
+			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, bShowSidebar = " + bShowSidebar);
+			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, bShowContent = " + bShowContent);
 
-			var skipContent = false ;//this.forceFormSubmitOnly && !this.submitted;
-			if(this.forceFormSubmitOnly){
-				this.hideContent();
-			}
-			else {
-				this.showContent(this.model);
-			}
 			this.showSidebar(this.model);
+			this.showContent(this.model);
+			
+			
 		},
 		showSidebar : function(routeModel) {
 			var _this = this;
-			// create the search form view
-			console.log("Creating sidebar search form with formSchemaKey " + _this.sidebarFormSchemaKey);
-			var formView = new Calipso.view.GenericFormView({
-				formSchemaKey : _this.sidebarFormSchemaKey,
-				model : routeModel
-			});
+			// create the search form view if not there
+			if(!this.sidebarRegion.hasView()){
+				console.log("Calipso.view.ModelDrivenSearchLayout#showSidebar search form with formSchemaKey " + _this.model.getFormSchemaKey());
+				var formView = new Calipso.view.GenericFormView({
+					formSchemaKey :  _this.model.getFormSchemaKey(),
+					model : routeModel
+				});
+				// show the search form
+				this.sidebarRegion.show(formView);
+			}
 
-			// show the search form
-			this.sidebarRegion.show(formView);
 		},
 		showItemViewForModel : function(itemModel, formSchemaKey) {
 			console.log("SHOULD NOT BE CALLED: showItemViewForModel");
@@ -1876,12 +1980,14 @@ define("calipso", function(require) {
 //			this.hideSidebar();
 		},
 		hideSidebar : function() {
-			this.$el.find("#calipsoModelDrivenSearchLayout-sideBarRegion").hide();
-			this.$el.find("#calipsoModelDrivenSearchLayout-contentRegion").removeClass("col-sm-9").addClass("col-sm-12");
+			console.log("ModelDrivenSearchLayout#hideSidebar");
+//			this.$el.find("#calipsoModelDrivenSearchLayout-sideBarRegion").hide();
+//			this.$el.find("#calipsoModelDrivenSearchLayout-contentRegion").removeClass("col-sm-9 col-sm-6").addClass("col-sm-12");
 		},
 		hideContent : function() {
-			this.$el.find("#calipsoModelDrivenSearchLayout-contentRegion").hide();
-			this.$el.find("#calipsoModelDrivenSearchLayout-sideBarRegion").removeClass("col-sm-3").addClass("col-sm-12");
+			console.log("ModelDrivenSearchLayout#hideContent");
+//			this.$el.find("#calipsoModelDrivenSearchLayout-contentRegion").hide();
+//			this.$el.find("#calipsoModelDrivenSearchLayout-sideBarRegion").removeClass("col-sm-3 col-sm-9").addClass("col-sm-12");
 		},
 		
 	}, {
@@ -3169,26 +3275,32 @@ define("calipso", function(require) {
 			 * @example 
 			 *  {{#ifUserInRole "ROLE_MANAGER" "ROLE_ADMIN"}}  <p>User is either a Manager or an Administrator! </p>{{/ifUserInRole}}
 			 */
+			// TODO: move these helpers to root scope  
+			// and replace _this.userDetails with Calipso.session.userDetails
 			Handlebars.registerHelper("ifUserInRole", function() {
 				var hasRole = false;
 				// only process if the user is authenticated
 				if (_this.isAuthenticated()) {
 					//Last argument is the options object.
 					var options = arguments[arguments.length - 1];
-					// now get the given roles, skipping the last argument.
-					var givenRoles = [];
+					
+					// now get input roles, the ones to check for just a single match
+					var inputRoles = [];
 					for (var i = 0; i < arguments.length - 1; ++i) {
-						givenRoles.push(arguments[i]);
+						inputRoles.push(arguments[i]);
 					}
-					console.log("ifHasRole, givenRoles: " + givenRoles);
+					console.log("ifHasRole, inputRoles: " + inputRoles);
 					// now check if user has any of the given roles
-					if (givenRoles) {
-						var givenRole;
-						for (var j = 0; j < givenRoles.length && hasRole == false; j++) {
-							givenRole = givenRoles[j];
-							for (var k = 0; k < _this.userDetails.get("roles").length; k++) {
-								console.log("ifHasRole, comparing to role name: " + _this.userDetails.get("roles")[k].name);
-								if (givenRole == _this.userDetails.get("roles")[k].name) {
+					if (inputRoles) {
+						var inputRole;
+						for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
+							inputRole = inputRoles[j];
+							var ownedRoles = _this.userDetails.get("roles");
+							for (var k = 0; k < ownedRoles.length; k++) {
+								var ownedRole = ownedRoles[k];
+								console.log("ifHasRole, comparing input role '" + inputRole + 
+										"' to user rolee '" + ownedRole.name);
+								if (inputRole == ownedRole.name) {
 									hasRole = true;
 									break;
 								}
@@ -3361,6 +3473,11 @@ define("calipso", function(require) {
 	Calipso.isAuthenticated = function(){
 		return Calipso.session && Calipso.session.isAuthenticated();
 	}
+	
+	
+	////////////////////////////////////////////////////////////////
+	// Handlebars Helpers
+	////////////////////////////////////////////////////////////////
 	/**
 	 * @example
 	 * {{#ifLoggedIn}} <p>User is logged in! </p>{{/ifLoggedIn}}
@@ -3642,7 +3759,8 @@ define("calipso", function(require) {
 
 					console.log("getModelForRoute, created model: " + modelForRoute);
 				}
-			} else {
+			}
+			else {
 				// create a model to use as a wrapper for a collection of
 				// instances of the same type, fill it with any given search criteria
 				if(!httpParams){
@@ -3678,7 +3796,7 @@ define("calipso", function(require) {
 			//				console.log("AbstractController#mainNavigationSearchRoute, argument: " + (arguments[i] + ' '));
 			//			}
 			var httpParams = Calipso.getHttpUrlParams();
-			//			console.log("AbstractController#mainNavigationSearchRoute, httpParams: " + httpParams.toSource());
+						console.log("AbstractController#mainNavigationSearchRoute, httpParams: " + httpParams.toSource());
 			this.mainNavigationCrudRoute(mainRoutePart, null, httpParams);
 
 		},
@@ -3702,11 +3820,12 @@ define("calipso", function(require) {
 			var renderFetchable = function() {
 
 				// get the layout type corresponding to the requested model
-				console.log(modelForRoute);
+				console.log();
 				var RequestedModelLayoutType = modelForRoute.getLayoutViewType();
 
 				// show the layout
 				// TODO: reuse layout if of the same type
+				console.log("AbstractController#mainNavigationCrudRoute, options.model for layout: "+modelForRoute);
 				var routeLayout = new RequestedModelLayoutType({
 					model : modelForRoute
 				});

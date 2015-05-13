@@ -49,7 +49,15 @@ button[class^="btn-cancel-search-"], button[class*=" btn-cancel-search-"] {
 div#navbar-menu div.navbar-default{
     background-color: transparent;
 }
-
+#calipsoModelDrivenSearchLayout-accordion .panel-heading a:after {
+    font-family:'Glyphicons Halflings';
+    content:"\e114";
+    float: right;
+    color: grey;
+}
+#calipsoModelDrivenSearchLayout-accordion .panel-heading a.collapsed:after {
+    content:"\e080";
+}
 div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link,
 div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:link,
 div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:hover{

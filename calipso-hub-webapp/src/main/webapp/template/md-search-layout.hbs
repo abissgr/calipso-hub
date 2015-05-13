@@ -1,10 +1,47 @@
 <div class="tmpl-hint">start md-browse-layout.hbs</div>
-<div id="calipsoModelDrivenSearchLayout-row" class="row">
-	<div class="col-sm-3" id="calipsoModelDrivenSearchLayout-sideBarRegion">
-	    <!--Body content-->
+<div class="panel-group" id="calipsoModelDrivenSearchLayout-accordion"
+	role="tablist" aria-multiselectable="true">
+
+	<div class="panel panel-default">
+		<div class="panel-heading" role="tab"
+			id="calipsoModelDrivenSearchLayout-headingOne">
+			<h4 class="panel-title">
+
+				<a data-toggle="collapse"
+					data-parent="#calipsoModelDrivenSearchLayout-accordion"
+					href="#collapseOne" aria-expanded="true"
+					aria-controls="collapseOne"> Search Criteria </a>
+			</h4>
+		</div>
+
+		<div id="collapseOne" class="panel-collapse collapse in"
+			role="tabpanel"
+			aria-labelledby="calipsoModelDrivenSearchLayout-headingOne">
+			<div class="panel-body"
+				id="calipsoModelDrivenSearchLayout-sideBarRegion">
+				<!--  panel content -->
+			</div>
+		</div>
 	</div>
-	<div class="col-sm-9" id="calipsoModelDrivenSearchLayout-contentRegion">
-	    <!--Body content-->
+
+	<div class="panel panel-default">
+		<div class="panel-heading" role="tab"
+			id="calipsoModelDrivenSearchLayout-headingTwo">
+			<h4 class="panel-title">
+				<a class="collapsed" data-toggle="collapse"
+					data-parent="#calipsoModelDrivenSearchLayout-accordion"
+					href="#collapseTwo" aria-expanded="false"
+					aria-controls="collapseTwo"> Search Results	</a>
+			</h4>
+		</div>
+		<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
+			aria-labelledby="calipsoModelDrivenSearchLayout-headingTwo">
+			<div class="panel-body"
+				id="calipsoModelDrivenSearchLayout-contentRegion">
+				<!--  panel content -->
+			</div>
+		</div>
 	</div>
+
 </div>
 <div class="tmpl-hint">end md-browse-layout.hbs</div>
