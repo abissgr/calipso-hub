@@ -58,6 +58,15 @@ div#navbar-menu div.navbar-default{
 #calipsoModelDrivenSearchLayout-accordion .panel-heading a.collapsed:after {
     content:"\e080";
 }
+.panel-results label{
+    border:0px;
+    font-weight: 700;
+    text-transform: uppercase;
+    top: 15px;
+}
+.panel-results label small{
+    text-transform: none;
+}
 div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link,
 div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:link,
 div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:hover{
@@ -391,9 +400,14 @@ div#sidebar-collapse-accordion div.panel div.panel-body .nav > li > a:hover{
 .generic-form-view label{
     font-size:80%;
 }
+.generic-form-view label small{
+    font-size:80%;
+    text-transform:none;
+}
 .generic-form-view fieldset{
     padding-top:10.5px
 }
+
 
 /*//////////////////////////////////////////////
 // Typeahead
@@ -603,7 +617,7 @@ a:hover, a:focus {
 @media (min-width: 48em) {
   .responsive-table tbody tr {
     display: table-row;
-    border-width: 1px;
+    /*border-width: 1px;*/
   }
 }
 .responsive-table tbody tr:last-of-type {

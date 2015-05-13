@@ -1482,7 +1482,15 @@ define("calipso", function(require) {
 		render : function() {
 			var _this = this;
 			function create() {
-				_this.$el.find("#" + _this.id).typeahead({
+				var $el = _this.$el.find("#" + _this.id);
+
+//				var editorAttrs = _this.schema.editorAttrs;
+//				if(editorAttrs){
+//					$.each(editorAttrs, function() {
+//						$el.attr(this.name, this.value);
+//					});
+//				}
+				$el.typeahead({
 							minLength : _this.minLength,
 							highlight : true,
 							hint : true
@@ -1509,13 +1517,21 @@ define("calipso", function(require) {
 		render : function() {
 			var _this = this;
 			function create() {
-				_this.$el.find("#" + _this.id + "Typeahead").typeahead({
-					minLength : _this.minLength,
-					highlight : true,
-					hint : true
-				},
-				_this.typeaheadSource
-			).on('typeahead:selected', function(e, suggestion, name) {
+
+				var $el = _this.$el.find("#" + _this.id + "Typeahead");
+//				var editorAttrs = _this.schema.editorAttrs;
+//				if(editorAttrs){
+//					$.each(editorAttrs, function() {
+//						$el.attr(this.name, this.value);
+//					});
+//				}
+				$el.typeahead({
+						minLength : _this.minLength,
+						highlight : true,
+						hint : true
+					},
+					_this.typeaheadSource
+				).on('typeahead:selected', function(e, suggestion, name) {
 					_this.setValue(suggestion, name);
 				});
 				_this.$el.find("#" + _this.id).val(_this.value.id ? _this.value.id : _this.value);
