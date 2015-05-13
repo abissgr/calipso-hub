@@ -819,6 +819,7 @@ define("calipso", function(require) {
 			// console.log("GenericModel#url: " + sUrl + ", is new: " + this.isNew() + ", id: " + this.get("id"));
 			return sUrl;
 		},
+		skipDefaultSearch : false,
 		isSearchModel : function(){
 			return this.wrappedCollection ? true :false;
 		},
@@ -1804,7 +1805,9 @@ define("calipso", function(require) {
 			this.listenTo(Calipso.vent, "genericFormSearched", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched, showing this.model: "+_this.model);
 				_this.showContent(_this.model);
+				window.alert("hide search form");
 				_this.$el.find("#collapseOne").collapse('hide');
+				window.alert("show search results");
 				_this.$el.find("#collapseTwo").collapse('show');
 			});
 			this.listenTo(Calipso.vent, "genericShowContent", function(model) {
@@ -1949,12 +1952,12 @@ define("calipso", function(require) {
 		onShow : function() {
 			var _this = this;
 			var hasCriteria =  _.size(this.searchResultsCollection.data) > 0;
-			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, hasCriteria = " + hasCriteria);
-			var bShowSidebar = !this.config.hideSidebarOnSearched && hasCriteria;
-			var bShowContent = !this.config.skipInitialResultsIfNoCriteria || !hasCriteria;
-			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, bShowSidebar = " + bShowSidebar);
-			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, bShowContent = " + bShowContent);
-
+			var skipSearch = this.model.skipDefaultSearch && !hasCriteria;
+			
+			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, hasCriteria = " + hasCriteria + ", skipSearch: " + skipSearch);
+			
+			_this.$el.find(skipSearch ? "#collapseOne" : "#collapseTwo").collapse('show');
+			
 			this.showSidebar(this.model);
 			this.showContent(this.model);
 			
@@ -3815,6 +3818,7 @@ define("calipso", function(require) {
 			var modelForRoute = this.getModelForRoute(ModelType, modelId, httpParams);
 			// decide whether we are fetching a model or a collection
 			var fetchable = modelForRoute.get("id") ? modelForRoute : modelForRoute.wrappedCollection;
+			var skipSearch = modelForRoute.skipDefaultSearch &&  modelForRoute.wrappedCollection.data == 0;
 			// promise to fetch then render
 			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id"));
 			var renderFetchable = function() {
@@ -3834,7 +3838,7 @@ define("calipso", function(require) {
 				// update page header tabs etc.
 				_self.syncMainNavigationState(modelForRoute);
 			};
-			if (fetchable.length == 0) {
+			if (!skipSearch && fetchable.length == 0) {
 				fetchable.fetch({
 					data : fetchable.data
 				}).then(renderFetchable);
