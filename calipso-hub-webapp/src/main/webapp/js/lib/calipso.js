@@ -1804,11 +1804,9 @@ define("calipso", function(require) {
 			}, this);
 			this.listenTo(Calipso.vent, "genericFormSearched", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched, showing this.model: "+_this.model);
+				_this.collapseSearchForm();
+				_this.expandSearchResults();
 				_this.showContent(_this.model);
-				window.alert("hide search form");
-				_this.$el.find("#collapseOne").collapse('hide');
-				window.alert("show search results");
-				_this.$el.find("#collapseTwo").collapse('show');
 			});
 			this.listenTo(Calipso.vent, "genericShowContent", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched, showing given model: "+model);
@@ -1827,6 +1825,18 @@ define("calipso", function(require) {
 //				}, this);
 			}
 
+		},
+		expandSearchForm : function(){
+			this.$el.find("#collapseOne").collapse('show');
+		},
+		collapseSearchForm : function(){
+			this.$el.find("#collapseOne").collapse('hide');
+		},
+		expandSearchResults : function(){
+			this.$el.find("#collapseTwo").collapse('show');
+		},
+		collapseSearchResults : function(){
+			this.$el.find("#collapseTwo").collapse('hide');
 		},
 		// TODO: remove
 //		showItemViewForModel : function(itemModel, formSchemaKey) {
@@ -1955,11 +1965,16 @@ define("calipso", function(require) {
 			var skipSearch = this.model.skipDefaultSearch && !hasCriteria;
 			
 			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, hasCriteria = " + hasCriteria + ", skipSearch: " + skipSearch);
-			
-			_this.$el.find(skipSearch ? "#collapseOne" : "#collapseTwo").collapse('show');
-			
+
 			this.showSidebar(this.model);
-			this.showContent(this.model);
+			if(skipSearch){
+				this.expandSearchForm();
+			}
+			else{
+				this.expandSearchResults();
+				this.showContent(this.model);
+			}
+			
 			
 			
 		},
