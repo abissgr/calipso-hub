@@ -1285,7 +1285,7 @@ define("calipso", function(require) {
 			label : "",
 			editable : false,
 			cell : Calipso.components.backgrid.EditRowCell,
-			//headerCell : Calipso.components.CreateNewHeaderCell
+			headerCell : Calipso.components.backgrid.CreateNewHeaderCell
 		} ];
 	};
 	Calipso.model.UserModel.prototype.getOverviewSchema = function(instance) {
@@ -1443,7 +1443,7 @@ define("calipso", function(require) {
 		createNewForManualEdit : function(e) {
 			//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
 			Calipso.stopEvent(e);
-			//Calipso.vent.trigger("layout:createModel", this.collection.model);
+			Calipso.vent.trigger("layout:createModel", this.collection.model);
 		},
 		render : function() {
 			var html = $("<button title='Create new' class='btn btn-xs btn-success'><i class='glyphicon glyphicon-asterisk'></i></button>");
@@ -1833,54 +1833,67 @@ define("calipso", function(require) {
 
 		},
 		// TODO: remove
-//		showItemViewForModel : function(itemModel, formSchemaKey) {
-//			if (!formSchemaKey) {
-//				formSchemaKey = "view";
-//			}
-//			//  get item view type for model
-//			var ItemViewType = itemModel.getItemViewType();
-//			// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
-//			// create new item view instance with model
-//			var childView = new ItemViewType({
-//				formSchemaKey : formSchemaKey,
-//				model : itemModel
-//			});
-//			// show item view
-//			this.contentRegion.show(childView);
-//			var navUrl = itemModel.getPathFragment() + "/" + (itemModel.isNew() ? "new" : itemModel.get("id"));
-//			if (formSchemaKey != "view") {
-//				navUrl += "/" + formSchemaKey;
-//			}
-//			Calipso.navigate(navUrl, {
-//				trigger : false
-//			});
-//		},
+		showItemViewForModel : function(itemModel, formSchemaKey) {
+			if (!formSchemaKey) {
+				formSchemaKey = "view";
+			}
+			//  get item view type for model
+			var ItemViewType = itemModel.getItemViewType();
+			// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
+			// create new item view instance with model
+			var childView = new ItemViewType({
+				formSchemaKey : formSchemaKey,
+				model : itemModel
+			});
+			// show item view
+			this.contentRegion.show(childView);
+			var navUrl = itemModel.getPathFragment() + "/" + (itemModel.isNew() ? "new" : itemModel.get("id"));
+			if (formSchemaKey != "view") {
+				navUrl += "/" + formSchemaKey;
+			}
+			Calipso.navigate(navUrl, {
+				trigger : false
+			});
+		},
 		showContent : function(routeModel) {
 			var _this = this;
 			var isSearch = routeModel.isSearchModel();
 			console.log("ModelDrivenBrowseLayout#showContent, isSearch: " + isSearch);
-		// get content view
+			// get content view
 			var singleResultType = !isSearch
-				|| ( _this.config.skipToSingleResult && searchResultsCollection.length == 1);
-			 console.log("ModelDrivenBrowseLayout.showContent: '" + routeModel.get("id") + "', _this.config.skipToSingleResult: " + _this.config.skipToSingleResult + ", collection length: " + (routeModel.wrappedCollection ? routeModel.wrappedCollection.length : "none"));
+			|| ( _this.config.skipToSingleResult && searchResultsCollection.length == 1);
+			console.log("ModelDrivenBrowseLayout.showContent: '" + routeModel.get("id") + "', _this.config.skipToSingleResult: " + _this.config.skipToSingleResult + ", collection length: " + (routeModel.wrappedCollection ? routeModel.wrappedCollection.length : "none"));
 			// get the model collection view type
 			var ContentViewType;
 			var contentView;
+			var searchedUrl;
 			if (isSearch) {
 				contentView = this.getSearchResultsViewForModel(routeModel);
+				searchedUrl = "" + routeModel.getPathFragment();
+				if (_this.model.wrappedCollection && _this.model.wrappedCollection.data) {
+					searchedUrl = searchedUrl + "?" + $.param(_this.model.wrappedCollection.data);
+					console.log("searchedUrl: "+searchedUrl)
+				}
 			} else {
-				 console.log("ModelDrivenBrowseLayout#showContent 2");
+				console.log("ModelDrivenBrowseLayout#showContent 2");
 				ContentViewType = routeModel.getItemViewType();
 				// create a new collection instance
 				contentView = new ContentViewType({
 					model : routeModel
 				});
-				
+
 			}
-//			 console.log("ModelDrivenBrowseLayout.showContent, ContentViewType: " + ContentViewType.prototype.getTypeName());
+//			console.log("ModelDrivenBrowseLayout.showContent, ContentViewType: " + ContentViewType.prototype.getTypeName());
 
 			//TODO reuse active view if of the same type
 			this.contentRegion.show(contentView);
+			// change location bar if appropriate
+			if(searchedUrl){
+				Calipso.navigate(searchedUrl, {
+					trigger : false
+				});
+			}
+
 		},
 		getSearchResultsViewForModel : function(routeModel){
 			var _this = this;
@@ -1900,10 +1913,6 @@ define("calipso", function(require) {
 					model : routeModel,
 					collection : routeModel.wrappedCollection
 				});
-				var searchedUrl = "" + routeModel.getPathFragment();
-				if (_this.model.wrappedCollection && _this.model.wrappedCollection.data) {
-					searchedUrl = searchedUrl + "?" + $.param(_this.model.wrappedCollection.data);
-				}
 				return searchResultsView;
 			}
 
