@@ -1467,8 +1467,8 @@ define("calipso", function(require) {
 		},
 		editEntry : function(e) {
 			Calipso.stopEvent(e);
-			console.log("EditInTabCell#editEntry");
 			var rowModel = this.model;
+			//console.log("EditInTabCell#editEntry "+ rowModel.getTypeName()+'#'+rowModel.get("id"));
 			// console.log("editRow, rowModel: " + rowModel.constructor.name);
 			Calipso.vent.trigger("genericShowContent", rowModel);
 		},
@@ -1885,7 +1885,7 @@ define("calipso", function(require) {
 				_this.onGenericFormSaved(model);
 			}, this);
 			this.listenTo(Calipso.vent, "genericShowContent", function(model) {
-				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericShowContent, showing given model: "+model);
+				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericShowContent, showing given model: "+ model.getTypeName()+'#'+model.get("id"));
 				_this.onGenericShowContent(model);
 			});
 
@@ -1958,7 +1958,7 @@ define("calipso", function(require) {
 			if (isSearch) {
 				contentView = this.getSearchResultsViewForModel(routeModel);
 				searchedUrl = "" + routeModel.getPathFragment();
-				if (_this.model.wrappedCollection && _this.model.wrappedCollection.data) {
+				if (routeModel.wrappedCollection && routeModel.wrappedCollection.data) {
 					searchedUrl = searchedUrl + "?" + $.param(_this.model.wrappedCollection.data);
 					console.log("searchedUrl: "+searchedUrl)
 				}
