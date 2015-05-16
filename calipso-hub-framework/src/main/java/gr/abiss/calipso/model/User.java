@@ -56,6 +56,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.wordnik.swagger.annotations.ApiModel;
 
@@ -79,11 +81,11 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	private String lastName;
 	
 	@Column(name = "user_name", unique = true, nullable = false)
-	private String userName;
+	private String username;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	@Column(name = "user_password")
-	private String userPassword;
+	private String password;
 
 	@JsonIgnore
 	@Column(name = "confirmation_token")
@@ -124,7 +126,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	private Short loginAttempts = 0;
 
 	@Column(name = "active")
-	private Boolean active = true;
+	private Boolean active = false;
 
 	@Column(name = "inactivation_reason")
 	private String inactivationReason;
@@ -181,8 +183,9 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	public String toString() {
 		return new ToStringBuilder(this)
 			.appendSuper(super.toString())
-			.append("userName", this.getUserName())
+			.append("username", this.getUsername())
 			.append("email", this.getEmail())
+			.append("password", this.getPassword())
 			.append("new", this.isNew())
 			.append("roles", this.getRoles())
 			.toString();
@@ -270,23 +273,23 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	}
 
 	@Override
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
 	@Override
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String userName) {
+		this.username = userName;
 	}
 
 	@Override
-	public String getUserPassword() {
-		return userPassword;
+	public String getPassword() {
+		return password;
 	}
 
 	@Override
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getConfirmationToken() {

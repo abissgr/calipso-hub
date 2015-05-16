@@ -109,26 +109,18 @@ public class AppInitializer {
 			User u0 = new User("info@abiss.gr");
 			u0.setFirstName("admin");
 			u0.setLastName("user");
-			u0.setUserName("admin");
-			u0.setUserPassword("admin");
+			u0.setUsername("admin");
+			u0.setPassword("admin");
 			u0.setLastVisit(now);
 			u0.addRole(adminRole);
 			u0 = userService.createActive(u0);
 
-			User u1 = new User("manosi@abiss.gr");
-			u1.setFirstName("Manos");
-			u1.setLastName("Batsis");
-			u1.setUserName("manos");
-			u1.setUserPassword("manos");
-			u1.setLastVisit(now);
-			u1 = userService.createActive(u1);
-
-			for(int i = 0; i < 30; i++){
+			for(int i = 0; i < 10; i++){
 				User u = new User("user"+i+"@abiss.gr");
 				u.setFirstName("First"+i);
 				u.setLastName("Last"+i);
-				u.setUserName("user"+i);
-				u.setUserPassword("user"+i);
+				u.setUsername("user"+i);
+				u.setPassword("user"+i);
 				u.setLastVisit(now);
 				u = userService.createActive(u);
 

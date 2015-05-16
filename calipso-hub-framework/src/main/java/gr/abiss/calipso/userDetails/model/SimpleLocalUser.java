@@ -30,8 +30,8 @@ public class SimpleLocalUser implements LocalUser {
 	private Boolean active;
 	private String confirmationToken;
 	private String resetPasswordToken;
-	private String userPassword;
-	private String userName;
+	private String password;
+	private String username;
 	private String email;
 	private String firstName;
 	private String lastName;
@@ -61,13 +61,13 @@ public class SimpleLocalUser implements LocalUser {
 	}
 
 	@Override
-	public void setUserPassword(String newPassword) {
-		this.userPassword = newPassword;
+	public void setPassword(String newPassword) {
+		this.password = newPassword;
 	}
 
 	@Override
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	@Override
@@ -119,13 +119,13 @@ public class SimpleLocalUser implements LocalUser {
 	}
 
 	@Override
-	public String getUserName() {
-		return this.userName;
+	public String getUsername() {
+		return this.username;
 	}
 
 	@Override
-	public String getUserPassword() {
-		return this.userPassword;
+	public String getPassword() {
+		return this.password;
 	}
 
 	@Override

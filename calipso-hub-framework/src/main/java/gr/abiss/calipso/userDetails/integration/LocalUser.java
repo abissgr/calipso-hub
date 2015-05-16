@@ -38,9 +38,9 @@ public interface LocalUser {
 
 	void setResetPasswordToken(String generateKey);
 
-	void setUserPassword(String newPassword);
+	void setPassword(String newPassword);
 
-	void setUserName(String newUsername);
+	void setUsername(String newUsername);
 
 	void setEmail(String socialEmail);
 
@@ -56,9 +56,9 @@ public interface LocalUser {
 
 	Serializable getId();
 
-	String getUserName();
+	String getUsername();
 
-	String getUserPassword();
+	String getPassword();
 
 	String getRedirectUrl();
 

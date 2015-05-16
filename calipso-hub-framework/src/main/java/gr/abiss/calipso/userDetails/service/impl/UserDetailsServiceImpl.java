@@ -100,13 +100,13 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	 */
 	@Override
 	public ICalipsoUserDetails loadUserByUsername(
-			String findByUserNameOrEmail) throws UsernameNotFoundException {
+			String findByUsernameOrEmail) throws UsernameNotFoundException {
 		ICalipsoUserDetails userDetails = null;
 
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("loadUserByUsername using: " + findByUserNameOrEmail);
+			LOGGER.debug("loadUserByUsername using: " + findByUsernameOrEmail);
 		}
-		LocalUser user = this.localUserService.findByUserNameOrEmail(findByUserNameOrEmail);
+		LocalUser user = this.localUserService.findByUserNameOrEmail(findByUsernameOrEmail);
 
 
 		if(LOGGER.isDebugEnabled()){
@@ -121,7 +121,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					+ ",	 with roles: " + userDetails.getAuthorities());
 		}
 		if (user == null) {
-			throw new UsernameNotFoundException("Could not match username: " + findByUserNameOrEmail);
+			throw new UsernameNotFoundException("Could not match username: " + findByUsernameOrEmail);
 		}
 		
 		
@@ -141,21 +141,21 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		ICalipsoUserDetails userDetails = null;
 		if (tryUserDetails != null) {
 			try {
-				String userNameOrEmail = tryUserDetails.getUsername();
-				if (StringUtils.isBlank(userNameOrEmail)) {
-					userNameOrEmail = tryUserDetails.getEmail();
+				String usernameOrEmail = tryUserDetails.getUsername();
+				if (StringUtils.isBlank(usernameOrEmail)) {
+					usernameOrEmail = tryUserDetails.getEmail();
 				}
 				String password = tryUserDetails.getPassword();
 				// TODO
 				Map<String, String> metadata = tryUserDetails.getMetadata();
 
 				// make sure we have credentials to send
-				if (StringUtils.isNotBlank(userNameOrEmail)
+				if (StringUtils.isNotBlank(usernameOrEmail)
 						&& StringUtils.isNotBlank(password)) {
 
 					// ask for the corresponding persisted user
 					LocalUser localUser = this.localUserService
-							.findByCredentials(userNameOrEmail, password,
+							.findByCredentials(usernameOrEmail, password,
 									metadata);
 					if(LOGGER.isDebugEnabled()){
 						LOGGER.debug("create, Matched local user: "+localUser);
@@ -186,6 +186,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	@Transactional(readOnly = false)
 	public ICalipsoUserDetails confirmPrincipal(String confirmationToken) {
+		LOGGER.debug("confirmPrincipal confirmationToken: " +  confirmationToken);
 		Assert.notNull(confirmationToken);
 		ICalipsoUserDetails userDetails = null;
 		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
@@ -200,22 +201,22 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Override
 	@Transactional(readOnly = false)
-	public void handlePasswordResetRequest(String userNameOrEmail) {
-		this.localUserService.handlePasswordResetRequest(userNameOrEmail);
+	public void handlePasswordResetRequest(String usernameOrEmail) {
+		this.localUserService.handlePasswordResetRequest(usernameOrEmail);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
-	public ICalipsoUserDetails resetPassword(String userNameOrEmail, String token, String newPassword) {
-		Assert.notNull(userNameOrEmail);
+	public ICalipsoUserDetails resetPassword(String usernameOrEmail, String token, String newPassword) {
+		Assert.notNull(usernameOrEmail);
 		ICalipsoUserDetails userDetails = null;
 		LocalUser localUser = this.localUserService.handlePasswordResetToken(
-				userNameOrEmail, token, newPassword);
+				usernameOrEmail, token, newPassword);
 		if (localUser == null) {
-			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
+			throw new UsernameNotFoundException("Could not match username: " + usernameOrEmail);
 		}
 		localUser.setConfirmationToken(null);
-		localUser.setUserPassword(newPassword);
+		localUser.setPassword(newPassword);
 		userDetails = UserDetails.fromUser(localUser);
 		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 		// LOGGER.info("create returning loggedInUserDetails: " +
@@ -329,7 +330,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("ConnectionSignUp#execute, connection: "+connection);
 		}
-		String localUserName = null;
+		String localUsername = null;
 		String accessToken = connection.createData().getAccessToken();
 		UserProfile profile = connection.fetchUserProfile();
 		ConnectionData data = connection.createData();
@@ -374,7 +375,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				if(LOGGER.isDebugEnabled()){
 					LOGGER.debug("ConnectionSignUp#execute, Email matches existing local user, no need to create one");
 				}
-				localUserName = user.getUserName();
+				localUsername = user.getUsername();
 			} else {
 				if(LOGGER.isDebugEnabled()){
 					LOGGER.debug("ConnectionSignUp#execute, Email did not match an local user, trying to create one");
@@ -393,14 +394,14 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				user = new SimpleLocalUser();
 				user.setActive(true);
 				user.setEmail(socialEmail);
-				user.setUserName(socialUsername);
+				user.setUsername(socialUsername);
 				user.setFirstName(socialFirstName);
 				user.setLastName(socialLastName);
-				user.setUserPassword(UUID.randomUUID().toString());
+				user.setPassword(UUID.randomUUID().toString());
 				try {
 					user = localUserService.createForImplicitSignup(user);
 					
-					localUserName = user.getUserName();
+					localUsername = user.getUsername();
 				} catch (DuplicateEmailException e) {
 					LOGGER.error("ConnectionSignUp#executeError while implicitly registering user", e);
 				}
@@ -414,9 +415,9 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		}
 		//localUserService.createAccount(account);
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("ConnectionSignUp#execute, returning localUserName: "+localUserName); 
+			LOGGER.debug("ConnectionSignUp#execute, returning localUsername: "+localUsername); 
 		}
-		return localUserName;
+		return localUsername;
 	}
 
 	/**

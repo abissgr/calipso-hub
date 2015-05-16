@@ -73,7 +73,7 @@ public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends 
 				username = principal.getEmail();
 			}
 			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
-				user = this.userRepository.findByUserNameOrEmail(username);
+				user = this.userRepository.findByUsernameOrEmail(username);
 			}
 		}
 

@@ -55,13 +55,11 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 	private String id;
 	
-	@JsonProperty(value = "username")
 	private String username;
 	
 	private Long notificationCount;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
-	@JsonProperty(value = "password")
 	private String password;
 	private Date lastPassWordChangeDate;
 
@@ -83,14 +81,14 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private String redirectUrl = null;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
-	private Boolean active = true;
+	private Boolean active = false;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	private String inactivationReason;
 
 	private Date inactivationDate;
 	private boolean isAdmin = false;
-	private boolean isModerator = false;
+	private boolean isSiteAdmin = false;
 
 	@JsonProperty(value = "roles")
 	private List<? extends GrantedAuthority> authorities;
@@ -109,8 +107,8 @@ public class UserDetails implements  ICalipsoUserDetails{
 			if(user.getId() != null){
 				details.setId(user.getId().toString());
 			}
-			details.setUsername(user.getUserName());
-			details.setPassword(user.getUserPassword());
+			details.setUsername(user.getUsername());
+			details.setPassword(user.getPassword());
 			details.setEmail(user.getEmail());
 			details.setFirstName(user.getFirstName());
 			details.setLastName(user.getLastName());
@@ -130,8 +128,8 @@ public class UserDetails implements  ICalipsoUserDetails{
 					if (authority.getAuthority().equals("ROLE_ADMIN")) {
 						details.isAdmin = true;
 					} else if (authority.getAuthority()
-							.equals("ROLE_MODERATOR")) {
-						details.isModerator = true;
+							.equals("ROLE_SITEADMIN")) {
+						details.isSiteAdmin = true;
 					}
 				}
 			}
@@ -447,19 +445,19 @@ public class UserDetails implements  ICalipsoUserDetails{
 	}
 
 	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#isModerator()
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#isSiteAdmin()
 	 */
 	@Override
-	public boolean isModerator() {
-		return isModerator;
+	public boolean isSiteAdmin() {
+		return isSiteAdmin;
 	}
 
 	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setModerator(boolean)
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setSiteAdmin(boolean)
 	 */
 	@Override
-	public void setModerator(boolean isModerator) {
-		this.isModerator = isModerator;
+	public void setSiteAdmin(boolean isSiteAdmin) {
+		this.isSiteAdmin = isSiteAdmin;
 	}
 
 	/**

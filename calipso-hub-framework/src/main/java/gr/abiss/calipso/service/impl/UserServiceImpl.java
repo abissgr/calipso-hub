@@ -28,6 +28,7 @@ import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.integration.LocalUserService;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
 import java.util.List;
@@ -35,12 +36,15 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.mail.MessagingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 //@Named("userService")
@@ -91,7 +95,46 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 
 	@Override
 	@Transactional(readOnly = false)
+	public User create(User resource) {
+
+		LOGGER.info("create user: " + resource);
+		Role userRole = roleRepository.findByName(Role.ROLE_USER);
+		resource.addRole(userRole);
+		ICalipsoUserDetails currentPrincipal = this.getPrincipal();
+		if(currentPrincipal == null 
+				|| (!currentPrincipal.isAdmin() && !currentPrincipal.isSiteAdmin())){
+			LOGGER.info("create, forcing active: false");
+			resource.setActive(false);
+		}
+		// TODO: remove
+		resource.setActive(true);
+		if(!resource.getActive()){
+			LOGGER.info("create, creating confirmation key");
+			resource.setConfirmationToken(generator.generateKey());
+		}
+		LOGGER.info("create, user: " + resource);
+		User user = super.create(resource);
+		roleRepository.save(userRole);
+		LOGGER.info("create, created user: " + resource);
+
+		if (user != null && !user.getActive()) {
+			try {
+				LOGGER.info("Sending account confirmation email...");
+				emailService.sendAccountConfirmation(user);
+			} catch (MessagingException e) {
+				LOGGER.error("Could not create account confirmation email", e);
+			}
+			LOGGER.info("Account confirmation email sent");
+		}
+		LOGGER.info("created user: " + user);
+		return user;
+	}
+
+
+	@Override
+	@Transactional(readOnly = false)
 	public User createActive(User resource) {
+		LOGGER.info("createActive, user: " + resource);
 		resource.setActive(true);
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
@@ -101,12 +144,66 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 		return user;
 	}
 
+	@Override
+	@Transactional(readOnly = false)
+	public User handlePasswordResetToken(String userNameOrEmail, String token, String newPassword) {
+		Assert.notNull(userNameOrEmail);
+		User user = this.findByUserNameOrEmail(userNameOrEmail);
+		if (user == null) {
+			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
+		}
+		user.setConfirmationToken(null);
+		user.setPassword(newPassword);
+		user = this.update(user);
+
+		LOGGER.info("handlePasswordResetToken returning local user: " + user);
+		return user;
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void handlePasswordResetRequest(String userNameOrEmail) {
+		Assert.notNull(userNameOrEmail);
+		User user = this.findByUserNameOrEmail(userNameOrEmail);
+		if (user == null) {
+			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
+		}
+		user.setResetPasswordToken(this.generator.generateKey());
+		user = this.userRepository.save(user);
+		try {
+			emailService.sendPasswordResetLink(user);
+		} catch (MessagingException e) {
+			throw new RuntimeException("Could not create password reset email", e);
+		}
+	}
+
+
+	@Override
+	@Transactional(readOnly = false)
+	public User confirmPrincipal(String confirmationToken) {
+		Assert.notNull(confirmationToken);
+		//LoggedInUserDetails loggedInUserDetails = new LoggedInUserDetails();
+		User original = this.userRepository.findByConfirmationToken(confirmationToken);
+		if (original != null) {
+			// enable and update user
+			original.setConfirmationToken(null);
+			original.setActive(true);
+			original = this.userRepository.save(original);
+		} else {
+			LOGGER.warn("Could not find any user matching confirmation token: " + confirmationToken);
+		}
+
+		LOGGER.info("create returning local user: " + original);
+		return original;
+	}
+
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public User findByUserNameOrEmail(String userNameOrEmail) {
-		return this.repository.findByUserNameOrEmail(userNameOrEmail);
+		return this.repository.findByUsernameOrEmail(userNameOrEmail);
 	}
 
 
@@ -114,38 +211,27 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 	 * {@inheritDoc}
 	 */
 	@Override
-	public User createForImplicitSignup(LocalUser user)
-			throws DuplicateEmailException {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(readOnly = false)
+	public User createForImplicitSignup(LocalUser userAccountData) throws DuplicateEmailException {
+		User user = new User();
+		user.setEmail(userAccountData.getEmail());
+		user.setUsername(userAccountData.getUsername());
+		user.setFirstName(userAccountData.getFirstName());
+		user.setLastName(userAccountData.getLastName());
+		user.setPassword(userAccountData.getPassword());
+		if (this.repository.findByUsernameOrEmail(user.getEmail()) != null) {
+			throw new DuplicateEmailException("Email address exists: " + userAccountData.getEmail());
+		}
+		if (this.repository.findByUsernameOrEmail(user.getUsername()) != null) {
+			throw new DuplicateEmailException("Username exists: " + userAccountData.getEmail());
+		}
+
+		user = createActive(user);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("createForImplicitSignup returning local user: " + user);
+		}
+		return user;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public User confirmPrincipal(String confirmationToken) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handlePasswordResetRequest(String userNameOrEmail) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public User handlePasswordResetToken(String userNameOrEmail,
-			String token, String newPassword) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

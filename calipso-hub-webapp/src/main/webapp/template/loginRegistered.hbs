@@ -6,20 +6,21 @@
 			</h3>
 		</div>
 		<div class="panel-body">
-
+			<div role="alert" class="alert alert-success">
+				<strong>Registration successful.</strong> Please login with your credentials bellow.
+			</div>
 			<div class="alert alert-error" style="display: none">
 				<p>Incorrect login credentials.</p>
 			</div>
 			<p>
-				<label for="email" class="control-label">Username or email</label>
-
-				<input class="form-control input-email" required="required"
+				<label for="email" class="control-label">Username or email</label> <input
+					class="form-control input-email" required="required"
 					class="input-block-level input-email" name="email"
 					value="{{ email }}" />
 			</p>
 			<p>
-				<label for="password" class="control-label">Username or	email</label> 
-				<input class="form-control input-password"
+				<label for="password" class="control-label">Username or
+					email</label> <input class="form-control input-password"
 					required="required" type="password"
 					class="input-block-level input-password" name="password"
 					value="{{ password }}" />
@@ -42,8 +43,9 @@
            </div> -->
 			<p>
 
-				<button class="btn btn-primary" type="submit">Login</button> or 
-                <a href="/register" class="btn btn-success" class="register" title="Click to register">Register</a>
+				<button class="btn btn-primary" type="submit">Login</button>
+				or <a href="/register" class="btn btn-success" class="register"
+					title="Click to register">Register</a>
 			</p>
 		</div>
 	</div>

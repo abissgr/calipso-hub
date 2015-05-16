@@ -72,10 +72,27 @@ public abstract class AbstractUserDetailsController<S extends UserDetailsService
 	 * @param token
 	 * @return
 	 */
-	@RequestMapping(value = "confirmation/{token}", method = {
-			RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "confirmation", method = {RequestMethod.POST })
 	@ResponseBody
 	public ICalipsoUserDetails confirmRegistrationAndLogin(HttpServletRequest request,
+			HttpServletResponse response, @RequestBody UserDetails resource) {
+		String key = resource.getConfirmationToken();
+		LOGGER.info("Confirmation key: " + key);
+		ICalipsoUserDetails userDetails = this.service.confirmPrincipal(key);
+		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
+		return userDetails;
+	}
+	
+	/**
+	 * Logins the given user after confirming his email address. Triggered by token HTML form (POST) or email confirmation link (GET)
+	 * @param request
+	 * @param response
+	 * @param token
+	 * @return
+	 */
+	@RequestMapping(value = "confirmation/{token}", method = {RequestMethod.GET})
+	@ResponseBody
+	public ICalipsoUserDetails confirmRegistrationAndLoginFromEmailLink(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable String token) {
 		ICalipsoUserDetails userDetails = this.service.confirmPrincipal(token);
 		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
@@ -89,8 +106,8 @@ public abstract class AbstractUserDetailsController<S extends UserDetailsService
 				}
 			}
 			else{
-				LOGGER.warn("Asked to confirm registration by GET but no comment was found as the one registration origin for user "
-						+ userDetails.getUsername() + ", redirecting to manager area");
+				LOGGER.warn("Asked to confirm registration by GET but no redirectUrl was found in result userDetails object "
+						+ "for user " + userDetails.getUsername() + ", redirecting to home");
 				try {
 					response.sendRedirect(request.getContextPath());
 				} catch (IOException e) {

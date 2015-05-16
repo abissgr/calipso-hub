@@ -177,8 +177,8 @@ public class ProviderSignInController extends org.springframework.social.connect
 			user.setEmail(userAccountData.getEmail());
 			user.setFirstName(userAccountData.getFirstName());
 			user.setLastName(userAccountData.getLastName());
-			user.setUserName(userAccountData.getUserName());
-			user.setUserPassword(userAccountData.getPassword());
+			user.setUsername(userAccountData.getUserName());
+			user.setPassword(userAccountData.getPassword());
 
 			registered = userService.createForImplicitSignup(user);
 		} catch (DuplicateEmailException ex) {

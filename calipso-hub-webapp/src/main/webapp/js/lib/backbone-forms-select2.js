@@ -50,8 +50,8 @@ define(['jquery', 'underscore', 'backbone', 'select2', 'backbone-forms'], functi
             var value = this.schema.options.findWhere({
                 id : simpleValue
             });
-            console.log("getValue, simpleValue: " + simpleValue);
-            console.log(value);
+            //console.log("getValue, simpleValue: " + simpleValue);
+            //console.log(value);
             return value;
         },
         // https://github.com/powmedia/backbone-forms/issues/291

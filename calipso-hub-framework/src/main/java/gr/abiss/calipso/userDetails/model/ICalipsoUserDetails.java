@@ -80,9 +80,9 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public void setAdmin(boolean isAdmin);
 
-	public boolean isModerator();
+	public boolean isSiteAdmin();
 
-	public void setModerator(boolean isModerator);
+	public void setSiteAdmin(boolean isSiteAdmin);
 
 	public void setRedirectUrl(String redirectUrl);
 

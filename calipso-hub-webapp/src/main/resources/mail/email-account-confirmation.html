@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:remove="all">Account Confirmation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style>
+        .greetings{color:#333333;}
+        </style>
+    </head>
+    <body>
+        <p class="greetings" th:text="#{email.greeting(${user.getFirstName()})}"
+        	th:unless="${#strings.isEmpty(user.getFirstName())}">
+            Hello, Peter Static!
+        </p>
+        <p class="greetings" th:text="#{email.greeting(${user.getUserName()})}"
+        	th:if="${#strings.isEmpty(user.getFirstName())}">
+            Hello, Peter Static!
+        </p>
+        <p th:text="#{email.accountconfirmation.code(${user.getConfirmationToken()})} ">
+        Your confirmation code is:
+        </p>
+        <p th:text="#{email.accountconfirmation.clicklinktoconfirm}">
+        Click the following link to confirm your email address and enable your account:
+        </p>
+        <p>
+        	<a th:if="${#strings.isEmpty(redir)}"
+	        	th:href="@{#{email.accountconfirmation.link(${baseUrl}, ${user.getConfirmationToken()})}}"
+	        	th:text="#{email.accountconfirmation.link(${baseUrl}, ${user.getConfirmationToken()})}"> </a>
+        	<a  th:unless="${#strings.isEmpty(redir)}"
+        		th:href="@{#{email.accountconfirmation.link.withredir(${baseUrl}, ${user.getConfirmationToken()}, ${redir})}}"
+        		th:text="#{email.accountconfirmation.link.withredir(${baseUrl}, ${user.getConfirmationToken()}, ${redir})}"> </a>
+        </p>
+        <p class="greetings">
+        	&emsp;Regards, <br />
+            &emsp;The ffora team
+        </p>
+    </body>
+</html>
