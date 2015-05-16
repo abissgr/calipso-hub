@@ -4093,6 +4093,7 @@ define("calipso", function(require) {
 		
 	}, {
 		// static members
+		parent: Calipso.model.UserModel
 	});
 
 	Calipso.model.UserRegistrationModel.prototype.showInMenu = false;
