@@ -2033,6 +2033,7 @@ define("calipso", function(require) {
 			return defaultConfig;
 		},
 		onGenericFormSearched : function(options) {
+			var _this = this;
 			console.log("Calipso.view.ModelDrivenSearchLayout caugh genericFormSearched, showing this.model: "+_this.model);
 			_this.collapseSearchForm();
 			_this.expandSearchResults();
