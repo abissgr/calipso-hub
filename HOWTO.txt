@@ -77,3 +77,5 @@ build.twitter.consumerKey=
 build.twitter.consumerSecret=
 build.linkedin.consumerKey=
 build.linkedin.consumerSecret=
+build.google.consumerKey=
+build.google.consumerSecret=

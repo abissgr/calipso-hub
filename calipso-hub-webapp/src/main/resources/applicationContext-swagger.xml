@@ -18,9 +18,6 @@
         http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd">
 
    
-    <!-- moved to applicationContext 
-    -->
-    <context:property-placeholder location="classpath:swagger.properties"/>
     <!-- pulls in the Controllers to document -->
     <context:component-scan base-package="gr.abiss.calipso" />
     

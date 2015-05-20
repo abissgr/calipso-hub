@@ -34,7 +34,27 @@ body {
   background-color: #f8f8f8;
   border-top:1px solid #E7E7E7;
 }
-
+/*
+ * Social buttons
+*/
+.btn-social-login, .btn-social-login:hover{
+    text-align:left;
+}
+.btn-social-login-facebook{
+    color: #3c568b;
+}
+.btn-social-login-linkedin{
+    color: #0d7cb7;
+}
+.btn-social-login-google{
+    color: #df4b38;
+}
+.btn-social-login-github{
+    color: #000000;
+}
+.btn-social-login-twitter{
+    color: #0084b4;
+}
 .modal-button-cell{
 	text-align:right!important;
 }

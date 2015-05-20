@@ -61,6 +61,7 @@ define("calipso", function(require) {
 	 * @return {[void]}
 	 */
 	Calipso.stopEvent = function(e) {
+		Calipso.vent.trigger("calipso:stoppedEvent given: ", e);
 		var event = e ? e : window.event;
 		if (event.preventDefault) {
 			event.preventDefault();
@@ -1617,11 +1618,19 @@ define("calipso", function(require) {
 
 	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
 	Calipso.components.backboneform.Datetimepicker = Backbone.Form.editors.Text.extend({
+
+		initialize : function(options) {
+			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
+			// set the options source
+			if (this.schema && this.schema.config) {
+				this.config = this.schema.config;
+			} else {
+				this.config = {locale : 'en'}
+			}
+		},
 		render : function() {
 			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
-			this.$el.datetimepicker({
-				locale : 'en'
-			});
+			this.$el.datetimepicker(this.config);
 			return this;
 		},
 	});
@@ -3089,9 +3098,10 @@ define("calipso", function(require) {
 			return this.prototype.getTypeName();
 		},
 		events : {
-			"submit" : "commit",
-			"click button.submit" : "commit",
-			 "click .register" : "register",
+			"click .register" : "register",
+			"click a.btn-social-login" : "socialLogin",
+			"click button.form-login-submit" : "commit",
+			"submit .form-login" : "commit",
 		},
 		commit : function(e) {
 			console.log("Calipso.view.LoginView#commit");
@@ -3104,6 +3114,39 @@ define("calipso", function(require) {
 				newPasswordConfirm : this.$('.new-password-confirm').val()
 			});
 			Calipso.session.save(userDetails);
+		},
+		socialLogin : function(e) {
+			console.log("Calipso.view.LoginView#socialLogin, stop event: " + e);
+			Calipso.stopEvent(e);
+			console.log("Calipso.view.LoginView#socialLogin");
+			var clicked = $(e.currentTarget);
+
+			//console.log("Calipso.view.LoginView#socialLogin, clicked:");
+			//console.log(clicked);
+			var providerNames = ["facebook", "linkedin", "twitter", "google"];
+			var providerName;
+			
+			for(var i=0; i < providerNames.length; i++){
+				//console.log("Calipso.view.LoginView#socialLogin looking for className: " + "btn-social-login-" + providerNames[i]);
+				if(clicked.hasClass("btn-social-login-" + providerNames[i])){
+					providerName = providerNames[i];
+					break;
+				}
+			}
+			console.log("Calipso.view.LoginView#socialLogin, providerName: " + providerName);
+			if(!providerName){
+				throw "Clicked element does not match a social provider";
+			}
+			// target='SignIn' 
+			var formHtml = "<form class='social-signin-form' action='" + 
+				Calipso.getBaseUrl() + "/signin/" + providerName +"' method='POST' role='form'>" + 
+			//"<input type='hidden' name='scope' value='email' />" + 
+			//"<input type='hidden' name='scope' value='emailure' />" + 
+			//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" + 
+				"</form>";
+			this.$el.find("div.social-form-container").html(formHtml);
+			this.$el.find("form.social-signin-form").submit();
+			return false;
 		},
 		/*
 		register : function(e) {

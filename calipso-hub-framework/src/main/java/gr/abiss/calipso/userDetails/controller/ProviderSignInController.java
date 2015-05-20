@@ -27,6 +27,7 @@ import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
 import gr.abiss.calipso.userDetails.util.SocialMediaService;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +73,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProviderSignInController.class);
 
 	protected static final String VIEW_NAME_REMEMBER_PAGE = "user/remember";
-	protected static final String VIEW_NAME_REGISTRATION_PAGE = "user/registrationForm";
+	protected static final String VIEW_NAME_REGISTRATION_PAGE = "register";
 
 	protected static final String ERROR_CODE_EMAIL_EXIST = "NotExist.user.email";
 	protected static final String MODEL_NAME_REGISTRATION_DTO = "user";
@@ -104,7 +106,11 @@ public class ProviderSignInController extends org.springframework.social.connect
 	public ProviderSignInController(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository,
 			SignInAdapter signInAdapter) {
 		super(connectionFactoryLocator, usersConnectionRepository, signInAdapter);
-		LOGGER.debug("constructor");
+
+		Configuration config = ConfigurationFactory.getConfiguration();
+		String applicationUrl = config.getString("calipso.baseurl");
+		LOGGER.info("Setting applicationUrl to " + applicationUrl);
+		//this.setApplicationUrl(applicationUrl);
 	}
 
 	@RequestMapping(value = "/popup/remember", method = RequestMethod.GET)
@@ -116,7 +122,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 	/**
 	* Renders the registration page.
 	*/
-	@RequestMapping(value = "/popup/register", method = { RequestMethod.GET })
+	@RequestMapping(value = "/register", method = { RequestMethod.GET })
 	//@RequestMapping(value = "/popup/register", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showRegistrationForm(WebRequest request, Model model) {
 		LOGGER.debug("showRegistrationForm, userAccountData: {}", model);
@@ -161,7 +167,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 		//do anything.
 		ProviderSignInUtils.handlePostSignUp(registered.getEmail(), request);
 
-		return "redirect:/signin/popup/remember";
+		return "redirect:/client";
 	}
 
 	/**
@@ -222,46 +228,11 @@ public class ProviderSignInController extends org.springframework.social.connect
 			ConnectionKey providerKey = connection.getKey();
 			dto.setSignInProvider(SocialMediaService.valueOf(providerKey.getProviderId().toUpperCase()));
 
-			HttpServletRequest curRequest = ((ServletRequestAttributes) RequestContextHolder
-					.currentRequestAttributes()).getRequest();
-			HttpSession session = curRequest.getSession(false);
-			if (session != null) {
-				String topWindowDomain = (String) session
-						.getAttribute(TOP_WINDOW_DOMAIN);
-				if (StringUtils.isNotBlank(topWindowDomain)) {
-					dto.setTopWindowDomain(topWindowDomain);
-				}
-			}
-
-			//
-
 			LOGGER.debug("createRegistrationDTO prepopulated form: " + dto);
 		} else {
 			LOGGER.debug("createRegistrationDTO: no connection was found");
 		}
 
 		return dto;
-	}
-
-	//SHOULD ALWAYS BE POST, leaving to super class' RequestMapping
-	@Override
-	@RequestMapping(value = "/{providerId}", method = RequestMethod.POST)
-	public RedirectView signIn(@PathVariable String providerId, NativeWebRequest request) {
-		String topWindowDomain = request.getParameter(TOP_WINDOW_DOMAIN);
-		LOGGER.info("signIn, providerId: " + providerId
-				+ ", topWindowDomain: " + topWindowDomain);
-		if (StringUtils.isNotBlank(topWindowDomain)) {
-			HttpServletRequest req = request
-					.getNativeRequest(HttpServletRequest.class);
-			HttpSession session = req.getSession(true);
-			session.setAttribute(TOP_WINDOW_DOMAIN, topWindowDomain);
-		}
-		//		HttpSession session = ((HttpServletRequest) request.getNativeRequest()).getSession();
-		//		if (session == null) {
-		//			session = ((HttpServletRequest) request.getNativeRequest()).getSession(true);
-		//			LOGGER.info("popupSignIn, created session");
-		//
-		//		}
-		return super.signIn(providerId, request);
 	}
 }

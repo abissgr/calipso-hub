@@ -512,7 +512,8 @@ Form.validators = (function() {
      
     return function required(value) {
       options.value = value;
-      
+      console.log("validators.required, value: ");
+      console.log(value);
       var err = {
         type: options.type,
         message: _.isFunction(options.message) ? options.message(options) : options.message

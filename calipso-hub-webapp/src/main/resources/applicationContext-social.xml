@@ -17,10 +17,6 @@ http://www.springframework.org/schema/social/facebook http://www.springframework
 http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd">
 
 
-    <!-- Configuration Properties  -->
-    <context:property-placeholder location="classpath:calipso.defaults.properties"/>
-    <context:property-placeholder location="classpath:calipso.properties"/>
-    
      <!--
 	Configures the social authentication provider which processes authentication requests
 	made by using supported social authentication services (FB, Twitter and so on).
@@ -67,6 +63,12 @@ http://www.springframework.org/schema/aop       http://www.springframework.org/s
 					<constructor-arg value="${linkedin.consumerKey}" />
 					<constructor-arg value="${linkedin.consumerSecret}" />
 				</bean>
+	            <bean class="org.springframework.social.google.connect.GoogleConnectionFactory">
+	                <constructor-arg value="${google.consumerKey}" />
+	                <constructor-arg value="${google.consumerSecret}" />   
+                    <property name="scope" value="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo#email https://www.googleapis.com/auth/plus.me " />
+                     <!--" /> -->             
+	            </bean>
 	        </list>
 	    </property>
 	</bean>
@@ -90,21 +92,22 @@ http://www.springframework.org/schema/aop       http://www.springframework.org/s
     </bean-->
 
 	<!-- This bean manages the connection flow between the account provider 
-		and the example application. -->
+		and the example application.
 	<bean id="connectController"
 		class="org.springframework.social.connect.web.ConnectController"
-		autowire="constructor" />
+		autowire="constructor">
+		</bean> -->
 		<!-- public ProviderSignInController(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository, SignInAdapter signInAdapter) {-->
 	
 	<bean class="gr.abiss.calipso.userDetails.controller.ProviderSignInController">
 		<constructor-arg ref="dataSource" />
-	    <property name="signUpUrl" value="/signin/popup/register" />
-	    <property name="postSignInUrl" value="/signin/popup/remember" />
-	    <property name="applicationUrl" value="${calipso.baseurl}" />
-	    <property name="signInInterceptors">
+	    <property name="signUpUrl" value="/signin/register" />
+	    <property name="postSignInUrl" value="/client/" />
+	    <!--property name="applicationUrl" value="${calipso.baseurl}" /-->
+	    <!--property name="signInInterceptors">
 	        <list>
 	            <bean class="gr.abiss.calipso.userDetails.util.FacebookConnectInterceptor" />
 	        </list>
-	    </property>
+	    </property-->
 	</bean>
 </beans>

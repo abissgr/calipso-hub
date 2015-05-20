@@ -25,6 +25,8 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 		appRoutes : {
 
 			'' : 'home',
+			'_=_' : 'toHome',
+			'#_=_' : 'toHome',
 			'home' : 'home',
 			'login' : 'login',
 			'loginRegistered' : 'loginRegistered',

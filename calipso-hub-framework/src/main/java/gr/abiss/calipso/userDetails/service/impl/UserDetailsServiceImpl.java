@@ -25,10 +25,10 @@ import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.notification.service.BaseNotificationsService;
-
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
+import gr.abiss.calipso.userDetails.util.SocialMediaService;
 
 import java.io.Serializable;
 import java.util.List;
@@ -54,6 +54,12 @@ import org.springframework.social.connect.ConnectionData;
 import org.springframework.social.connect.ConnectionSignUp;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.SignInAdapter;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.User;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.social.linkedin.api.LinkedIn;
+import org.springframework.social.linkedin.api.LinkedInProfile;
+import org.springframework.social.linkedin.api.impl.LinkedInTemplate;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -336,6 +342,28 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		ConnectionData data = connection.createData();
 
 		String socialUsername = profile.getUsername();
+		if (StringUtils.isBlank(socialUsername)) {
+			LOGGER.info("blank username for profile class: " + profile.getClass());
+			Object api = connection.getApi();
+			if (SocialMediaService.FACEBOOK.toString().equalsIgnoreCase(
+					connection.createData().getProviderId())) {
+				Facebook fbApi = new FacebookTemplate(accessToken);
+				User fbProfile = fbApi.userOperations().getUserProfile();
+				if (fbProfile != null) {
+					socialUsername = fbProfile.getId();
+					LOGGER.debug("ConnectionSignUp#execute, Got facebook id: " 	+ socialUsername);
+				}
+			}
+			else if (SocialMediaService.LINKEDIN.toString().equalsIgnoreCase(
+						connection.createData().getProviderId())) {
+					LinkedIn liApi = new LinkedInTemplate(accessToken);
+					LinkedInProfile liProfile = liApi.profileOperations().getUserProfile();
+					if (liProfile != null) {
+						socialUsername = liProfile.getId();
+						LOGGER.debug("ConnectionSignUp#execute, Got linkedin id: " 	+ socialUsername);
+					}
+				}
+		}
 		String socialName = profile.getName();
 		String socialEmail = profile.getEmail();
 		String socialFirstName = profile.getFirstName();

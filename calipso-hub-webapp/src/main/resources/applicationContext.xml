@@ -69,10 +69,16 @@
 	<!-- Configuration for the Runtime -->
 	<task:annotation-driven executor="asyncExecutor" />
 
-	<!-- Configuration Properties -->
-	<context:property-placeholder
-		location="classpath:calipso.defaults.properties,classpath:swagger.properties" />
-	<context:property-placeholder location="classpath:calipso.properties" />
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:calipso.defaults.properties</value>
+                <value>classpath:calipso.properties</value>
+                <value>classpath:swagger.properties</value>
+            </list>
+        </property> 
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
 
 	<!--mvc:annotation-driven/ -->
 

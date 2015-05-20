@@ -18,5 +18,5 @@
 package gr.abiss.calipso.userDetails.util;
 
 public enum SocialMediaService {
-	FACEBOOK, TWITTER, LINKEDIN, GITHUB
+	FACEBOOK, TWITTER, LINKEDIN, GITHUB, GOOGLE
 }

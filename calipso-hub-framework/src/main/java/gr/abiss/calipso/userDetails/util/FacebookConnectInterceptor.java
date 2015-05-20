@@ -28,6 +28,7 @@ import org.springframework.web.context.request.WebRequest;
 
 /**
 * Adds a "display=popup" parameter so that the Facebook authorization is displayed with minimal decoration.
+* @Deprecated
 */
 public class FacebookConnectInterceptor implements ProviderSignInInterceptor<Facebook> {
 

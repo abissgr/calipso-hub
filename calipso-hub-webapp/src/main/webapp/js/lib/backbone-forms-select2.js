@@ -47,11 +47,20 @@ define(['jquery', 'underscore', 'backbone', 'select2', 'backbone-forms'], functi
         //  select a model VS a string value.
         getValue : function() {
             var simpleValue = this.$el.val();
-            var value = this.schema.options.findWhere({
-                id : simpleValue
-            });
-            //console.log("getValue, simpleValue: " + simpleValue);
-            //console.log(value);
+            var multiple = this.schema.multiple;
+            var value;
+            if(multiple){
+            	value = this.schema.options.where({
+                  id : simpleValue
+              });
+            }
+            else{
+            	value = this.schema.options.findWhere({
+                  id : simpleValue
+              });
+            }
+            console.log("getValue, simpleValue: " + simpleValue + ", model value: ");
+            console.log(value);
             return value;
         },
         // https://github.com/powmedia/backbone-forms/issues/291
