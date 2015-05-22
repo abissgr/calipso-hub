@@ -15,7 +15,7 @@
 
 ## Howto Build [![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
 
-To build Calipso you need a Java Development Kit and Apache Maven installed. 
+To build Calipso you need a Java Development Kit(JDK7 ) and Apache Maven installed. 
 
 0) To start, checkout the project:
 
@@ -53,7 +53,7 @@ By default, Calipso uses H2, an in-memory database that works great for developm
 A fresh copy is created with test data each time you start Jetty using mvn:run. 
 The database console is available at: 
 
-	http://localhost:8080/console/database/
+	http://localhost:8080/calipso/console/database/
 	
 
 ## Use a custom database 
