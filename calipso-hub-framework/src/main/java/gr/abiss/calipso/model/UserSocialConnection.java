@@ -1,24 +1,28 @@
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.model.entities.AbstractPersistable;
+import java.io.Serializable;
 
-import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
-@Entity
-@Table(name = "UserConnection", uniqueConstraints = { @UniqueConstraint(columnNames = {
-		"userId", "providerId", "rank" }) })
-@AttributeOverride(name = "id", column = @Column(name = "userId", unique = true))
-public class UserSocialConnection extends AbstractPersistable {
+@Entity 
+@IdClass(UserSocialConnectionId.class)
+@Table(name = "UserConnection")
+public class UserSocialConnection implements Serializable{
 
+	@Id 
+	@Column(length = 255, nullable = false)
+	private String userId;
+	@Id 
 	@Column(length = 255, nullable = false)
 	private String providerId;
+	@Id 
+	private Integer rank;
 	private String providerUserId;
 	@Column(nullable = false)
-	private Integer rank;
 	private String displayName;
 	@Column(length = 1000, nullable = false)
 	private String profileUrl;
@@ -33,11 +37,11 @@ public class UserSocialConnection extends AbstractPersistable {
 		
 	}
 	
-	public UserSocialConnection(String id, String providerId,
+	public UserSocialConnection(String userId, String providerId,
 			String providerUserId, int rank, String displayName,
 			String profileUrl, String imageUrl, String accessToken,
 			String secret, String refreshToken, Long expireTime) {
-		this.setId(id);;
+		this.setUserId(userId);
 		this.setProviderId(providerId);
 		this.setProviderUserId(providerUserId);
 		this.setRank(rank);
@@ -49,6 +53,14 @@ public class UserSocialConnection extends AbstractPersistable {
 		this.setRefreshToken(refreshToken);
 		this.setExpireTime(expireTime);
 
+	}
+	
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getProviderId() {

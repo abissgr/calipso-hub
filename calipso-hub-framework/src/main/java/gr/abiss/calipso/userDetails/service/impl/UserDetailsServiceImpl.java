@@ -333,10 +333,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	@Transactional(readOnly = false)
 	public String execute(Connection<?> connection) {
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("ConnectionSignUp#execute, connection: "+connection);
-		}
-		String localUsername = null;
+		//if(LOGGER.isDebugEnabled()){
+			LOGGER.info("ConnectionSignUp#execute, connection: "+connection);
+		//}
+		//String localUsername = null;
 		String accessToken = connection.createData().getAccessToken();
 		UserProfile profile = connection.fetchUserProfile();
 		ConnectionData data = connection.createData();
@@ -392,44 +392,34 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		//				}
 		//			}
 		//		}
-
+		LocalUser user = null;
 		if (!StringUtils.isBlank(socialEmail)) {
 			// LOGGER.debug("ConnectionSignUp#execute, Social email accessible, looking for local user match");
 
-			LocalUser user = localUserService.findByUserNameOrEmail(socialEmail);
+			user = localUserService.findByUserNameOrEmail(socialEmail);
 			// 
 
 			if (user != null) {
 				if(LOGGER.isDebugEnabled()){
 					LOGGER.debug("ConnectionSignUp#execute, Email matches existing local user, no need to create one");
 				}
-				localUsername = user.getUsername();
+				//localUsername = user.getUsername();
 			} else {
 				if(LOGGER.isDebugEnabled()){
 					LOGGER.debug("ConnectionSignUp#execute, Email did not match an local user, trying to create one");
 				}
 
-				if (localUserService.findByUserNameOrEmail(socialUsername) != null) {
-					if(LOGGER.isDebugEnabled()){
-						LOGGER.debug("ConnectionSignUp#execute, The social account username is taken, will generate one using increment suffix");
-					}
-					int increment = 1;
-					for (int i = 0; localUserService.findByUserNameOrEmail(socialUsername + i) != null; i++) {
-						increment++;
-					}
-					socialUsername = socialUsername + increment;
-				}
 				user = new SimpleLocalUser();
 				user.setActive(true);
 				user.setEmail(socialEmail);
-				user.setUsername(socialUsername);
+				user.setUsername(socialEmail);
 				user.setFirstName(socialFirstName);
 				user.setLastName(socialLastName);
 				user.setPassword(UUID.randomUUID().toString());
 				try {
 					user = localUserService.createForImplicitSignup(user);
 					
-					localUsername = user.getUsername();
+					//localUsername = user.getUsername();
 				} catch (DuplicateEmailException e) {
 					LOGGER.error("ConnectionSignUp#executeError while implicitly registering user", e);
 				}
@@ -442,10 +432,11 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			}
 		}
 		//localUserService.createAccount(account);
+		String result = user != null && user.getId() != null ? user.getId().toString() : null;
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("ConnectionSignUp#execute, returning localUsername: "+localUsername); 
+			LOGGER.debug("ConnectionSignUp#execute, returning result: "+result); 
 		}
-		return localUsername;
+		return result;
 	}
 
 	/**
@@ -454,10 +445,15 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	 */
 	@Override
 	public String signIn(String userId, Connection<?> connection, NativeWebRequest request) {
-		LocalUser user = this.localUserService.findByUserNameOrEmail(userId);
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("SignInAdapter#signIn userId: " + userId + ", connection: " + connection.getDisplayName() + ", mached user: " + user);
+		LOGGER.info("signIn, userId: " + userId);
+
+		LocalUser user = this.localUserService.findById(userId);
+		if(user == null){
+			user = this.localUserService.findByUserNameOrEmail(userId);
 		}
+		//if(LOGGER.isDebugEnabled()){
+			LOGGER.info("SignInAdapter#signIn userId: " + userId + ", connection: " + connection.getKey() + ", mached user: " + user);
+		//}
 		if(user != null){
 			SecurityUtil.login((HttpServletRequest) request.getNativeRequest(), (HttpServletResponse) request.getNativeResponse(), user, this.userDetailsConfig);
 		}
@@ -467,7 +463,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	public ICalipsoUserDetails createForImplicitSignup(
 			LocalUser localUser) throws DuplicateEmailException {
-		LOGGER.debug("createForImplicitSignup, localUser: " + localUser);
+		LOGGER.info("createForImplicitSignup, localUser: " + localUser);
 		ICalipsoUserDetails userDetails = UserDetails
 				.fromUser(this.localUserService	.createForImplicitSignup(localUser));
 		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));

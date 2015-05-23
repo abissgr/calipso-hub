@@ -79,17 +79,13 @@ http://www.springframework.org/schema/aop       http://www.springframework.org/s
 		the data source bean for obtaining database connection. -->
 	<social:jdbc-connection-repository connection-signup-ref="userDetailsService" />
 	<!--bean id="usersConnectionRepository"
-        class="org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository">
+        class="gr.abiss.calipso.userDetails.integration.CalipsoJdbcUsersConnectionRepository">
         <aop:scoped-proxy proxy-target-class="false" />
         <constructor-arg ref="dataSource" />
         <constructor-arg ref="connectionFactoryLocator" />
         <constructor-arg ref="textEncryptor" />
-	        <property name="connectionSignUp" ref="userDetailsService" /> 
-	</bean>
-	<bean id="connectionRepository" factory-method="createConnectionRepository" factory-bean="usersConnectionRepository" scope="request">
-        <constructor-arg value="#{request.userPrincipal.principal.id}" />
-        <aop:scoped-proxy proxy-target-class="false" />
-    </bean-->
+	    <property name="connectionSignUp" ref="userDetailsService" /> 
+	</bean-->
 
 	<!-- This bean manages the connection flow between the account provider 
 		and the example application.

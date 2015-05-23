@@ -32,7 +32,7 @@ import java.util.Map;
 public interface LocalUserService<ID extends Serializable, T extends LocalUser> {
 
 	public T findByUserNameOrEmail(String userNameOrEmail);
-
+	public T findById(String userId);
 	public T createForImplicitSignup(LocalUser user) throws DuplicateEmailException;
 
 	/**

@@ -213,24 +213,29 @@ public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepos
 	@Override
 	@Transactional(readOnly = false)
 	public User createForImplicitSignup(LocalUser userAccountData) throws DuplicateEmailException {
+		LOGGER.info("createForImplicitSignup, localUser: " + userAccountData);
 		User user = new User();
 		user.setEmail(userAccountData.getEmail());
 		user.setUsername(userAccountData.getUsername());
 		user.setFirstName(userAccountData.getFirstName());
 		user.setLastName(userAccountData.getLastName());
 		user.setPassword(userAccountData.getPassword());
-		if (this.repository.findByUsernameOrEmail(user.getEmail()) != null) {
-			throw new DuplicateEmailException("Email address exists: " + userAccountData.getEmail());
+		User existing = this.repository.findByUsernameOrEmail(user.getEmail());
+		if(existing == null){
+			existing = this.repository.findByUsernameOrEmail(user.getUsername());
 		}
-		if (this.repository.findByUsernameOrEmail(user.getUsername()) != null) {
-			throw new DuplicateEmailException("Username exists: " + userAccountData.getEmail());
-		}
-
-		user = createActive(user);
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("createForImplicitSignup returning local user: " + user);
-		}
-		return user;
+		
+//		if (this.repository.findByUsernameOrEmail(user.getUsername()) != null) {
+//			throw new DuplicateEmailException("Email address exists: " + userAccountData.getEmail());
+//		}
+//		if (this.repository.findByUsernameOrEmail(user.getUsername()) != null) {
+//			throw new DuplicateEmailException("Username exists: " + userAccountData.getEmail());
+//		}
+//
+//		if(LOGGER.isDebugEnabled()){
+//			LOGGER.debug("createForImplicitSignup returning local user: " + user);
+//		}
+		return existing != null ? existing : createActive(user);
 	}
 
 
