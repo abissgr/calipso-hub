@@ -744,7 +744,7 @@ define("calipso", function(require) {
 		return "Calipso.collection.PollingCollection";
 	};
 	//////////////////////////////////////////
-	// Model
+	// Models
 	//////////////////////////////////////////
 	/**
 	 * Abstract model implementation to inherit from your own models.
@@ -1310,6 +1310,79 @@ define("calipso", function(require) {
 			viewType : Calipso.view.CollectionMemberGridView
 		} ];
 	};
+	
+	// Role model
+	// ---------------------------------------
+	Calipso.model.RoleModel = Calipso.model.GenericModel.extend(
+	/** @lends Calipso.model.RoleModel.prototype */
+	{
+		toString : function() {
+			return this.get("name");
+		}
+	//urlRoot : "/api/rest/users"
+	}, {
+		// static members
+		parent : Calipso.model.GenericModel,
+		label : "Role",
+		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC
+	});
+
+	Calipso.model.RoleModel.prototype.showInMenu = true;
+	/**
+	 * Get the model class URL fragment corresponding this class
+	 * @returns the URL path fragment as a string
+	 */
+	Calipso.model.RoleModel.prototype.getPathFragment = function(instance) {
+		return "roles";
+	};
+
+	Calipso.model.RoleModel.prototype.getTypeName = function(instance) {
+		return "RoleModel";
+	};
+
+	Calipso.model.RoleModel.prototype.getPrototypeFormSchemas = function(instance) {
+		var schemas = instance.get("formSchema");
+		return schemas ? schemas : {//
+			name : {
+				"search" : 'Text',
+				"default" : {
+					type : 'Text',
+					validators : [ 'required' ]
+				}
+			},
+			description : {
+				"search" : 'Text',
+				"default" : {
+					type : 'Text',
+					validators : [ 'required' ]
+				}
+			}
+		};
+
+	};
+
+	Calipso.model.RoleModel.prototype.getGridSchema = function(instance) {
+		return [ {
+			name : "name",
+			label : "Name",
+			cell : Calipso.components.backgrid.ViewRowCell,
+			editable : false
+		}, {
+			name : "description",
+			label : "Description",
+			editable : false,
+			cell : "string"
+		}, {
+			name : "edit",
+			label : "",
+			editable : false,
+			cell : Calipso.components.backgrid.EditRowCell,
+			headerCell : Calipso.components.backgrid.CreateNewHeaderCell
+		} ];
+	};
+	
+	// Notification Model
+	// -----------------------------------------
 	Calipso.model.BaseNotificationModel = Calipso.model.GenericModel.extend({
 	},
 	// static members 
@@ -1775,7 +1848,7 @@ define("calipso", function(require) {
 			"click a.logout" : "logout"
 		},
 		regions : {
-			menuRegion : "#calipsoHeaderView-menuRegion",
+			//menuRegion : "#calipsoHeaderView-menuRegion",
 			notificationsRegion : "#calipsoHeaderView-notificationsRegion"
 		},
 		// TODO: investigate
@@ -1809,12 +1882,12 @@ define("calipso", function(require) {
 				template : require('hbs!template/header-menuitem')
 			});
 
-			var MenuCollectionView = Backbone.Marionette.CollectionView.extend({
-				tagName : "ul",
-				template : require('hbs!template/header-menuitem'),
-				childView : MenuItemView
-			});
-			this.menuRegion.show(new MenuCollectionView(menuModel));
+//			var MenuCollectionView = Backbone.Marionette.CollectionView.extend({
+//				tagName : "ul",
+//				template : require('hbs!template/header-menuitem'),
+//				childView : MenuItemView
+//			});
+//			this.menuRegion.show(new MenuCollectionView(menuModel));
 			if(Calipso.isAuthenticated()){
 				// load and render notifications list
 				var notifications = new Calipso.collection.PollingCollection([], {
@@ -1825,7 +1898,6 @@ define("calipso", function(require) {
 				//console.log("HeaderView, created notifications collection: " + notifications + ", url: " + notifications.url);
 				var notificationsView = new Calipso.view.TemplateBasedCollectionView({
 					tagName : "span",
-					className : "dropdown",
 					childViewContainer : "ul",
 					template : require("hbs!template/headerNotificationsCollectionView"),
 					childViewOptions : {

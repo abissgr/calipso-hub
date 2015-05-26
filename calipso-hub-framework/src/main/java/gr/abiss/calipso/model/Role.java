@@ -49,11 +49,15 @@ public class Role extends AbstractAuditable<User> implements GrantedAuthority {
 
 	// global roles
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
+	public static final String ROLE_SITE_OPERATOR = "ROLE_SITE_OPERATOR";
 	public static final String ROLE_USER = "ROLE_USER";
 
 
-	@Column(name = "name")
+	@Column(unique = true, nullable = false)
 	private String name;
+	
+	@Column(length = 510)
+	private String description;
 
 	@JsonIgnore
 	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
@@ -65,6 +69,11 @@ public class Role extends AbstractAuditable<User> implements GrantedAuthority {
 
 	public Role(String name) {
 		this.name = name;
+	}
+
+	public Role(String name, String description) {
+		this(name);
+		this.description = description;
 	}
 
 	@Override
@@ -101,6 +110,14 @@ public class Role extends AbstractAuditable<User> implements GrantedAuthority {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public Collection<User> getMembers() {

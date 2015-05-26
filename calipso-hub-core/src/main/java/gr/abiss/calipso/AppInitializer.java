@@ -74,10 +74,12 @@ public class AppInitializer {
 		if(initData){
 			
 
-			Role adminRole = new Role(Role.ROLE_ADMIN);
+			Role adminRole = new Role(Role.ROLE_ADMIN, "System Administrator.");
 			adminRole = roleService.create(adminRole);
+			Role siteAdminRole = new Role(Role.ROLE_SITE_OPERATOR, "Site Operator.");
+			siteAdminRole = roleService.create(siteAdminRole);
 			// this is added to users by user service, just creating it
-			Role userRole = new Role(Role.ROLE_USER);
+			Role userRole = new Role(Role.ROLE_USER, "Logged in user");
 			userRole = roleService.create(userRole);
 
 			Date now = new Date();
