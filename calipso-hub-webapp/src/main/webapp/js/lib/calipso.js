@@ -1704,6 +1704,10 @@ define("calipso", function(require) {
 		render : function() {
 			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
 			this.$el.datetimepicker(this.config);
+			if (this.value) {
+				var initValue = new Date(this.value);
+				this.$el.data("DateTimePicker").date(initValue);
+			}
 			return this;
 		},
 	});
