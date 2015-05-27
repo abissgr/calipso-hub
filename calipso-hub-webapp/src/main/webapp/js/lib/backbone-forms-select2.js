@@ -18,7 +18,7 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 			var config = this.schema.config || {};
 			var _this = this;
 			setTimeout(function() {
-				if (_this) {
+				if (_this.schema.multiple) {
 					_this.$el.prop('multiple', true);
 				}
 				_this.$el.select2(config);
