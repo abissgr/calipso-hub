@@ -1212,10 +1212,14 @@ define("calipso", function(require) {
 	};
 
 	Calipso.model.UserModel.prototype.getPrototypeFormSchemas = function(instance) {
-		// console.log("UserModel.prototype.getPrototypeFormSchemas");
-		var schemas = instance.get("formSchema");
-		// console.log("JUserMdel.prototype.getPrototypeFormSchemas, schemas: " + schemas.toSource);
-		return schemas ? schemas : {//
+		console.log("UserModel.prototype.getPrototypeFormSchemas for " + instance.getTypeName());
+		var rolesCollection = new Calipso.collection.AllCollection([], {
+			url : function() {
+				return Calipso.session.getBaseUrl() + "/api/rest/" + Calipso.model.RoleModel.prototype.getPathFragment();
+			},
+			model : Calipso.model.RoleModel,
+		});
+		return {//
 			firstName : {
 				"search" : 'Text',
 				"default" : {
@@ -1257,6 +1261,19 @@ define("calipso", function(require) {
 				"default" : {
 					type : 'Text',
 					validators : [ 'required', 'email' ]
+				}
+			},
+			roles : {
+				"search" : {
+					type : Backbone.Form.editors.ModelSelect2,
+					options: rolesCollection,
+					multiple: true,
+				},
+				"default" : {
+					type : Backbone.Form.editors.ModelSelect2,
+					options: rolesCollection,
+					multiple: true,
+					validators : [ 'required' ],
 				}
 			}
 		};
@@ -3981,6 +3998,7 @@ define("calipso", function(require) {
 			var ModelType;
 			if (Calipso.modelTypesMap[modelTypeKey]) {
 				ModelType = Calipso.modelTypesMap[modelTypeKey];
+				console.log("AbstractController#getModelType, modelTypeKey: " + modelTypeKey + ", ModelType: " + ModelType.prototype.getTypeName());
 			} else {
 				var modelForRoute;
 				var modelModuleId = "model/" + _.singularize(modelTypeKey);
@@ -4026,7 +4044,7 @@ define("calipso", function(require) {
 		 * @see Calipso.model.GenericModel.prototype.getBusinessKey
 		 */
 		getModelForRoute : function(ModelType, modelId, httpParams) {
-			console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams);
+			console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams + ", type: " + ModelType.prototype.getTypeName());
 
 			// Obtain a model for the view:
 			// if a model id is present, obtain a promise 
@@ -4220,6 +4238,9 @@ define("calipso", function(require) {
 	Calipso.model.UserRegistrationModel.prototype.getTypeName = function(instance) {
 		return "UserRegistrationModel";
 	};
+	Calipso.model.UserRegistrationModel.prototype.getPathFragment = function(instance) {
+		return "userRegistrations";
+	};
 	/**
 	 * Get the model class URL fragment corresponding this class
 	 * @returns the URL path fragment as a string
@@ -4232,11 +4253,11 @@ define("calipso", function(require) {
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
 	 */
 	Calipso.model.UserRegistrationModel.prototype.getLayoutViewType = function(instance) {
-		console.log("GenericModel.prototype.getLayoutViewType() called, will return ModelDrivenSearchLayout");
+		console.log("UserRegistrationModel.prototype.getLayoutViewType() called, will return ModelDrivenSearchLayout");
 		return Calipso.view.UserRegistrationLayout;
 	};
 	Calipso.model.UserRegistrationModel.prototype.getPrototypeFormSchemas = function(instance) {
-		// console.log("JUserMdel.prototype.getPrototypeFormSchemas, schemas: " + schemas.toSource);
+		console.log("UserRegistrationModel.prototype.getPrototypeFormSchemas for " + instance.getTypeName());
 		var requiredText = {
 			type : 'Text',
 			validators : [ 'required' ]
@@ -4285,13 +4306,6 @@ define("calipso", function(require) {
 		};
 
 	};
-
-
-
-
-
-
-
 
 	// AMD define happens at the end for compatibility with AMD loaders
 	// that don't enforce next-turn semantics on modules.
