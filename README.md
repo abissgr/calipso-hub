@@ -105,5 +105,7 @@ http://download.eclipse.org/releases/luna/
 4) Import Calipso
 
 File -> Import -> Git -> Projects From Git -> URI
+
 Enter the Calipso Github repository url: https://github.com/abissgr/calipso-hub.git
+
 Select the branch
