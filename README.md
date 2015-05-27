@@ -5,6 +5,7 @@
 - [Browse the Database Console](#browse-the-database-console)
 - [Use a custom database](#use-a-custom-database)
 - [Create a RESTful service](#create-a-service)
+- [Set up Eclipse](#set-up-eclipse)
 
 ## Modules
 - calipso-hub (this one)
@@ -85,3 +86,24 @@ then uncommenting the MySQL section. Other databases can be also be used.
 [calipso-hub-framework]:calipso-hub-framework
 [calipso-hub-utilities]:calipso-hub-utilities
 [calipso-hub-webapp]:calipso-hub-webapp
+
+## Set up Eclipse
+
+1) Download and install Eclipse
+
+http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
+http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
+
+2) Install M2Eclipse
+
+http://download.eclipse.org/technology/m2e/releases/
+
+3) Install EGit
+
+http://download.eclipse.org/releases/luna/
+
+4) Import Calipso
+
+File -> Import -> Git -> Projects From Git -> URI
+Enter the Calipso Github repository url: https://github.com/abissgr/calipso-hub.git
+Select the branch
