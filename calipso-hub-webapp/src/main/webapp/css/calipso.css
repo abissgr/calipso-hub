@@ -354,7 +354,21 @@ div#sidebar-collapse-accordion div.panel div.panel-body .nav > li > a:hover{
 .backgrid .select-cell.editor option::-o-focus-inner {
   border: 0;
 }
+/*
+  backgrid-moment-cell
+  http://github.com/wyuenho/backgrid
 
+  Copyright (c) 2013 Jimmy Yuen Ho Wong and contributors
+  Licensed under the MIT @license.
+*/
+
+.backgrid .moment-cell {
+  text-align: right;
+}
+
+.backgrid .moment-cell.editor input[type=text] {
+  text-align: right;
+}
 /*
   backgrid-paginator
   http://github.com/wyuenho/backgrid

@@ -1,5 +1,7 @@
 package gr.abiss.calipso.userDetails.model;
 
+import gr.abiss.calipso.userDetails.integration.LocalUser;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -111,6 +113,8 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 	public Long getNotificationCount();
 	
 	public void setNotificationCount(Long notificationCount);
+
+	LocalUser getUser();
 	
 
 }

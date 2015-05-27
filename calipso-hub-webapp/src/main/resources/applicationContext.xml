@@ -31,7 +31,7 @@
 	        </map>
 	    </property>
 	</bean>
-
+    <jpa:auditing auditor-aware-ref="auditorBean"/>
 	<context:component-scan base-package="
     	gr.abiss.calipso, 
     	org.resthub" />

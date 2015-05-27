@@ -347,7 +347,7 @@ define("calipso", function(require) {
 
 			Calipso.session.userDetails = userDetails;
 			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
-				model : userDetails
+				model : Calipso.session.userDetails
 			}));
 
 			// send logged in user on their way

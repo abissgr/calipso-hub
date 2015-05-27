@@ -52,6 +52,7 @@ require.config({
 		'console' : 'lib/resthub/console',
 		'backgrid' : 'lib/backgrid/backgrid',
 		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
+		"backgrid-moment" : 'lib/backgrid/extensions/moment/backgrid-moment-cell',
 		"calipso" : 'lib/calipso',
 		'supermodel' : 'lib/supermodel',
 		// Mocha testing
@@ -116,6 +117,10 @@ require.config({
 			deps : [ 'backgrid', 'backbone-pageable' ],
 			exports : 'Backgrid.Extension.Paginator'
 		},
+		'backgrid-moment' : {
+			deps : [ 'backgrid' ],
+			exports : 'Backgrid.Extension.Moment'
+		},
 		'bootstrap' : {
 			deps : [ 'jquery' ]
 		},
@@ -147,7 +152,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker'],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker'],
 			exports : 'calipso'
 		},
 		'cookie': { 

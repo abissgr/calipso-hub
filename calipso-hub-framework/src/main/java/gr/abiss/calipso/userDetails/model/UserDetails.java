@@ -37,6 +37,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.wordnik.swagger.annotations.ApiModel;
@@ -98,6 +99,9 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private String confirmationToken;
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	private String resetPasswordToken;
+	
+	@JsonIgnore
+	private LocalUser user;
 
 	public static ICalipsoUserDetails fromUser(LocalUser user) {
 		UserDetails details = null;
@@ -133,6 +137,11 @@ public class UserDetails implements  ICalipsoUserDetails{
 					}
 				}
 			}
+			
+			// add user
+			details.setUser(user);
+			
+			
 		}
 		return details;
 	}
@@ -627,5 +636,17 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@Override
 	public String getUserId() {
 		return this.id;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getUser()
+	 */
+	@Override
+	public LocalUser getUser() {
+		return user;
+	}
+
+	public void setUser(LocalUser user) {
+		this.user = user;
 	}
 }

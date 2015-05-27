@@ -47,7 +47,6 @@ public abstract class AbstractAuditable<U extends AbstractPersistable> extends
 
 	private static final long serialVersionUID = 8809874829822002089L;
 
-	@JsonIgnore
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "created_by", referencedColumnName = "id", nullable = true)
 	private U createdBy;
