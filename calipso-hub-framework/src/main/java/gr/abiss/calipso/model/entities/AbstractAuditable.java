@@ -109,7 +109,6 @@ public abstract class AbstractAuditable<U extends AbstractPersistable> extends
 	 * @see org.springframework.data.domain.Auditable#getCreatedDate()
 	 */
 	@Override
-	@JoinColumn(name = "date_created")
 	public DateTime getCreatedDate() {
 
 		return null == createdDate ? null : new DateTime(createdDate);
@@ -128,8 +127,6 @@ public abstract class AbstractAuditable<U extends AbstractPersistable> extends
 	 * @see org.springframework.data.domain.Auditable#getLastModifiedBy()
 	 */
 	@Override
-	@ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="modified_by")
 	public U getLastModifiedBy() {
 		return lastModifiedBy;
 	}
@@ -146,7 +143,6 @@ public abstract class AbstractAuditable<U extends AbstractPersistable> extends
 	 * @see org.springframework.data.domain.Auditable#getLastModifiedDate()
 	 */
 	@Override
-	@JoinColumn(name = "date_last_modified")
 	public DateTime getLastModifiedDate() {
 		return null == lastModifiedDate ? null : new DateTime(lastModifiedDate);
 	}
