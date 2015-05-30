@@ -98,7 +98,7 @@ http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
 
 http://download.eclipse.org/technology/m2e/releases/
 
-3) Install EGit
+3) Install EGit(not needed)
 
 http://download.eclipse.org/releases/luna/
 
