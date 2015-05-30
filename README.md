@@ -89,6 +89,8 @@ then uncommenting the MySQL section. Other databases can be also be used.
 
 ## Set up Eclipse
 
+Requires JDK (Maven not needed)
+
 1) Download and install Eclipse
 
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
