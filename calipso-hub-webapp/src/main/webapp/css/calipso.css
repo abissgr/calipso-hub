@@ -6,34 +6,6 @@
 -------------------------------------------------- */
 .tmpl-hint{display:none}
 .hidden{display:none}
-html,
-body {
-  height: 100%;
-  background-color: #ffffff;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  /* The html and body elements cannot have any padding or margin. */
-}
-
-/* Wrapper for page content to push down footer */
-#wrap {
-  min-height: 100%;
-  height: auto;
-  /* Negative indent footer by its height */
-  margin: 0 auto -60px;
-  /* Pad bottom by footer height */
-  padding: 60px 0 60px;
-}
-.navbar-static-side{
-	left:0px;
-	top: 0px;
-}
-/* Set the fixed height of the footer here */
-#footer {
-  height: 60px;
-  background-color: #f8f8f8;
-  border-top:1px solid #E7E7E7;
-}
 /*
  * Social buttons
 */
@@ -66,14 +38,14 @@ button[class^="btn-cancel-search-"], button[class*=" btn-cancel-search-"] {
     text-align: right;
 }
 
-div#navbar-menu div.navbar-default{
-    background-color: transparent;
+
+#navbar-menu .navbar-default{
+    background-color: rgba(255, 255, 255, 0.898);
 }
 #calipsoModelDrivenSearchLayout-accordion .panel-heading a:after {
     font-family:'Glyphicons Halflings';
     content:"\e114";
     float: right;
-    color: grey;
 }
 #calipsoModelDrivenSearchLayout-accordion .panel-heading a.collapsed:after {
     content:"\e080";
@@ -104,15 +76,6 @@ div#sidebar-collapse-accordion div.panel-body{
     padding-right:0px;
     padding-bottom:0px;
     padding-left:0px;
-}
-div#sidebar-collapse-accordion div.panel-heading,
-div#sidebar-collapse-accordion h4.panel-title,
-div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link,
-div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:link,
-div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.sidebar-accordion-link:hover,
-div#sidebar-collapse-accordion div.panel div.panel-body .nav > li > a:hover{
-    background-color: #f8f8f8;
-    color: #777777;
 }
 /*
   backgrid
@@ -176,7 +139,6 @@ div#sidebar-collapse-accordion div.panel div.panel-body .nav > li > a:hover{
 
 .backgrid thead th {
   vertical-align: bottom;
-  background-color: #f9f9f9;
 }
 
 .backgrid thead th a {
@@ -508,19 +470,6 @@ div#sidebar-collapse-accordion div.panel div.panel-body .nav > li > a:hover{
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-
-body {
-  font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
-  color: #5e5d52;
-}
-
-a {
-  color: #337aa8;
-}
-a:hover, a:focus {
-  color: #4b8ab2;
-}
-
 .container {
   margin: 5% 3%;
 }

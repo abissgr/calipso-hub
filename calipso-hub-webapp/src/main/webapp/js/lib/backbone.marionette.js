@@ -1224,6 +1224,7 @@
     // Override this method to change how the new view is
     // appended to the `$el` that the region is managing
     attachHtml: function(view) {
+   	 console.log("marionette region attachHtml");
       // empty the node and append new view
       this.el.innerHTML='';
       this.el.appendChild(view.el);

@@ -1256,10 +1256,12 @@ define("calipso", function(require) {
 			email : {
 				"search" : {
 					type : 'Text',
+					dataType: "email",
 					validators : [ 'email' ]
 				},
 				"default" : {
 					type : 'Text',
+					dataType: "email",
 					validators : [ 'required', 'email' ]
 				}
 			},
@@ -1856,7 +1858,29 @@ define("calipso", function(require) {
 			return "Calipso.view.ModalLayout";
 		}
 	});
-
+	Calipso.view.HeaderNotificationsRegion = Backbone.Marionette.Region.extend({
+		el: "#calipsoHeaderView-notificationsRegion",
+		attachHtml: function(view){
+			console.log("Calipso.view.HeaderNotificationsRegion.attachHtml");
+			this.$el.clear().
+				append(
+						'<a href="#" data-toggle="dropdown" class="dropdown-toggle">' +
+						'<i class="fa fa-bell fa-fw"></i>'+
+						'<sup class="badge badge-primary badge-notifications-count hidden"></sup>' +
+						'<i class="fa fa-caret-down"></i>', 
+						view.el);
+		}
+	});
+	Calipso.view.HeaderNotificationsRegion.prototype.attachHtml = function(view){
+		console.log("Calipso.view.HeaderNotificationsRegion.prototype.attachHtml");
+		this.$el.clear().
+			append(
+					'<a href="#" data-toggle="dropdown" class="dropdown-toggle">' +
+					'<i class="fa fa-bell fa-fw"></i>'+
+					'<sup class="badge badge-primary badge-notifications-count hidden"></sup>' +
+					'<i class="fa fa-caret-down"></i>', 
+					view.el);
+	};
 	Calipso.view.HeaderView = Calipso.view.AbstractLayout.extend(
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
@@ -1870,7 +1894,11 @@ define("calipso", function(require) {
 		},
 		regions : {
 			//menuRegion : "#calipsoHeaderView-menuRegion",
-			notificationsRegion : "#calipsoHeaderView-notificationsRegion"
+			notificationsRegion : {
+				// appends the notifications without clearing the link, 
+				// fixes HTML structure issue
+				regionClass : Calipso.view.HeaderNotificationsRegion
+			}
 		},
 		// TODO: investigate
 //		serializeData: function(){
@@ -1918,8 +1946,8 @@ define("calipso", function(require) {
 	
 				//console.log("HeaderView, created notifications collection: " + notifications + ", url: " + notifications.url);
 				var notificationsView = new Calipso.view.TemplateBasedCollectionView({
-					tagName : "span",
-					childViewContainer : "ul",
+					tagName : "ul",
+					className: "dropdown-menu dropdown-notifications",
 					template : require("hbs!template/headerNotificationsCollectionView"),
 					childViewOptions : {
 						template : require("hbs!template/headerNotificationsItemView"),
