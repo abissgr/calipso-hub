@@ -2136,7 +2136,22 @@ define("calipso", function(require) {
 
 
 		
-		}
+		},
+		showFormForModel : function(routeModel, region, forceShow) {
+			console.log("Calipso.view.ModelDrivenSearchLayout#showSidebar");
+			var _this = this;
+			// create the search form view if not there
+			if(forceShow || !region.hasView()){
+				console.log("Calipso.view.ModelDrivenSearchLayout#showSidebar search form with formSchemaKey " + _this.model.getFormSchemaKey());
+				var formView = new Calipso.view.GenericFormView({
+					formSchemaKey :  _this.model.getFormSchemaKey(),
+					model : routeModel
+				});
+				// show the search form
+				region.show(formView);
+			}
+
+		},
 		
 	}, {
 		// static members
@@ -2225,18 +2240,7 @@ define("calipso", function(require) {
 			this.$el.find("#collapseTwo").collapse('hide');
 		},
 		showSidebar : function(routeModel) {
-			console.log("Calipso.view.ModelDrivenSearchLayout#showSidebar");
-			var _this = this;
-			// create the search form view if not there
-			if(!this.sidebarRegion.hasView()){
-				console.log("Calipso.view.ModelDrivenSearchLayout#showSidebar search form with formSchemaKey " + _this.model.getFormSchemaKey());
-				var formView = new Calipso.view.GenericFormView({
-					formSchemaKey :  _this.model.getFormSchemaKey(),
-					model : routeModel
-				});
-				// show the search form
-				this.sidebarRegion.show(formView);
-			}
+			this.showFormForModel(routeModel, this.sidebarRegion);
 
 		},
 //		showItemViewForModel : function(itemModel, formSchemaKey) {

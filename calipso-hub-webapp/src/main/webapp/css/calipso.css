@@ -654,3 +654,7 @@ div#sidebar-collapse-accordion div.panel-body{
 .footer-nav, .footer-logo{
 	float: left
 }
+
+.no-gutter > [class*='col-'] {
+    padding: 0;
+}
