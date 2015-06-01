@@ -2203,11 +2203,10 @@ define("calipso", function(require) {
 		onShow : function() {
 			console.log("Calipso.view.ModelDrivenSearchLayout#onShow");
 			var _this = this;
-			var hasCriteria =  this.searchResultsCollection.hasCriteria();
+			var hasCriteria =  this.searchResultsCollection && this.searchResultsCollection.hasCriteria();
 			var skipDefaultSearch = this.model.skipDefaultSearch && !hasCriteria;
-			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, hasCriteria = " + hasCriteria + ", skipDefaultSearch: " + skipDefaultSearch + ", criteria:");
-			console.log(this.searchResultsCollection.data);
-
+			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, hasCriteria = " + hasCriteria + ", skipDefaultSearch: " + skipDefaultSearch);
+			
 			this.showSidebar(this.model);
 			if(skipDefaultSearch){
 				console.log("Calipso.view.ModelDrivenSearchLayout#onShow calling expandSearchForm");
