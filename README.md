@@ -94,16 +94,16 @@ then uncommenting the MySQL section. Other databases can be also be used.
 http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
 
-![alt tag]()
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/jdkdownload.png)
 
 2) Download and install Eclipse
 
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
 
-![alt tag]()
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload1.png)
 
-![alt tag]()
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload2.png)
 
 3) Import Calipso
 
@@ -113,9 +113,9 @@ Enter the Calipso Github repository url: https://github.com/abissgr/calipso-hub.
 
 Select the branch
 
-![alt tag]()
-![alt tag]()
-![alt tag]()
-![alt tag]()
-![alt tag]()
-![alt tag]()
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport1.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport2.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport3.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport4.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport5.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport6.png)
