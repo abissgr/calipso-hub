@@ -93,7 +93,7 @@ then uncommenting the MySQL section. Other databases can be also be used.
 
 http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
-![alt tag](http://https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/1.%20ECLIPSE%5B1%5D.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/1.%20ECLIPSE%5B1%5D.png)
 
 1) Download and install Eclipse
 
