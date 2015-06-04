@@ -94,16 +94,28 @@ then uncommenting the MySQL section. Other databases can be also be used.
 http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
 
-1) Download and install Eclipse
+![alt tag]()
+
+2) Download and install Eclipse
 
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
 
-\
-4) Import Calipso
+![alt tag]()
+
+![alt tag]()
+
+3) Import Calipso
 
 File -> Import -> Git -> Projects From Git -> URI
 
 Enter the Calipso Github repository url: https://github.com/abissgr/calipso-hub.git
 
 Select the branch
+
+![alt tag]()
+![alt tag]()
+![alt tag]()
+![alt tag]()
+![alt tag]()
+![alt tag]()
