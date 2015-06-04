@@ -89,21 +89,18 @@ then uncommenting the MySQL section. Other databases can be also be used.
 
 ## Set up Eclipse
 
-Requires JDK (Maven not needed)
+1) Download and install Java Development Kit 7(JDK7)
+
+http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+
+![alt tag](http://https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/1.%20ECLIPSE%5B1%5D.png)
 
 1) Download and install Eclipse
 
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
 
-2) Install M2Eclipse
-
-http://download.eclipse.org/technology/m2e/releases/
-
-3) Install EGit(not needed)
-
-http://download.eclipse.org/releases/luna/
-
+\
 4) Import Calipso
 
 File -> Import -> Git -> Projects From Git -> URI
