@@ -65,6 +65,7 @@ require.config({
       //'typeahead': "lib/bootstrap3-typeahead"
       'typeahead' : 'lib/typeahead.jquery',
       'bloodhound': 'lib/bloodhound',
+      'chart': 'lib/Chart',
       
 			
 	},
