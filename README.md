@@ -89,25 +89,33 @@ then uncommenting the MySQL section. Other databases can be also be used.
 
 ## Set up Eclipse
 
-Requires JDK (Maven not needed)
+1) Download and install Java Development Kit 7(JDK7)
 
-1) Download and install Eclipse
+http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/jdkdownload.png)
+
+2) Download and install Eclipse
 
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
 
-2) Install M2Eclipse
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload1.png)
 
-http://download.eclipse.org/technology/m2e/releases/
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload2.png)
 
-3) Install EGit(not needed)
-
-http://download.eclipse.org/releases/luna/
-
-4) Import Calipso
+3) Import Calipso
 
 File -> Import -> Git -> Projects From Git -> URI
 
 Enter the Calipso Github repository url: https://github.com/abissgr/calipso-hub.git
 
 Select the branch
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport1.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport2.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport3.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport4.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport5.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport6.png)
