@@ -472,6 +472,29 @@ define("calipso", function(require) {
 					delete options.data[""];
 				}
 				this.data = options.data;
+
+				var stateData = [{
+					name: "size",
+					stateName: "pageSize"
+				}, {
+					name : "page", 
+					stateName : "currentPage"
+				}, {
+					name : "order", 
+					stateName : "direction"
+				}, {
+					name : "properties", 
+					stateName : "sortKey"
+				}];
+				for(var i=0; i < stateData.length; i++){
+					if(this.data[stateData[i].name]){
+						this.state[stateData[i].stateName] = this.data[stateData[i].name];
+						console.log("state "+stateData[i].stateName+": "+this.data[stateData[i].name]);
+					}
+				}
+
+				console.log("state finished:");
+				console.log(this.state);
 			}
 			if (options.url) {
 				this.url = options.url;
