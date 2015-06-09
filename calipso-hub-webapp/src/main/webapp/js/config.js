@@ -53,6 +53,7 @@ require.config({
 		'backgrid' : 'lib/backgrid/backgrid',
 		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
 		"backgrid-moment" : 'lib/backgrid/extensions/moment/backgrid-moment-cell',
+		"backgrid-text" : 'lib/backgrid/extensions/text/backgrid-text-cell',
 		"calipso" : 'lib/calipso',
 		'supermodel' : 'lib/supermodel',
 		// Mocha testing
@@ -122,6 +123,10 @@ require.config({
 			deps : [ 'backgrid' ],
 			exports : 'Backgrid.Extension.Moment'
 		},
+		'backgrid-text' : {
+			deps : [ 'backgrid' ],
+			exports : 'Backgrid.Extension.Text'
+		},
 		'bootstrap' : {
 			deps : [ 'jquery' ]
 		},
@@ -153,7 +158,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker'],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker'],
 			exports : 'calipso'
 		},
 		'cookie': { 

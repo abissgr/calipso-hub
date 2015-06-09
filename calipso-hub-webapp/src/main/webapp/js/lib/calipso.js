@@ -1575,16 +1575,27 @@ define("calipso", function(require) {
 	Calipso.components.backgrid.ChildStringAttributeCell = Backgrid.StringCell.extend({
 		render : function() {
 			var parameters = this.column.get("name").split(".");
-			var parent = this.model.get(parameters[0]);
-			if (parameters.length > 2) {
-				for (i = 1; i < parameters.length - 1; i++) {
-					parent = parent[parameters[i]];
-				}
-			}
-			var value = parent ? this.formatter.fromRaw(parent[parameters[parameters.length - 1]]) : "";
+			var result = this.walk(this.model, parameters);
+			
+			var value = result ? this.formatter.fromRaw(result) : "-";
 			this.$el.text(value);
 			this.delegateEvents();
 			return this;
+		},
+		walk : function(currentStepValue, pathSteps, stepIndex){
+			var value;
+			if(stepIndex == undefined){
+				stepIndex = 0;
+			}
+			var stepName = pathSteps[stepIndex];
+			if(currentStepValue && stepName){
+				value = currentStepValue.get ? currentStepValue.get(stepName) :  currentStepValue[stepName];
+				stepIndex++;
+				if(value && stepIndex < pathSteps.length){
+					value = this.walk(value, pathSteps, stepIndex);
+				}
+			}
+			return value;
 		}
 	});
 	Calipso.components.backgrid.CreateNewHeaderCell  = Backgrid.HeaderCell.extend({
