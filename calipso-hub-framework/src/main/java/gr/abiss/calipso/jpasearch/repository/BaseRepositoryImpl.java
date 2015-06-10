@@ -17,34 +17,41 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
+import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.types.AggregateFunction;
+import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-public class BaseRepositoryImpl<T, ID extends Serializable>
- extends SimpleJpaRepository<T, ID> implements
-		BaseRepository<T, ID> {
+public class BaseRepositoryImpl<T, ID extends Serializable> extends
+		SimpleJpaRepository<T, ID> implements BaseRepository<T, ID> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BaseRepositoryImpl.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(BaseRepositoryImpl.class);
 
 	private final EntityManager entityManager;
 	private final Class<T> domainClass;
@@ -82,14 +89,15 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	}
 
 	@Override
-	public List<Metadatum> addMetadata(ID subjectId, Map<String, String> metadata) {
+	public List<Metadatum> addMetadata(ID subjectId,
+			Map<String, String> metadata) {
 		ensureMetadataIsSupported();
 		List<Metadatum> saved;
 		if (!CollectionUtils.isEmpty(metadata)) {
 			saved = new ArrayList<Metadatum>(metadata.size());
 			for (String predicate : metadata.keySet()) {
-				LOGGER.info("addMetadatum subjectId: " + subjectId + ", predicate: "
-						+ predicate);
+				LOGGER.info("addMetadatum subjectId: " + subjectId
+						+ ", predicate: " + predicate);
 				Metadatum metadatum = this.findMetadatum(subjectId, predicate);
 				LOGGER.info("addMetadatum metadatum: " + metadatum);
 				if (metadatum == null) {
@@ -119,11 +127,9 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	}
 
 	@SuppressWarnings("unchecked")
-	private Metadatum buildMetadatum(MetadataSubject subject,
-			String predicate,
+	private Metadatum buildMetadatum(MetadataSubject subject, String predicate,
 			String object) {
-		Class<?> metadatumClass = subject
-				.getMetadataDomainClass();
+		Class<?> metadatumClass = subject.getMetadataDomainClass();
 		Metadatum metadatum = null;
 		try {
 			metadatum = (Metadatum) metadatumClass.getConstructor(
@@ -154,15 +160,13 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 		// CriteriaQuery criteria = builder.createQuery(metadatumClass);
 		// Root root = criteria.from(metadatumClass);
 		// criteria.where( builder.equal(root.get("predicate"), predicate));
-		
-		
-		
-//		T entity = this.findOne(subjectId);
-//		MetadataSubject subject = (MetadataSubject) entity;
-//		if (subject.getMetadata() != null) {
-//			subject.getMetadata().remove(predicate);
-//			this.merge(entity);
-//		}
+
+		// T entity = this.findOne(subjectId);
+		// MetadataSubject subject = (MetadataSubject) entity;
+		// if (subject.getMetadata() != null) {
+		// subject.getMetadata().remove(predicate);
+		// this.merge(entity);
+		// }
 	}
 
 	@Override
@@ -171,17 +175,18 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 		Class<?> metadatumClass = ((MetadataSubject) subjectEntity)
 				.getMetadataDomainClass();
 		return this.findMetadatum(subjectId, predicate, metadatumClass);
-		
+
 	}
-	
+
 	protected Metadatum findMetadatum(ID subjectId, String predicate,
 			Class<?> metadatumClass) {
-		List<Metadatum> results = this.getEntityManager()
+		List<Metadatum> results = this
+				.getEntityManager()
 				.createQuery(
-				"from " + metadatumClass.getSimpleName()
-						+ " m where m.predicate = ?1 and m.subject.id = ?2")
-						.setParameter(1, predicate)
-						.setParameter(2, subjectId)
+						"from "
+								+ metadatumClass.getSimpleName()
+								+ " m where m.predicate = ?1 and m.subject.id = ?2")
+				.setParameter(1, predicate).setParameter(2, subjectId)
 				.getResultList();
 		Metadatum metadatum = results.isEmpty() ? null : results.get(0);
 		return metadatum;
@@ -209,11 +214,15 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	@Override
 	public Page<T> findAll(Pageable pageable) {
 		if (pageable instanceof ParameterMapBackedPageRequest) {
-			Specification<T> spec = GenericSpecifications.matchAll(getDomainClass(), ((ParameterMapBackedPageRequest) pageable).getParameterMap());
+			Specification<T> spec = GenericSpecifications.matchAll(
+					getDomainClass(),
+					((ParameterMapBackedPageRequest) pageable)
+							.getParameterMap());
 			return super.findAll(spec, pageable);
-		} 
-		else if (pageable instanceof RestrictionBackedPageRequest) {
-			Specification<T> spec = GenericSpecifications.matchAll(getDomainClass(), ((RestrictionBackedPageRequest) pageable).getRestriction());
+		} else if (pageable instanceof RestrictionBackedPageRequest) {
+			Specification<T> spec = GenericSpecifications.matchAll(
+					getDomainClass(),
+					((RestrictionBackedPageRequest) pageable).getRestriction());
 			return super.findAll(spec, pageable);
 		} else {
 			return super.findAll(pageable);
@@ -225,6 +234,22 @@ public class BaseRepositoryImpl<T, ID extends Serializable>
 	 */
 	protected EntityManager getEntityManager() {
 		return entityManager;
+	}
+
+	@Transactional(readOnly = true)
+	public Iterable<ReportDataset> getReportDatasets(TimeUnit timeUnit,
+			String dateField, Date dateFrom, Date dateTo,
+			String aggregateField, AggregateFunction aggregateFunction) {
+//		return this.repository.getReportDatasets(timeUnit, dateField, dateFrom,
+//				dateTo, aggregateField, aggregateFunction);
+		String query = "select new gr.abiss.calipso.model.ReportDataset(e, SUM(e.totalPrice), DATE(e.date)) " +
+				"from #{#entityName} e " +
+				"where e.date BETWEEN :dateFrom AND :dateTo" +
+				"group by DATE(e.date)";
+		TypedQuery<ReportDataset> q = this.entityManager.createQuery(query, ReportDataset.class);
+		List<ReportDataset> results =  q.getResultList();
+		LOGGER.info("getReportDatasets, results found: " + results.size());
+		return results;
 	}
 
 }

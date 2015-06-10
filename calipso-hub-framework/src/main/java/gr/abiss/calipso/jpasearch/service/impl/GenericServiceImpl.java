@@ -17,8 +17,11 @@
  */
 package gr.abiss.calipso.jpasearch.service.impl;
 
+import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.types.AggregateFunction;
+import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.acl.model.AclClass;
 import gr.abiss.calipso.acl.model.AclObject;
 import gr.abiss.calipso.acl.model.AclObjectIdentity;
@@ -32,6 +35,7 @@ import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -203,5 +207,15 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 		this.repository.removeMetadatum(subjectId, predicate);
 	}
 
+	@Override
+	public Iterable<ReportDataset> getReportDatasets(
+			TimeUnit timeUnit,
+			String dateField,
+			Date dateFrom,
+			Date dateTo,
+			String aggregateField,
+			AggregateFunction aggregateFunction) {
+		return this.repository.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, aggregateField, aggregateFunction);
+	}
 
 }

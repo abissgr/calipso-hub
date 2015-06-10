@@ -17,10 +17,14 @@
  */
 package gr.abiss.calipso.jpasearch.service;
 
+import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.types.AggregateFunction;
+import gr.abiss.calipso.model.types.TimeUnit;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 
 import org.resthub.common.service.CrudService;
 import org.springframework.data.domain.Persistable;
@@ -49,4 +53,8 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 	public void addMetadata(ID subjectId, Collection<Metadatum> dtos);
 
 	public void removeMetadatum(ID subjectId, String predicate);
+
+	public Iterable<ReportDataset> getReportDatasets(TimeUnit timeUnit,
+			String dateField, Date dateFrom, Date dateTo,
+			String aggregateField, AggregateFunction aggregateFunction);
 }

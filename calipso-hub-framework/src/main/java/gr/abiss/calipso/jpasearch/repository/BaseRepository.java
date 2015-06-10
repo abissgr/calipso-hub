@@ -17,14 +17,21 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
+import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.types.AggregateFunction;
+import gr.abiss.calipso.model.types.TimeUnit;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.transaction.annotation.Transactional;
 
 @NoRepositoryBean
 public interface BaseRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
@@ -37,13 +44,16 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
 	
 	public Class<T> getDomainClass();
 
-	Metadatum addMetadatum(ID subjectId, String predicate, String object);
+	public Metadatum addMetadatum(ID subjectId, String predicate, String object);
 
-	List<Metadatum> addMetadata(ID subjectId, Map<String, String> metadata);
+	public List<Metadatum> addMetadata(ID subjectId, Map<String, String> metadata);
 
-	void removeMetadatum(ID subjectId, String predicate);
+	public void removeMetadatum(ID subjectId, String predicate);
 
-	Metadatum findMetadatum(ID subjectId, String predicate);
-
+	public Metadatum findMetadatum(ID subjectId, String predicate);
+	
+	public Iterable<ReportDataset> getReportDatasets(TimeUnit timeUnit,
+			String dateField, Date dateFrom, Date dateTo,
+			String aggregateField, AggregateFunction aggregateFunction);
 
 }

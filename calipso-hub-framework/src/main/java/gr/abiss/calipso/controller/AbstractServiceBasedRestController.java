@@ -23,23 +23,23 @@ import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
-import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
+import gr.abiss.calipso.model.types.AggregateFunction;
+import gr.abiss.calipso.model.types.TimeUnit;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.resthub.common.exception.NotFoundException;
-import org.resthub.common.view.ResponseView;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,14 +58,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
 
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
@@ -321,5 +318,32 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	public void removeMetadatum(@PathVariable ID subjectId,
 			@PathVariable String predicate) {
 		service.removeMetadatum(subjectId, predicate);
+	}
+	
+//	@InitBinder 
+//	protected void initBinder(WebDataBinder binder) { 
+//		binder.registerCustomEditor(TimeUnit.class, new EnumConverter<TimeUnit>(TimeUnit.class));}
+	
+	@RequestMapping(value = "report", method = RequestMethod.GET)
+	@ResponseBody
+	@ApiOperation(value = "report", notes = "Get a report dataset for the given date range and time unit", httpMethod = "GET") 
+	public Iterable<ReportDataset> getReportDatasets(
+			@RequestParam(value = "timeUnit", required = false, defaultValue = "DAY") TimeUnit timeUnit,
+			@RequestParam(value = "dateField", required = false, defaultValue = "createdDate") String dateField,
+			@RequestParam(value = "dateFrom", required = false) Date dateFrom,
+			@RequestParam(value = "dateTo", required = false) Date dateTo,
+			@RequestParam(value = "aggregateField", required = true) String aggregateField,
+			@RequestParam(value = "aggregateFunction", required = false, defaultValue = "COUNT") AggregateFunction aggregateFunction) {
+		// default date region is the current day
+		Date now = new Date();
+		if(dateFrom == null){
+			dateFrom = DateUtils.truncate(now, Calendar.DATE);
+		}
+		if(dateTo == null){
+			dateTo = DateUtils.addMilliseconds(DateUtils.ceiling(now, Calendar.DATE), -1);
+		}
+		Map<String, String[]> paramsMap = request.getParameterMap();
+		
+		return this.service.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, aggregateField, aggregateFunction);
 	}
 }

@@ -22,19 +22,25 @@ import gr.abiss.calipso.model.entities.AbstractPersistable;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Persistable;
 
 /**
  */
 @MappedSuperclass
-public class ReportDataset<T extends Persistable<?>, D extends Serializable> extends AbstractPersistable {
+public class ReportDataset<T extends AbstractPersistable, D extends Serializable> extends AbstractPersistable {
 //	Query query = em.createQuery('select new ReportDataset(p, size(p.dogs)) from Person p');
 //	return (List<Report<Person, Long>>) query.list();
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ReportDataset.class);
+	
 	private String label;
 
 	private T subject;
@@ -49,6 +55,18 @@ public class ReportDataset<T extends Persistable<?>, D extends Serializable> ext
 		this();
 		this.subject = subject;
 		this.data = data;
+	}
+	public ReportDataset(T subject, D datumm, Date date) {
+		this();
+		this.subject = subject;
+		this.data = new HashMap<Date, D>();
+		this.data.put(date, datumm);
+		LOGGER.info("Created dataset: " + this);
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this).append("subject", this.getSubject()).append("data", this.getData()).toString();
 	}
 
 

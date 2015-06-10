@@ -20,7 +20,10 @@ package gr.abiss.calipso.service.impl;
 
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
+import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.types.AggregateFunction;
+import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
@@ -28,6 +31,7 @@ import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -38,6 +42,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends BaseRepository<T, ID>>
@@ -82,5 +87,6 @@ public abstract class AbstractServiceImpl<T extends Persistable<ID>, ID extends 
 		}
 		return user;
 	}
+	
 
 }
