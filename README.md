@@ -130,4 +130,4 @@ This is the final step of the proccess .To import Calipso as a Maven project :
 
 Wait for the proccess to finish. If the outcome looks like this:
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/final.png)
-you have a complete enviroment to work on.
+you have a proper developing enviroment to work on.
