@@ -46,7 +46,7 @@ To build Calipso you need a Java Development Kit(JDK7 ) and Apache Maven install
 
 After you complete the steps above, you can access Calipso using your web browser: 
 
-    http://localhost:8080/
+    http://localhost:8080/calipso
     
 ## Browse the Database Console 
 
@@ -95,6 +95,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.h
 
 
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/jdkdownload.png)
+Download the JDK 7 version that matches your OS
 
 2) Download and install Eclipse
 
@@ -102,16 +103,16 @@ http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
 http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
 
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload1.png)
+Be sure to download the correct version to match your OS
 
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload2.png)
+After it finishes downloading move to your Download directory to install Eclipse
 
 3) Import Calipso
 
+Now to import Calipso to Eclipse follow the steps bellow(NOTE:Remember your github username and password because they are needed in order to authenticate you as a valid user to download Calipso)
 File -> Import -> Git -> Projects From Git -> URI
-
 Enter the Calipso Github repository url: https://github.com/abissgr/calipso-hub.git
-
-Select the branch
 
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport1.png)
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport2.png)
@@ -119,3 +120,14 @@ Select the branch
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport4.png)
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport5.png)
 ![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport6.png)
+
+4)Import Calipso as a Maven project
+
+This is the final step of the proccess .To import Calipso as a Maven project : 
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/mavenimport.png)
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/mavenimport2.png)
+
+Wait for the proccess to finish. If the outcome looks like this:
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/final.png)
+you have a complete enviroment to work on.
