@@ -32,11 +32,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 /**
  * A predicates for many2one members implementing org.springframework.data.domain.Persistable
  */
-public class ManyToOnePredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
+public class AnyToOnePredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ManyToOnePredicateFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePredicateFactory.class);
 
-	public ManyToOnePredicateFactory() {
+	public AnyToOnePredicateFactory() {
 	}
 
 

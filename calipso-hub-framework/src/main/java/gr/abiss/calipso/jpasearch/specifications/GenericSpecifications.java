@@ -65,7 +65,7 @@ public class GenericSpecifications {
 	private static final NumberPredicateFactory<Long> longPredicateFactory = new NumberPredicateFactory<Long>(Long.class);
 	private static final NumberPredicateFactory<Double> doublePredicateFactory = new NumberPredicateFactory<Double>(Double.class);
 
-	private static final ManyToOnePredicateFactory manyToOnePredicateFactory = new ManyToOnePredicateFactory();
+	private static final AnyToOnePredicateFactory anyToOnePredicateFactory = new AnyToOnePredicateFactory();
 	private static final CurrentPrincipalPredicateFactory currentPrincipalPredicateFactory = new CurrentPrincipalPredicateFactory();
 	
 	private static final HashMap<Class, IPredicateFactory> factoryForClassMap = new HashMap<Class, IPredicateFactory>();
@@ -101,7 +101,7 @@ public class GenericSpecifications {
 				return currentPrincipalPredicateFactory;
 			}
 			else{
-				return manyToOnePredicateFactory;
+				return anyToOnePredicateFactory;
 			}
 		} else {
 			return factoryForClassMap.get(clazz);
