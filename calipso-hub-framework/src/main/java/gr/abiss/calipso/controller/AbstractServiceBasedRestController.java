@@ -23,8 +23,8 @@ import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.jpasearch.service.GenericService;
-import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
+import gr.abiss.calipso.model.dto.ReportDataset;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
@@ -320,30 +320,4 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 		service.removeMetadatum(subjectId, predicate);
 	}
 	
-//	@InitBinder 
-//	protected void initBinder(WebDataBinder binder) { 
-//		binder.registerCustomEditor(TimeUnit.class, new EnumConverter<TimeUnit>(TimeUnit.class));}
-	
-	@RequestMapping(value = "report", method = RequestMethod.GET)
-	@ResponseBody
-	@ApiOperation(value = "report", notes = "Get a report dataset for the given date range and time unit", httpMethod = "GET") 
-	public Iterable<ReportDataset> getReportDatasets(
-			@RequestParam(value = "timeUnit", required = false, defaultValue = "DAY") TimeUnit timeUnit,
-			@RequestParam(value = "dateField", required = false, defaultValue = "createdDate") String dateField,
-			@RequestParam(value = "dateFrom", required = false) Date dateFrom,
-			@RequestParam(value = "dateTo", required = false) Date dateTo,
-			@RequestParam(value = "aggregateField", required = true) String aggregateField,
-			@RequestParam(value = "aggregateFunction", required = false, defaultValue = "COUNT") AggregateFunction aggregateFunction) {
-		// default date region is the current day
-		Date now = new Date();
-		if(dateFrom == null){
-			dateFrom = DateUtils.truncate(now, Calendar.DATE);
-		}
-		if(dateTo == null){
-			dateTo = DateUtils.addMilliseconds(DateUtils.ceiling(now, Calendar.DATE), -1);
-		}
-		Map<String, String[]> paramsMap = request.getParameterMap();
-		
-		return this.service.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, aggregateField, aggregateFunction);
-	}
 }

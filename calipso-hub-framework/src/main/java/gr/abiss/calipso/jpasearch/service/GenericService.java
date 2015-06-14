@@ -17,7 +17,7 @@
  */
 package gr.abiss.calipso.jpasearch.service;
 
-import gr.abiss.calipso.model.ReportDataset;
+import gr.abiss.calipso.model.dto.ReportDataset;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
@@ -54,7 +54,4 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 
 	public void removeMetadatum(ID subjectId, String predicate);
 
-	public Iterable<ReportDataset> getReportDatasets(TimeUnit timeUnit,
-			String dateField, Date dateFrom, Date dateTo,
-			String aggregateField, AggregateFunction aggregateFunction);
 }

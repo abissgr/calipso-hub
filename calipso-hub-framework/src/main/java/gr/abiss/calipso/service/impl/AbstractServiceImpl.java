@@ -20,8 +20,8 @@ package gr.abiss.calipso.service.impl;
 
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
-import gr.abiss.calipso.model.ReportDataset;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.dto.ReportDataset;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.repository.UserRepository;

@@ -17,7 +17,7 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
-import gr.abiss.calipso.model.ReportDataset;
+import gr.abiss.calipso.model.dto.ReportDataset;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -52,8 +53,5 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
 
 	public Metadatum findMetadatum(ID subjectId, String predicate);
 	
-	public Iterable<ReportDataset> getReportDatasets(TimeUnit timeUnit,
-			String dateField, Date dateFrom, Date dateTo,
-			String aggregateField, AggregateFunction aggregateFunction);
 
 }

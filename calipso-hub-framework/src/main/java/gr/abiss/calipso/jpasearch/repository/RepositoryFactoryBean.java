@@ -17,6 +17,8 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
+import gr.abiss.calipso.model.entities.AbstractPersistable;
+
 import java.io.Serializable;
 
 import javax.persistence.EntityManager;
@@ -27,7 +29,8 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
-public class RepositoryFactoryBean<R extends JpaRepository<T, I>, T, I extends Serializable> extends JpaRepositoryFactoryBean<R, T, I> {
+public class RepositoryFactoryBean<R extends JpaRepository<T, I>, T, I extends Serializable> 
+extends JpaRepositoryFactoryBean<R, T, I> {
 
 	@Override
 	protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
