@@ -124,7 +124,7 @@
 		<org.springframework.security.crypto-version>3.1.4.RELEASE</org.springframework.security.crypto-version>
 		<thymeleaf.version>2.0.16</thymeleaf.version>
 		<joda-time.version>2.1</joda-time.version>
-		<commons-lang3.version>3.1</commons-lang3.version>
+		<commons-lang3.version>3.4</commons-lang3.version>
 		<commons-configuration.version>1.9</commons-configuration.version>
 		<commons-beanutils.version>1.9.1</commons-beanutils.version>
 		<jackson.version>2.1.4</jackson.version>

@@ -17,7 +17,8 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
-import gr.abiss.calipso.model.ReportDataset;
+import gr.abiss.calipso.model.dto.ReportDataset;
+import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
@@ -30,6 +31,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -236,20 +238,5 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		return entityManager;
 	}
 
-	@Transactional(readOnly = true)
-	public Iterable<ReportDataset> getReportDatasets(TimeUnit timeUnit,
-			String dateField, Date dateFrom, Date dateTo,
-			String aggregateField, AggregateFunction aggregateFunction) {
-//		return this.repository.getReportDatasets(timeUnit, dateField, dateFrom,
-//				dateTo, aggregateField, aggregateFunction);
-		String query = "select new gr.abiss.calipso.model.ReportDataset(e, SUM(e.totalPrice), DATE(e.date)) " +
-				"from #{#entityName} e " +
-				"where e.date BETWEEN :dateFrom AND :dateTo" +
-				"group by DATE(e.date)";
-		TypedQuery<ReportDataset> q = this.entityManager.createQuery(query, ReportDataset.class);
-		List<ReportDataset> results =  q.getResultList();
-		LOGGER.info("getReportDatasets, results found: " + results.size());
-		return results;
-	}
 
 }
