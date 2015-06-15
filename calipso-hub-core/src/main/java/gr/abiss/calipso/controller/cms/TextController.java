@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +40,7 @@ public class TextController extends AbstractServiceBasedRestController<Text, Str
 
 	@Override
 	@Inject
+	@Qualifier("textService") // somehow required for CDI to work on 64bit JDK?
 	public void setService(TextService service) {
 		this.service = service;
 	}

@@ -24,7 +24,7 @@ import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
-import gr.abiss.calipso.notification.service.BaseNotificationsService;
+import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
@@ -81,7 +81,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	private LocalUserService<? extends Serializable, ? extends LocalUser> localUserService;
 	
-	private BaseNotificationsService baseNotificationService;
+	private BaseNotificationService baseNotificationService;
 	
 	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {
@@ -95,8 +95,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Autowired(required = true)
-	public void setBaseNotificationsService(BaseNotificationsService baseNotificationsService) {
-		this.baseNotificationService = baseNotificationsService;
+	public void setBaseNotificationsService(BaseNotificationService baseNotificationService) {
+		this.baseNotificationService = baseNotificationService;
 	}
 
 	/**

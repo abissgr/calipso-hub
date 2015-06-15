@@ -39,6 +39,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.ConnectionFactoryLocator;
@@ -88,6 +89,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 	}
 
 	@Inject
+	@Qualifier("userDetailsService") // somehow required for CDI to work on 64bit JDK?
 	public void setUserService(UserDetailsService userService) {
 		this.userService = userService;
 	}

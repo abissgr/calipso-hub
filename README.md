@@ -1,28 +1,65 @@
-
+- [Checkout](#checkout)
+    - [Checkout using Eclipse](#checkout-eclipse)
+    - [Checkout using the Command Line](#checkout-cmd)
 - [Modules](#modules)
 - [Howto Build](#howto-build)
 - [Browse Calipso](#browse-calipso)
 - [Browse the Database Console](#browse-the-database-console)
 - [Use a custom database](#use-a-custom-database)
 - [Create a RESTful service](#create-a-service)
-- [Set up Eclipse](#set-up-eclipse)
+
+
+## Checkout
+
+To build Calipso you need a Java Development Kit version (1.)7, Git and Apache Maven. Eclipse (Java or JEE) IDE users need EGit and m2eclipse plugins, those are included in Eclipse Java/JEE Luna and above. Read bellow for instructions to checkout the source using eclipse or the command line.
+
+### Checkout using Eclipse
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/010_import_dialog.png)
+
+Right-click in Eclipse's Package/Project Explorer and click Import, then choose Git > Projects from Git
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/011_clone_uri.png)
+
+Select the "Clone URI" option, then click "Next"
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/012_import_from_git.png)
+
+Enter https://github.com/abissgr/calipso-hub.git as the clone URI
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/014_local_dest.png)
+
+Select your local files location (independent to your Eclipse workspace)
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/015_wizard.png)
+
+Select the "Import as general project" wizard
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/016_project_name.png)
+
+Use "calipso-hub" as the project name
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/017_import_existing_maven.png)
+
+Right click on the "calipso-hub" then click on "Import". Choose "Existing Maven projects". Browse to the project folder for eclipse to discover the maven submodules, then click "Finish".
+
+
+### Checkout using the Command Line
+
+See https://help.github.com/articles/importing-a-git-repository-using-the-command-line/
 
 ## Modules
 - calipso-hub (this one)
-    - [calipso-hub-core]: application-specific components
     - [calipso-hub-framework]: development framework components
     - [calipso-hub-utilities]: utility components
     - [calipso-hub-webapp]: deployable web application (WAR)
 
+ 
 ## Howto Build [![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
 
 To build Calipso you need a Java Development Kit(JDK7 ) and Apache Maven installed. 
 
-0) To start, checkout the project:
-
-    $ git clone git://github.com/abissgr/calipso-hub.git
-
-1) Change to the project base directory:
+1) Change to the root project directory:
 
     $ cd calipso-hub
 
@@ -82,52 +119,6 @@ then uncommenting the MySQL section. Other databases can be also be used.
 
     https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/service/impl/RoleServiceImpl.java
 
-[calipso-hub-core]:calipso-hub-core
 [calipso-hub-framework]:calipso-hub-framework
 [calipso-hub-utilities]:calipso-hub-utilities
 [calipso-hub-webapp]:calipso-hub-webapp
-
-## Set up Eclipse
-
-1) Download and install Java Development Kit 7(JDK7)
-
-http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
-
-
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/jdkdownload.png)
-Download the JDK 7 version that matches your OS
-
-2) Download and install Eclipse
-
-http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/lunasr2
-http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2
-
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload1.png)
-Be sure to download the correct version to match your OS
-
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipsedownload2.png)
-After it finishes downloading move to your Download directory to install Eclipse
-
-3) Import Calipso
-
-Now to import Calipso to Eclipse follow the steps bellow(NOTE:Remember your github username and password because they are needed in order to authenticate you as a valid user to download Calipso)
-File -> Import -> Git -> Projects From Git -> URI
-Enter the Calipso Github repository url: https://github.com/abissgr/calipso-hub.git
-
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport1.png)
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport2.png)
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport3.png)
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport4.png)
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport5.png)
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/eclipseimport6.png)
-
-4)Import Calipso as a Maven project
-
-This is the final step of the proccess .To import Calipso as a Maven project : 
-
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/mavenimport.png)
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/mavenimport2.png)
-
-Wait for the proccess to finish. If the outcome looks like this:
-![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/devtutorial/final.png)
-you have a proper developing enviroment to work on.

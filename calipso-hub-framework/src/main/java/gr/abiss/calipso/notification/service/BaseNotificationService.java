@@ -27,7 +27,7 @@ import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 
-public interface BaseNotificationsService extends GenericService<BaseNotification, String> {
+public interface BaseNotificationService extends GenericService<BaseNotification, String> {
 
 	/**
 	 * Count the unseen notifications addressed to the current principal

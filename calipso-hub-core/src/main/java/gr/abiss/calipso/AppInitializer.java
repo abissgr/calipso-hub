@@ -24,7 +24,7 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.notification.model.BaseNotification;
 import gr.abiss.calipso.notification.model.NotificationType;
-import gr.abiss.calipso.notification.service.BaseNotificationsService;
+import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
@@ -65,7 +65,7 @@ public class AppInitializer {
 	
 	@Inject
 	@Named("baseNotificationService")
-	private BaseNotificationsService baseNotificationService;
+	private BaseNotificationService baseNotificationService;
 
 	@PostInitialize
 	public void init() {

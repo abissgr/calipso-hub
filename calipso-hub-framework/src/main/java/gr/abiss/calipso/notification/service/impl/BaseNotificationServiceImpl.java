@@ -24,7 +24,7 @@ import java.util.Map;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.notification.model.BaseNotification;
-import gr.abiss.calipso.notification.service.BaseNotificationsService;
+import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.notification.repository.BaseNotificationRepository;
 import gr.abiss.calipso.service.impl.AbstractServiceImpl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
@@ -41,7 +41,7 @@ import org.springframework.data.domain.Sort;
 
 @Named("baseNotificationService")
 public class BaseNotificationServiceImpl extends AbstractServiceImpl<BaseNotification, String, BaseNotificationRepository> 
-	implements BaseNotificationsService{
+	implements BaseNotificationService{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseNotificationServiceImpl.class);
 

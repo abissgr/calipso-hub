@@ -55,10 +55,7 @@ public abstract class AbstractUserDetailsController<S extends UserDetailsService
 	protected UserDetailsConfig userDetailsConfig = new SimpleUserDetailsConfig();
 
 	@Override
-	@Autowired
-	public void setService(S service) {
-		this.service = service;
-	}
+	public abstract void setService(S service);
 
 	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {

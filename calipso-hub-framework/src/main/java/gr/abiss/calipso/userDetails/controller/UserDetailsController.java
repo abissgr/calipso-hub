@@ -17,11 +17,15 @@
  */
 package gr.abiss.calipso.userDetails.controller;
 
+import javax.inject.Inject;
+
+import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.mangofactory.swagger.annotations.ApiIgnore;
@@ -37,6 +41,13 @@ import com.wordnik.swagger.annotations.Api;
 public class UserDetailsController extends AbstractUserDetailsController<UserDetailsService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsController.class);
+	
+	@Override
+	@Inject
+	@Qualifier("userDetailsService") // somehow required for CDI to work on 64bit JDK?
+	public void setService(UserDetailsService service) {
+		this.service = service;
+	}
 	
 	
 }

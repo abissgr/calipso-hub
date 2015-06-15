@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -41,6 +42,7 @@ public class RoleController extends AbstractServiceBasedRestController<Role, Str
 
 	@Override
 	@Inject
+	@Qualifier("roleService") // somehow required for CDI to work on 64bit JDK?
 	public void setService(RoleService service) {
 		this.service = service;
 	}

@@ -20,12 +20,13 @@ package gr.abiss.calipso.notification.controller;
 
 import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 import gr.abiss.calipso.notification.model.BaseNotification;
-import gr.abiss.calipso.notification.service.BaseNotificationsService;
+import gr.abiss.calipso.notification.service.BaseNotificationService;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -35,13 +36,14 @@ import com.wordnik.swagger.annotations.Api;
 @Controller
 @Api(value = "Notifications")
 @RequestMapping(value = "/api/rest/baseNotifications", produces = { "application/json", "application/xml" })
-public class BaseNotificationController extends AbstractServiceBasedRestController<BaseNotification, String, BaseNotificationsService> {
+public class BaseNotificationController extends AbstractServiceBasedRestController<BaseNotification, String, BaseNotificationService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseNotificationController.class);
 
 	@Override
 	@Inject
-	public void setService(BaseNotificationsService service) {
+	@Qualifier("baseNotificationService") // somehow required for CDI to work on 64bit JDK?
+	public void setService(BaseNotificationService service) {
 		this.service = service;
 	}
 	
