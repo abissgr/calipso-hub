@@ -17,7 +17,7 @@
  */
 package gr.abiss.calipso.jpasearch.service.impl;
 
-import gr.abiss.calipso.model.dto.ReportDataset;
+import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;

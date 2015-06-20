@@ -24,7 +24,7 @@ import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
-import gr.abiss.calipso.model.dto.ReportDataset;
+import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;

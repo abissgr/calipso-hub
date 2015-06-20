@@ -532,6 +532,15 @@
 				<artifactId>mysql-connector-java</artifactId>
 				<version>5.1.22</version>
 			</dependency>
+			<dependency>
+			    <groupId>com.h2database</groupId>
+			    <artifactId>h2</artifactId>
+			    <!-- 
+			    see https://groups.google.com/forum/#!topic/h2-database/A9WnxtFwk48
+			     -->
+			    <version>1.4.181</version>
+            </dependency>
+
 		</dependencies>
 
 	</dependencyManagement>
@@ -546,7 +555,7 @@
 					<bottom>Copyright 2005 - 2014 ${pom.organization.name}. All Rights
 						Reserved | Dependency:
 						${project.packaging}:${project.groupId}:${project.artifactId}:${project.version}</bottom>
-					<doclet>org.jboss.apiviz.APIviz</doclet>
+					<doclet>org.jboss.apiviz.APIviz</doclet> 
 					<docletArtifact>
 						<groupId>org.jboss.apiviz</groupId>
 						<artifactId>apiviz</artifactId>
