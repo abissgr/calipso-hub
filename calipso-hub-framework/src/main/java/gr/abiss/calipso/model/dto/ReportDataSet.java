@@ -19,6 +19,7 @@
 package gr.abiss.calipso.model.dto;
 
 import gr.abiss.calipso.model.entities.AbstractPersistable;
+import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
 import gr.abiss.calipso.model.types.TimeUnit;
 
 import java.io.Serializable;
@@ -42,6 +43,8 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  */
 public class ReportDataSet {
@@ -49,17 +52,23 @@ public class ReportDataSet {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReportDataSet.class);
 	private static FastDateFormat dayFormat = FastDateFormat.getInstance("yyyy-MM-dd");
 	private static FastDateFormat monthFormat = FastDateFormat.getInstance("yyyy-MM");
-	private Object subject;
 	
 	
-	private List<ReportDataEntry> entries;
-	
+	@JsonIgnore
 	private Date dateFrom;
+	@JsonIgnore
 	private Date dateTo;
+	@JsonIgnore
 	private TimeUnit timeUnit;
+	@JsonIgnore
 	private Integer dateIndex;
+	@JsonIgnore
 	private Map<String, Integer> keyIndexes;
-
+	
+	private String id;
+	private String label;
+	private ReportDataSetSubject subject;
+	private List<ReportDataEntry> entries;
 	/**
 	 * 
 	 * @param dateFrom the report starting date
@@ -73,14 +82,16 @@ public class ReportDataSet {
 	private ReportDataSet(){
 	}
 	
-	public ReportDataSet(Object subject, Date dateFrom, Date dateTo, TimeUnit timeUnit, Map<String, Integer> keyIndexes) {
+	public ReportDataSet(ReportDataSetSubject subject, Date dateFrom, Date dateTo, TimeUnit timeUnit, Map<String, Integer> keyIndexes) {
 		this(subject, dateFrom, dateTo, timeUnit, keyIndexes , null);
 	}
 
-	public ReportDataSet(Object subject, Date dateFrom, Date dateTo, TimeUnit timeUnit, Map<String, Integer> keyIndexes, Map<String, Serializable> defaultDataEntry) {
+	public ReportDataSet(ReportDataSetSubject subject, Date dateFrom, Date dateTo, TimeUnit timeUnit, Map<String, Integer> keyIndexes, Map<String, Serializable> defaultDataEntry) {
 
 		// init members
 		this.subject = subject;
+		this.id = subject.getId().toString();
+		this.label = subject.getLabel();
 		this.dateFrom = dateFrom;
 		this.dateTo = dateTo;
 		this.timeUnit = timeUnit;
@@ -161,11 +172,11 @@ public class ReportDataSet {
 		this.entries.add(entry);
 	}
 
-	public Object getSubject() {
+	public ReportDataSetSubject getSubject() {
 		return subject;
 	}
 
-	public void setSubject(Object subject) {
+	public void setSubject(ReportDataSetSubject subject) {
 		this.subject = subject;
 	}
 
@@ -176,6 +187,23 @@ public class ReportDataSet {
 	public void setEntries(List<ReportDataEntry> entries) {
 		this.entries = entries;
 	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	
 	
 	
 

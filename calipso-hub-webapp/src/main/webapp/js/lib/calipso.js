@@ -1520,7 +1520,46 @@ define("calipso", function(require) {
 		};
 
 	};
+	
+	Calipso.model.ReportDatasetModel = Calipso.model.GenericModel.extend({
+		
+	},
+	// static members
+	{ 
+		parent : Calipso.model.GenericModel,
+	});
 
+
+	Calipso.model.ReportDatasetModel.prototype.getTypeName = function() {
+		return "Calipso.model.ReportDatasetModel";
+	};
+
+	Calipso.model.ReportDatasetModel.prototype.getPathFragment = function() {
+		return "Calipso.model.ReportDatasetModel";
+	};
+	
+	Calipso.model.ReportDatasetModel.prototype.getLayoutViewType = function() {
+		return Calipso.view.ModelDrivenBrowseLayout;
+	};
+	
+	Calipso.model.ReportDatasetModel.prototype.getCollectionViewType = function() {
+		return Calipso.view.ModelDrivenReportView;
+	};
+	
+	Calipso.model.ReportDatasetModel.prototype.getFormSchemas = function() {
+		console.log("ReportDatasetModel.prototype.getFormSchemas() called, will return undefined");
+
+	
+		return {};
+	};
+	Calipso.model.ReportDatasetModel.prototype.getGridSchema = function() {
+		return [{
+			name : "label",
+			label : "Subject",
+			editable : false,
+			cell : "text",
+		}];
+	};
 	//////////////////////////////////////////////////
 	// UI components
 	//////////////////////////////////////////////////
@@ -2726,6 +2765,8 @@ define("calipso", function(require) {
 	 * @lends Calipso.view.ModelDrivenCollectionGridView.prototype 
 	 * */
 	{
+		// Define view template
+		template : require('hbs!template/md-collection-grid-view'),
 		events : {
 			"click button.btn-windowcontrols-destroy" : "back"
 		},
@@ -2735,7 +2776,7 @@ define("calipso", function(require) {
 			window.history.back();
 		},
 		initialize : function(options) {
-
+			console.log("ModelDrivenCollectionGridView.initialize, options: " + options);
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			if (options.collection) {
 				this.collection = options.collection;
@@ -2758,8 +2799,6 @@ define("calipso", function(require) {
 		onCollectionFetchFailed : function() {
 
 		},
-		// Define view template
-		template : require('hbs!template/md-collection-grid-view'),
 		onShow : function() {
 			var _self = this;
 			console.log("ModelDrivenCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
@@ -2868,6 +2907,179 @@ define("calipso", function(require) {
 		getTypeName : function() {
 			return "ModelDrivenCollectionGridView";
 		}
+	});
+	
+	Calipso.view.ModelDrivenReportView = Calipso.view.ModelDrivenCollectionGridView.extend({
+		tagName: "div",
+		// Define view template
+		//template : require('hbs!template/md-report-view'),
+		chartOptions : {
+			responsive: true,
+			maintainAspectRatio: false,
+//		    bezierCurveTension : 0.7,
+	      //bezierCurve: false
+		    ///Boolean - Whether grid lines are shown across the chart
+		    scaleShowGridLines : true,
+
+		    //String - Colour of the grid lines
+		    scaleGridLineColor : "rgba(0,0,0,.05)",
+
+		    //Number - Width of the grid lines
+		    scaleGridLineWidth : 1,
+
+		    //Boolean - Whether to show horizontal lines (except X axis)
+		    scaleShowHorizontalLines: true,
+
+		    //Boolean - Whether to show vertical lines (except Y axis)
+		    scaleShowVerticalLines: true,
+
+		    // Boolean - Whether to show labels on the scale
+		    scaleShowLabels: true,
+
+		    pointDotRadius : 3,
+		    //Number - Pixel width of point dot stroke
+		    pointDotStrokeWidth : 2,
+		    datasetStrokeWidth : 2,
+		    // Interpolated JS string - can access value
+		    scaleLabel: "<%=value%>",
+		   multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>",
+		   //String - A legend template
+		    legendTemplate : "<ul class=\"list-group\"><% for (var i=0; i<segments.length; i++){%><li class=\"list-group-item\"><span style=\"color:<%=segments[i].fillColor%> \"><i class=\"fa fa-bookmark\"></i>&nbsp;</span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
+
+		},
+		colors : [
+		          "91, 144, 191",
+		          "163, 190, 140",
+		          "171, 121, 103",
+		          "208, 135, 112",
+		          "180, 142, 173", 
+		          "235, 203, 139",
+			"39, 165, 218", //"#5DA5DA" , // blue
+			"250, 164, 58", //"#FAA43A" , // orange
+			"96, 189, 104", //"#60BD68" , // green
+			"241, 124, 176", //"#F17CB0" , // pink
+			"178, 145, 47", //"#B2912F" , // brown
+			"178, 118, 178", //"#B276B2" , // purple
+			"222, 207, 63", //"#DECF3F" , // yellow
+			"241, 88, 84", //"#F15854" , // red
+			"77, 77, 77", //"#4D4D4D" , // gray
+			"0, 0, 0", //"#000000" , // black
+		],
+		initialize : function(options) {
+			console.log("ReportView.initialize, options: " + options);
+			Calipso.view.ModelDrivenCollectionGridView.prototype.initialize.apply(this, arguments);
+			var self = this;
+			this.template = tmpl;
+			if(options && options.chartOptions){
+				_.extend(this.chartOptions, options.chartOptions);
+			}
+			//this.bindTo(this.model, "change", this.modelChanged);
+		},
+		onShow : function() {
+			Calipso.view.ModelDrivenCollectionGridView.prototype.onShow.apply(this);
+			var model = this.model, _this = this;
+		// Get the context of the canvas element we want to select
+			var canvas = this.$(".chart")[0];
+			var $canvas = $(canvas);
+//			$canvas.attr("width", $canvas.parent().attr("width"));
+//			$canvas.attr("height", $canvas.parent().attr("height"));
+			var ctx = canvas.getContext("2d");
+			
+			var dataTotals = [];
+			_.each(this.data.datasets, function(dataset, index) {
+				  var color = _this.colors[index];
+				  dataset.fillColor = "rgba("+color+",0.02)";
+				  dataset.strokeColor = "rgba("+color+",0.8)";
+				  dataset.pointColor = "rgba("+color+",0.8)";
+				  dataset.pointStrokeColor = "rgba("+color+",0)";
+				  dataset.pointHighlightFill = "#fff";
+				  dataset.pointHighlightStroke = "rgba("+color+",04)";
+				  
+				  // add totals dataset
+				  var sum = 0;
+				  for (var i = 0; i < dataset.data.length; i++) {
+					  sum += dataset.data[i]
+					}
+				  dataTotals.push({
+					  label: dataset.label,
+			        value: sum,
+			        color:"rgba("+color+",0.8)",
+			        highlight: "rgba("+color+",0.4)",
+				  });
+			});
+
+			this.chart = new Chart(ctx).Line(this.data, this.chartOptions);
+			
+
+			var canvasTotals = this.$(".chart-totals")[0];
+			var $canvasTotals = $(canvasTotals);
+//			$canvasTotals.attr("width", $canvasTotals.parent().attr("width"));
+//			$canvasTotals.attr("height", $canvasTotals.parent().attr("height"));
+			var ctxTotals = canvasTotals.getContext("2d");
+
+			this.chartTotals = new Chart(ctxTotals).PolarArea(dataTotals, this.chartOptions);
+
+			  //then you just need to generate the legend
+			  var legend = this.chartTotals.generateLegend();
+			  this.$('.chart-legend').append(legend);
+			  
+//			this.chart.onclick = function(value, category) {
+//				self.trigger("click", category);
+//			};
+		},
+		modelChanged : function() {
+//			if (this.chart && this.seriesSource()) {
+//				this.chart.redraw();
+//			}
+		},
+
+
+		data : {
+			    labels: ["January", "February", "March", "April", "May", "June", "July"],
+			    datasets: [
+						        {
+						            label: "My 1st",
+						            data: [65, 50, 80, 81, 56, 55, 40]
+						        },
+						        {
+						            label: "My 2nd",
+						            data: [35, 39, 70, 84, 57, 37, 78]
+						        },
+						        {
+						            label: "My 3rd",
+						            data: [55, 49, 82, 66, 61, 42, 59]
+						        },
+						        {
+						            label: "My 4th",
+						            data: [95, 59, 58, 35, 60, 73, 44]
+						        },
+						        {
+						            label: "My 5th",
+						            data: [95, 32, 69, 46, 44, 65, 74]
+						        },
+						        {
+						            label: "My 6th",
+						            data: [62, 45, 72, 53, 40, 52, 90]
+						        },
+//						        {
+//						            label: "My 7th",
+//						            data: [65, 59, 80, 81, 56, 55, 40]
+//						        },
+//						        {
+//						            label: "My 6th",
+//						            data: [25, 90, 09, 92, 83, 98, 70]
+//						        },
+//						        {
+//						            label: "My 9th",
+//						            data: [57, 67, 29, 39, 42, 92, 46]
+//						        },
+//						        {
+//						            label: "My 10th",
+//						            data: [88, 73, 86, 39, 29, 36, 59]
+//						        },
+			    ]
+			}
+
 	});
 
 	Calipso.view.MainContentNavView = Marionette.ItemView.extend({
@@ -4156,6 +4368,41 @@ define("calipso", function(require) {
 			//console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.prototype.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
 			return modelForRoute;
 
+		},
+		mainNavigationReportRoute : function(mainRoutePart, queryString) {
+			console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
+			var _self = this;
+			var httpParams = Calipso.getHttpUrlParams();
+
+			// get the model the report focuses on 
+			var ModelType = this.getModelType(mainRoutePart);
+			if (!Calipso.isAuthenticated() && !ModelType.prototype.isPublic()) {
+				return this._redir("login");
+			}
+			
+			// build a report dataset collection using the model's report URL
+			var collectionOptions = {
+				model : Calipso.model.ReportDataSetModel,
+				url : Calipso.session.getBaseUrl() + "/api/rest/" + ModelType.prototype.getPathFragment() + "/reports"
+			};
+			if (httpParams) {
+				if (httpParams[""] || httpParams[""] == null) {
+					delete httpParams[""];
+				}
+				collectionOptions.data = httpParams;
+			}
+			var reporDataSetCollection = Calipso.util.cache.getCollection(collectionOptions);
+			
+			// fetch and render report
+			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
+			reporDataSetCollection.fetch({
+				data : reporDataSetCollection.data
+			}).then(function() {
+				// show the layout type corresponding to the requested model
+				var reportModel = new ReportDataSetModel();
+				reportmodel.set("wrappedCollection", reporDataSetCollection);
+				_self.showLayoutForModel(reportModel);
+			});
 		},
 		/**
 		 * 

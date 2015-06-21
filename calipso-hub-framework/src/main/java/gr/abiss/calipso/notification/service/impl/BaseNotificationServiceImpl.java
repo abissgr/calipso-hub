@@ -18,6 +18,7 @@
  */
 package gr.abiss.calipso.notification.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -78,7 +80,7 @@ public class BaseNotificationServiceImpl extends AbstractServiceImpl<BaseNotific
 			mapBackedPageable.setParameterMap(paramsMap);
 		}
 	
-		return super.findAll(pageable);
+		return new PageImpl<BaseNotification>(new ArrayList<BaseNotification>(0), pageable, new Long(0));//super.findAll(pageable);
 	}
 
 	/**

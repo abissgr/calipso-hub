@@ -21,6 +21,7 @@ package gr.abiss.calipso.model;
 import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
 import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
+import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
@@ -67,7 +68,7 @@ import com.wordnik.swagger.annotations.ApiModel;
 @ApiModel(description = "Human users")
 @Table(name = "\"user\"")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser {
+public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 	
@@ -153,6 +154,15 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	
 	public User(String email) {
 		this.email = email;
+	}
+
+	/**
+	 * {@inheritDoc}}
+	 * @see gr.abiss.calipso.model.interfaces.ReportDataSetSubject#getLabel()
+	 */
+	@Override
+	public String getLabel(){
+		return this.getName();
 	}
 
 	@Override
