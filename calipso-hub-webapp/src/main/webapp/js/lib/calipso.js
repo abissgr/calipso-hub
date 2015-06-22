@@ -449,9 +449,6 @@ define("calipso", function(require) {
 		initialize : function(attributes, options) {
 
 			options || (options = {});
-
-			//console.log("GenericCollection#initialize, options: " );
-			//console.log(options);
 			if (options.model && options.model.prototype.getTypeName()) {
 				this.model = options.model;
 				//console.log("GenericCollection#initialize, model: " + this.model.prototype.getTypeName());
@@ -1521,7 +1518,7 @@ define("calipso", function(require) {
 
 	};
 	
-	Calipso.model.ReportDatasetModel = Calipso.model.GenericModel.extend({
+	Calipso.model.ReportDataSetModel = Calipso.model.GenericModel.extend({
 		
 	},
 	// static members
@@ -1530,29 +1527,25 @@ define("calipso", function(require) {
 	});
 
 
-	Calipso.model.ReportDatasetModel.prototype.getTypeName = function() {
-		return "Calipso.model.ReportDatasetModel";
+	Calipso.model.ReportDataSetModel.prototype.getTypeName = function() {
+		return "Calipso.model.ReportDataSetModel";
 	};
 
-	Calipso.model.ReportDatasetModel.prototype.getPathFragment = function() {
-		return "Calipso.model.ReportDatasetModel";
+	Calipso.model.ReportDataSetModel.prototype.getPathFragment = function() {
+		return "Calipso.model.ReportDataSetModel";
 	};
 	
-	Calipso.model.ReportDatasetModel.prototype.getLayoutViewType = function() {
-		return Calipso.view.ModelDrivenBrowseLayout;
-	};
-	
-	Calipso.model.ReportDatasetModel.prototype.getCollectionViewType = function() {
+	Calipso.model.ReportDataSetModel.prototype.getCollectionViewType = function() {
 		return Calipso.view.ModelDrivenReportView;
 	};
 	
-	Calipso.model.ReportDatasetModel.prototype.getFormSchemas = function() {
+	Calipso.model.ReportDataSetModel.prototype.getFormSchemas = function() {
 		console.log("ReportDatasetModel.prototype.getFormSchemas() called, will return undefined");
 
 	
 		return {};
 	};
-	Calipso.model.ReportDatasetModel.prototype.getGridSchema = function() {
+	Calipso.model.ReportDataSetModel.prototype.getGridSchema = function() {
 		return [{
 			name : "label",
 			label : "Subject",
@@ -4069,6 +4062,14 @@ define("calipso", function(require) {
 			if(!collectionOptions){
 				throw "Calipso.cache.getCollection: options  are required";
 			}
+
+
+			console.log("Calipso.cache.getCollection, collectionOptions: " );
+			console.log(collectionOptions);
+			console.log("Calipso.cache.getCollection, collectionOptions.model: " );
+			console.log(collectionOptions.model);
+			console.log("Calipso.cache.getCollection, collectionOptions.model.prototype.getTypeName(): " );
+			console.log(collectionOptions.model.prototype.getTypeName());
 			if(!collectionOptions.model || !collectionOptions.model.prototype.getTypeName){
 				throw "Calipso.cache.getCollection: options.model is required and must be a GenericModel subtype";
 			}
@@ -4394,12 +4395,11 @@ define("calipso", function(require) {
 			var reporDataSetCollection = Calipso.util.cache.getCollection(collectionOptions);
 			
 			// fetch and render report
-			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
 			reporDataSetCollection.fetch({
 				data : reporDataSetCollection.data
 			}).then(function() {
 				// show the layout type corresponding to the requested model
-				var reportModel = new ReportDataSetModel();
+				var reportModel = new Calipso.model.ReportDataSetModel();
 				reportmodel.set("wrappedCollection", reporDataSetCollection);
 				_self.showLayoutForModel(reportModel);
 			});
