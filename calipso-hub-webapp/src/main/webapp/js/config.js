@@ -158,7 +158,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker'],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'chart'],
 			exports : 'calipso'
 		},
 		'cookie': { 

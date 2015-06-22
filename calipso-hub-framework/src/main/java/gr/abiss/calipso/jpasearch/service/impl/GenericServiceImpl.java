@@ -31,19 +31,25 @@ import gr.abiss.calipso.acl.repository.AclObjectIdentityRepository;
 import gr.abiss.calipso.acl.repository.AclSidRepository;
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Propagation;
@@ -205,6 +211,16 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 		LOGGER.info("removeMetadatum subjectId: " + subjectId + ", predicate: "
 				+ predicate);
 		this.repository.removeMetadatum(subjectId, predicate);
+	}
+	
+
+	@Override
+	public Page<ReportDataSet> getReportDatasets(TimeUnit timeUnit,
+			String dateField, Date dateFrom, Date dateTo,
+			String aggregateField, AggregateFunction aggregateFunction) {
+		
+		return new PageImpl<ReportDataSet>(new ArrayList<ReportDataSet>(0));		
+		
 	}
 
 }

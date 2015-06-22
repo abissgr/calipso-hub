@@ -240,7 +240,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@RequestMapping(value = "query", produces = { "application/json" }, method = RequestMethod.POST)
 	@ResponseBody
 	@Deprecated
-	@ApiOperation(value = "deprecated: find paginated with restrictions", httpMethod = "GET")
+	@ApiOperation(value = "deprecated: find paginated with restrictions", httpMethod = "POST")
 	public Page<T> findPaginatedWithRestrictions(
 			@RequestBody Restriction restriction) {
 		return this.service.findAll(new RestrictionBackedPageRequest(restriction));
@@ -321,9 +321,9 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	}
 	
 
-	@RequestMapping(value="reports", method = RequestMethod.GET)
+	@RequestMapping(value = "reports", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "", notes = "Get a report dataset for the given date range and time unit", httpMethod = "GET") 
+	@ApiOperation(value = "reports", httpMethod = "GET")
 	public Page<ReportDataSet> getReportDatasets(
 			@RequestParam(value = "timeUnit", required = false, defaultValue = "DAY") TimeUnit timeUnit,
 			@RequestParam(value = "dateField", required = false, defaultValue = "createdDate") String dateField,
@@ -342,7 +342,9 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 		Map<String, String[]> paramsMap = request.getParameterMap();
 		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + dateFrom + ", dateTo: " + dateTo + ", aggregateField: " + aggregateField + 
 				", aggregateFunction: " + aggregateFunction);
-		return null;//this.service.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, aggregateField, aggregateFunction);
+		Page<ReportDataSet> page = this.service.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, aggregateField, aggregateFunction);
+		LOGGER.info("getReportDatasets returning " + page.getTotalElements());
+		return page;
 	}
 	
 }

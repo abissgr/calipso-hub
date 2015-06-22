@@ -2905,7 +2905,7 @@ define("calipso", function(require) {
 	Calipso.view.ModelDrivenReportView = Calipso.view.ModelDrivenCollectionGridView.extend({
 		tagName: "div",
 		// Define view template
-		//template : require('hbs!template/md-report-view'),
+		template : require('hbs!template/md-report-view'),
 		chartOptions : {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -2962,7 +2962,6 @@ define("calipso", function(require) {
 			console.log("ReportView.initialize, options: " + options);
 			Calipso.view.ModelDrivenCollectionGridView.prototype.initialize.apply(this, arguments);
 			var self = this;
-			this.template = tmpl;
 			if(options && options.chartOptions){
 				_.extend(this.chartOptions, options.chartOptions);
 			}
@@ -4253,6 +4252,8 @@ define("calipso", function(require) {
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
 		showLayoutForModel : function(givenModel, GivenModelLayoutType){
+			console.log("Calipso.controller.AbstractController#showLayoutForModel");
+			console.log(givenModel);
 				// make sure to choose a layout type
 				if(!GivenModelLayoutType){
 					GivenModelLayoutType = givenModel.getLayoutViewType();
@@ -4395,14 +4396,18 @@ define("calipso", function(require) {
 			var reporDataSetCollection = Calipso.util.cache.getCollection(collectionOptions);
 			
 			// fetch and render report
-			reporDataSetCollection.fetch({
-				data : reporDataSetCollection.data
-			}).then(function() {
+			var renderFetchable = function() {
+				console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
 				// show the layout type corresponding to the requested model
 				var reportModel = new Calipso.model.ReportDataSetModel();
-				reportmodel.set("wrappedCollection", reporDataSetCollection);
+				reportModel.wrappedCollection = reporDataSetCollection;
 				_self.showLayoutForModel(reportModel);
-			});
+			};
+			console.log("AbstractController#mainNavigationReportRoute calling reporDataSetCollection.fetch");
+			reporDataSetCollection.fetch({
+				data : reporDataSetCollection.data
+			}).then(renderFetchable);
+		
 		},
 		/**
 		 * 

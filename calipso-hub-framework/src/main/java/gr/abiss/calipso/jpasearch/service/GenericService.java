@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.resthub.common.service.CrudService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -53,5 +54,9 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 	public void addMetadata(ID subjectId, Collection<Metadatum> dtos);
 
 	public void removeMetadatum(ID subjectId, String predicate);
+
+	public Page<ReportDataSet> getReportDatasets(TimeUnit timeUnit, String dateField,
+			Date dateFrom, Date dateTo, String aggregateField,
+			AggregateFunction aggregateFunction);
 
 }
