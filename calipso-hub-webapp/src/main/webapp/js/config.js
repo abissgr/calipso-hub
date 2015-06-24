@@ -61,11 +61,16 @@ require.config({
 		'chai' : 'lib/chai/chai',
 		//'chai-jquery' : 'lib/chai/chai-jquery',
 		'sinon' : 'lib/sinon/chai-jquery',
+		'calendar' : 'lib/calendar',
       'select2' : 'lib/select2',
+      'raty' : 'lib/jquery.raty-fa',
+      'bootstrap-fileInput' : 'lib/fileinput',
       'backbone-forms-select2' : 'lib/backbone-forms-select2',
       //'typeahead': "lib/bootstrap3-typeahead"
       'typeahead' : 'lib/typeahead.jquery',
       'bloodhound': 'lib/bloodhound',
+      'google-maps-loader' : 'lib/google-maps-loader',
+      'humanize' : 'lib/humanize-duration',
       'chart': 'lib/Chart',
       
 			

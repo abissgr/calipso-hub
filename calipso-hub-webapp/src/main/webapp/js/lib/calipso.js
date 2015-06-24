@@ -57,7 +57,7 @@ define("calipso", function(require) {
 	};
 	/**
 	 * Utility method to stop events, covers IE8+
-	 * @param  {[event]} 
+	 * @param  {[event]}
 	 * @return {[void]}
 	 */
 	Calipso.stopEvent = function(e) {
@@ -77,13 +77,13 @@ define("calipso", function(require) {
 		Calipso.vent.trigger("calipso:stoppedEvent", e);
 	};
 	/**
-	 * Update bootstrap badges 
+	 * Update bootstrap badges
 	 * @param  {[String]} the jquery selector to use
 	 * @param  {[stStringring]} the new badge text
 	 * @return {[type]}
 	 */
 	Calipso.updateBadges = function(selector, text) {
-		// e.g. update visual notification counters 
+		// e.g. update visual notification counters
 		//console.log("Notifications count: " + text);
 		if (text) {
 			//console.log("Showing notification counters...");
@@ -295,8 +295,8 @@ define("calipso", function(require) {
 			// create form if it doesn't exist
 			if (!oForm) {
 				var formHtml = "<form id='calipso-social-signin-form' action='" + window.calipsoBasePath + "/signin/" + providerId + "'  method='POST' role='form'>" +
-				//"<input type='hidden' name='scope' value='email' />" + 
-				//"<input type='hidden' name='scope' value='emailure' />" + 
+				//"<input type='hidden' name='scope' value='email' />" +
+				//"<input type='hidden' name='scope' value='emailure' />" +
 				"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" + "</form>";
 				wrapper.append(formHtml);
 				oForm = document.getElementById("calipso-social-signin-form");
@@ -335,12 +335,12 @@ define("calipso", function(require) {
 
 			$("#page-wrapper").removeClass("anonymous");
 			$("#page-wrapper").addClass("loggedIn");
-			
+
 
 			$("#container").removeClass("container");
 			$("#container").addClass("container-fluid");
 			// console.log("vent event session:created");
-			// update otification counters 
+			// update otification counters
 			var count = userDetails ? userDetails.get("notificationCount") : 0;
 
 			Calipso.updateBadges(".badge-notifications-count", userDetails ? userDetails.get("notificationCount") : 0);
@@ -367,7 +367,7 @@ define("calipso", function(require) {
 
 			$("#page-wrapper").removeClass("loggedIn");
 			$("#page-wrapper").addClass("anonymous");
-			
+
 
 			$("#container").addClass("container");
 			$("#container").removeClass("container-fluid");
@@ -389,11 +389,11 @@ define("calipso", function(require) {
 			Calipso.app.modal.show(view);
 		});
 		/**
-		 * @example Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"}); 
+		 * @example Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"});
 		 */
 		Calipso.vent.on('modal:showInLayout', function(properties) {
 			console.log("vent event modal:showInLayout");
-			// make sure a view is provided 
+			// make sure a view is provided
 			if (!properties.view) {
 				throw "A 'view' property is required on vent trigger 'modal:showInLayout'.";
 			}
@@ -474,13 +474,13 @@ define("calipso", function(require) {
 					name: "size",
 					stateName: "pageSize"
 				}, {
-					name : "page", 
+					name : "page",
 					stateName : "currentPage"
 				}, {
-					name : "order", 
+					name : "order",
 					stateName : "direction"
 				}, {
-					name : "properties", 
+					name : "properties",
 					stateName : "sortKey"
 				}];
 				for(var i=0; i < stateData.length; i++){
@@ -497,7 +497,7 @@ define("calipso", function(require) {
 				this.url = options.url;
 			}
 
-		
+
 		},
 		hasCriteria : function(){
 			var minData = 0;
@@ -547,7 +547,7 @@ define("calipso", function(require) {
 		 * firstPage true sort [Object { direction="DESC", property="id",
 		 * ascending=false}] number 0 size 10
 		 */
-		//		
+		//
 		// parseState: function (resp, queryParams, state, options) {
 		// return {
 		// totalRecords: resp.totalElements
@@ -769,10 +769,10 @@ define("calipso", function(require) {
 	/**
 	 * Abstract model implementation to inherit from your own models.
 	 * Subclasses of this model should follow the model driven
-	 * design conventions used in the Calipso backbone stack, note the " REQUIRED" parts 
+	 * design conventions used in the Calipso backbone stack, note the " REQUIRED" parts
 	 * of the example for details.
-	 * 
-	 * @example 
+	 *
+	 * @example
 	 * // Load module
 	 * require(['models/generic-model'], function(GenericModel) {
 	 * 	// define our person model subclass
@@ -786,17 +786,17 @@ define("calipso", function(require) {
 	 * 		// OPTIONAL: set the form schema cache behavior
 	 * 		formSchemaCache : this.FORM_SCHEMA_CACHE_CLIENT
 	 * 	});
-	 * 
+	 *
 	 * 	// REQUIRED: our subclass name
 	 * 	PersonModel.prototype.getTypeName = function() {
 	 * 		return "PersonModel";
 	 * 	}
-	 * 	// REQUIRED: our subclass URL path fragment, 
+	 * 	// REQUIRED: our subclass URL path fragment,
 	 * 	// e.g. "persons" for PersonModel
 	 * 	PersonModel.prototype.getPathFragment = function() {
 	 * 		//...
 	 * 	}
-	 * 
+	 *
 	 * 	// REQUIRED: our subclass grid schema
 	 * 	PersonModel.prototype.getGridSchema = function() {
 	 * 		//...
@@ -805,34 +805,34 @@ define("calipso", function(require) {
 	 * 	PersonModel.prototype.getPrototypeFormSchemas = function() {
 	 * 		//...
 	 * 	}
-	 * 
-	 * 	// OPTIONAL: our subclass layout view, 
-	 * 	// defaults to ModelDrivenBrowseLayout 
+	 *
+	 * 	// OPTIONAL: our subclass layout view,
+	 * 	// defaults to ModelDrivenBrowseLayout
 	 * 	PersonModel.prototype.getLayoutViewType = function() {
 	 * 		//...
 	 * 	}
-	 * 	// OPTIONAL: our subclass collection view, 
-	 * 	// defaults to ModelDrivenCollectionGridView 
+	 * 	// OPTIONAL: our subclass collection view,
+	 * 	// defaults to ModelDrivenCollectionGridView
 	 * 	PersonModel.prototype.getCollectionViewType = function() {
 	 * 		//...
 	 * 	}
-	 * 	// OPTIONAL: our subclass item view, 
+	 * 	// OPTIONAL: our subclass item view,
 	 * 	// defaults to ModelDrivenFormView
 	 * 	PersonModel.prototype.getItemViewType = function() {
 	 * 		//...
 	 * 	}
-	 * 	// OPTIONAL: our subclass item view template, 
+	 * 	// OPTIONAL: our subclass item view template,
 	 * 	PersonModel.prototype.getItemViewTemplate = function() {
 	 * 		//...
 	 * 	}
-	 * 	// OPTIONAL: our subclass business key, 
-	 * 	// used to check if the model has been loaded from the server. 
-	 * 	// defaults to "name" 
+	 * 	// OPTIONAL: our subclass business key,
+	 * 	// used to check if the model has been loaded from the server.
+	 * 	// defaults to "name"
 	 * 	PersonModel.prototype.getBusinessKey = function() {
 	 * 		//...
 	 * 	}
-	 * 
-	 * });   
+	 *
+	 * });
 	 * @constructor
 	 * @requires Backbone
 	 * @requires Supermodel
@@ -870,7 +870,7 @@ define("calipso", function(require) {
 			return formSchemaKey;
 		},
 		/**
-		 * Get the URL path fragment for this model. Calls the prototype method with the same name. 
+		 * Get the URL path fragment for this model. Calls the prototype method with the same name.
 		 * @returns the URL path fragment as a string
 		 */
 		getPathFragment : function() {
@@ -878,7 +878,7 @@ define("calipso", function(require) {
 		},
 		/**
 		 * Get the name of this class. Calls the prototype method with the same name.
-		 * TODO: switch to named constructors 
+		 * TODO: switch to named constructors
 		 * @returns the class name as a string
 		 */
 		getTypeName : function() {
@@ -892,12 +892,12 @@ define("calipso", function(require) {
 			return this.prototype.isCollectionCacheable && this.prototype.isCollectionCacheable();
 		},
 		/**
-		 * Get the layout view for this model. To specify a layout for your model under a static 
-		 * or instance context, override {@link Calipso.model.GenericModel.prototype.getLayoutViewType} 
-		 * or {@link getLayoutViewType} respectively in your subclass. 
-		 * 
+		 * Get the layout view for this model. To specify a layout for your model under a static
+		 * or instance context, override {@link Calipso.model.GenericModel.prototype.getLayoutViewType}
+		 * or {@link getLayoutViewType} respectively in your subclass.
+		 *
 		 * Layout views defined this way are picked up by controllers.
-		 * 
+		 *
 		 * @see {@link Calipso.model.GenericModel.prototype.getLayoutViewType}
 		 */
 		getLayoutViewType : function() {
@@ -907,25 +907,25 @@ define("calipso", function(require) {
 			return this.prototype.getLayoutOptions(this);
 		},
 		/**
-		 * Get the collection view type for collections of this model. To specify a collection 
-		 * view for your model under a static or instance context, override 
-		 * {@link Calipso.model.GenericModel.prototype.getCollectionViewType} or 
+		 * Get the collection view type for collections of this model. To specify a collection
+		 * view for your model under a static or instance context, override
+		 * {@link Calipso.model.GenericModel.prototype.getCollectionViewType} or
 		 * {@link getCollectionViewType} respectively in your subclass.
-		 * 
+		 *
 		 * Collection views defined this way are picked up by layout views..
-		 * 
+		 *
 		 * @see {@link Calipso.model.GenericModel.prototype.getCollectionViewType}
 		 */
 		getCollectionViewType : function() {
 			return this.prototype.getCollectionViewType(this);
 		},
 		/**
-		 * Get the item view type for this model. To specify an item view for your model under a static 
-		 * or instance context, override {@link Calipso.model.GenericModel.prototype.getItemViewType} 
+		 * Get the item view type for this model. To specify an item view for your model under a static
+		 * or instance context, override {@link Calipso.model.GenericModel.prototype.getItemViewType}
 		 * or {@link getItemViewType} respectively in your subclass.
-		 * 
+		 *
 		 * Layout views defined this way are picked up by controllers.
-		 * 
+		 *
 		 * @see {@link Calipso.model.GenericModel.prototype.getItemViewType}
 		 */
 		getItemViewType : function() {
@@ -934,14 +934,14 @@ define("calipso", function(require) {
 			return this.prototype.getItemViewType(this);
 		},
 		/**
-		 * Get the item view template for this model. the template is picked up and 
-		 * used by item views like GenericView.  To specify an item view template for 
-		 * your model under a static or instance context, 
-		 * override {@link Calipso.model.GenericModel.prototype.getItemViewTemplate} 
+		 * Get the item view template for this model. the template is picked up and
+		 * used by item views like GenericView.  To specify an item view template for
+		 * your model under a static or instance context,
+		 * override {@link Calipso.model.GenericModel.prototype.getItemViewTemplate}
 		 * or {@link getItemViewTemplate} respectively in your subclass.
-		 * 
+		 *
 		 * Layout views defined this way are picked up by controllers.
-		 * 
+		 *
 		 * @see {@link Calipso.model.GenericModel.prototype.getItemViewType}
 		 */
 		getItemViewTemplate : function() {
@@ -949,21 +949,21 @@ define("calipso", function(require) {
 			return this.prototype.getItemViewTemplate(this);
 		},
 		/**
-		 * Get the complete set of form schemas. You can also obtain the form schema for 
-		 * a specific action like "create", "update" or "search" using 
-		 * {@linkcode getFormSchema} instead. 
-		 * 
-		 * To define form schemas for your subclass under a static or instance context on the client-side, override 
+		 * Get the complete set of form schemas. You can also obtain the form schema for
+		 * a specific action like "create", "update" or "search" using
+		 * {@linkcode getFormSchema} instead.
+		 *
+		 * To define form schemas for your subclass under a static or instance context on the client-side, override
 		 * {@link Calipso.model.GenericMogetPrototypeFormSchemasgetPrototypeFormSchemas} or {@link getFormSchemas} respectively.
-		 * 
+		 *
 		 * This method will attempt to retrieve the model schema in the following order:
 		 * 	<ul><li>Schema set to the model by the server</li>
 		 * 	<li>schemas defined by the model's prototype object</li>
-		 * 	</ul>  
-		 * 
+		 * 	</ul>
+		 *
 		 * Form schemas are picked up by form views like {@linkcode GenericFormView} or layout views
 		 * that use such form views in their regions.
-		 * 
+		 *
 		 * @see {@link Calipso.model.GenericModel.prototype.getPrototypeFormSchemas}
 		 */
 		getFormSchemas : function() {
@@ -975,21 +975,21 @@ define("calipso", function(require) {
 			if (this.formSchemaCacheMode == this.FORM_SCHEMA_CACHE_CLIENT) {
 				formSchema = this.getPrototypeFormSchemas(this);
 			}
-			if (formSchema) {	
+			if (formSchema) {
 			} else {
-				formSchema = this.getPrototypeFormSchemas(this);	
+				formSchema = this.getPrototypeFormSchemas(this);
 			}
 			return formSchema;
 		},
 		/**
-		 * Get the form schema for a specific action like "create", "update" or "search". 
-		 * 
-		 * To define form schemas for your subclass under a static or instance context, override 
+		 * Get the form schema for a specific action like "create", "update" or "search".
+		 *
+		 * To define form schemas for your subclass under a static or instance context, override
 		 * {@link Calipso.model.GenericModel.prototype.getPrototypeFormSchemas} or {@link getFormSchemas} respectively.
-		 * 
+		 *
 		 * Form schemas are used by form views like {@linkcode GenericFormView} or layout views
 		 * that use such form views in their regions.
-		 * 
+		 *
 		 * @param {string} actionName for example "create", "update" or "search"
 		 * @see {@link getFormSchemas}
 		 * @todo implement optional merging of superclass schemas by using the supermodel.parent property
@@ -1077,9 +1077,9 @@ define("calipso", function(require) {
 	};
 	Calipso.model.GenericModel.prototype.showInMenu = false;
 	/**
-	 * Get the model class URL fragment corresponding to your server 
-	 * side controller, e.g. "users" for UserModel. Model subclasses 
-	 * are required to implement this method. 
+	 * Get the model class URL fragment corresponding to your server
+	 * side controller, e.g. "users" for UserModel. Model subclasses
+	 * are required to implement this method.
 	 * @returns the URL path fragment as a string
 	 */
 	Calipso.model.GenericModel.prototype.getPathFragment = function(instance) {
@@ -1141,16 +1141,16 @@ define("calipso", function(require) {
 	};
 
 	/**
-	 * Override this to declaratively define 
+	 * Override this to declaratively define
 	 * grid views for your subclass
 	 */
 	Calipso.model.GenericModel.prototype.getGridSchema = function(instance) {
-		//console.log("GenericModel.prototype.getSchemaForGrid() called, will return undefined");
+		//console.log("GenericModel.prototype.getGridSchema() called, will return undefined");
 		return undefined;
 	};
 
 	/**
-	 * Override this in your subclass to declaratively define 
+	 * Override this in your subclass to declaratively define
 	 * form views for the default or custom actions
 	 */
 	Calipso.model.GenericModel.prototype.getPrototypeFormSchemas = function(instance) {
@@ -1159,7 +1159,7 @@ define("calipso", function(require) {
 	};
 
 	/**
-	 * Override this to define a default layout view at a static context for your subclass, 
+	 * Override this to define a default layout view at a static context for your subclass,
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
 	 */
 	Calipso.model.GenericModel.prototype.getLayoutViewType = function(instance) {
@@ -1168,9 +1168,9 @@ define("calipso", function(require) {
 	};
 
 	/**
-	 * Override this to define a default collection view like the 
-	 * default {@link ModelDrivenCollectionGridView} 
-	 * at a static context for your subclass, 
+	 * Override this to define a default collection view like the
+	 * default {@link ModelDrivenCollectionGridView}
+	 * at a static context for your subclass,
 	 *@returns {@link ModelDrivenCollectionGridView}
 	 */
 	Calipso.model.GenericModel.prototype.getCollectionViewType = function(instance) {
@@ -1179,7 +1179,7 @@ define("calipso", function(require) {
 	};
 
 	/**
-	 * Override this to define a default layout view at a static context for your subclass, 
+	 * Override this to define a default layout view at a static context for your subclass,
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
 	 */
 	Calipso.model.GenericModel.prototype.getItemViewType = function(instance) {
@@ -1187,7 +1187,7 @@ define("calipso", function(require) {
 		return Calipso.view.GenericFormView;
 	};
 	/**
-	 * Override this to define a default layout view at a static context for your subclass, 
+	 * Override this to define a default layout view at a static context for your subclass,
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
 	 */
 	Calipso.model.GenericModel.prototype.getItemViewTemplate = function(instance) {
@@ -1195,9 +1195,9 @@ define("calipso", function(require) {
 		return null;
 	};
 	/**
-	 * Get the name of the model's business key property. The property name is used to 
+	 * Get the name of the model's business key property. The property name is used to
 	 * check whether a model instance has been loaded from the server. The default is "name".
-	 * 
+	 *
 	 * @returns the business key if one is defined by the model class, "name" otherwise
 	 */
 	Calipso.model.GenericModel.prototype.getBusinessKey = function(instance) {
@@ -1349,7 +1349,7 @@ define("calipso", function(require) {
 			viewType : Calipso.view.CollectionMemberGridView
 		} ];
 	};
-	
+
 	// Role model
 	// ---------------------------------------
 	Calipso.model.RoleModel = Calipso.model.GenericModel.extend(
@@ -1419,12 +1419,12 @@ define("calipso", function(require) {
 			headerCell : Calipso.components.backgrid.CreateNewHeaderCell
 		} ];
 	};
-	
+
 	// Notification Model
 	// -----------------------------------------
 	Calipso.model.BaseNotificationModel = Calipso.model.GenericModel.extend({
 	},
-	// static members 
+	// static members
 	{
 		parent : Calipso.model.GenericModel,
 	});
@@ -1436,7 +1436,7 @@ define("calipso", function(require) {
 	Calipso.model.BaseNotificationModel.prototype.getTypeName = function(instance) {
 		return "BaseNotificationModel";
 	};
-	
+
 	Calipso.model.UserDetailsModel = Backbone.Model.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
@@ -1476,8 +1476,8 @@ define("calipso", function(require) {
 			options = options || {};
 			options.timeout = 30000;
 			if (!options.url) {
-				options.url = Calipso.session.getBaseUrl() + 
-					Calipso.getConfigProperty("apiAuthPath") + "/" + 
+				options.url = Calipso.session.getBaseUrl() +
+					Calipso.getConfigProperty("apiAuthPath") + "/" +
 					_this.getPathFragment();
 			}
 			// options.dataType = "jsonp"; // JSON is default.
@@ -1496,7 +1496,7 @@ define("calipso", function(require) {
 	Calipso.model.UserDetailsModel.prototype.getTypeName = function() {
 		return "UserDetailsModel";
 	};
-	
+
 	Calipso.model.UserDetailsConfirmationModel = Calipso.model.UserDetailsModel.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{});
@@ -1517,12 +1517,34 @@ define("calipso", function(require) {
 		};
 
 	};
-	
+
 	Calipso.model.ReportDataSetModel = Calipso.model.GenericModel.extend({
-		
+		getGridSchema : function(attributeName){
+			// sum or count
+			if(!attributeName){attributeName = "sum";}
+			var schema = [{
+				name : "label",
+				label : "Name",
+				editable : false,
+				cell : "text",
+			}];
+			console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
+			var entries = this.wrappedCollection.first().get("entries");
+			for(var i = 0 ; i < entries.length; i++){
+				schema.push({
+					name : "entries." + i + ".entryData." + attributeName,
+					label : entries[i].label,
+					editable : false,
+					cell : Calipso.components.backgrid.ChildStringAttributeCell,
+				});
+			}
+			console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
+			console.log(schema);
+			return schema;
+		}
 	},
 	// static members
-	{ 
+	{
 		parent : Calipso.model.GenericModel,
 	});
 
@@ -1534,24 +1556,22 @@ define("calipso", function(require) {
 	Calipso.model.ReportDataSetModel.prototype.getPathFragment = function() {
 		return "Calipso.model.ReportDataSetModel";
 	};
-	
+
 	Calipso.model.ReportDataSetModel.prototype.getCollectionViewType = function() {
 		return Calipso.view.ModelDrivenReportView;
 	};
-	
+
 	Calipso.model.ReportDataSetModel.prototype.getFormSchemas = function() {
 		console.log("ReportDatasetModel.prototype.getFormSchemas() called, will return undefined");
-
-	
-		return {};
-	};
-	Calipso.model.ReportDataSetModel.prototype.getGridSchema = function() {
-		return [{
-			name : "label",
-			label : "Subject",
-			editable : false,
-			cell : "text",
-		}];
+		return {//
+			firstName : {
+				"search" : 'Text',
+				"default" : {
+					type : 'Text',
+					//validators : [ 'required' ]
+				}
+			},
+		};
 	};
 	//////////////////////////////////////////////////
 	// UI components
@@ -1603,7 +1623,7 @@ define("calipso", function(require) {
 
 	});
 
-	// 
+	//
 	Calipso.components.backgrid.EditRowCell = Backgrid.Cell.extend(
 	/** @lends Calipso.components.backgrid.EditRowCell.prototype */
 	{
@@ -1629,9 +1649,10 @@ define("calipso", function(require) {
 
 	Calipso.components.backgrid.ChildStringAttributeCell = Backgrid.StringCell.extend({
 		render : function() {
-			var parameters = this.column.get("name").split(".");
+			// replace square to dot notation and split
+			var parameters = this.column.get("name").replace(/\[(.*?)\]/g,'.$1').split(".");
 			var result = this.walk(this.model, parameters);
-			
+
 			var value = result ? this.formatter.fromRaw(result) : "-";
 			this.$el.text(value);
 			this.delegateEvents();
@@ -1717,7 +1738,7 @@ define("calipso", function(require) {
 						},
 						_this.typeaheadSource
 				);
-				
+
 			}
 			// apply typeahead after the field has been added to the DOM
 			setTimeout(create, 250);
@@ -1728,7 +1749,7 @@ define("calipso", function(require) {
 		initialize : function(options) {
 			Calipso.components.backboneform.Typeahead.prototype.initialize.call(this, options);
 			this.$el.removeAttr("id class name type autocomplete");
-			this.$el.html('<input type="hidden" id="' + this.id + '" name="' + this.getName() + '" />' + 
+			this.$el.html('<input type="hidden" id="' + this.id + '" name="' + this.getName() + '" />' +
 					'<input type="text" class="form-control" id="' + this.id + 'Typeahead" name="' + this.getName() + 'Typeahead" autocomplete="off" />');
 		},
 		/**
@@ -1816,14 +1837,14 @@ define("calipso", function(require) {
 			return defaultConfig;
 		},
 		/**
-		 * Get an array of required option names. An error will be thrown 
-		 * during initialization if anyone is undefined or null.  
+		 * Get an array of required option names. An error will be thrown
+		 * during initialization if anyone is undefined or null.
 		 */
 		getRequiredOptionNames : function(){
 			return [];
-		}, 
+		},
 		/**
-		 * Validate the final configuration. Called during initialization 
+		 * Validate the final configuration. Called during initialization
 		 * by {Calipso.view.AbstractLayout#configure}. Internal use only.
 		 */
 		_validateConfiguration : function(){
@@ -1839,13 +1860,13 @@ define("calipso", function(require) {
 				}
 			}
 			if(missing.length > 0){
-				throw this.prototype.getTypeName() + 
-					"#validateConfiguration ERROR: missing required options" + 
+				throw this.prototype.getTypeName() +
+					"#validateConfiguration ERROR: missing required options" +
 					missing.toString();
 			}
 		},
 		/**
-		 * (Re) Configure by overwriting this.config with according to 
+		 * (Re) Configure by overwriting this.config with according to
 		 * this.model.getLayoutOptions and then by relevant options only.
 		 * Finally, validate configuration for missing required options.
 		 */
@@ -1856,9 +1877,9 @@ define("calipso", function(require) {
 					this.searchResultsCollection = this.model.wrappedCollection;
 				}
 			}
-			// initialize config using defaults 
+			// initialize config using defaults
 			this.config = this.getDefaultConfig();
-			// (re) configure according to this.model.getLayoutOptions 
+			// (re) configure according to this.model.getLayoutOptions
 			// _.extend(this.config, this.model.prototype.getLayoutOptions(this.model));
 			// and then again by relevant options only
 			options = options || {};
@@ -1933,7 +1954,7 @@ define("calipso", function(require) {
 						'<a href="#" data-toggle="dropdown" class="dropdown-toggle">' +
 						'<i class="fa fa-bell fa-fw"></i>'+
 						'<sup class="badge badge-primary badge-notifications-count hidden"></sup>' +
-						'<i class="fa fa-caret-down"></i>', 
+						'<i class="fa fa-caret-down"></i>',
 						view.el);
 		}
 	});
@@ -1944,7 +1965,7 @@ define("calipso", function(require) {
 					'<a href="#" data-toggle="dropdown" class="dropdown-toggle">' +
 					'<i class="fa fa-bell fa-fw"></i>'+
 					'<sup class="badge badge-primary badge-notifications-count hidden"></sup>' +
-					'<i class="fa fa-caret-down"></i>', 
+					'<i class="fa fa-caret-down"></i>',
 					view.el);
 	};
 	Calipso.view.HeaderView = Calipso.view.AbstractLayout.extend(
@@ -1961,7 +1982,7 @@ define("calipso", function(require) {
 		regions : {
 			//menuRegion : "#calipsoHeaderView-menuRegion",
 			notificationsRegion : {
-				// appends the notifications without clearing the link, 
+				// appends the notifications without clearing the link,
 				// fixes HTML structure issue
 				regionClass : Calipso.view.HeaderNotificationsRegion
 			}
@@ -2009,7 +2030,7 @@ define("calipso", function(require) {
 					url : Calipso.session.getBaseUrl() + "/api/rest/baseNotifications",
 					model: Calipso.model.BaseNotificationModel
 				});
-	
+
 				//console.log("HeaderView, created notifications collection: " + notifications + ", url: " + notifications.url);
 				var notificationsView = new Calipso.view.TemplateBasedCollectionView({
 					tagName : "ul",
@@ -2074,7 +2095,7 @@ define("calipso", function(require) {
 			console.log("Calipso.view.ModelDrivenBrowseLayout#initialize, scrolling to top");
 			$(window).scrollTop(0);
 			var _this = this;
-			
+
 
 			this.listenTo(Calipso.vent, "genericFormSaved", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSaved, showing this.model: "+_this.model);
@@ -2089,7 +2110,7 @@ define("calipso", function(require) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSearched, showing given model: "+model);
 				_this.onGenericFormSearched(model);
 			});
-			// vent handling might be overriden by subclasses 
+			// vent handling might be overriden by subclasses
 			if (!options.dontListenTo) {
 				this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
 					_this.showItemViewForModel(itemModel, "view");
@@ -2099,7 +2120,7 @@ define("calipso", function(require) {
 				}, this);
 //				this.listenTo(Calipso.vent, "layout:updateModel", function(itemModel) {
 //					_this.showItemViewForModel(itemModel, "update");
-//				}, this); 
+//				}, this);
 			}
 
 		},
@@ -2201,7 +2222,7 @@ define("calipso", function(require) {
 			}
 
 
-		
+
 		},
 		showFormForModel : function(routeModel, region, forceShow) {
 			console.log("Calipso.view.ModelDrivenSearchLayout#showSidebar");
@@ -2218,7 +2239,7 @@ define("calipso", function(require) {
 			}
 
 		},
-		
+
 	}, {
 		// static members
 		getTypeName : function() {
@@ -2272,7 +2293,7 @@ define("calipso", function(require) {
 			var hasCriteria =  this.searchResultsCollection && this.searchResultsCollection.hasCriteria();
 			var skipDefaultSearch = this.model.skipDefaultSearch && !hasCriteria;
 			console.log("Calipso.view.ModelDrivenSearchLayout#onShow, hasCriteria = " + hasCriteria + ", skipDefaultSearch: " + skipDefaultSearch);
-			
+
 			this.showSidebar(this.model);
 			if(skipDefaultSearch){
 				console.log("Calipso.view.ModelDrivenSearchLayout#onShow calling expandSearchForm");
@@ -2284,9 +2305,9 @@ define("calipso", function(require) {
 				console.log("Calipso.view.ModelDrivenSearchLayout#onShow calling showContent");
 				this.showContent(this.model);
 			}
-			
-			
-			
+
+
+
 		},
 		expandSearchForm : function(){
 			console.log("ModelDrivenSearchLayout#expandSearchForm");
@@ -2323,7 +2344,7 @@ define("calipso", function(require) {
 //			this.$el.find("#calipsoModelDrivenSearchLayout-contentRegion").hide();
 //			this.$el.find("#calipsoModelDrivenSearchLayout-sideBarRegion").removeClass("col-sm-3 col-sm-9").addClass("col-sm-12");
 //		},
-		
+
 	}, {
 		getTypeName : function() {
 			return "ModelDrivenSearchLayout";
@@ -2349,7 +2370,7 @@ define("calipso", function(require) {
 		{
 	 		getTypeName: function(){return "ModelDrivenCrudLayout"}
 		});
-		
+
 		var ModelDrivenCrudLayout = AbstractLayout.extend({
 			template : tmpl,
 			tagName : "div",
@@ -2359,7 +2380,7 @@ define("calipso", function(require) {
 				tabContentsRegion : '#calipsoTabContentsRegion'
 			},
 			initialize: function(options){
-				
+
 				Marionette.LayoutView.prototype.initialize.apply(this, arguments);
 				if(options.collection){
 					this.collection = options.collection;
@@ -2448,11 +2469,11 @@ define("calipso", function(require) {
 						options.collection = item.wrappedCollection;
 					}
 				    // do custom stuff here
-		
+
 				    var view = new ItemViewClass(options);
-		
+
 				    // more custom code working off the view instance
-		
+
 				    return view;
 				}
 			  },
@@ -2461,7 +2482,7 @@ define("calipso", function(require) {
 	///////////////////////////////////////////////////////
 	// Views
 	///////////////////////////////////////////////////////
-	// plumbing for handlebars template helpers 
+	// plumbing for handlebars template helpers
 	// Marionette.ItemView.prototype.mixinTemplateHelpers = function(target) {
 	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
 		var self = this;
@@ -2488,16 +2509,16 @@ define("calipso", function(require) {
 	// The recursive tree view
 	//	var TreeView = Backbone.Marionette.CompositeView.extend({
 	//	    template: "#node-template",
-	//	    
+	//
 	//	    tagName: "li",
-	//	    
+	//
 	//	    initialize: function(){
 	//	        // grab the child collection from the parent model
 	//	        // so that we can render the collection as children
 	//	        // of this parent node
 	//	        this.collection = this.model.nodes;
 	//	    },
-	//	    
+	//
 	//	    appendHtml: function(cv, iv){
 	//	        cv.$("ul:first").append(iv.el);
 	//	    },
@@ -2559,7 +2580,7 @@ define("calipso", function(require) {
 					// options for the plugin when instantiating a new collection.
 					this.collection.configure(this.options.pollOptions);
 				}
-				// initialize polling if needed 
+				// initialize polling if needed
 				if (!this.collection.isFetching()) {
 					this.collection.startFetching();
 				}
@@ -2583,7 +2604,7 @@ define("calipso", function(require) {
 
 		},
 		/**
-		 * Stop polling the collection if appropriate 
+		 * Stop polling the collection if appropriate
 		 */
 		onBeforeDestroy : function() {
 			if (!this.pollCollectionAfterDestroy) {
@@ -2595,13 +2616,13 @@ define("calipso", function(require) {
 				}
 			}
 		}
-	/** use the template defined by the child if any 
+	/** use the template defined by the child if any
 	buildChildView: function(child, ChildViewClass, childViewOptions){
 		  var options = _.extend({}, childViewOptions);
 		  options.model = child;
 		  console.log("buildChildView, childViewOptions.template: "+childViewOptions.template);
 		  if(child.childViewTemplate){
-			  options.template = child.childViewTemplate; 
+			  options.template = child.childViewTemplate;
 		  }
 		  return new ChildViewClass(options);
 		}*/
@@ -2689,7 +2710,7 @@ define("calipso", function(require) {
 
 		// Transition the new view in.
 		// This is broken out as a method for convenient overriding of
-		// the default transition behavior. If you only want to change the 
+		// the default transition behavior. If you only want to change the
 		// animation use the trasition class options instead.
 		transitionViewIn : function(view) {
 			//console.log('in', this.options);
@@ -2712,7 +2733,7 @@ define("calipso", function(require) {
 
 		// Trastition a view out.
 		// This is broken out as a method for convenient overriding of
-		// the default transition behavior. If you only want to change the 
+		// the default transition behavior. If you only want to change the
 		// animation use the trasition class options instead.
 		transitionViewOut : function(view) {
 			this.trigger('before:transitionOut', this, view);
@@ -2728,10 +2749,10 @@ define("calipso", function(require) {
 
 	Calipso.view.ModelDrivenCollectionView = Marionette.ItemView.extend(
 	/**
-	 * @param options object members: 
+	 * @param options object members:
 	 *  - collection/wrappedCollection
 	 *  - callCollectionFetch: whether to fetch the collection from the server
-	 * @lends Calipso.view.ModelDrivenCollectionView.prototype 
+	 * @lends Calipso.view.ModelDrivenCollectionView.prototype
 	 */
 	{
 
@@ -2752,10 +2773,10 @@ define("calipso", function(require) {
 
 	Calipso.view.ModelDrivenCollectionGridView = Marionette.ItemView.extend(
 	/**
-	 * @param options object members: 
+	 * @param options object members:
 	 *  - collection/wrappedCollection
 	 *  - callCollectionFetch: whether to fetch the collection from the server
-	 * @lends Calipso.view.ModelDrivenCollectionGridView.prototype 
+	 * @lends Calipso.view.ModelDrivenCollectionGridView.prototype
 	 * */
 	{
 		// Define view template
@@ -2901,7 +2922,7 @@ define("calipso", function(require) {
 			return "ModelDrivenCollectionGridView";
 		}
 	});
-	
+
 	Calipso.view.ModelDrivenReportView = Calipso.view.ModelDrivenCollectionGridView.extend({
 		tagName: "div",
 		// Define view template
@@ -2945,7 +2966,7 @@ define("calipso", function(require) {
 		          "163, 190, 140",
 		          "171, 121, 103",
 		          "208, 135, 112",
-		          "180, 142, 173", 
+		          "180, 142, 173",
 		          "235, 203, 139",
 			"39, 165, 218", //"#5DA5DA" , // blue
 			"250, 164, 58", //"#FAA43A" , // orange
@@ -2976,7 +2997,7 @@ define("calipso", function(require) {
 //			$canvas.attr("width", $canvas.parent().attr("width"));
 //			$canvas.attr("height", $canvas.parent().attr("height"));
 			var ctx = canvas.getContext("2d");
-			
+
 			var dataTotals = [];
 			_.each(this.data.datasets, function(dataset, index) {
 				  var color = _this.colors[index];
@@ -2986,7 +3007,7 @@ define("calipso", function(require) {
 				  dataset.pointStrokeColor = "rgba("+color+",0)";
 				  dataset.pointHighlightFill = "#fff";
 				  dataset.pointHighlightStroke = "rgba("+color+",04)";
-				  
+
 				  // add totals dataset
 				  var sum = 0;
 				  for (var i = 0; i < dataset.data.length; i++) {
@@ -3001,7 +3022,7 @@ define("calipso", function(require) {
 			});
 
 			this.chart = new Chart(ctx).Line(this.data, this.chartOptions);
-			
+
 
 			var canvasTotals = this.$(".chart-totals")[0];
 			var $canvasTotals = $(canvasTotals);
@@ -3014,7 +3035,7 @@ define("calipso", function(require) {
 			  //then you just need to generate the legend
 			  var legend = this.chartTotals.generateLegend();
 			  this.$('.chart-legend').append(legend);
-			  
+
 //			this.chart.onclick = function(value, category) {
 //				self.trigger("click", category);
 //			};
@@ -3132,7 +3153,7 @@ define("calipso", function(require) {
 		}
 	});
 
-	// 
+	//
 	Calipso.view.GenericFormView = Marionette.ItemView.extend({
 		/**
 		 * Cals the static method of the same name. Returns a Backbone.Form template
@@ -3144,7 +3165,7 @@ define("calipso", function(require) {
 			return this.constructor.getFormTemplate(this, templateKey);
 		},
 		formTemplateKey : "horizontal",
-		
+
 		// Define view template
 		formSchemaKey : null,
 		template : require('hbs!template/GenericFormView'),
@@ -3153,14 +3174,14 @@ define("calipso", function(require) {
 				return this.formSchemaKey;
 			}
 		},
-		
+
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			console.log("GenericFormView#initialize, this.model: ");
 			console.log(this.model);
 			console.log("GenericFormView#initialize, options.model: ");
 			console.log(options.model);
-			
+
 			if (options.model) {
 				this.model = options.model;
 			}
@@ -3170,13 +3191,13 @@ define("calipso", function(require) {
 			// set schema key, from options or model
 			if (options.formSchemaKey) {
 				this.formSchemaKey = options.formSchemaKey;
-			} 
+			}
 			else{
 				this.formSchemaKey = this.model.getFormSchemaKey();
 			}
 			if (options.formTemplateKey) {
 				this.formTemplateKey = options.formTemplateKey;
-			} 
+			}
 			// use vertical form for searches
 			else if(this.formSchemaKey.slice(0, 6) == "search"){
 				this.formTemplateKey =  "vertical";
@@ -3185,11 +3206,11 @@ define("calipso", function(require) {
 			// grab a handle for the search results collection if any, from options or model
 			if (this.options.searchResultsCollection) {
 				this.searchResultsCollection = options.searchResultsCollection;
-			} 
+			}
 			else if (this.model.wrappedCollection) {
 				this.searchResultsCollection = this.model.wrappedCollection;
-			} 
-			// 
+			}
+			//
 			this.formTemplate = this.getFormTemplate(options.formTemplateKey ? options.formTemplateKey : this.formTemplateKey);
 
 			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + ", type " + this.model.getTypeName());
@@ -3228,28 +3249,28 @@ define("calipso", function(require) {
 				console.log("GenericFormView#commit search, return false");
 				return false;
 			}
-			// if no validation errors 
+			// if no validation errors
 			else{
 				// Case: create/update
 				if (_this.formSchemaKey == "create" || _this.formSchemaKey == "update") {
 					// persist changes
 					console.log("Calipso.view.GenericFormView#commit persist, _this.url: " + _this.url);
 					console.log("Calipso.view.GenericFormView#commit persist, model url: " + _this.model.get("url"));
-					
+
 					_this.model.save(null, {
 						success:function(model, response){
 				        console.log("Calipso.view.GenericFormView#commit model save success, triggering genericFormSaved");
 							Calipso.vent.trigger("genericFormSaved", model);
-						}, 
+						},
 						error:function(){
 					        console.log("Calipso.view.GenericFormView#commit model save error");
 								alert("Failed persisting changes");
-					    } 
+					    }
 					});
 				}
 				else{
 
-					
+
 					console.log("GenericFormView#commit, saving search data to session");
 					var newData = this.form.toJson();
 					this.searchResultsCollection.data = newData;
@@ -3269,9 +3290,9 @@ define("calipso", function(require) {
 						}
 
 					});
-				
+
 				}
-				// Case: search 
+				// Case: search
 				//else if (this.formSchemaKey.substring(0, 6) == "search") {}
 			}
 			// search entities?
@@ -3287,7 +3308,7 @@ define("calipso", function(require) {
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 			console.log("GenericFormView#onShow, formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: " + formSchema);
 
-			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering) 
+			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering)
 			if (formSchema && _.size(formSchema) > 0) {
 				_self.renderForm();
 			} else {
@@ -3440,9 +3461,9 @@ define("calipso", function(require) {
 	Calipso.view.AbstractLayout.prototype.getTypeName = function() {
 		return "AbstractLayout";
 	};
-	
+
 	/*
-	 * Default Login View implementation. Can be overriden with 
+	 * Default Login View implementation. Can be overriden with
 	 * Calipso.initializeApp({loginViewType: Foobar})
 	 */
 	Calipso.view.LoginView = Marionette.ItemView.extend({
@@ -3487,7 +3508,7 @@ define("calipso", function(require) {
 			//console.log(clicked);
 			var providerNames = ["facebook", "linkedin", "twitter", "google"];
 			var providerName;
-			
+
 			for(var i=0; i < providerNames.length; i++){
 				//console.log("Calipso.view.LoginView#socialLogin looking for className: " + "btn-social-login-" + providerNames[i]);
 				if(clicked.hasClass("btn-social-login-" + providerNames[i])){
@@ -3499,12 +3520,12 @@ define("calipso", function(require) {
 			if(!providerName){
 				throw "Clicked element does not match a social provider";
 			}
-			// target='SignIn' 
-			var formHtml = "<form class='social-signin-form' action='" + 
-				Calipso.getBaseUrl() + "/signin/" + providerName +"' method='POST' role='form'>" + 
-			//"<input type='hidden' name='scope' value='email' />" + 
-			//"<input type='hidden' name='scope' value='emailure' />" + 
-			//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" + 
+			// target='SignIn'
+			var formHtml = "<form class='social-signin-form' action='" +
+				Calipso.getBaseUrl() + "/signin/" + providerName +"' method='POST' role='form'>" +
+			//"<input type='hidden' name='scope' value='email' />" +
+			//"<input type='hidden' name='scope' value='emailure' />" +
+			//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" +
 				"</form>";
 			this.$el.find("div.social-form-container").html(formHtml);
 			this.$el.find("form.social-signin-form").submit();
@@ -3515,7 +3536,7 @@ define("calipso", function(require) {
 			console.log("Calipso.view.LoginView#register");
 			Calipso.stopEvent(e);
 			var _this = this;
-			
+
 			// pickup form data
 			var formData = {
 				password : this.$('.input-password').val()
@@ -3529,7 +3550,7 @@ define("calipso", function(require) {
 					formData.username = usernameOrEmail;
 				}
 			}
-			
+
 			var userModel = new Calipso.model.UserModel(formData);
 			var registrationForm = new Calipso.view.GenericFormView({
 				model : userModel
@@ -3587,10 +3608,10 @@ define("calipso", function(require) {
 			this.listenTo('remove', this.onModelRemoved, this);
 		},
 		onModelAdded : function(model, collection, options) {
-			//_self.tabKeys[model.get("id")] = model; 
+			//_self.tabKeys[model.get("id")] = model;
 		},
 		onModelRemoved : function(model, collection, options) {
-			//_self.tabKeys[model.get("id")] = null; 
+			//_self.tabKeys[model.get("id")] = null;
 		},
 	});
 	Calipso.model.TabModel.prototype.getTypeName = function(instance) {
@@ -3699,17 +3720,17 @@ define("calipso", function(require) {
 	//		 * (routeHelper.routeModel) ]);
 	/*
 	 * TODO
-	 * 
+	 *
 	 * initCrudLayout : function(routeHelper){ if((!this.layout) ||
 	 * this.layout.getTypeName() != "AppLayout"){ //
 	 * console.log("AbstractController#initCrudLayout, calling
 	 * this.ensureActiveLayout()"); this.ensureActiveLayout(); } else{ //
 	 * console.log("AbstractController#initCrudLayout, not updating
 	 * this.layout: "+this.layout.getTypeName()); } var _self = this;
-	 * 
+	 *
 	 *   var tabLayout = new
 	 * TabLayout({collection: this.tabs});
-	 * 
+	 *
 	 * vent.on("childView:openGridRowInTab", function(itemModel) {
 	 * vent.trigger("openGridRowInTab", itemModel); });
 	 * vent.on("openGridRowInTab", function(itemModel) {
@@ -3720,7 +3741,7 @@ define("calipso", function(require) {
 	 * Calipso.navigate("client/"+_self.lastMainNavTabName+"/"+itemModel.get("id"), { //
 	 * trigger : false // }); _self.syncMainNavigationState(null,
 	 * itemModel.get("id")); });
-	 * 
+	 *
 	 * this.layout.contentRegion.show(tabLayout); },
 	 */
 
@@ -3775,7 +3796,7 @@ define("calipso", function(require) {
 		}
 		return Calipso._baseUrl;
 	}
-	
+
 
 	//
 	Calipso.util.Session = Backbone.Model.extend({
@@ -3804,10 +3825,10 @@ define("calipso", function(require) {
 			});
 			/**
 			 * Check if the loggedin user has any of the given roles. Any numberof roles can be passed to the helper.
-			 * @example 
+			 * @example
 			 *  {{#ifUserInRole "ROLE_MANAGER" "ROLE_ADMIN"}}  <p>User is either a Manager or an Administrator! </p>{{/ifUserInRole}}
 			 */
-			// TODO: move these helpers to root scope  
+			// TODO: move these helpers to root scope
 			// and replace _this.userDetails with Calipso.session.userDetails
 			Handlebars.registerHelper("ifUserInRole", function() {
 				var hasRole = false;
@@ -3815,7 +3836,7 @@ define("calipso", function(require) {
 				if (_this.isAuthenticated()) {
 					//Last argument is the options object.
 					var options = arguments[arguments.length - 1];
-					
+
 					// now get input roles, the ones to check for just a single match
 					var inputRoles = [];
 					for (var i = 0; i < arguments.length - 1; ++i) {
@@ -3830,7 +3851,7 @@ define("calipso", function(require) {
 							var ownedRoles = _this.userDetails.get("roles");
 							for (var k = 0; k < ownedRoles.length; k++) {
 								var ownedRole = ownedRoles[k];
-//								console.log("ifHasRole, comparing input role '" + inputRole + 
+//								console.log("ifHasRole, comparing input role '" + inputRole +
 //										"' to user rolee '" + ownedRole.name);
 								if (inputRole == ownedRole.name) {
 									hasRole = true;
@@ -3843,7 +3864,7 @@ define("calipso", function(require) {
 
 				}
 			});
-			
+
 
 			/**
 			 * Format a date using Moment.js
@@ -4001,12 +4022,12 @@ define("calipso", function(require) {
 		}
 
 	});
-	
+
 	Calipso.isAuthenticated = function(){
 		return Calipso.session && Calipso.session.isAuthenticated();
 	}
-	
-	
+
+
 	////////////////////////////////////////////////////////////////
 	// Handlebars Helpers
 	////////////////////////////////////////////////////////////////
@@ -4040,7 +4061,7 @@ define("calipso", function(require) {
 	Calipso.util.cache = {
 		collections : {},
 		/**
-		 * Returns a cache entry key as 
+		 * Returns a cache entry key as
 		 * <code>collectionOptions.model.getPathFragment + "/" + (collectionOptions.useCase ? collectionOptions.useCase : "search")</code>
 		 * @param collectionOptions the options used to create the collection and cache entry key
 		 */
@@ -4051,9 +4072,9 @@ define("calipso", function(require) {
 		},
 		/**
 		 * Obtain a cached collecion for the given model type, criteria and use case.
-		 * The method will return the cached collection if a match is available 
-		 * with the same search criteria or a new one otherwise. 
-		 * 
+		 * The method will return the cached collection if a match is available
+		 * with the same search criteria or a new one otherwise.
+		 *
 		 * @param collectionOptions the options used to create the collection
 		 * @return the collection created or matching the given options
 		 */
@@ -4102,7 +4123,7 @@ define("calipso", function(require) {
 			return collection;
 		},
 		/**
-		 * Create a fresh collection with the given options and replace the 
+		 * Create a fresh collection with the given options and replace the
 		 * corresponding cache entry if one exists.
 		 * @param collectionOptions the options used to create the collection
 		 */
@@ -4111,7 +4132,7 @@ define("calipso", function(require) {
 			return this.getCollection(options);
 		},
 		/**
-		 * Perform a single-level property comparison 
+		 * Perform a single-level property comparison
 		 * of objects that correspond to HTTP parameters
 		 */
 		compareSearchCriteria : function(o1, o2) {
@@ -4243,12 +4264,12 @@ define("calipso", function(require) {
 		register : function(){
 			console.log("Calipso.controller.AbstractController#register");
 			this.showLayoutForModel(new Calipso.model.UserRegistrationModel());
-			
+
 		},
 		/**
 		 * Instantiate and show a layout for the given model
 		 * @param  {Calipso.model.GenericModel} givenModel the model for which the layout will be shown
-		 * @param  {Calipso.view.abstractLayout]} the layout type to use. If absent the method will 
+		 * @param  {Calipso.view.abstractLayout]} the layout type to use. If absent the method will
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
 		showLayoutForModel : function(givenModel, GivenModelLayoutType){
@@ -4270,7 +4291,7 @@ define("calipso", function(require) {
 		},
 		/**
 		 * Get the model type corresponding to the given
-		 * business key/URI componenent 
+		 * business key/URI componenent
 		 */
 		getModelType : function(modelTypeKey) {
 			// load model Type
@@ -4297,19 +4318,19 @@ define("calipso", function(require) {
 		},
 		/**
 		 * Get a model representing the current request.
-		 * 
+		 *
 		 * For an example, consider the URL [api-root]/users/[some-id]. First,
 		 * a model class is loaded based on the URL fragment representing the
 		 * type, e.g. "users" for UserModel.
-		 * 
+		 *
 		 * A model instance is then created using some-id if provided or
 		 * "search" otherwise. If a backbone supermodel instance is already
 		 * cached, it is reused.
-		 * 
+		 *
 		 * In case of "search" a collection of the given model type is
 		 * initialized but, similarly to the model instance, it is not fetched
 		 * from the server.
-		 * 
+		 *
 		 * @param {string}
 		 *           modelTypeKey the URL fragment representing the model type
 		 *           key, e.g. "users" for UserModel
@@ -4326,8 +4347,8 @@ define("calipso", function(require) {
 			console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams + ", type: " + ModelType.prototype.getTypeName());
 
 			// Obtain a model for the view:
-			// if a model id is present, obtain a promise 
-			// for the corresponding instance 
+			// if a model id is present, obtain a promise
+			// for the corresponding instance
 			var modelForRoute;
 			if (modelId) {
 				console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
@@ -4363,10 +4384,10 @@ define("calipso", function(require) {
 					collectionOptions.data = httpParams;
 				}
 				modelForRoute.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
-			
-				
+
+
 			}
-			
+
 			//console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.prototype.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
 			return modelForRoute;
 
@@ -4376,12 +4397,12 @@ define("calipso", function(require) {
 			var _self = this;
 			var httpParams = Calipso.getHttpUrlParams();
 
-			// get the model the report focuses on 
+			// get the model the report focuses on
 			var ModelType = this.getModelType(mainRoutePart);
 			if (!Calipso.isAuthenticated() && !ModelType.prototype.isPublic()) {
 				return this._redir("login");
 			}
-			
+
 			// build a report dataset collection using the model's report URL
 			var collectionOptions = {
 				model : Calipso.model.ReportDataSetModel,
@@ -4394,7 +4415,7 @@ define("calipso", function(require) {
 				collectionOptions.data = httpParams;
 			}
 			var reporDataSetCollection = Calipso.util.cache.getCollection(collectionOptions);
-			
+
 			// fetch and render report
 			var renderFetchable = function() {
 				console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
@@ -4405,12 +4426,13 @@ define("calipso", function(require) {
 			};
 			console.log("AbstractController#mainNavigationReportRoute calling reporDataSetCollection.fetch");
 			reporDataSetCollection.fetch({
+				//url : collectionUrl,
 				data : reporDataSetCollection.data
 			}).then(renderFetchable);
-		
+
 		},
 		/**
-		 * 
+		 *
 		 */
 		mainNavigationSearchRoute : function(mainRoutePart, queryString) {
 			// console.log("AbstractController#mainNavigationSearchRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
@@ -4501,10 +4523,10 @@ define("calipso", function(require) {
 
 
 	//////////////////////////////////////////////////////
-	// user Registration: model, layout etc. Uses the 
+	// user Registration: model, layout etc. Uses the
 	// userRegistrations path fragment/route.
 	//////////////////////////////////////////////////////
-	
+
 	Calipso.view.UserRegistrationLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
 	/** @lends Calipso.view.UserRegistrationLayout.prototype */
 	{
@@ -4515,7 +4537,7 @@ define("calipso", function(require) {
 
 		onGenericFormSaved : function(model){
 			// if the user is active just navigate to login
-			// TODO: add message 
+			// TODO: add message
 			if(model.get("active") == true){
 				console.log("Calipso.view.UserRegistrationLayout#onGenericFormSaved, user is active, saving to session");
 
@@ -4538,14 +4560,14 @@ define("calipso", function(require) {
 
 	// User Registration Model
 	// -----------------------
-	
+
 	/**
 	 * Subclasses UserModel to provide layout, forms etc. configuration
 	 * for user registration flows.
 	 */
 	Calipso.model.UserRegistrationModel = Calipso.model.UserModel .extend(
 	/** @lends Calipso.model.UserRegistrationModel */{
-		
+
 	}, {
 		// static members
 		parent: Calipso.model.UserModel
@@ -4561,12 +4583,12 @@ define("calipso", function(require) {
 	/**
 	 * Get the model class URL fragment corresponding this class
 	 * @returns the URL path fragment as a string
-	 
+
 	Calipso.model.UserRegistrationModel.prototype.getPathFragment = function(instance) {
 		return "userRegistrations";
 	};*/
 	/**
-	 * Override this to define a default layout view at a static context for your subclass, 
+	 * Override this to define a default layout view at a static context for your subclass,
 	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
 	 */
 	Calipso.model.UserRegistrationModel.prototype.getLayoutViewType = function(instance) {
@@ -4585,9 +4607,9 @@ define("calipso", function(require) {
 		};
 		var passwordConfirm = {
 			type : 'Password',
-			validators: [{ 
-				type: 'match', field: 'password', message: 'Passwords must match!' 
-			}] 
+			validators: [{
+				type: 'match', field: 'password', message: 'Passwords must match!'
+			}]
 		};
 		return {//
 			firstName : {
@@ -4604,7 +4626,7 @@ define("calipso", function(require) {
 			},
 			email : {
 				"search" : {
-					title : "Username or email", 
+					title : "Username or email",
 					type : 'Text',
 				},
 				"default" : {

@@ -143,7 +143,9 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	@Override
 	@Transactional(readOnly = false)
 	public T update(T resource) {
-		LOGGER.info("update, resource: " + resource);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("update, resource: " + resource);
+		}
 		Map<String, Metadatum> metadata = noteMetadata(resource);
 		T saved = super.update(resource);
 		persistNotedMetadata(metadata, saved);
@@ -153,7 +155,9 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 
 	private void persistNotedMetadata(Map<String, Metadatum> metadata, T saved) {
 
-		LOGGER.info("persistNotedMetadata, noted: " + metadata);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("persistNotedMetadata, noted: " + metadata);
+		}
 		if (!CollectionUtils.isEmpty(metadata)) {
 			MetadataSubject subject = (MetadataSubject) saved;
 			Metadatum[] metaArray = metadata.values().toArray(
@@ -173,9 +177,13 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 			metadata = ((MetadataSubject) resource).getMetadata();
 			((MetadataSubject) resource)
 					.setMetadata(new HashMap<String, Metadatum>());
-			LOGGER.info("noteMetadata, noted: " + metadata);
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("noteMetadata, noted: " + metadata);
+			}
 		} else {
-			LOGGER.info("noteMetadata, not a metadata subject");
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("noteMetadata, not a metadata subject");
+			}
 		}
 		return metadata;
 	}
@@ -187,7 +195,9 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	@Override
 	@Transactional(readOnly = false)
 	public void addMetadatum(ID subjectId, Metadatum dto) {
-		LOGGER.info("addMetadatum subjectId: "+subjectId + ", metadatum: "+dto);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("addMetadatum subjectId: "+subjectId + ", metadatum: "+dto);
+		}
 		this.repository.addMetadatum(subjectId, dto.getPredicate(),
 				dto.getObject());
 	}
@@ -208,8 +218,10 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	@Override
 	@Transactional(readOnly = false)
 	public void removeMetadatum(ID subjectId, String predicate) {
-		LOGGER.info("removeMetadatum subjectId: " + subjectId + ", predicate: "
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("removeMetadatum subjectId: " + subjectId + ", predicate: "
 				+ predicate);
+		}
 		this.repository.removeMetadatum(subjectId, predicate);
 	}
 	

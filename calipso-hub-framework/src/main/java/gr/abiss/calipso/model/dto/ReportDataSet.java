@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -68,7 +69,7 @@ public class ReportDataSet {
 	private String id;
 	private String label;
 	private ReportDataSetSubject subject;
-	private List<ReportDataEntry> entries;
+	private TreeSet<ReportDataEntry> entries;
 	/**
 	 * 
 	 * @param dateFrom the report starting date
@@ -165,10 +166,11 @@ public class ReportDataSet {
 	
 	public void addEntry(ReportDataEntry entry) {
 		if(this.entries == null){
-			this.entries = new LinkedList<ReportDataEntry>();
+			this.entries = new TreeSet<ReportDataEntry>();
 		}
 
 		LOGGER.info("Adding entry: " + ReflectionToStringBuilder.toString(entry));
+		this.entries.remove(entry);
 		this.entries.add(entry);
 	}
 
@@ -180,11 +182,11 @@ public class ReportDataSet {
 		this.subject = subject;
 	}
 
-	public List<ReportDataEntry> getEntries() {
+	public TreeSet<ReportDataEntry> getEntries() {
 		return entries;
 	}
 
-	public void setEntries(List<ReportDataEntry> entries) {
+	public void setEntries(TreeSet<ReportDataEntry> entries) {
 		this.entries = entries;
 	}
 

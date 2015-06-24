@@ -33,6 +33,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -332,13 +333,19 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			@RequestParam(value = "aggregateField", required = false) String aggregateField,
 			@RequestParam(value = "aggregateFunction", required = false, defaultValue = "COUNT") AggregateFunction aggregateFunction) {
 		// default date region is the current day
-		Date now = new Date();
-		if(dateFrom == null){
-			dateFrom = DateUtils.truncate(now, Calendar.DATE);
-		}
-		if(dateTo == null){
-			dateTo = DateUtils.addMilliseconds(DateUtils.ceiling(now, Calendar.DATE), -1);
-		}
+		//Date now = new Date();
+
+		//if(dateFrom == null){
+			GregorianCalendar start = new GregorianCalendar();
+			start.set(Calendar.MONTH, start.get(Calendar.MONTH) - 1);
+			dateFrom = start.getTime();
+		//}
+		dateFrom = DateUtils.truncate(dateFrom, Calendar.DATE);
+		//if(dateTo == null){
+			dateTo = new Date();
+		//}
+		dateTo = DateUtils.addMilliseconds(DateUtils.ceiling(dateTo, Calendar.DATE), -1);
+		
 		Map<String, String[]> paramsMap = request.getParameterMap();
 		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + dateFrom + ", dateTo: " + dateTo + ", aggregateField: " + aggregateField + 
 				", aggregateFunction: " + aggregateFunction);

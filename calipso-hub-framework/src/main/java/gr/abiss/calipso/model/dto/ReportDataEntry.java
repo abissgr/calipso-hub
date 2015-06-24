@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
@@ -56,15 +57,10 @@ public class ReportDataEntry implements Comparable<ReportDataEntry>{
 
 	@Override
 	public int compareTo(ReportDataEntry that) {
-		if(this.getLabel() != null){
-			return this.getLabel().compareTo(that.getLabel());
-		}
-		else if(that.getLabel() != null){
-			return that.getLabel().compareTo(this.getLabel());
-		}
-		else{
-			return 0;
-		}
+	     return new CompareToBuilder()
+	       //.appendSuper(super.compareTo(o)
+	       .append(this.getLabel(), that.getLabel())
+	       .toComparison();
 	}
 
 	@Override
