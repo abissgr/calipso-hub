@@ -33,11 +33,11 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			'logout' : 'logout',
 			'register' : 'register',
 
-			'reports/:mainRoutePart' : 'mainNavigationReportRoute',
-			'reports/:mainRoutePart/' : 'mainNavigationReportRoute',
-			'reports/:mainRoutePart/?*queryString' : 'mainNavigationReportRoute',
-			'reports/:mainRoutePart?*queryString' : 'mainNavigationReportRoute',
-			
+			':mainRoutePart/reports' : 'mainNavigationReportRoute',
+			':mainRoutePart/reports/' : 'mainNavigationReportRoute',
+			':mainRoutePart/reports/?*queryString' : 'mainNavigationReportRoute',
+			':mainRoutePartreports?*queryString' : 'mainNavigationReportRoute',
+
 			':mainRoutePart' : 'mainNavigationSearchRoute',
 			':mainRoutePart/' : 'mainNavigationSearchRoute',
 			':mainRoutePart/?*queryString' : 'mainNavigationSearchRoute',

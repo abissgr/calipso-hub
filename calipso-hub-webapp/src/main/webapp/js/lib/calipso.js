@@ -153,7 +153,7 @@ define("calipso", function(require) {
 			var parseModel = function(ModelType) {
 				var model = new ModelType();
 				// console.log("initialize model type: " + ModelType.prototype.getTypeName());
-				if (model.getTypeName() != "GenericModel") {
+				if (model.getTypeName() != "Calipso.model.GenericModel" && model.getTypeName() != "Calipso.model.ReportDataSetModel") {
 
 					Calipso.modelTypesMap[model.getPathFragment()] = ModelType;
 					// console.log("initialized model type: " + model.getTypeName() + " and key: " + model.getPathFragment());
@@ -572,7 +572,7 @@ define("calipso", function(require) {
 			var itemsArray = response;
 			if (response.content) {
 				itemsArray = response.content;
-				this.total = response.totalElements;
+				this.totalRecords = response.totalElements;
 				this.totalPages = response.totalPages;
 			} else {
 				this.total = itemsArray.length;
@@ -920,6 +920,19 @@ define("calipso", function(require) {
 			return this.prototype.getCollectionViewType(this);
 		},
 		/**
+		 * Get the collection view type for collections of this model. To specify a collection
+		 * view for your model under a static or instance context, override
+		 * {@link Calipso.model.GenericModel.prototype.getCollectionViewType} or
+		 * {@link getCollectionViewType} respectively in your subclass.
+		 *
+		 * Collection views defined this way are picked up by layout views..
+		 *
+		 * @see {@link Calipso.model.GenericModel.prototype.getCollectionViewType}
+		 */
+		getReportCollectionViewType : function() {
+			return this.prototype.getReportCollectionViewType(this);
+		},
+		/**
 		 * Get the item view type for this model. To specify an item view for your model under a static
 		 * or instance context, override {@link Calipso.model.GenericModel.prototype.getItemViewType}
 		 * or {@link getItemViewType} respectively in your subclass.
@@ -982,7 +995,7 @@ define("calipso", function(require) {
 			return formSchema;
 		},
 		/**
-		 * Get the form schema for a specific action like "create", "update" or "search".
+		 * Get the form schema for a specific action like "create", "update", "search" or "report".
 		 *
 		 * To define form schemas for your subclass under a static or instance context, override
 		 * {@link Calipso.model.GenericModel.prototype.getPrototypeFormSchemas} or {@link getFormSchemas} respectively.
@@ -1064,7 +1077,7 @@ define("calipso", function(require) {
 		/** Retrieve the form schema every time it is accessed */
 		FORM_SCHEMA_CACHE_NONE : "FORM_SCHEMA_CACHE_NONE",
 		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_CLIENT,
-		typeName : "GenericModel",
+		typeName : "Calipso.model.GenericModel",
 		label : "GenericModel",
 
 	});
@@ -1131,7 +1144,7 @@ define("calipso", function(require) {
 	 * @returns the class name as a string
 	 */
 	Calipso.model.GenericModel.prototype.getTypeName = function(instance) {
-		return "GenericModel";
+		return "Calipso.model.GenericModel";
 	};
 	/**
 	 * Check if the model type requires it's search collections to be cached
@@ -1176,6 +1189,16 @@ define("calipso", function(require) {
 	Calipso.model.GenericModel.prototype.getCollectionViewType = function(instance) {
 		//console.log("GenericModel.prototype.getCollectionViewType() called, will return ModelDrivenCollectionGridView");
 		return Calipso.view.ModelDrivenCollectionGridView;
+	};
+
+	/**
+	 * Override this to define a default report view like the
+	 * default {@link ModelDrivenCollectionGridView}
+	 * at a static context for your subclass,
+	 *@returns {@link Calipso.view.ModelDrivenReportView}
+	 */
+	Calipso.model.GenericModel.prototype.getReportCollectionViewType = function(instance) {
+		return Calipso.view.ModelDrivenReportView;
 	};
 
 	/**
@@ -1518,10 +1541,120 @@ define("calipso", function(require) {
 
 	};
 
+		// Report Dataset Model
+		// This model is used by the router controller when a
+		// subjectModelTypeFragment/reports
+		// route is matched, where the subjectModelType matches a model type's URL fragent.
+		// The controller uses the ReportDataSetModel
+		// as the route model after configuring it with the targe rRoute model
+		// type, from which the ReportDataSetModel obtains any custom configuration
+		// for route layouts, views and form/grid schemas according to the following table:
+		// ReportDataSet                    ModelType
+		// getLayoutViewType()              prototype.getReportLayoutType()
+		// getCollectionViewType()          prototype.getReportCollectionViewType()
+		// getPathFragment()                prototype.getPathFragment() + "/reports"
+		// getFormSchemaKey()               "report"
+		// getReportKpiOptions()            prototype.getReportKpiOptions(this.get("reportType"/*URL param*/)
+		// -----------------------------------------
 	Calipso.model.ReportDataSetModel = Calipso.model.GenericModel.extend({
-		getGridSchema : function(attributeName){
+		subjectModelType : null,
+		// TODO: inline form tmpl
+		defaults : {
+			formTemplateKey : "horizontal",
+			kpi : "sum",
+			timeUnit : "DAY",
+			reportType : null,
+		},
+		initialize : function() {
+			Calipso.model.GenericModel.prototype.initialize.apply(this, arguments);
+			//this.subjectModelType = options.subjectModelType;
+			var subjectModelType = this.get("subjectModelType");
+			console.log("Calipso.model.ReportDataSetModel#initialize, subjectModelType: ");
+			console.log(subjectModelType);
+			console.log("Calipso.model.ReportDataSetModel#initialize, attributes: ");
+			console.log(this.attributes);
+			if(!(subjectModelType && subjectModelType.prototype.getPathFragment)){
+				console.log("option 'subjectModelType' is required and must extend Calipso.model.GenericModel");
+			}
+		},
+		getPathFragment : function(){
+			return this.get("subjectModelType").prototype.getPathFragment() + "/reports";
+		},
+		getFormSchemaKey : function(){
+			return "report";
+		},
+		getCollectionViewType : function(){
+			return this.get("subjectModelType").prototype.getReportCollectionViewType();
+		},
+		getLayoutViewType : function(){
+			return this.get("subjectModelType").prototype.getReportLayoutType
+				? this.get("subjectModelType").prototype.getReportLayoutType()
+				: Calipso.view.ModelDrivenReportLayout;
+		},
+		getReportTypeOptions : function(){
+			return this.get("subjectModelType").prototype.getReportTypeOptions
+				? this.get("subjectModelType").prototype.getReportTypeOptions()
+				: null;
+		},
+		getReportKpiOptions : function(reportType){
+			var options;
+			if(!reportType){
+				reportType = this.get("reportType");
+			}
+
+			if(this.get("subjectModelType").prototype.getReportKpiOptions){
+				options = this.get("subjectModelType").prototype.getReportKpiOptions(reportType);
+			}
+
+			if(!options){
+				options = [
+					{ val: "sum", label: 'Sum' },
+					{ val: "count", label: 'Count' }
+				];
+			}
+			return options;
+		},
+		getFormSchema : function(actionName){
+			console.log("Calipso.model.ReportDataSetModel#getFormSchema actionName: " + actionName);
+			var formSchema = {};
+			var reportTypeOptions = this.getReportTypeOptions();
+			if(reportTypeOptions){
+				formSchema.reportType = {
+					type : 'Select',
+					options : reportTypeOptions,
+					// TODO: validate option
+					// validators : [ 'required' ]
+				};
+			}
+
+			formSchema.kpi = {
+				name: "KPI",
+				type: 'Select',
+				options : this.getReportKpiOptions(),
+				// TODO: validate option
+				// validators : [ 'required' ]
+			};
+			formSchema.timeUnit = {
+				name: "Time Unit",
+				type: 'Select',
+				options : [
+					{ val: "DAY", label: 'Day' },
+					{ val: "MONTH", label: 'Month' }
+				],
+				// TODO: validate option
+				// validators : [ 'required' ]
+			};
+			console.log("Calipso.model.ReportDataSetModel#getFormSchema formSchema: ");
+			console.log(formSchema);
+			return formSchema;
+		},
+		getGridSchema : function(kpi){
+		console.log("Calipso.model.ReportDataSetModel#getGridSchema kpi: " + kpi);
 			// sum or count
-			if(!attributeName){attributeName = "sum";}
+			if(!kpi){
+				kpi = this.get("kpi");
+				console.log("Calipso.model.ReportDataSetModel#getGridSchema this.kpi: " + kpi);
+			}
 			var schema = [{
 				name : "label",
 				label : "Name",
@@ -1532,7 +1665,7 @@ define("calipso", function(require) {
 			var entries = this.wrappedCollection.first().get("entries");
 			for(var i = 0 ; i < entries.length; i++){
 				schema.push({
-					name : "entries." + i + ".entryData." + attributeName,
+					name : "entries." + i + ".entryData." + kpi,
 					label : entries[i].label,
 					editable : false,
 					cell : Calipso.components.backgrid.ChildStringAttributeCell,
@@ -1553,14 +1686,14 @@ define("calipso", function(require) {
 		return "Calipso.model.ReportDataSetModel";
 	};
 
-	Calipso.model.ReportDataSetModel.prototype.getPathFragment = function() {
+	/*Calipso.model.ReportDataSetModel.prototype.getPathFragment = function() {
 		return "Calipso.model.ReportDataSetModel";
-	};
+	};*/
 
 	Calipso.model.ReportDataSetModel.prototype.getCollectionViewType = function() {
 		return Calipso.view.ModelDrivenReportView;
 	};
-
+/*
 	Calipso.model.ReportDataSetModel.prototype.getFormSchemas = function() {
 		console.log("ReportDatasetModel.prototype.getFormSchemas() called, will return undefined");
 		return {//
@@ -1573,6 +1706,7 @@ define("calipso", function(require) {
 			},
 		};
 	};
+	*/
 	//////////////////////////////////////////////////
 	// UI components
 	//////////////////////////////////////////////////
@@ -1580,18 +1714,31 @@ define("calipso", function(require) {
 	Calipso.components.backboneform = {};
 	Calipso.components.backboneformTemplates = {
 			vertical :  _.template('\
-				    <div class="form-group field-<%= key %>">\
-				      <label class="control-label" for="<%= editorId %>">\
-				        <% if (titleHTML){ %><%= titleHTML %>\
-				        <% } else { %><%- title %><% } %>\
-				      </label>\
-				      <div class="">\
-				        <span data-editor></span>\
-				        <p class="help-block" data-error></p>\
-				        <p class="help-block"><%= help %></p>\
-				      </div>\
-				    </div>\
-				  ')
+		    <div class="form-group field-<%= key %>">\
+		      <label class="control-label" for="<%= editorId %>">\
+		        <% if (titleHTML){ %><%= titleHTML %>\
+		        <% } else { %><%- title %><% } %>\
+		      </label>\
+		      <div class="">\
+		        <span data-editor></span>\
+		        <p class="help-block" data-error></p>\
+		        <p class="help-block"><%= help %></p>\
+		      </div>\
+		    </div>\
+		  '),
+			inline :  _.template('\
+		    <div class="form-group field-<%= key %>">\
+		      <label class="control-label" for="<%= editorId %>">\
+		        <% if (titleHTML){ %><%= titleHTML %>\
+		        <% } else { %><%- title %><% } %>\
+		      </label>\
+		      <div class="">\
+		        <span data-editor></span>\
+		        <p class="help-block" data-error></p>\
+		        <p class="help-block"><%= help %></p>\
+		      </div>\
+		    </div>\
+		  ')
 	};
 	Calipso.components.backgrid.ViewRowCell = Backgrid.StringCell.extend(
 	/** @lends Calipso.components.backgrid.ViewRowCell.prototype */
@@ -1968,6 +2115,7 @@ define("calipso", function(require) {
 					'<i class="fa fa-caret-down"></i>',
 					view.el);
 	};
+
 	Calipso.view.HeaderView = Calipso.view.AbstractLayout.extend(
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
@@ -2247,7 +2395,6 @@ define("calipso", function(require) {
 		}
 	});
 
-
 	Calipso.view.ModelDrivenSearchLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
 	/** @lends Calipso.view.ModelDrivenSearchLayout.prototype */
 	{
@@ -2348,6 +2495,16 @@ define("calipso", function(require) {
 	}, {
 		getTypeName : function() {
 			return "ModelDrivenSearchLayout";
+		}
+	});
+
+	Calipso.view.ModelDrivenReportLayout = Calipso.view.ModelDrivenSearchLayout.extend(
+	/** @lends Calipso.view.ModelDrivenReportLayout.prototype */
+	{
+		template : require('hbs!template/md-report-layout'),
+	}, {
+		getTypeName : function() {
+			return "Calipso.view.ModelDrivenReportLayout";
 		}
 	});
 	/*
@@ -2815,6 +2972,7 @@ define("calipso", function(require) {
 		},
 		onShow : function() {
 			var _self = this;
+			// in case of a report we need a grid schema key
 			console.log("ModelDrivenCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
 			var gridSchema = _self.model.getGridSchema();
 			console.log("ModelDrivenCollectionGridView.onShow,  _self.model.getGridSchema: ");
@@ -2980,7 +3138,7 @@ define("calipso", function(require) {
 			"0, 0, 0", //"#000000" , // black
 		],
 		initialize : function(options) {
-			console.log("ReportView.initialize, options: " + options);
+			//console.log("ReportView.initialize, options: " + options);
 			Calipso.view.ModelDrivenCollectionGridView.prototype.initialize.apply(this, arguments);
 			var self = this;
 			if(options && options.chartOptions){
@@ -2997,9 +3155,12 @@ define("calipso", function(require) {
 //			$canvas.attr("width", $canvas.parent().attr("width"));
 //			$canvas.attr("height", $canvas.parent().attr("height"));
 			var ctx = canvas.getContext("2d");
-
+				var chartData = this.getDataForAttribute("sum");
 			var dataTotals = [];
-			_.each(this.data.datasets, function(dataset, index) {
+			_.each(chartData.datasets, function(dataset, index) {
+
+				//console.log("Calipso.view.ModelDrivenReportView#onShow each:chartData, dataset: ");
+				//console.log(dataset);
 				  var color = _this.colors[index];
 				  dataset.fillColor = "rgba("+color+",0.02)";
 				  dataset.strokeColor = "rgba("+color+",0.8)";
@@ -3021,7 +3182,7 @@ define("calipso", function(require) {
 				  });
 			});
 
-			this.chart = new Chart(ctx).Line(this.data, this.chartOptions);
+			this.chart = new Chart(ctx).Line(chartData, this.chartOptions);
 
 
 			var canvasTotals = this.$(".chart-totals")[0];
@@ -3045,53 +3206,58 @@ define("calipso", function(require) {
 //				this.chart.redraw();
 //			}
 		},
+		getDataForAttribute : function(entryAttribute){
+			var data = {};
+			var reportDataSets = this.model.wrappedCollection;
+			//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, datasets: ");
+			//console.log(reportDataSets);
 
-
-		data : {
-			    labels: ["January", "February", "March", "April", "May", "June", "July"],
-			    datasets: [
-						        {
-						            label: "My 1st",
-						            data: [65, 50, 80, 81, 56, 55, 40]
-						        },
-						        {
-						            label: "My 2nd",
-						            data: [35, 39, 70, 84, 57, 37, 78]
-						        },
-						        {
-						            label: "My 3rd",
-						            data: [55, 49, 82, 66, 61, 42, 59]
-						        },
-						        {
-						            label: "My 4th",
-						            data: [95, 59, 58, 35, 60, 73, 44]
-						        },
-						        {
-						            label: "My 5th",
-						            data: [95, 32, 69, 46, 44, 65, 74]
-						        },
-						        {
-						            label: "My 6th",
-						            data: [62, 45, 72, 53, 40, 52, 90]
-						        },
-//						        {
-//						            label: "My 7th",
-//						            data: [65, 59, 80, 81, 56, 55, 40]
-//						        },
-//						        {
-//						            label: "My 6th",
-//						            data: [25, 90, 09, 92, 83, 98, 70]
-//						        },
-//						        {
-//						            label: "My 9th",
-//						            data: [57, 67, 29, 39, 42, 92, 46]
-//						        },
-//						        {
-//						            label: "My 10th",
-//						            data: [88, 73, 86, 39, 29, 36, 59]
-//						        },
-			    ]
+			// add dataset labels
+			var labels = [];
+			var entries = reportDataSets.first().get("entries");
+			for(var i = 0 ; i < entries.length; i++){
+				labels.push(entries[i].label);
 			}
+			data.labels = labels;
+			//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, data labels: ");
+			//console.log(data.labels);
+
+			// add datasets
+			var datasets = [];
+
+			reportDataSets.each(function(child, index) {
+				// the new dataset...
+				//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, child: ");
+				//console.log(child);
+				var dataset = {};
+
+				// ... it's label...
+				dataset.label = child.get("label");
+
+				// ... and it's data entries
+				var dataSetData = [];
+				for(var i = 0 ; i < child.get("entries").length; i++){
+					//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, child.entries: ");
+					//console.log(child.get("entries"));
+					dataSetData.push(child.get("entries")[i].entryData[entryAttribute]);
+				}
+				dataset.data = dataSetData;
+				//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, dataset.data: ");
+				//console.log(dataset.data);
+
+				// add the dataset
+				datasets.push(dataset);
+			}, reportDataSets);
+
+			// add the datasets to the returned data
+			data.datasets = datasets;
+
+			// return the data
+			//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, returns data: ");
+			//console.log(data);
+			return data;
+
+		},
 
 	});
 
@@ -3153,7 +3319,7 @@ define("calipso", function(require) {
 		}
 	});
 
-	//
+	// Model Driven Form View
 	Calipso.view.GenericFormView = Marionette.ItemView.extend({
 		/**
 		 * Cals the static method of the same name. Returns a Backbone.Form template
@@ -3197,6 +3363,9 @@ define("calipso", function(require) {
 			}
 			if (options.formTemplateKey) {
 				this.formTemplateKey = options.formTemplateKey;
+			}
+			else if (this.model.get("formTemplateKey")) {
+				this.formTemplateKey = this.model.get("formTemplateKey");
 			}
 			// use vertical form for searches
 			else if(this.formSchemaKey.slice(0, 6) == "search"){
@@ -3306,7 +3475,8 @@ define("calipso", function(require) {
 			// get appropriate schema
 			console.log("GenericFormView.onShow, this.formSchemaKey: "+this.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-			console.log("GenericFormView#onShow, formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: " + formSchema);
+			console.log("GenericFormView#onShow, formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: ");
+			console.log(formSchema);
 
 			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering)
 			if (formSchema && _.size(formSchema) > 0) {
@@ -4066,7 +4236,7 @@ define("calipso", function(require) {
 		 * @param collectionOptions the options used to create the collection and cache entry key
 		 */
 		buildCacheEntryKey : function(collectionOptions) {
-			var key = collectionOptions.model.prototype.getPathFragment() + "/" + (collectionOptions.useCase ? collectionOptions.useCase : "search");
+			var key = collectionOptions.pathFragment ? collectionOptions.pathFragment : collectionOptions.model.prototype.getPathFragment() + "/" + (collectionOptions.useCase ? collectionOptions.useCase : "search");
 			//consolelog("Calipso.util.cache#buildCacheEntryKey: " + key);
 			return key;
 		},
@@ -4385,7 +4555,6 @@ define("calipso", function(require) {
 				}
 				modelForRoute.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
 
-
 			}
 
 			//console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.prototype.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
@@ -4404,9 +4573,11 @@ define("calipso", function(require) {
 			}
 
 			// build a report dataset collection using the model's report URL
+			var reportModel = new Calipso.model.ReportDataSetModel({subjectModelType: ModelType});
 			var collectionOptions = {
 				model : Calipso.model.ReportDataSetModel,
-				url : Calipso.session.getBaseUrl() + "/api/rest/" + ModelType.prototype.getPathFragment() + "/reports"
+				url : Calipso.session.getBaseUrl() + "/api/rest/" + reportModel.getPathFragment(),
+				pathFragment : reportModel.getPathFragment(),
 			};
 			if (httpParams) {
 				if (httpParams[""] || httpParams[""] == null) {
@@ -4420,7 +4591,6 @@ define("calipso", function(require) {
 			var renderFetchable = function() {
 				console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
 				// show the layout type corresponding to the requested model
-				var reportModel = new Calipso.model.ReportDataSetModel();
 				reportModel.wrappedCollection = reporDataSetCollection;
 				_self.showLayoutForModel(reportModel);
 			};
