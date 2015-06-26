@@ -475,11 +475,11 @@ define("calipso", function(require) {
   	*/
     queryParams: {
       totalPages: "totalPages",
-			pageSize: "size",
-			currentPage: "number",
+		pageSize: "size",
+		currentPage: "number",
       totalRecords: "totalElements",
       sortKey: "properties",
-			order : "sort",//"direction"?
+      order : "sort",//"direction"?
       directions: {
         "-1": "ASC",
         "1": "DESC"
@@ -599,32 +599,11 @@ define("calipso", function(require) {
 			var itemsArray = response;
 			if (response.content) {
 				itemsArray = response.content;
-				this.totalRecords = response.totalElements;
-				this.totalPages = response.totalPages;
 			} else {
 				this.total = itemsArray.length;
 				this.totalPages = 1;
 			}
-
-			superModelAwareInstances = [];
-			//console.log("GenericCollection#parse, items: " + itemsArray.length+", model: ");
-			//console.log(_self.model);
-			//console.log("GenericCollection#parse, of type: " +  _self.model.prototype.getTypeName());
-			var modelItem;
-			var superModelAwareInstance;
-			for (var i = 0; i < itemsArray.length; i++) {
-				modelItem = itemsArray[i];
-				if (modelItem) {
-					// make Backbone Supermodel aware of this item
-					superModelAwareInstance = _self.model.create(modelItem);
-					superModelAwareInstance.collection = _self;
-					// add to results
-					//console.log("GenericCollection#parse adding: " + superModelAwareInstance.getTypeName() + '#' + superModelAwareInstance.get("id"));
-					superModelAwareInstances.push(superModelAwareInstance);
-				}
-			}
-			// _.each(response.content, function(modelItem) {});
-			return superModelAwareInstances;
+			return itemsArray;
 		}
 
 	});
@@ -648,7 +627,7 @@ define("calipso", function(require) {
 			options || (options = {});
 			var data = (options.data || {});
 			options.data = {
-				page : "no"
+				number : "no"
 			};
 			return Backbone.Collection.prototype.fetch.call(this, options);
 		}
@@ -866,7 +845,7 @@ define("calipso", function(require) {
 	 * @requires Backgrid
 	 * @augments module:Supermodel.Model
 	 */
-	Calipso.model.GenericModel = Supermodel.Model.extend(
+	Calipso.model.GenericModel = Backbone.Model.extend(
 	/** @lends Calipso.model.GenericModel.prototype */
 	{
 		skipDefaultSearch : false,
@@ -1085,7 +1064,7 @@ define("calipso", function(require) {
 			return formSchema;
 		},
 		initialize : function() {
-			Supermodel.Model.prototype.initialize.apply(this, arguments);
+			Backbone.Model.prototype.initialize.apply(this, arguments);
 			var thisModel = this;
 			this.on("change", function(model, options) {
 				if (options && options.save === false) {
@@ -1106,6 +1085,9 @@ define("calipso", function(require) {
 		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_CLIENT,
 		typeName : "Calipso.model.GenericModel",
 		label : "GenericModel",
+		create : function(attrs, options){
+			return new this(attrs, options);
+		}
 
 	});
 
@@ -4532,8 +4514,7 @@ define("calipso", function(require) {
 		 * type, e.g. "users" for UserModel.
 		 *
 		 * A model instance is then created using some-id if provided or
-		 * "search" otherwise. If a backbone supermodel instance is already
-		 * cached, it is reused.
+		 * "search" otherwise. .
 		 *
 		 * In case of "search" a collection of the given model type is
 		 * initialized but, similarly to the model instance, it is not fetched

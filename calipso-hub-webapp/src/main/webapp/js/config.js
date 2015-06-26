@@ -39,10 +39,7 @@ require.config({
 		'handlebars-orig' : 'lib/handlebars',
 		'handlebars' : 'lib/resthub/handlebars-helpers',
 		'backbone-queryparams' : 'lib/backbone-queryparams',
-		// 'backbone-datagrid': 'lib/backbone-datagrid', lib/calipso/view
-		// 'backbone-paginator': 'lib/backbone-paginator',
-		// 'backbone-relational': 'lib/backbone-relational',
-		'backbone-pageable' : 'lib/backbone-pageable',
+		'backbone.paginator': 'lib/backbone.paginator',
 		'async' : 'lib/async',
 		'keymaster' : 'lib/keymaster',
 		'hbs' : 'lib/resthub/require-handlebars',
@@ -55,7 +52,6 @@ require.config({
 		"backgrid-moment" : 'lib/backgrid/extensions/moment/backgrid-moment-cell',
 		"backgrid-text" : 'lib/backgrid/extensions/text/backgrid-text-cell',
 		"calipso" : 'lib/calipso',
-		'supermodel' : 'lib/supermodel',
 		// Mocha testing
 		'mocha' : 'lib/mocha/mocha',
 		'chai' : 'lib/chai/chai',
@@ -72,8 +68,8 @@ require.config({
       'google-maps-loader' : 'lib/google-maps-loader',
       'humanize' : 'lib/humanize-duration',
       'chart': 'lib/Chart',
-      
-			
+
+
 	},
 	shim : {
 
@@ -97,14 +93,6 @@ require.config({
 			deps : [ 'jquery', 'underscore', 'backbone' ],
 			exports : 'Marionette'
 		},
-		'supermodel' : {
-			deps : [ 'underscore', 'backbone' ],
-			exports : 'Supermodel'
-		},
-		'backbone-pageable' : {
-			deps : [ 'backbone' ],
-			exports : 'Backbone.PageableCollection'
-		},
 		'backgrid' : {
 			deps : [ 'jquery', 'backbone', 'underscore'],
 			exports : 'Backgrid'
@@ -121,7 +109,7 @@ require.config({
 			deps : [ 'jquery', 'underscore', 'backbone', 'backbone-forms' ]
 		},
 		'backgrid-paginator' : {
-			deps : [ 'backgrid', 'backbone-pageable' ],
+			deps : [ 'underscore', 'backbone', 'backgrid', 'backbone.paginator' ],
 			exports : 'Backgrid.Extension.Paginator'
 		},
 		'backgrid-moment' : {
@@ -139,7 +127,7 @@ require.config({
 			deps : [ 'jquery' ],
 			exports : 'Markdown'
 		},
-		
+
 		'metis-menu' : {
 			deps : [ 'jquery', 'bootstrap' ],
 			exports : 'jquery'
@@ -163,13 +151,13 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backbone-forms-select2', 'supermodel', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'chart'],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backbone-forms-select2', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'chart'],
 			exports : 'calipso'
 		},
-		'cookie': { 
+		'cookie': {
 			deps: ['jquery']
 		},
-		'chai-jquery': { 
+		'chai-jquery': {
 			deps: ['jquery', 'chai']
 		},
 //		'typeahead': {
