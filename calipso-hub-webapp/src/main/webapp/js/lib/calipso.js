@@ -1678,6 +1678,9 @@ define("calipso", function(require) {
 					label : entries[i].label,
 					editable : false,
 					cell : Calipso.components.backgrid.ChildStringAttributeCell,
+					editorAttrs : {
+						style : "text-align: right;"
+					}
 				});
 			}
 			console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
@@ -2990,6 +2993,9 @@ define("calipso", function(require) {
 		onCollectionFetchFailed : function() {
 
 		},
+		getGrid : function(gridOptions){
+			return new Backgrid.Grid(gridOptions);
+		},
 		onShow : function() {
 			var _self = this;
 			// in case of a report we need a grid schema key
@@ -3003,7 +3009,7 @@ define("calipso", function(require) {
 			console.log("ModelDrivenCollectionGridView.onShow, collection.data: " + _self.collection.data);
 			console.log(_self.collection.data);
 
-			var backgrid = new Backgrid.Grid({
+			var backgrid = this.getGrid({
 				className : "backgrid responsive-table",
 				columns : gridSchema,
 				collection : _self.collection,
@@ -3165,6 +3171,13 @@ define("calipso", function(require) {
 				_.extend(this.chartOptions, options.chartOptions);
 			}
 			//this.bindTo(this.model, "change", this.modelChanged);
+		},
+		getGrid : function(gridOptions){
+			gridOptions.columnsToPin = 1;
+			gridOptions.minScreenSize = 4000;
+			gridOptions.className = "backgrid";
+			console.log("building responsive grid...");
+			return new Backgrid.Extension.ResponsiveGrid(gridOptions);
 		},
 		onShow : function() {
 			Calipso.view.ModelDrivenCollectionGridView.prototype.onShow.apply(this);
@@ -4583,7 +4596,7 @@ define("calipso", function(require) {
 		},
 		mainNavigationReportRoute : function(mainRoutePart, queryString) {
 			console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
-			
+
 			// TODO: temp fix
 			var isReport = window.location.href.indexOf("/reports") > -1 ;
 			console.log("AbstractController#mainNavigationReportRoute, isReport: " + isReport);

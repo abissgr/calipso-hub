@@ -51,6 +51,7 @@ require.config({
 		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
 		"backgrid-moment" : 'lib/backgrid/extensions/moment/backgrid-moment-cell',
 		"backgrid-text" : 'lib/backgrid/extensions/text/backgrid-text-cell',
+		'backgrid-responsive-grid' : 'lib/backgrid/extensions/responsive-grid/responsive-grid',
 		"calipso" : 'lib/calipso',
 		// Mocha testing
 		'mocha' : 'lib/mocha/mocha',
@@ -120,6 +121,10 @@ require.config({
 			deps : [ 'backgrid' ],
 			exports : 'Backgrid.Extension.Text'
 		},
+		'backgrid-responsive-grid' : {
+			deps : [ 'jquery', 'underscore', 'backbone', 'backgrid' ],
+			exports : 'Backgrid.Extension.ResponsiveGrid'
+		},
 		'bootstrap' : {
 			deps : [ 'jquery' ]
 		},
@@ -151,7 +156,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backbone-forms-select2', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'chart'],
+			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backgrid-responsive-grid', 'backbone-forms-select2', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'chart'],
 			exports : 'calipso'
 		},
 		'cookie': {
