@@ -3983,6 +3983,7 @@ define("calipso", function(require) {
 				// fallback, will only work with a root web application context
 				Calipso._baseUrl = window.location.protocol + "//" + window.location.host;
 			}
+			console.log("Calipso.getBaseUrl configured to: "  + Calipso._baseUrl );
 		}
 		return Calipso._baseUrl;
 	}
@@ -4581,12 +4582,15 @@ define("calipso", function(require) {
 
 		},
 		mainNavigationReportRoute : function(mainRoutePart, queryString) {
+			console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
+			
 			// TODO: temp fix
-			if(!window.location.href.indexOf("reports") > -1) {
-       	this.mainNavigationSearchRoute(mainRoutePart, queryString);
-    	}
+			var isReport = window.location.href.indexOf("/reports") > -1 ;
+			console.log("AbstractController#mainNavigationReportRoute, isReport: " + isReport);
+			if(!isReport) {
+				this.mainNavigationSearchRoute(mainRoutePart, queryString);
+			}
 			else{
-				console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
 				var _self = this;
 				var httpParams = Calipso.getHttpUrlParams();
 
