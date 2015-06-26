@@ -2002,6 +2002,7 @@ define("calipso", function(require) {
 		defaultForward : null,
 		/** Stores the final configuration */
 		config : null,
+		skippSrollToTop = false,
 		/**
 		 * Get the default config.
 		 */
@@ -2072,6 +2073,9 @@ define("calipso", function(require) {
 		initialize : function(options){
 			Backbone.Marionette.LayoutView.prototype.initialize.apply(this, arguments);
 			console.log("Calipso.view.AbstractLayout#initialize");
+			if(!this.get("skippSrollToTop")){
+				$(window).scrollTop(0);
+			}
 		},
 		getTypeName : function() {
 			return this.prototype.getTypeName();
@@ -2268,8 +2272,6 @@ define("calipso", function(require) {
 		},
 		initialize : function(options) {
 			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
-			console.log("Calipso.view.ModelDrivenBrowseLayout#initialize, scrolling to top");
-			$(window).scrollTop(0);
 			var _this = this;
 
 
@@ -4590,43 +4592,50 @@ define("calipso", function(require) {
 
 		},
 		mainNavigationReportRoute : function(mainRoutePart, queryString) {
-			console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
-			var _self = this;
-			var httpParams = Calipso.getHttpUrlParams();
+			// TODO: temp fix
+			if(!window.location.href.indexOf("reports") > -1) {
+       	this.mainNavigationSearchRoute(mainRoutePart, queryString);
+    	}
+			else{
+				console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
+				var _self = this;
+				var httpParams = Calipso.getHttpUrlParams();
 
-			// get the model the report focuses on
-			var ModelType = this.getModelType(mainRoutePart);
-			if (!Calipso.isAuthenticated() && !ModelType.prototype.isPublic()) {
-				return this._redir("login");
-			}
-
-			// build a report dataset collection using the model's report URL
-			var reportModel = new Calipso.model.ReportDataSetModel({subjectModelType: ModelType});
-			var collectionOptions = {
-				model : Calipso.model.ReportDataSetModel,
-				url : Calipso.session.getBaseUrl() + "/api/rest/" + reportModel.getPathFragment(),
-				pathFragment : reportModel.getPathFragment(),
-			};
-			if (httpParams) {
-				if (httpParams[""] || httpParams[""] == null) {
-					delete httpParams[""];
+				// get the model the report focuses on
+				var ModelType = this.getModelType(mainRoutePart);
+				if (!Calipso.isAuthenticated() && !ModelType.prototype.isPublic()) {
+					return this._redir("login");
 				}
-				collectionOptions.data = httpParams;
-			}
-			var reporDataSetCollection = Calipso.util.cache.getCollection(collectionOptions);
 
-			// fetch and render report
-			var renderFetchable = function() {
-				console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
-				// show the layout type corresponding to the requested model
-				reportModel.wrappedCollection = reporDataSetCollection;
-				_self.showLayoutForModel(reportModel);
-			};
-			console.log("AbstractController#mainNavigationReportRoute calling reporDataSetCollection.fetch");
-			reporDataSetCollection.fetch({
-				//url : collectionUrl,
-				data : reporDataSetCollection.data
-			}).then(renderFetchable);
+				// build a report dataset collection using the model's report URL
+				var reportModel = new Calipso.model.ReportDataSetModel({subjectModelType: ModelType});
+				var collectionOptions = {
+					model : Calipso.model.ReportDataSetModel,
+					url : Calipso.session.getBaseUrl() + "/api/rest/" + reportModel.getPathFragment(),
+					pathFragment : reportModel.getPathFragment(),
+				};
+				if (httpParams) {
+					if (httpParams[""] || httpParams[""] == null) {
+						delete httpParams[""];
+					}
+					collectionOptions.data = httpParams;
+				}
+				var reporDataSetCollection = Calipso.util.cache.getCollection(collectionOptions);
+
+				// fetch and render report
+				var renderFetchable = function() {
+					console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
+					// show the layout type corresponding to the requested model
+					reportModel.wrappedCollection = reporDataSetCollection;
+					_self.showLayoutForModel(reportModel);
+				};
+				console.log("AbstractController#mainNavigationReportRoute calling reporDataSetCollection.fetch");
+				reporDataSetCollection.fetch({
+					//url : collectionUrl,
+					data : reporDataSetCollection.data
+				}).then(renderFetchable);
+
+			}
 
 		},
 		/**
