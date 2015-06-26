@@ -443,11 +443,53 @@ define("calipso", function(require) {
 	/** @lends Calipso.collection.GenericCollection.prototype */
 	{
 		mode : "server",
+		data : {},
+		/**
+		 * Initial pagination states
+		 */
+		state : {
+			/**
+			 * The first page index. Set to 0 if your server API uses 0-based indices.
+			 */
+			firstPage : 0,
+			currentPage : 0,
+			pageSize : 10,
+		},
+    /**
+     A translation map to convert Backbone.PageableCollection state attributes
+     to the query parameters accepted by your server API.
+
+     You can override the default state by extending this class or specifying
+     them in `options.queryParams` object hash to the constructor.
+
+     @property {Object} queryParams
+     @property {string} [queryParams.currentPage="number"]
+     @property {string} [queryParams.pageSize="size"]
+     @property {string} [queryParams.totalPages="totalPages"]
+     @property {string} [queryParams.totalRecords="totalElements"]
+     @property {string} [queryParams.sortKey="properties"]
+     @property {string} [queryParams.order="sort"]
+     @property {string} [queryParams.directions={"-1": "ASC", "1": "DESC"}] A
+     map for translating a Backbone.PageableCollection#state.order constant to
+     the ones your server API accepts.
+  	*/
+    queryParams: {
+      totalPages: "totalPages",
+			pageSize: "size",
+			currentPage: "number",
+      totalRecords: "totalElements",
+      sortKey: "properties",
+			order : "sort",
+      directions: {
+        "-1": "ASC",
+        "1": "DESC"
+      }
+    },
 		getTypeName : function() {
 			return this.prototype.getTypeName();
 		},
 		initialize : function(attributes, options) {
-
+			Backbone.PageableCollection.prototype.initialize.apply(this, arguments);
 			options || (options = {});
 			if (options.model && options.model.prototype.getTypeName()) {
 				this.model = options.model;
@@ -464,12 +506,19 @@ define("calipso", function(require) {
 			if (options.schemaForGrid) {
 				this.schemaForGrid = options.schemaForGrid;
 			}
+
 			if (options.data) {
 				if (options.data[""] || options.data[""] == null) {
 					delete options.data[""];
 				}
 				this.data = options.data;
+				/*for (var qName in this.queryParams) {
+					if(this.data[qName]){
+						this.state[qName] = this.data[qName];
+					}
+				}*/
 
+				/*
 				var stateData = [{
 					name: "size",
 					stateName: "pageSize"
@@ -489,10 +538,10 @@ define("calipso", function(require) {
 						console.log("state "+stateData[i].stateName+": "+this.data[stateData[i].name]);
 					}
 				}
+				*/
 
-				console.log("state finished:");
-				console.log(this.state);
 			}
+
 			if (options.url) {
 				this.url = options.url;
 			}
@@ -508,12 +557,6 @@ define("calipso", function(require) {
 				}
 			}
 			return  _.size(this.data) > minData;
-		},
-		// Initial pagination states
-		state : {
-			firstPage : 1,
-			currentPage : 1,
-			pageSize : 10,
 		},
 		getGridSchema : function() {
 			// use explicit configuration if available
@@ -532,42 +575,27 @@ define("calipso", function(require) {
 		getPathFragment : function() {
 			return this.prototype.getPathFragment();
 		},
-		// You can remap the query parameters from `state keys from
-		// the default to those your server supports
-		queryParams : {
-			currentPage : "page",
-			pageSize : "size",
-			totalPages : "totalPages",
-			totalRecords : "totalElements",
-			sortKey : "properties",
-			direction : "order"
-		},
-		/*
-		 * totalElements: 32 lastPage false totalPages 4 numberOfElements 10
-		 * firstPage true sort [Object { direction="DESC", property="id",
-		 * ascending=false}] number 0 size 10
-		 */
-		//
-		// parseState: function (resp, queryParams, state, options) {
-		// return {
-		// totalRecords: resp.totalElements
-		// };
-		// },
-		// //
-		// parseRecords: function (resp, options) {
-		// return resp.content ;
-		// },
-		// Parse the JSON response and get the total number of
-		// elements.
-		// Return only the content JSON element, that contains
-		// the users.
-		// These are necessary for paging to work.
-		// parse : function(resp) {
-		// this.total = resp.totalElements;
-		// this.totalPages = resp.totalPages;
-		// return resp.content;
-		// }
-		parse : function(response) {
+
+		parseState: function (resp, queryParams, state, options) {
+      if (resp && resp.length === 2 && _isObject(resp[0]) && _isArray(resp[1])) {
+
+        var newState = _clone(state);
+        var serverState = resp;
+
+        _each(_pairs(_omit(queryParams, "directions")), function (kvp) {
+          var k = kvp[0], v = kvp[1];
+          var serverVal = serverState[v];
+          if (!_isUndefined(serverVal) && !_.isNull(serverVal)) newState[k] = serverState[v];
+        });
+
+        if (serverState.order) {
+          newState.order = _invert(queryParams.directions)[serverState.order] * 1;
+        }
+				console.log("new state:" + newState.toSource());
+        return newState;
+      }
+    },
+		parseRecords : function(response, options) {
 			var _self = this;
 			var itemsArray = response;
 			if (response.content) {
