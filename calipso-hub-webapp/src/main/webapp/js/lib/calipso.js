@@ -591,8 +591,7 @@ define("calipso", function(require) {
         if (serverState.order) {
           newState.order = _invert(queryParams.directions)[serverState.order] * 1;
         }
-				console.log("new state:" + newState.toSource());
-        return newState;
+				return newState;
       }
     },
 		parseRecords : function(response, options) {
