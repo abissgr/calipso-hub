@@ -369,7 +369,6 @@
        @return {Array.<Object>} an array of page handle objects hashes
     */
     makeHandles: function () {
-
       var handles = [];
       var collection = this.collection;
 
@@ -408,6 +407,8 @@
        Render the paginator handles inside an unordered list.
     */
     render: function () {
+
+   	 console.log("Paginator render, colection state: " + this.collection.state.toSource());
       this.$el.empty();
 
       if (this.handles) {
