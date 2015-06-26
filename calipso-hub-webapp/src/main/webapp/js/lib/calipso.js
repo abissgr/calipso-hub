@@ -479,7 +479,7 @@ define("calipso", function(require) {
 			currentPage: "number",
       totalRecords: "totalElements",
       sortKey: "properties",
-			order : "sort",
+			order : "sort",//"direction"?
       directions: {
         "-1": "ASC",
         "1": "DESC"
@@ -2002,7 +2002,7 @@ define("calipso", function(require) {
 		defaultForward : null,
 		/** Stores the final configuration */
 		config : null,
-		skippSrollToTop = false,
+		skipSrollToTop : false,
 		/**
 		 * Get the default config.
 		 */
@@ -2073,7 +2073,7 @@ define("calipso", function(require) {
 		initialize : function(options){
 			Backbone.Marionette.LayoutView.prototype.initialize.apply(this, arguments);
 			console.log("Calipso.view.AbstractLayout#initialize");
-			if(!this.get("skippSrollToTop")){
+			if(!this.skipSrollToTop){
 				$(window).scrollTop(0);
 			}
 		},
@@ -2274,6 +2274,10 @@ define("calipso", function(require) {
 			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
 			var _this = this;
 
+			this.listenTo(Calipso.vent, "updateSearchLocation", function(model) {
+				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSaved, showing this.model: "+_this.model);
+				_this.updateSearchLocation(model);
+			}, this);
 
 			this.listenTo(Calipso.vent, "genericFormSaved", function(model) {
 				console.log("Calipso.view.ModelDrivenBrowseLayout caugh genericFormSaved, showing this.model: "+_this.model);
@@ -2337,6 +2341,19 @@ define("calipso", function(require) {
 				trigger : false
 			});
 		},
+		updateSearchLocation : function(){
+			if(this.model && this.model.isSearchModel && this.model.isSearchModel()){
+				var searchedUrl = "" + this.model.getPathFragment();
+				if (this.model.wrappedCollection && this.model.wrappedCollection.data) {
+					searchedUrl = searchedUrl + "?" + $.param(this.model.wrappedCollection.data);
+				}
+				if(searchedUrl){
+					Calipso.navigate(searchedUrl, {
+						trigger : false
+					});
+				}
+			}
+		},
 		showContent : function(routeModel) {
 			$(window).scrollTop(0);
 			var _this = this;
@@ -2349,14 +2366,10 @@ define("calipso", function(require) {
 			// get the model collection view type
 			var ContentViewType;
 			var contentView;
-			var searchedUrl;
 			if (isSearch) {
 				contentView = this.getSearchResultsViewForModel(routeModel);
-				searchedUrl = "" + routeModel.getPathFragment();
-				if (routeModel.wrappedCollection && routeModel.wrappedCollection.data) {
-					searchedUrl = searchedUrl + "?" + $.param(_this.model.wrappedCollection.data);
-					console.log("searchedUrl: "+searchedUrl)
-				}
+				// change location bar if appropriate
+				this.updateSearchLocation()
 			} else {
 				console.log("ModelDrivenBrowseLayout#showContent 2");
 				ContentViewType = routeModel.getItemViewType();
@@ -2371,11 +2384,7 @@ define("calipso", function(require) {
 			//TODO reuse active view if of the same type
 			this.contentRegion.show(contentView);
 			// change location bar if appropriate
-			if(searchedUrl){
-				Calipso.navigate(searchedUrl, {
-					trigger : false
-				});
-			}
+
 
 		},
 		getSearchResultsViewForModel : function(routeModel){
