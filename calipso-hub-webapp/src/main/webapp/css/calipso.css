@@ -79,8 +79,17 @@ div#sidebar-collapse-accordion div.panel-body{
 }
 
 /*
+  custom backgrid styles
+--------------------------------------------------
+*/
+form.form-inline fieldset{
+  display: inline
+}
+
+
+/*
   backgrid
--------------------------------------------------- 
+--------------------------------------------------
   http://github.com/wyuenho/backgrid
 
   Copyright (c) 2013 Jimmy Yuen Ho Wong and contributors

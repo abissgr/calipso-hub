@@ -1,4 +1,4 @@
-/** 
+/**
  * Include this template file after backbone-forms.amd.js to override the default templates
  *
  * 'data-*' attributes control where elements are placed
@@ -6,7 +6,7 @@
 define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Backbone) {
   var Form = Backbone.Form;
 
-  
+
   /**
    * Bootstrap 3 templates
    */
@@ -14,7 +14,7 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Ba
     <form class="form-horizontal" role="form">\
       <div data-fieldsets></div>\
       <% if (submitButton) { %>\
-        <button type="submit" class="btn"><%= submitButton %></button>\
+        <button type="submit" class="btn btn-default"><%= submitButton %></button>\
       <% } %>\
     </form>\
   ');
@@ -74,7 +74,7 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Ba
         <button type="button" class="btn bbf-del" data-action="remove">&times;</button>\
       </li>\
     ');
-    
+
 
     Form.editors.List.Object.template = Form.editors.List.NestedModel.template = _.template('\
       <div class="bbf-list-modal"><%= summary %></div>\

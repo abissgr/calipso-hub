@@ -848,6 +848,9 @@ define("calipso", function(require) {
 	Calipso.model.GenericModel = Backbone.Model.extend(
 	/** @lends Calipso.model.GenericModel.prototype */
 	{
+		getFormSubmitButton : function(){
+			return null;
+		},
 		skipDefaultSearch : false,
 		/**
 		 * Prefer the collection URL if any for more specific CRUD, fallback to
@@ -874,6 +877,14 @@ define("calipso", function(require) {
 				formSchemaKey = this.isNew() ? "create" : "update";
 			}
 			return formSchemaKey;
+		},
+		getFormTemplateKey : function(){
+			var schemaKey = this.getFormSchemaKey();
+			var formTemplateKey = "horizontal";
+			if(/*schemaKey.indexOf("search") == 0 ||*/ schemaKey.indexOf("report") == 0){
+				formTemplateKey = "nav";
+			}
+			return formTemplateKey;
 		},
 		/**
 		 * Get the URL path fragment for this model. Calls the prototype method with the same name.
@@ -1066,6 +1077,10 @@ define("calipso", function(require) {
 		initialize : function() {
 			Backbone.Model.prototype.initialize.apply(this, arguments);
 			var thisModel = this;
+			// make any submit button available to templates
+			if( this.getFormSubmitButton()){
+				this.set("calipsoFormSubmitButton", this.getFormSubmitButton());
+			}
 			this.on("change", function(model, options) {
 				if (options && options.save === false) {
 					return;
@@ -1573,6 +1588,7 @@ define("calipso", function(require) {
 			kpi : "sum",
 			timeUnit : "DAY",
 			reportType : null,
+			calipsoFormSubmitButton : "Show Report"
 		},
 		initialize : function() {
 			Calipso.model.GenericModel.prototype.initialize.apply(this, arguments);
@@ -1631,6 +1647,7 @@ define("calipso", function(require) {
 				formSchema.reportType = {
 					type : 'Select',
 					options : reportTypeOptions,
+					template: this.fieldTemplate
 					// TODO: validate option
 					// validators : [ 'required' ]
 				};
@@ -1640,6 +1657,7 @@ define("calipso", function(require) {
 				name: "KPI",
 				type: 'Select',
 				options : this.getReportKpiOptions(),
+				template: this.fieldTemplate
 				// TODO: validate option
 				// validators : [ 'required' ]
 			};
@@ -1650,6 +1668,7 @@ define("calipso", function(require) {
 					{ val: "DAY", label: 'Day' },
 					{ val: "MONTH", label: 'Month' }
 				],
+				template: this.fieldTemplate
 				// TODO: validate option
 				// validators : [ 'required' ]
 			};
@@ -1686,7 +1705,16 @@ define("calipso", function(require) {
 			console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
 			console.log(schema);
 			return schema;
-		}
+		},
+		fieldTemplate : _.template('\
+	    <div class="form-group field-<%= key %>">&nbsp;\
+	      <label class="control-label" for="<%= editorId %>">\
+	        <% if (titleHTML){ %><%= titleHTML %>\
+	        <% } else { %><%- title %><% } %>\
+	      </label>&nbsp;\
+        <span data-editor></span>\
+	    </div>&nbsp;\
+	  '),
 	},
 	// static members
 	{
@@ -3142,16 +3170,16 @@ define("calipso", function(require) {
 		    scaleLabel: "<%=value%>",
 		   multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>",
 		   //String - A legend template
-		    legendTemplate : "<ul class=\"list-group\"><% for (var i=0; i<segments.length; i++){%><li class=\"list-group-item\"><span style=\"color:<%=segments[i].fillColor%> \"><i class=\"fa fa-bookmark\"></i>&nbsp;</span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
+		    legendTemplate : "<ul class=\"list-inline\"><% for (var i=0; i<segments.length; i++){%><li class=\"list-group-item\"><span style=\"color:<%=segments[i].fillColor%> \"><i class=\"fa fa-bookmark\"></i>&nbsp;</span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
 
 		},
 		colors : [
-		          "91, 144, 191",
-		          "163, 190, 140",
-		          "171, 121, 103",
-		          "208, 135, 112",
-		          "180, 142, 173",
-		          "235, 203, 139",
+      "91, 144, 191",
+      "163, 190, 140",
+      "171, 121, 103",
+      "208, 135, 112",
+      "180, 142, 173",
+      "235, 203, 139",
 			"39, 165, 218", //"#5DA5DA" , // blue
 			"250, 164, 58", //"#FAA43A" , // orange
 			"96, 189, 104", //"#60BD68" , // green
@@ -3205,7 +3233,7 @@ define("calipso", function(require) {
 				  // add totals dataset
 				  var sum = 0;
 				  for (var i = 0; i < dataset.data.length; i++) {
-					  sum += dataset.data[i]
+					  sum += parseFloat(dataset.data[i]);//.toFixed(2);
 					}
 				  dataTotals.push({
 					  label: dataset.label,
@@ -3224,6 +3252,7 @@ define("calipso", function(require) {
 //			$canvasTotals.attr("height", $canvasTotals.parent().attr("height"));
 			var ctxTotals = canvasTotals.getContext("2d");
 
+			console.log("dataTotals: " + dataTotals.toSource());
 			this.chartTotals = new Chart(ctxTotals).PolarArea(dataTotals, this.chartOptions);
 
 			  //then you just need to generate the legend
@@ -3367,11 +3396,11 @@ define("calipso", function(require) {
 
 		// Define view template
 		formSchemaKey : null,
-		template : require('hbs!template/GenericFormView'),
+		template : require('hbs!template/md-form-view'),
 		templateHelpers : {
 			formSchemaKey : function() {
 				return this.formSchemaKey;
-			}
+			},
 		},
 
 		initialize : function(options) {
@@ -3536,7 +3565,8 @@ define("calipso", function(require) {
 			var _self = this;
 			console.log("GenericFormView#renderForm called, schema key: " + _self.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-
+			var formSubmitButton = _self.model.get("calipsoFormSubmitButton")//;(_self.formSchemaKey);
+			console.log("formSubmitButton: " + formSubmitButton);
 			// render form
 			var JsonableForm = Backbone.Form.extend({
 				toJson : function() {
@@ -3559,10 +3589,17 @@ define("calipso", function(require) {
 			var formOptions = {
 				model : _self.model,
 				schema : formSchema,
-				template : _self.getFormTemplate()
+				template : _self.getFormTemplate(_self.model.getFormTemplateKey())
 			};
+			// model driven submit button?
+			if(formSubmitButton){
+				formOptions.submitButton = formSubmitButton;
+			}
 			this.form = new JsonableForm(formOptions).render();
-			this.$el.find(".generic-form-view").append(this.form.el);// generic-form-view
+			this.$el.find(".generic-form-view").append(this.form.el);
+
+
+			// generic-form-view
 			//					$(selector + ' textarea[data-provide="markdown"]').each(function() {
 			//						var $this = $(this);
 			//
@@ -3595,15 +3632,25 @@ define("calipso", function(require) {
 					<form class="form-horizontal" role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="btn"><%= submitButton %></button>\
+					<button type="submit" class="btn btn-default"><%= submitButton %></button>\
 					<% } %>\
 					</form>\
 			'),
-			inline : _.template('\
-					<form class="form-inline" role="form">\
-					<div data-fieldsets></div>\
+			nav : _.template('\
+					<nav class="navbar navbar-default">\
+					<form class="navbar-form navbar-left" role="form">\
+					<span data-fields="*"></span>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="btn"><%= submitButton %></button>\
+					<button type="submit" class="btn btn-primary"><%= submitButton %></button>\
+					<% } %>\
+					</form>\
+					</nav>\
+			'),
+			inline : _.template('\
+					<form class="form-inline">\
+					<span data-fields="*"></span>\
+					<% if (submitButton) { %>\
+					<div class="form-group"><button type="submit" class="btn btn-default"><%= submitButton %></button></div>\
 					<% } %>\
 					</form>\
 			'),
@@ -3611,7 +3658,7 @@ define("calipso", function(require) {
 					<form role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="btn"><%= submitButton %></button>\
+					<button type="submit" class="btn btn-default"><%= submitButton %></button>\
 					<% } %>\
 					</form>\
 			')
