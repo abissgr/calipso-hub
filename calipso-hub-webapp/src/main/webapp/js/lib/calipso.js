@@ -475,8 +475,8 @@ define("calipso", function(require) {
   	*/
     queryParams: {
       totalPages: "totalPages",
-		pageSize: "size",
-		currentPage: "number",
+			pageSize: "size",
+			currentPage: "number",
       totalRecords: "totalElements",
       sortKey: "properties",
       order : "sort",//"direction"?
@@ -512,12 +512,10 @@ define("calipso", function(require) {
 					delete options.data[""];
 				}
 				this.data = options.data;
-				/*for (var qName in this.queryParams) {
-					if(this.data[qName]){
-						this.state[qName] = this.data[qName];
-					}
-				}*/
+				console.log("state before: " + this.state.toSource());
+				this.state = this.parseState(this.data, this.queryParams, this.state, {});
 
+				console.log("state after: " + this.state.toSource());
 				/*
 				var stateData = [{
 					name: "size",
@@ -577,19 +575,19 @@ define("calipso", function(require) {
 		},
 
 		parseState: function (resp, queryParams, state, options) {
-      if (resp && resp.length === 2 && _isObject(resp[0]) && _isArray(resp[1])) {
+      if (resp/* && resp.length === 2 && _isObject(resp[0]) && _isArray(resp[1])*/) {
 
-        var newState = _clone(state);
+        var newState = _.clone(state);
         var serverState = resp;
 
-        _each(_pairs(_omit(queryParams, "directions")), function (kvp) {
+        _.each(_.pairs(_.omit(queryParams, "directions")), function (kvp) {
           var k = kvp[0], v = kvp[1];
           var serverVal = serverState[v];
-          if (!_isUndefined(serverVal) && !_.isNull(serverVal)) newState[k] = serverState[v];
+          if (!_.isUndefined(serverVal) && !_.isNull(serverVal)) newState[k] = serverState[v];
         });
 
         if (serverState.order) {
-          newState.order = _invert(queryParams.directions)[serverState.order] * 1;
+          newState.order = _.invert(queryParams.directions)[serverState.order] * 1;
         }
 				return newState;
       }
