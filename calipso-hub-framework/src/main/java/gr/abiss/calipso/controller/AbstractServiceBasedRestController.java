@@ -129,7 +129,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 						: Sort.Direction.DESC, sort);
 		List<Order> orders = new ArrayList<Order>(1);
 		orders.add(order);
-		Pageable pageable = new ParameterMapBackedPageRequest(paramsMap, page /*- 1*/, size, new Sort(orders));
+		Pageable pageable = new ParameterMapBackedPageRequest(paramsMap, page - 1, size, new Sort(orders));
 		return pageable;
 	}
 	

@@ -451,7 +451,7 @@ define("calipso", function(require) {
 			/**
 			 * The first page index. Set to 0 if your server API uses 0-based indices.
 			 */
-			firstPage : 1,
+			firstPage : 0,
 			currentPage : 0,
 			pageSize : 10,
 		},
@@ -513,7 +513,7 @@ define("calipso", function(require) {
 				}
 				this.data = options.data;
 				console.log("state before: " + this.state.toSource());
-				this.state = this.parseState(this.data, this.queryParams, this.state, {});
+				//this.state = this.parseState(this.data, this.queryParams, this.state, {});
 
 				console.log("state after: " + this.state.toSource());
 				/*
