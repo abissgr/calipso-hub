@@ -18,12 +18,6 @@
  */
 package gr.abiss.calipso.model.dto;
 
-import java.io.Serializable;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -42,13 +36,13 @@ public class ReportDataEntry implements Comparable<ReportDataEntry>{
 	private static FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMdd");
 	
 	private String label;
-	private Map<String, Serializable> entryData;
+	private Map<String, Number> entryData;
 	
 	private ReportDataEntry() {
 		super();
 	}
 	
-	public ReportDataEntry(String label, Map<String, Serializable> entryData) {
+	public ReportDataEntry(String label, Map<String, Number> entryData) {
 		this();
 		this.label = label;
 		this.entryData = entryData;
@@ -95,11 +89,11 @@ public class ReportDataEntry implements Comparable<ReportDataEntry>{
 		this.label = label;
 	}
 	
-	public Map<String, Serializable> getEntryData() {
+	public Map<String, Number> getEntryData() {
 		return entryData;
 	}
 	
-	public void setEntryData(Map<String, Serializable> entryData) {
+	public void setEntryData(Map<String, Number> entryData) {
 		this.entryData = entryData;
 	}
 	

@@ -87,7 +87,7 @@ public class ReportDataSet {
 		this(subject, dateFrom, dateTo, timeUnit, keyIndexes , null);
 	}
 
-	public ReportDataSet(ReportDataSetSubject subject, Date dateFrom, Date dateTo, TimeUnit timeUnit, Map<String, Integer> keyIndexes, Map<String, Serializable> defaultDataEntry) {
+	public ReportDataSet(ReportDataSetSubject subject, Date dateFrom, Date dateTo, TimeUnit timeUnit, Map<String, Integer> keyIndexes, Map<String, Number> defaultDataEntry) {
 
 		// init members
 		this.subject = subject;
@@ -103,10 +103,10 @@ public class ReportDataSet {
 
 	protected void initDefaults(Date dateFrom, Date dateTo, TimeUnit timeUnit,
 			Map<String, Integer> keyIndexes,
-			Map<String, Serializable> defaultDataEntry) {
+			Map<String, Number> defaultDataEntry) {
 		// init default record values, to be used in missing date slots to ensure regular records
 		if(defaultDataEntry == null){
-			defaultDataEntry = new HashMap<String, Serializable>();
+			defaultDataEntry = new HashMap<String, Number>();
 			for(String key : keyIndexes.keySet()){
 				defaultDataEntry.put(key, new Integer(0));
 			}
@@ -153,7 +153,7 @@ public class ReportDataSet {
 
 
 
-	public void addEntry(Date date, Map<String, Serializable> datum) {
+	public void addEntry(Date date, Map<String, Number> datum) {
 		String label = null;
 		if(this.timeUnit.equals(TimeUnit.DAY)){
 			label = dayFormat.format(date);

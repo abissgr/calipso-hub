@@ -1645,6 +1645,7 @@ define("calipso", function(require) {
 			var reportTypeOptions = this.getReportTypeOptions();
 			if(reportTypeOptions){
 				formSchema.reportType = {
+					title: "Report Type",
 					type : 'Select',
 					options : reportTypeOptions,
 					template: this.fieldTemplate
@@ -1654,7 +1655,7 @@ define("calipso", function(require) {
 			}
 
 			formSchema.kpi = {
-				name: "KPI",
+				title: "KPI",
 				type: 'Select',
 				options : this.getReportKpiOptions(),
 				template: this.fieldTemplate
@@ -1662,7 +1663,7 @@ define("calipso", function(require) {
 				// validators : [ 'required' ]
 			};
 			formSchema.timeUnit = {
-				name: "Time Unit",
+				title: "Time Unit",
 				type: 'Select',
 				options : [
 					{ val: "DAY", label: 'Day' },
@@ -1696,10 +1697,7 @@ define("calipso", function(require) {
 					name : "entries." + i + ".entryData." + kpi,
 					label : entries[i].label,
 					editable : false,
-					cell : Calipso.components.backgrid.ChildStringAttributeCell,
-					editorAttrs : {
-						style : "text-align: right;"
-					}
+					cell : Calipso.components.backgrid.ChildNumberAttributeCell,
 				});
 			}
 			console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
@@ -1861,6 +1859,35 @@ define("calipso", function(require) {
 			return value;
 		}
 	});
+
+	Calipso.components.backgrid.ChildNumberAttributeCell = Backgrid.NumberCell.extend({
+		render : function() {
+			// replace square to dot notation and split
+			var parameters = this.column.get("name").replace(/\[(.*?)\]/g,'.$1').split(".");
+			var result = this.walk(this.model, parameters);
+
+			var value = result ? (result % 1 === 0 ? result : this.formatter.fromRaw(result))  : "0";
+			this.$el.text(value);
+			this.delegateEvents();
+			return this;
+		},
+		walk : function(currentStepValue, pathSteps, stepIndex){
+			var value;
+			if(stepIndex == undefined){
+				stepIndex = 0;
+			}
+			var stepName = pathSteps[stepIndex];
+			if(currentStepValue && stepName){
+				value = currentStepValue.get ? currentStepValue.get(stepName) :  currentStepValue[stepName];
+				stepIndex++;
+				if(value && stepIndex < pathSteps.length){
+					value = this.walk(value, pathSteps, stepIndex);
+				}
+			}
+			return value;
+		}
+	});
+
 	Calipso.components.backgrid.CreateNewHeaderCell  = Backgrid.HeaderCell.extend({
 
 		tagName : "th",
@@ -3143,34 +3170,34 @@ define("calipso", function(require) {
 			responsive: true,
 			maintainAspectRatio: false,
 //		    bezierCurveTension : 0.7,
-	      //bezierCurve: false
-		    ///Boolean - Whether grid lines are shown across the chart
-		    scaleShowGridLines : true,
+      //bezierCurve: false
+	    ///Boolean - Whether grid lines are shown across the chart
+	    scaleShowGridLines : true,
 
-		    //String - Colour of the grid lines
-		    scaleGridLineColor : "rgba(0,0,0,.05)",
+	    //String - Colour of the grid lines
+	    scaleGridLineColor : "rgba(0,0,0,.05)",
 
-		    //Number - Width of the grid lines
-		    scaleGridLineWidth : 1,
+	    //Number - Width of the grid lines
+	    scaleGridLineWidth : 1,
 
-		    //Boolean - Whether to show horizontal lines (except X axis)
-		    scaleShowHorizontalLines: true,
+	    //Boolean - Whether to show horizontal lines (except X axis)
+	    scaleShowHorizontalLines: true,
 
-		    //Boolean - Whether to show vertical lines (except Y axis)
-		    scaleShowVerticalLines: true,
+	    //Boolean - Whether to show vertical lines (except Y axis)
+	    scaleShowVerticalLines: true,
 
-		    // Boolean - Whether to show labels on the scale
-		    scaleShowLabels: true,
+	    // Boolean - Whether to show labels on the scale
+	    scaleShowLabels: true,
 
-		    pointDotRadius : 3,
-		    //Number - Pixel width of point dot stroke
-		    pointDotStrokeWidth : 2,
-		    datasetStrokeWidth : 2,
-		    // Interpolated JS string - can access value
-		    scaleLabel: "<%=value%>",
-		   multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>",
-		   //String - A legend template
-		    legendTemplate : "<ul class=\"list-inline\"><% for (var i=0; i<segments.length; i++){%><li class=\"list-group-item\"><span style=\"color:<%=segments[i].fillColor%> \"><i class=\"fa fa-bookmark\"></i>&nbsp;</span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
+	    pointDotRadius : 3,
+	    //Number - Pixel width of point dot stroke
+	    pointDotStrokeWidth : 2,
+	    datasetStrokeWidth : 2,
+	    // Interpolated JS string - can access value
+	    scaleLabel: "<%=value%>",
+	   	multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>",
+		  //String - A legend template
+		  legendTemplate : "<ul class=\"list-inline\"><% for (var i=0; i<segments.length; i++){%><li class=\"list-group-item\"><span style=\"color:<%=segments[i].fillColor%> \"><i class=\"fa fa-bookmark\"></i>&nbsp;</span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
 
 		},
 		colors : [
@@ -3216,7 +3243,7 @@ define("calipso", function(require) {
 //			$canvas.attr("width", $canvas.parent().attr("width"));
 //			$canvas.attr("height", $canvas.parent().attr("height"));
 			var ctx = canvas.getContext("2d");
-				var chartData = this.getDataForAttribute("sum");
+			var chartData = this.getDataForAttribute(this.model.get("kpi"));
 			var dataTotals = [];
 			_.each(chartData.datasets, function(dataset, index) {
 
@@ -3233,11 +3260,11 @@ define("calipso", function(require) {
 				  // add totals dataset
 				  var sum = 0;
 				  for (var i = 0; i < dataset.data.length; i++) {
-					  sum += parseFloat(dataset.data[i]);//.toFixed(2);
+					  sum += parseFloat(dataset.data[i]);
 					}
 				  dataTotals.push({
 					  label: dataset.label,
-			        value: sum,
+			        value: sum % 1 === 0 ? sum : parseFloat(sum.toFixed(2)),
 			        color:"rgba("+color+",0.8)",
 			        highlight: "rgba("+color+",0.4)",
 				  });
@@ -3300,7 +3327,6 @@ define("calipso", function(require) {
 				var dataSetData = [];
 				for(var i = 0 ; i < child.get("entries").length; i++){
 					//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, child.entries: ");
-					//console.log(child.get("entries"));
 					dataSetData.push(child.get("entries")[i].entryData[entryAttribute]);
 				}
 				dataset.data = dataSetData;
@@ -3447,9 +3473,9 @@ define("calipso", function(require) {
 			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + ", type " + this.model.getTypeName());
 
 		},
-
 		events : {
 			"click button.submit" : "commit",
+			"submit form" : "commit",
 			"click button.cancel" : "cancel",
 			"submit" : "commitOnEnter",
 			"keypress input[type=password]" : "commitOnEnter",
@@ -3463,6 +3489,7 @@ define("calipso", function(require) {
 			}
 		},
 		commit : function(e) {
+		console.log("GenericFormView#commit");
 			var _this = this;
 			Calipso.stopEvent(e);
 			console.log("commit, schemaKey: " + this.formSchemaKey);
@@ -3504,6 +3531,7 @@ define("calipso", function(require) {
 
 					console.log("GenericFormView#commit, saving search data to session");
 					var newData = this.form.toJson();
+					console.log(newData);
 					this.searchResultsCollection.data = newData;
 					this.searchResultsCollection.fetch({
 						reset : true,
@@ -3570,7 +3598,7 @@ define("calipso", function(require) {
 			// render form
 			var JsonableForm = Backbone.Form.extend({
 				toJson : function() {
-					return _.reduce(this.$el.serializeArray(), function(hash, pair) {
+					return _.reduce(this.$("form").serializeArray(), function(hash, pair) {
 						if (pair.value) {
 							hash[pair.name] = pair.value;
 						}
@@ -3647,7 +3675,7 @@ define("calipso", function(require) {
 					</nav>\
 			'),
 			inline : _.template('\
-					<form class="form-inline">\
+					<form class="form-inline" role="form">\
 					<span data-fields="*"></span>\
 					<% if (submitButton) { %>\
 					<div class="form-group"><button type="submit" class="btn btn-default"><%= submitButton %></button></div>\

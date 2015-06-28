@@ -55,8 +55,8 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 
 	public void removeMetadatum(ID subjectId, String predicate);
 
-	public Page<ReportDataSet> getReportDatasets(TimeUnit timeUnit, String dateField,
-			Date dateFrom, Date dateTo, String aggregateField,
-			AggregateFunction aggregateFunction);
+	public Page<ReportDataSet> getReportDatasets(TimeUnit timeUnit,
+			String dateField, Date dateFrom, Date dateTo,
+			String reportName);
 
 }

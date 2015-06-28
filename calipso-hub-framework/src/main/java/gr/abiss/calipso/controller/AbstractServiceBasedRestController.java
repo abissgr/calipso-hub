@@ -330,8 +330,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			@RequestParam(value = "dateField", required = false, defaultValue = "createdDate") String dateField,
 			@RequestParam(value = "dateFrom", required = false) Date dateFrom,
 			@RequestParam(value = "dateTo", required = false) Date dateTo,
-			@RequestParam(value = "aggregateField", required = false) String aggregateField,
-			@RequestParam(value = "aggregateFunction", required = false, defaultValue = "COUNT") AggregateFunction aggregateFunction) {
+			@RequestParam(value = "reportType", required = false) String reportType) {
 		// default date region is the current day
 		//Date now = new Date();
 
@@ -347,9 +346,8 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 		dateTo = DateUtils.addMilliseconds(DateUtils.ceiling(dateTo, Calendar.DATE), -1);
 		
 		Map<String, String[]> paramsMap = request.getParameterMap();
-		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + dateFrom + ", dateTo: " + dateTo + ", aggregateField: " + aggregateField + 
-				", aggregateFunction: " + aggregateFunction);
-		Page<ReportDataSet> page = this.service.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, aggregateField, aggregateFunction);
+		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + dateFrom + ", dateTo: " + dateTo + ", reportName: " + reportType );
+		Page<ReportDataSet> page = this.service.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, reportType);
 		LOGGER.info("getReportDatasets returning " + page.getTotalElements());
 		return page;
 	}

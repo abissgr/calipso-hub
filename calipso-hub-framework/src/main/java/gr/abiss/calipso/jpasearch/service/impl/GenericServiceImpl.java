@@ -229,7 +229,7 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	@Override
 	public Page<ReportDataSet> getReportDatasets(TimeUnit timeUnit,
 			String dateField, Date dateFrom, Date dateTo,
-			String aggregateField, AggregateFunction aggregateFunction) {
+			String reportName) {
 		
 		return new PageImpl<ReportDataSet>(new ArrayList<ReportDataSet>(0));		
 		
