@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -113,14 +114,23 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 	protected Page<T> findPaginated(Integer page, Integer size, String sort,
 			String direction, Map<String, String[]> paramsMap) {
+		Pageable pageable = buildPageable(page, size, sort, direction, paramsMap);
+		return this.service.findAll(pageable);
+				
+	}
+
+
+
+	protected Pageable buildPageable(Integer page, Integer size, String sort,
+			String direction, Map<String, String[]> paramsMap) {
 		Assert.isTrue(page > 0, "Page index must be greater than 0");
 		Order order = new Order(
 				direction.equalsIgnoreCase("ASC") ? Sort.Direction.ASC
 						: Sort.Direction.DESC, sort);
 		List<Order> orders = new ArrayList<Order>(1);
 		orders.add(order);
-		return this.service.findAll(
-				new ParameterMapBackedPageRequest(paramsMap, page - 1, size, new Sort(orders)));
+		Pageable pageable = new ParameterMapBackedPageRequest(paramsMap, page /*- 1*/, size, new Sort(orders));
+		return pageable;
 	}
 	
 	
@@ -326,6 +336,12 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@ResponseBody
 	@ApiOperation(value = "reports", httpMethod = "GET")
 	public Page<ReportDataSet> getReportDatasets(
+
+			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
+			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction,
+			
 			@RequestParam(value = "timeUnit", required = false, defaultValue = "DAY") TimeUnit timeUnit,
 			@RequestParam(value = "dateField", required = false, defaultValue = "createdDate") String dateField,
 			@RequestParam(value = "dateFrom", required = false) Date dateFrom,
@@ -347,9 +363,10 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 		
 		Map<String, String[]> paramsMap = request.getParameterMap();
 		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + dateFrom + ", dateTo: " + dateTo + ", reportName: " + reportType );
-		Page<ReportDataSet> page = this.service.getReportDatasets(timeUnit, dateField, dateFrom, dateTo, reportType);
-		LOGGER.info("getReportDatasets returning " + page.getTotalElements());
-		return page;
+		Pageable pageable = buildPageable(page, size, sort, direction, paramsMap);
+		Page<ReportDataSet> results = this.service.getReportDatasets(pageable, timeUnit, dateField, dateFrom, dateTo, reportType);
+		LOGGER.info("getReportDatasets returning " + results.getTotalElements());
+		return results;
 	}
 	
 }

@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Propagation;
@@ -227,11 +228,11 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 	
 
 	@Override
-	public Page<ReportDataSet> getReportDatasets(TimeUnit timeUnit,
+	public Page<ReportDataSet> getReportDatasets(Pageable pageable, TimeUnit timeUnit,
 			String dateField, Date dateFrom, Date dateTo,
 			String reportName) {
 		
-		return new PageImpl<ReportDataSet>(new ArrayList<ReportDataSet>(0));		
+		return new PageImpl<ReportDataSet>(new ArrayList<ReportDataSet>(0), pageable, 0);		
 		
 	}
 

@@ -28,6 +28,7 @@ import java.util.Date;
 
 import org.resthub.common.service.CrudService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -55,8 +56,7 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 
 	public void removeMetadatum(ID subjectId, String predicate);
 
-	public Page<ReportDataSet> getReportDatasets(TimeUnit timeUnit,
-			String dateField, Date dateFrom, Date dateTo,
-			String reportName);
+	public Page<ReportDataSet> getReportDatasets(Pageable pageable, TimeUnit timeUnit,
+			String dateField, Date dateFrom, Date dateTo, String reportName);
 
 }

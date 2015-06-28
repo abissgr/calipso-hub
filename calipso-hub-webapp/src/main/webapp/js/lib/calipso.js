@@ -451,7 +451,7 @@ define("calipso", function(require) {
 			/**
 			 * The first page index. Set to 0 if your server API uses 0-based indices.
 			 */
-			firstPage : 0,
+			firstPage : 1,
 			currentPage : 0,
 			pageSize : 10,
 		},
@@ -3596,7 +3596,8 @@ define("calipso", function(require) {
 			// render form
 			var JsonableForm = Backbone.Form.extend({
 				toJson : function() {
-					return _.reduce(this.$("form").serializeArray(), function(hash, pair) {
+					var nodeName = this.$el[0].nodeName.toLowerCase();
+					return _.reduce((nodeName == "form" ? this.$el : this.$("form")).serializeArray(), function(hash, pair) {
 						if (pair.value) {
 							hash[pair.name] = pair.value;
 						}
