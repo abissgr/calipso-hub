@@ -476,10 +476,10 @@ define("calipso", function(require) {
     queryParams: {
       totalPages: "totalPages",
 			pageSize: "size",
-			currentPage: "number",
+			currentPage: "page",
       totalRecords: "totalElements",
       sortKey: "properties",
-      order : "sort",//"direction"?
+      order : "direction",//"direction"?
       directions: {
         "-1": "ASC",
         "1": "DESC"
@@ -512,31 +512,7 @@ define("calipso", function(require) {
 					delete options.data[""];
 				}
 				this.data = options.data;
-				console.log("state before: " + this.state.toSource());
-				//this.state = this.parseState(this.data, this.queryParams, this.state, {});
-
-				console.log("state after: " + this.state.toSource());
-				/*
-				var stateData = [{
-					name: "size",
-					stateName: "pageSize"
-				}, {
-					name : "page",
-					stateName : "currentPage"
-				}, {
-					name : "order",
-					stateName : "direction"
-				}, {
-					name : "properties",
-					stateName : "sortKey"
-				}];
-				for(var i=0; i < stateData.length; i++){
-					if(this.data[stateData[i].name]){
-						this.state[stateData[i].stateName] = this.data[stateData[i].name];
-						console.log("state "+stateData[i].stateName+": "+this.data[stateData[i].name]);
-					}
-				}
-				*/
+				this.state = this.parseState(this.data, this.queryParams, this.state, {});
 
 			}
 
@@ -573,17 +549,26 @@ define("calipso", function(require) {
 		getPathFragment : function() {
 			return this.prototype.getPathFragment();
 		},
-
 		parseState: function (resp, queryParams, state, options) {
-      if (resp/* && resp.length === 2 && _isObject(resp[0]) && _isArray(resp[1])*/) {
+      if (resp) {
 
         var newState = _.clone(state);
         var serverState = resp;
 
+				var intKeys = ["firstPage", "currentPage", "pageSize", "totalPages", "totalRecords"];
         _.each(_.pairs(_.omit(queryParams, "directions")), function (kvp) {
           var k = kvp[0], v = kvp[1];
           var serverVal = serverState[v];
-          if (!_.isUndefined(serverVal) && !_.isNull(serverVal)) newState[k] = serverState[v];
+          if (!_.isUndefined(serverVal) && !_.isNull(serverVal)){
+						newState[k] = serverVal;
+						// enforce integers when applicable
+
+						if($.inArray(k, intKeys) > -1){
+						  if (typeof serverVal == "string") {
+						    newState[k] = parseInt(serverVal) || 0;
+						  }
+						}
+					}
         });
 
         if (serverState.order) {
@@ -3111,7 +3096,6 @@ define("calipso", function(require) {
 				if (_self.collection.data) {
 					if (_self.collection.data[""] || _self.collection.data[""] == null) {
 						delete _self.collection.data[""];
-						// toSource
 					}
 					fetchOptions.data = _self.collection.data;
 					//
@@ -3277,7 +3261,6 @@ define("calipso", function(require) {
 //			$canvasTotals.attr("height", $canvasTotals.parent().attr("height"));
 			var ctxTotals = canvasTotals.getContext("2d");
 
-			console.log("dataTotals: " + dataTotals.toSource());
 			this.chartTotals = new Chart(ctxTotals).PolarArea(dataTotals, this.chartOptions);
 
 			  //then you just need to generate the legend

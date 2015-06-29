@@ -123,13 +123,13 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 	protected Pageable buildPageable(Integer page, Integer size, String sort,
 			String direction, Map<String, String[]> paramsMap) {
-		Assert.isTrue(page > 0, "Page index must be greater than 0");
+		Assert.isTrue(page >= 0, "Page index must be greater than, or equal to, 0");
 		Order order = new Order(
 				direction.equalsIgnoreCase("ASC") ? Sort.Direction.ASC
 						: Sort.Direction.DESC, sort);
 		List<Order> orders = new ArrayList<Order>(1);
 		orders.add(order);
-		Pageable pageable = new ParameterMapBackedPageRequest(paramsMap, page - 1, size, new Sort(orders));
+		Pageable pageable = new ParameterMapBackedPageRequest(paramsMap, page /*- 1*/, size, new Sort(orders));
 		return pageable;
 	}
 	
