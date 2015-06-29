@@ -610,7 +610,7 @@ define("calipso", function(require) {
 			options || (options = {});
 			var data = (options.data || {});
 			options.data = {
-				number : "no"
+				page : "no"
 			};
 			return Backbone.Collection.prototype.fetch.call(this, options);
 		}
@@ -864,7 +864,7 @@ define("calipso", function(require) {
 		getFormTemplateKey : function(){
 			var schemaKey = this.getFormSchemaKey();
 			var formTemplateKey = "horizontal";
-			if(/*schemaKey.indexOf("search") == 0 ||*/ schemaKey.indexOf("report") == 0){
+			if(schemaKey.indexOf("search") == 0 ||  schemaKey.indexOf("report") == 0){
 				formTemplateKey = "nav";
 			}
 			return formTemplateKey;
