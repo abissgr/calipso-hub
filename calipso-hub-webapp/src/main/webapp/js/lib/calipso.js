@@ -376,7 +376,7 @@ define("calipso", function(require) {
 			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 				model : userDetails
 			}));
-			Calipso.navigate("login", {
+			Calipso.navigate("home", {
 				trigger : true
 			});
 		});
@@ -2019,7 +2019,7 @@ define("calipso", function(require) {
 	//////////////////////////////////////////////////
 
 	Calipso.view.AbstractLayout = Backbone.Marionette.LayoutView.extend({
-		containerClass : "container-fluid",
+		taName: "div",
 		/** Stores the default forward path to use after a successful action */
 		defaultForward : null,
 		/** Stores the final configuration */
@@ -2043,7 +2043,7 @@ define("calipso", function(require) {
 		},
 		/**
 		 * Validate the final configuration. Called during initialization
-		 * by {Calipso.view.AbstractLayout#configure}. Internal use only.
+		 * by {Calipso.view.MainLayout#configure}. Internal use only.
 		 */
 		_validateConfiguration : function(){
 			var missing = [];
@@ -2082,7 +2082,7 @@ define("calipso", function(require) {
 			// and then again by relevant options only
 			options = options || {};
 			_.extendOwn(this.config, options);
-			console.log("Calipso.view.AbstractLayout#configure, final config: ");
+			console.log("Calipso.view.MainLayout#configure, final config: ");
 			console.log(this.config);
 			// validate config
 			this._validateConfiguration();
@@ -2094,7 +2094,7 @@ define("calipso", function(require) {
 		},
 		initialize : function(options){
 			Backbone.Marionette.LayoutView.prototype.initialize.apply(this, arguments);
-			console.log("Calipso.view.AbstractLayout#initialize");
+			console.log("Calipso.view.MainLayout#initialize");
 			if(!this.skipSrollToTop){
 				$(window).scrollTop(0);
 			}
@@ -2104,8 +2104,13 @@ define("calipso", function(require) {
 		}
 	}, {
 		getTypeName : function() {
-			return "AbstractLayout"
+			return "MainLayout"
 		}
+	});
+
+
+	Calipso.view.MainLayout = Calipso.view.AbstractLayout.extend({
+		className : "container configurable-fluid",
 	});
 
 	Calipso.view.ModalLayout = Calipso.view.AbstractLayout.extend({
@@ -2170,9 +2175,10 @@ define("calipso", function(require) {
 					view.el);
 	};
 
-	Calipso.view.HeaderView = Calipso.view.AbstractLayout.extend(
+	Calipso.view.HeaderView = Calipso.view.MainLayout.extend(
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
+		className: "container",
 		template : require('hbs!template/header'),
 		id : "navbar-menu",
 		className : "col-sm-12",
@@ -2270,17 +2276,17 @@ define("calipso", function(require) {
 			return "HeaderView";
 		}
 	});
-	Calipso.view.ModelDrivenBrowseLayout = Calipso.view.AbstractLayout.extend(
+	Calipso.view.ModelDrivenBrowseLayout = Calipso.view.MainLayout.extend(
 	/** @lends Calipso.view.ModelDrivenBrowseLayout.prototype */
 	{
 		tagName : 'div',
 		id : "calipsoModelDrivenBrowseLayout",
 		template : require('hbs!template/md-browse-layout'),
 		/**
-		 * Get the default config. Overwrites {Calipso.view.AbstractLayout#getDefaultConfig}
+		 * Get the default config. Overwrites {Calipso.view.MainLayout#getDefaultConfig}
 		 */
 		getDefaultConfig : function(){
-			var defaultConfig = Calipso.view.AbstractLayout.prototype.getDefaultConfig.apply(this);
+			var defaultConfig = Calipso.view.MainLayout.prototype.getDefaultConfig.apply(this);
 			// now set this class' default config
 			defaultConfig.skipToSingleResult = false;
 			return defaultConfig;
@@ -2293,7 +2299,7 @@ define("calipso", function(require) {
 			this.showContent(this.model);
 		},
 		initialize : function(options) {
-			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
+			Calipso.view.MainLayout.prototype.initialize.apply(this, arguments);
 			var _this = this;
 
 			this.listenTo(Calipso.vent, "updateSearchLocation", function(model) {
@@ -2463,7 +2469,7 @@ define("calipso", function(require) {
 		id : "calipsoModelDrivenSearchLayout",
 		template : require('hbs!template/md-search-layout'),
 		/**
-		 * Get the default config. Overwrites {Calipso.view.AbstractLayout#getDefaultConfig}
+		 * Get the default config. Overwrites {Calipso.view.MainLayout#getDefaultConfig}
 		 */
 		getDefaultConfig : function(){
 			var defaultConfig = Calipso.view.ModelDrivenBrowseLayout.prototype.getDefaultConfig.apply(this);
@@ -2569,7 +2575,7 @@ define("calipso", function(require) {
 		}
 	});
 	/*
-		var ModelDrivenOverviewLayout = AbstractLayout.extend({
+		var ModelDrivenOverviewLayout = MainLayout.extend({
 			template : require('hbs!template/md-overview-layout'),
 			onShow : function() {
 				console.log("ModelDrivenOverviewLayout#onShow");
@@ -2589,7 +2595,7 @@ define("calipso", function(require) {
 	 		getTypeName: function(){return "ModelDrivenCrudLayout"}
 		});
 
-		var ModelDrivenCrudLayout = AbstractLayout.extend({
+		var ModelDrivenCrudLayout = MainLayout.extend({
 			template : tmpl,
 			tagName : "div",
 			className : "col-sm-12",
@@ -2862,7 +2868,7 @@ define("calipso", function(require) {
 	Calipso.view.FooterView = Marionette.ItemView.extend(
 	/** @lends Calipso.view.FooterView.prototype */
 	{
-
+		className : "container",
 		template : require('hbs!template/footer'),
 		id : "navbar-menu",
 		className : "col-sm-12"
@@ -3003,6 +3009,7 @@ define("calipso", function(require) {
 			"click button.btn-windowcontrols-destroy" : "back"
 		},
 		collection : null,
+		backgrid : null,
 		back : function(e) {
 			Calipso.stopEvent(e);
 			window.history.back();
@@ -3024,6 +3031,9 @@ define("calipso", function(require) {
 			}
 			console.log("ModelDrivenCollectionGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
 			console.log("ModelDrivenCollectionGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
+		},
+		onGridRendered : function() {
+
 		},
 		onCollectionFetched : function() {
 
@@ -3047,14 +3057,14 @@ define("calipso", function(require) {
 			console.log("ModelDrivenCollectionGridView.onShow, collection.data: " + _self.collection.data);
 			console.log(_self.collection.data);
 
-			var backgrid = this.getGrid({
+			this.backgrid = this.getGrid({
 				className : "backgrid responsive-table",
 				columns : gridSchema,
 				collection : _self.collection,
 				emptyText : "No records found"
 			});
 
-			this.$('.backgrid-table-container').append(backgrid.render().$el);
+			this.$('.backgrid-table-container').append(this.backgrid.render().$el);
 			_self.listenTo(_self.collection, "backgrid:refresh", _self.showFixedHeader);
 			var paginator = new Backgrid.Extension.Paginator({
 
@@ -3076,7 +3086,7 @@ define("calipso", function(require) {
 
 			this.$('.backgrid-paginator-container').append(paginator.render().el);
 			//						console.log("ModelDrivenCollectionGridView.onShow, collection url: "+);
-
+			this.onGridRendered();
 			if (this.callCollectionFetch) {
 				var fetchOptions = {
 					reset : true,
@@ -3211,10 +3221,13 @@ define("calipso", function(require) {
 		},
 		getGrid : function(gridOptions){
 			gridOptions.columnsToPin = 1;
-			gridOptions.minScreenSize = 4000;
+			gridOptions.minScreenSize = 5000;
 			gridOptions.className = "backgrid";
 			console.log("building responsive grid...");
 			return new Backgrid.Extension.ResponsiveGrid(gridOptions);
+		},
+		onGridRendered : function() {
+		  this.backgrid.setSwitchable({});
 		},
 		onShow : function() {
 			Calipso.view.ModelDrivenCollectionGridView.prototype.onShow.apply(this);
@@ -3718,8 +3731,8 @@ define("calipso", function(require) {
 		}
 	});
 
-	Calipso.view.AbstractLayout.prototype.getTypeName = function() {
-		return "AbstractLayout";
+	Calipso.view.MainLayout.prototype.getTypeName = function() {
+		return "MainLayout";
 	};
 
 	/*
@@ -3841,7 +3854,7 @@ define("calipso", function(require) {
 		return "LoginView";
 	};
 
-	Calipso.view.AppLayout = Calipso.view.AbstractLayout.extend({
+	Calipso.view.AppLayout = Calipso.view.MainLayout.extend({
 		tagName : "div",
 		template : require('hbs!template/applayout'),// _.template(templates.applayout),
 		regions : {
@@ -4530,7 +4543,7 @@ define("calipso", function(require) {
 		/**
 		 * Instantiate and show a layout for the given model
 		 * @param  {Calipso.model.GenericModel} givenModel the model for which the layout will be shown
-		 * @param  {Calipso.view.abstractLayout]} the layout type to use. If absent the method will
+		 * @param  {Calipso.view.MainLayout]} the layout type to use. If absent the method will
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
 		showLayoutForModel : function(givenModel, GivenModelLayoutType){
