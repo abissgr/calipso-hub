@@ -115,7 +115,7 @@
 		<spring-data-jpa-version>1.4.2.RELEASE</spring-data-jpa-version>
 		<spring-data-commons-version>1.6.2.RELEASE</spring-data-commons-version>
 		<spring-data-elasticsearch-version>1.0.0.M1</spring-data-elasticsearch-version>
-
+		
 		<org.springframework.social.web-version>1.1.0.M4</org.springframework.social.web-version>
 		<spring.security.version>3.1.4.RELEASE</spring.security.version>
 		<spring.security.taglibs.version>3.1.3.RELEASE</spring.security.taglibs.version>
@@ -123,7 +123,11 @@
 
 		<org.springframework.security.crypto-version>3.1.4.RELEASE</org.springframework.security.crypto-version>
 		<thymeleaf.version>2.0.16</thymeleaf.version>
-		<joda-time.version>2.1</joda-time.version>
+		
+		<joda-time.version>2.8.1</joda-time.version>
+		<org.jadira.usertype.core.version>3.2.0.GA</org.jadira.usertype.core.version>
+		<jackson-datatype-joda.version>2.4.0</jackson-datatype-joda.version>   
+
 		<commons-lang3.version>3.4</commons-lang3.version>
 		<commons-configuration.version>1.9</commons-configuration.version>
 		<commons-beanutils.version>1.9.1</commons-beanutils.version>
@@ -489,6 +493,16 @@
 				<artifactId>joda-time</artifactId>
 				<version>${joda-time.version}</version>
 			</dependency>
+	        <dependency>
+	            <groupId>org.jadira.usertype</groupId>
+	            <artifactId>usertype.core</artifactId>
+	            <version>${org.jadira.usertype.core.version}</version>
+	        </dependency>
+	        <dependency>
+	           <groupId>com.fasterxml.jackson.datatype</groupId>
+	           <artifactId>jackson-datatype-joda</artifactId>
+	           <version>${jackson-datatype-joda.version}</version>
+	        </dependency> 
 			<dependency>
 				<groupId>org.owasp</groupId>
 				<artifactId>antisamy</artifactId>

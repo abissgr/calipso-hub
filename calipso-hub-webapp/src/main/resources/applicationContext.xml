@@ -21,13 +21,14 @@
         <constructor-arg value="${calipso.domain}" />
         <constructor-arg value="/" />
     </bean>
-    <bean id="conversionService"
-    class="org.springframework.context.support.ConversionServiceFactoryBean">
-    <property name="converters">
-        <!-- converters is a set of both converters and converterfactories -->
-        <bean class="gr.abiss.calipso.model.serializers.CustomEnumConverterFactory" />
-    </property>
-</bean>
+    
+    <bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+	    <property name="converters">
+	        <!-- converters is a set of both converters and converterfactories -->
+	        <bean class="gr.abiss.calipso.model.serializers.CustomEnumConverterFactory" />
+	    </property>
+	</bean>
     
     <!-- extend resthub JPA config databaseProperties -->
     <bean id="jpaProperties" parent="resthubCoreJpaProperties">
