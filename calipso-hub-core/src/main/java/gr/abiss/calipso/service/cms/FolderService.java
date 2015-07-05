@@ -18,10 +18,10 @@
  */
 package gr.abiss.calipso.service.cms;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.cms.Folder;
+import gr.abiss.calipso.service.GenericEntityService;
 
-public interface FolderService extends GenericService<Folder, String> {
+public interface FolderService extends GenericEntityService<Folder, String> {
 
 
 }

@@ -58,5 +58,4 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 
 	public Page<ReportDataSet> getReportDatasets(Pageable pageable, TimeUnit timeUnit,
 			String dateField, Date dateFrom, Date dateTo, String reportName);
-
 }

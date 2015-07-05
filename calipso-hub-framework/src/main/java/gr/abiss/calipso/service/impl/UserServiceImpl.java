@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 //@Named("userService")
-public class UserServiceImpl extends AbstractServiceImpl<User, String, UserRepository> 
+public class UserServiceImpl extends GenericEntityServiceImpl<User, String, UserRepository> 
 	implements UserService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);

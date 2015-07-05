@@ -18,7 +18,7 @@
 package gr.abiss.calipso.controller;
 
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.service.GenericEntityService;
 
 import java.io.Serializable;
 
@@ -38,7 +38,7 @@ import com.wordnik.swagger.annotations.Api;
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
 @Api(description = "All generic operations for entities", value = "")
-public abstract class ReadOnlyServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericService<T, ID>>
+public abstract class ReadOnlyServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
 		extends
 		AbstractServiceBasedRestController<T, ID, S> {
 

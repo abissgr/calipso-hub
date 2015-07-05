@@ -22,7 +22,7 @@ import gr.abiss.calipso.model.cms.File;
 import gr.abiss.calipso.repository.cms.FileRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.cms.FileService;
-import gr.abiss.calipso.service.impl.AbstractServiceImpl;
+import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named("fileService")
-public class FileServiceImpl extends AbstractServiceImpl<File, String, FileRepository> 
+public class FileServiceImpl extends GenericEntityServiceImpl<File, String, FileRepository> 
 	implements FileService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileServiceImpl.class);

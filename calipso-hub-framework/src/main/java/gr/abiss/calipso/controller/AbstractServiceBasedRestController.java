@@ -18,28 +18,32 @@
 package gr.abiss.calipso.controller;
 
 
+import gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
-import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
+import gr.abiss.calipso.service.GenericEntityService;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.resthub.common.exception.NotFoundException;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
@@ -69,9 +73,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
 @Api(description = "All generic operations for entities", value = "")
-public abstract class AbstractServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericService<T, ID>>
-		extends
-		ServiceBasedRestController<T, ID, S> {
+public abstract class AbstractServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
+		extends ServiceBasedRestController<T, ID, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceBasedRestController.class);
  
@@ -105,16 +108,33 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
 			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
 
-		Map<String, String[]> paramsMap = request.getParameterMap();
 		
-		return findPaginated(page, size, sort, direction, paramsMap);
+		return findPaginated(page, size, sort, direction, request.getParameterMap(), true);
 	}
 
 
 
 	protected Page<T> findPaginated(Integer page, Integer size, String sort,
-			String direction, Map<String, String[]> paramsMap) {
-		Pageable pageable = buildPageable(page, size, sort, direction, paramsMap);
+			String direction, Map<String, String[]> paramsMap, boolean applyImplicitPredicates) {
+
+		// add implicit criteria?
+		Map<String, String[]> parameters = null;
+		if(applyImplicitPredicates){
+			parameters = new HashMap<String, String[]>();
+			parameters.putAll(paramsMap);
+			List<Field> currentPrincipalPredicateFields = FieldUtils.getFieldsListWithAnnotation(this.service.getDomainClass(), UserDetailsCriterion.class);
+			if(CollectionUtils.isNotEmpty(currentPrincipalPredicateFields)){
+				for(Field field : currentPrincipalPredicateFields){
+					String[] val = {this.service.getPrincipal().getId()};
+					parameters.put(field.getName(), val);
+				}
+			}
+		}
+		else{
+			parameters = paramsMap;
+		}
+		
+		Pageable pageable = buildPageable(page, size, sort, direction, parameters);
 		return this.service.findAll(pageable);
 				
 	}

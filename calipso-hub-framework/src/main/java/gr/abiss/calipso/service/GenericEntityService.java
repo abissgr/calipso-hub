@@ -16,12 +16,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service.cms;
-
-import gr.abiss.calipso.model.cms.Text;
-import gr.abiss.calipso.service.GenericEntityService;
-
-public interface TextService extends GenericEntityService<Text, String> {
+package gr.abiss.calipso.service;
 
 
+import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+
+import java.io.Serializable;
+
+import org.springframework.data.domain.Persistable;
+import org.springframework.stereotype.Service;
+
+@Service
+public interface GenericEntityService <T extends Persistable<ID>, ID extends Serializable>
+extends GenericService<T, ID>{
+
+	public ICalipsoUserDetails getPrincipal();
+
+	public LocalUser getPrincipalLocalUser();
 }

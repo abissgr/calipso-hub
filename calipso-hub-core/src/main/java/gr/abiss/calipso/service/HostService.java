@@ -18,10 +18,9 @@
  */
 package gr.abiss.calipso.service;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.Host;
 
-public interface HostService extends GenericService<Host, String> {
+public interface HostService extends GenericEntityService<Host, String> {
 
 	Host findByDomain(String domain);
 

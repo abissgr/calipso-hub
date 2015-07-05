@@ -18,11 +18,10 @@
  */
 package gr.abiss.calipso.service;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
 
-public interface RoleService extends GenericService<Role, String> {
+public interface RoleService extends GenericEntityService<Role, String> {
 
 	Role findByIdOrName(String idOrName);
 

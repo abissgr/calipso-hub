@@ -22,7 +22,7 @@ import gr.abiss.calipso.model.cms.Tag;
 import gr.abiss.calipso.repository.cms.TagRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.cms.TagService;
-import gr.abiss.calipso.service.impl.AbstractServiceImpl;
+import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named("tagService")
-public class TagServiceImpl extends AbstractServiceImpl<Tag, String, TagRepository> 
+public class TagServiceImpl extends GenericEntityServiceImpl<Tag, String, TagRepository> 
 	implements TagService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);

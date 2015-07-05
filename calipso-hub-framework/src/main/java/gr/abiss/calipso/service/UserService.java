@@ -24,7 +24,7 @@ import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.userDetails.integration.LocalUserService;
 
-public interface UserService extends GenericService<User, String>, LocalUserService<String, User> {
+public interface UserService extends GenericEntityService<User, String>, LocalUserService<String, User> {
 
 	User findByCredentials(String userNameOrEmail, String password, Map metadata);
 

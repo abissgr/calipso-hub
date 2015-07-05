@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Named("roleService")
 @Transactional(readOnly = true)
-public class RoleServiceImpl extends AbstractServiceImpl<Role, String, RoleRepository> implements RoleService {
+public class RoleServiceImpl extends GenericEntityServiceImpl<Role, String, RoleRepository> implements RoleService {
 
 	@Override
 	@Inject

@@ -18,10 +18,10 @@
  */
 package gr.abiss.calipso.service.cms;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.cms.Tag;
+import gr.abiss.calipso.service.GenericEntityService;
 
-public interface TagService extends GenericService<Tag, String> {
+public interface TagService extends GenericEntityService<Tag, String> {
 
 
 }

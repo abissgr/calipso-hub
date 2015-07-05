@@ -18,10 +18,10 @@
  */
 package gr.abiss.calipso.service.cms;
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.cms.File;
+import gr.abiss.calipso.service.GenericEntityService;
 
-public interface FileService extends GenericService<File, String> {
+public interface FileService extends GenericEntityService<File, String> {
 
 
 }

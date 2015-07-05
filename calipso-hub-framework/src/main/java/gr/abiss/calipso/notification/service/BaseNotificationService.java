@@ -18,16 +18,13 @@
  */
 package gr.abiss.calipso.notification.service;
 
-import java.io.Serializable;
-
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.notification.model.BaseNotification;
+import gr.abiss.calipso.service.GenericEntityService;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.UserDetails;
 
-public interface BaseNotificationService extends GenericService<BaseNotification, String> {
+public interface BaseNotificationService extends GenericEntityService<BaseNotification, String> {
 
 	/**
 	 * Count the unseen notifications addressed to the current principal

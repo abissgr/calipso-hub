@@ -32,7 +32,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
 @Named("hostService")
-public class HostServiceImpl extends AbstractServiceImpl<Host, String, HostRepository> 
+public class HostServiceImpl extends GenericEntityServiceImpl<Host, String, HostRepository> 
 	implements HostService{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HostServiceImpl.class);
