@@ -47,12 +47,6 @@ public class UserRegistrationController extends UserController {
 		return super.findPaginated(page, size, sort, direction);
 	}
 
-	@Override
-	protected Page<User> findPaginated(Integer page, Integer size, String sort,
-			String direction, Map<String, String[]> paramsMap) {
-		// TODO Auto-generated method stub
-		return super.findPaginated(page, size, sort, direction, paramsMap);
-	}
 
 	@Override
 	public User update(String id, User resource) {

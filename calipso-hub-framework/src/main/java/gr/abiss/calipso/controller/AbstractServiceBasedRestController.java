@@ -28,6 +28,7 @@ import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -124,8 +125,9 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			parameters.putAll(paramsMap);
 			List<Field> currentPrincipalPredicateFields = FieldUtils.getFieldsListWithAnnotation(this.service.getDomainClass(), UserDetailsCriterion.class);
 			if(CollectionUtils.isNotEmpty(currentPrincipalPredicateFields)){
+				ICalipsoUserDetails principal = this.service.getPrincipal();
+				String[] val = {principal != null ? principal.getId() : "anonymous"};
 				for(Field field : currentPrincipalPredicateFields){
-					String[] val = {this.service.getPrincipal().getId()};
 					parameters.put(field.getName(), val);
 				}
 			}
