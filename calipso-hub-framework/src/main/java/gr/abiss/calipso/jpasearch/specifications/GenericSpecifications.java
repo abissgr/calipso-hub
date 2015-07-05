@@ -66,6 +66,7 @@ public class GenericSpecifications {
 	private static final NumberPredicateFactory<Double> doublePredicateFactory = new NumberPredicateFactory<Double>(Double.class);
 
 	private static final AnyToOnePredicateFactory anyToOnePredicateFactory = new AnyToOnePredicateFactory();
+	private static final AnyToOneToOnePropertyPredicateFactory anyToOneToOnePredicateFactory = new AnyToOneToOnePropertyPredicateFactory();
 	private static final CurrentPrincipalPredicateFactory currentPrincipalPredicateFactory = new CurrentPrincipalPredicateFactory();
 	
 	private static final HashMap<Class, IPredicateFactory> factoryForClassMap = new HashMap<Class, IPredicateFactory>();
@@ -85,7 +86,7 @@ public class GenericSpecifications {
 		factoryForClassMap.put(Double.class, doublePredicateFactory);
 		
 		// init ignore list
-		String[] ignoredFieldNames = {"page", "direction", "size"};
+		String[] ignoredFieldNames = {"page", "direction", "properties", "size"};
 		IGNORED_FIELD_NAMES = new ArrayList<String>(ignoredFieldNames.length);
 		for(int i = 0; i < ignoredFieldNames.length; i++){
 			IGNORED_FIELD_NAMES.add(ignoredFieldNames[i]);
@@ -144,7 +145,7 @@ public class GenericSpecifications {
 		return field;
 	}
 
-	protected static Predicate getPredicate(final Class clazz,
+	protected static Predicate getRootPredicate(final Class clazz,
 			final Map<String, String[]> searchTerms, Root<Persistable> root,
 			CriteriaBuilder cb) {
 		LinkedList<Predicate> predicates = new LinkedList<Predicate>();
@@ -184,7 +185,7 @@ public class GenericSpecifications {
 			String[] searchMode = { mode };
 			for (Map<String, String[]> params : andJunctions.values()) {
 				params.put(SEARCH_MODE, searchMode);
-				Predicate nestedPredicate = getPredicate(clazz, params, root,
+				Predicate nestedPredicate = getRootPredicate(clazz, params, root,
 						cb);
 				if (nestedPredicate != null) {
 					predicates.add(nestedPredicate);
@@ -227,16 +228,24 @@ public class GenericSpecifications {
 			Root<Persistable> root, CriteriaBuilder cb,
 			LinkedList<Predicate> predicates, String[] propertyValues,
 			String propertyName) {
-		Field field = GenericSpecifications.getField(clazz,
-				propertyName);
-		if (field != null) {
-			LOGGER.info("addPredicate, property: " + propertyName);
-			Class fieldType = field.getType();
-			IPredicateFactory predicateFactory = getPredicateFactoryForClass(field);
-			LOGGER.info("addPredicate, predicateFactory: " + predicateFactory);
-			if (predicateFactory != null) {
-				predicates.add(predicateFactory.getPredicate(root, cb,
-						propertyName, fieldType, propertyValues));
+		// dot notation only supports toOne.toOne.id
+		if(propertyName.contains(".")){
+			LOGGER.info("addPredicate, property name is a path: " + propertyName);
+			predicates.add(anyToOneToOnePredicateFactory.getPredicate(root, cb,
+					propertyName, null, propertyValues));
+		}
+		else{// normal single step predicate
+			Field field = GenericSpecifications.getField(clazz,
+					propertyName);
+			if (field != null) {
+				LOGGER.info("addPredicate, property: " + propertyName);
+				Class fieldType = field.getType();
+				IPredicateFactory predicateFactory = getPredicateFactoryForClass(field);
+				LOGGER.info("addPredicate, predicateFactory: " + predicateFactory);
+				if (predicateFactory != null) {
+					predicates.add(predicateFactory.getPredicate(root, cb,
+							propertyName, fieldType, propertyValues));
+				}
 			}
 		}
 	}
@@ -255,7 +264,7 @@ public class GenericSpecifications {
 		return new Specification<Persistable>() {
 			@Override
 			public Predicate toPredicate(Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				return GenericSpecifications.getPredicate(clazz, searchTerms, root, cb);
+				return GenericSpecifications.getRootPredicate(clazz, searchTerms, root, cb);
 			}
 
 

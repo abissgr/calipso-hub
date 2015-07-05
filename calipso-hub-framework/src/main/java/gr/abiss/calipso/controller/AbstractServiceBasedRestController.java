@@ -100,7 +100,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@ResponseBody
 	@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
 	public Page<T> findPaginated(
-			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
 			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
 			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
