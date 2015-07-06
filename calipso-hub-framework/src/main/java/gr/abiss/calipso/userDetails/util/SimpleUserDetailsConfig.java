@@ -21,7 +21,7 @@ import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 
 public class SimpleUserDetailsConfig implements UserDetailsConfig {
 
-	private String cookiesBasicAuthTokenName = "Authorization";
+	private String cookiesBasicAuthTokenName = "calipso-sso";
 	private String cookiesDomain = null;
 	private String cookiesContextPath = null;
 	private boolean cookiesSecure = false;

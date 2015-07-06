@@ -86,7 +86,7 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 				}
 			}
 			if(LOGGER.isDebugEnabled() && authToken == null){
-				LOGGER.debug("Found no calipso SSO cookie with name: '" + ssoCookieName);
+				LOGGER.debug("Found no calipso SSO cookie with name: " + ssoCookieName);
 				
 			}
 		}

@@ -60,10 +60,12 @@ implements GenericEntityService<T, ID>{
 		this.userRepository = userRepository;
 	}
 
+	@Override
 	public ICalipsoUserDetails getPrincipal() {
 		return SecurityUtil.getPrincipal();
 	}
 
+	@Override
 	public LocalUser getPrincipalLocalUser() {
 		ICalipsoUserDetails principal = getPrincipal();
 		LocalUser user = null;
