@@ -863,8 +863,8 @@ define("calipso", function(require) {
 		},
 		getFormTemplateKey : function(){
 			var schemaKey = this.getFormSchemaKey();
-			var formTemplateKey = "horizontal";
-			if(schemaKey.indexOf("search") == 0 ||  schemaKey.indexOf("report") == 0){
+			var formTemplateKey = "vertical";
+			if( schemaKey.indexOf("report") == 0){
 				formTemplateKey = "nav";
 			}
 			return formTemplateKey;

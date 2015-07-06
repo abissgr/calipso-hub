@@ -112,6 +112,7 @@ public abstract class AbstractAuditableRateable<U extends AbstractPersistable, R
 	 */
 	@Override
 	public void setRatingsSize(Integer ratingsSize) {
+		
 		this.ratingsSize = ratingsSize;
 	}
 

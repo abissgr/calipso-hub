@@ -31,15 +31,13 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Ba
 
   Form.Field.template = _.template('\
     <div class="form-group field-<%= key %>">\
-      <label class="col-sm-2 control-label" for="<%= editorId %>">\
+      <label class=" control-label" for="<%= editorId %>">\
         <% if (titleHTML){ %><%= titleHTML %>\
         <% } else { %><%- title %><% } %>\
       </label>\
-      <div class="col-sm-10">\
         <span data-editor></span>\
         <p class="help-block" data-error></p>\
         <p class="help-block"><%= help %></p>\
-      </div>\
     </div>\
   ');
 
