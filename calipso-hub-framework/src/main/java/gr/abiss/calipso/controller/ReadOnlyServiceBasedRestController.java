@@ -22,18 +22,22 @@ import gr.abiss.calipso.service.GenericEntityService;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.resthub.web.exception.NotImplementedClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Persistable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
@@ -64,5 +68,17 @@ public abstract class ReadOnlyServiceBasedRestController<T extends Persistable<I
 	public void delete(ID id) {
 		throw new NotImplementedClientException("Method is unsupported.");
 	}
-    
+
+	@Override
+	@RequestMapping(method = RequestMethod.GET)
+	@ResponseBody
+	@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
+	public Page<T> findPaginated(
+			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
+			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
+		// skip current principal predicates
+		return findPaginated(page, size, sort, direction, request.getParameterMap(), false);
+	}
 }

@@ -46,6 +46,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.lucene.index.Fields;
@@ -112,9 +113,14 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
 			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
 			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
-
+		boolean applyCurrentPrincipalIdPredicate = true;
 		
-		return findPaginated(page, size, sort, direction, request.getParameterMap(), true);
+		if(BooleanUtils.toBoolean(request.getParameter("skipCurrentPrincipalIdPredicate"))){
+			applyCurrentPrincipalIdPredicate = false;
+			LOGGER.debug("Skipping CurrentPrincipalIdPredicate");
+		}
+		
+		return findPaginated(page, size, sort, direction, request.getParameterMap(), applyCurrentPrincipalIdPredicate);
 	}
 
 

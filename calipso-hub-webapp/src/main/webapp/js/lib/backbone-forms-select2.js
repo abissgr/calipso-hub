@@ -47,17 +47,20 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 			console.log("Backbone.Form.editors.ModelSelect2#getValue, value: ");
 			console.log(simpleValue);
 			var value;
-			if (this.schema.multiple) {
-				value = [];
-				for (var i = 0; i < simpleValue.length; i++) {
-					value.push(this.schema.options.findWhere({
-						id : simpleValue[i]
-					}));
+			if(simpleValue){
+
+				if (this.schema.multiple) {
+					value = [];
+					for (var i = 0; i < simpleValue.length; i++) {
+						value.push(this.schema.options.findWhere({
+							id : simpleValue[i]
+						}));
+					}
+				} else {
+					value = this.schema.options.findWhere({
+						id : simpleValue
+					});
 				}
-			} else {
-				value = this.schema.options.findWhere({
-					id : simpleValue
-				});
 			}
 			console.log("getValue, simpleValue: " + simpleValue + ", model value: ");
 			console.log(value);
