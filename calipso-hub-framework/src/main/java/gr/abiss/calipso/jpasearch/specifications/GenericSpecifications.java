@@ -17,7 +17,7 @@
  */
 package gr.abiss.calipso.jpasearch.specifications;
 
-import gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion;
+import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
@@ -98,7 +98,7 @@ public class GenericSpecifications {
 		if (clazz.isEnum()) {
 			return new EnumStringPredicateFactory(clazz);
 		} else if (Persistable.class.isAssignableFrom(clazz)) {
-			if (field.isAnnotationPresent(UserDetailsCriterion.class)) {
+			if (field.isAnnotationPresent(CurrentPrincipalIdPredicate.class)) {
 				return currentPrincipalPredicateFactory;
 			}
 			else{
@@ -230,7 +230,7 @@ public class GenericSpecifications {
 			String propertyName) {
 		// dot notation only supports toOne.toOne.id
 		if(propertyName.contains(".")){
-			LOGGER.info("addPredicate, property name is a path: " + propertyName);
+			//LOGGER.info("addPredicate, property name is a path: " + propertyName);
 			predicates.add(anyToOneToOnePredicateFactory.getPredicate(root, cb,
 					propertyName, null, propertyValues));
 		}
@@ -238,10 +238,10 @@ public class GenericSpecifications {
 			Field field = GenericSpecifications.getField(clazz,
 					propertyName);
 			if (field != null) {
-				LOGGER.info("addPredicate, property: " + propertyName);
+				//LOGGER.info("addPredicate, property: " + propertyName);
 				Class fieldType = field.getType();
 				IPredicateFactory predicateFactory = getPredicateFactoryForClass(field);
-				LOGGER.info("addPredicate, predicateFactory: " + predicateFactory);
+				//LOGGER.info("addPredicate, predicateFactory: " + predicateFactory);
 				if (predicateFactory != null) {
 					predicates.add(predicateFactory.getPredicate(root, cb,
 							propertyName, fieldType, propertyValues));
@@ -259,8 +259,7 @@ public class GenericSpecifications {
 	 */
 	public static Specification matchAll(final Class clazz, final Map<String, String[]> searchTerms) {
 
-		LOGGER.info("matchAll, entity: " + clazz.getSimpleName()
-				+ ", searchTerms: " + searchTerms);
+		LOGGER.info("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
 		return new Specification<Persistable>() {
 			@Override
 			public Predicate toPredicate(Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -281,8 +280,7 @@ public class GenericSpecifications {
 	public static Specification matchAll(final Class clazz,
 			final Restriction searchTerms) {
 
-		LOGGER.info("matchAll, entity: " + clazz.getSimpleName()
-				+ ", searchTerms: " + searchTerms);
+		LOGGER.info("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
 		return new Specification<Persistable>() {
 			@Override
 			public Predicate toPredicate(Root<Persistable> root,

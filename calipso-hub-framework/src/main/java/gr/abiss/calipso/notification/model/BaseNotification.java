@@ -2,7 +2,7 @@ package gr.abiss.calipso.notification.model;
 
 import java.util.Date;
 
-import gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion;
+import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
@@ -30,6 +30,7 @@ import com.wordnik.swagger.annotations.ApiModel;
  * Base notification class, corresponds to a Log Table that aggregates basic information for all 
  * notifications.  
  */
+@CurrentPrincipalIdPredicate( path = "recepient", ignoreforRoles = {"ROLE_ADMIN", "ROLE_SITE_OPERATOR"} )
 @Entity
 @ApiModel
 @Table(name = "base_notification")
@@ -49,7 +50,6 @@ public class BaseNotification extends AbstractPersistable {
 
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "recepient", referencedColumnName = "id", nullable = false, updatable = false)
-	@UserDetailsCriterion
 	private User recepient;
 
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)

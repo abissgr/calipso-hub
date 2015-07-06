@@ -18,17 +18,20 @@
 package gr.abiss.calipso.controller;
 
 
-import gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion;
+import gr.abiss.calipso.jpasearch.annotation.ApplyCurrentPrincipal;
+import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
+import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.service.GenericEntityService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -45,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.lucene.index.Fields;
 import org.resthub.common.exception.NotFoundException;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
@@ -121,24 +125,47 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 		// add implicit criteria?
 		Map<String, String[]> parameters = null;
 		if(applyImplicitPredicates){
+			LOGGER.info("Adding implicit predicates");
 			parameters = new HashMap<String, String[]>();
 			parameters.putAll(paramsMap);
-			List<Field> currentPrincipalPredicateFields = FieldUtils.getFieldsListWithAnnotation(this.service.getDomainClass(), UserDetailsCriterion.class);
-			if(CollectionUtils.isNotEmpty(currentPrincipalPredicateFields)){
+			CurrentPrincipalIdPredicate predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalIdPredicate.class);
+			if(predicate != null){
 				ICalipsoUserDetails principal = this.service.getPrincipal();
-				String[] val = {principal != null ? principal.getId() : "anonymous"};
-				for(Field field : currentPrincipalPredicateFields){
-					parameters.put(field.getName(), val);
+				String[] excludeRoles = predicate.ignoreforRoles();
+				boolean skipPredicate = this.hasAnyRoles(predicate.ignoreforRoles());
+				if(!skipPredicate){
+					String id = principal != null ? principal.getId() : "ANONYMOUS";
+					String[] val = {id};
+					LOGGER.info("Adding implicit predicate, name: " + predicate.path() + ", value: " + id);
+					parameters.put(predicate.path(), val);
 				}
+				else{
+					LOGGER.info("Skipping implicit predicate, name: " + predicate.path());
+				}
+				
 			}
 		}
 		else{
+			LOGGER.info("Skipping implicit predicates");
 			parameters = paramsMap;
 		}
 		
 		Pageable pageable = buildPageable(page, size, sort, direction, parameters);
 		return this.service.findAll(pageable);
 				
+	}
+
+
+
+	protected boolean hasAnyRoles(String[] roles) {
+		boolean skipPredicate = false;
+		for(int i = 0; i < roles.length; i++){
+			if(request.isUserInRole(roles[i])){
+				skipPredicate = true; 
+				break;
+			}
+		}
+		return skipPredicate;
 	}
 
 
@@ -167,7 +194,50 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
     @ApiOperation(value = "create", notes = "Create a new resource", httpMethod = "POST")
 	////@ApiResponse(code = 201, message = "created")
 	public T create(@RequestBody T resource) {
+		applyCurrentPrincipal(resource);
 		return super.create(resource);
+	}
+
+
+
+	protected void applyCurrentPrincipal(T resource) {
+		Field[] fields = FieldUtils.getFieldsWithAnnotation(this.service.getDomainClass(), ApplyCurrentPrincipal.class);
+		//ApplyPrincipalUse predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalIdPredicate.class);
+		if(fields.length > 0){
+			ICalipsoUserDetails principal = this.service.getPrincipal();
+			for(int i = 0; i < fields.length; i++){
+				Field field = fields[i];
+				ApplyCurrentPrincipal applyRule = field.getAnnotation(ApplyCurrentPrincipal.class);
+				
+				// if property is not already set
+				try {
+					if(field.get(resource) == null){
+						boolean skipApply = this.hasAnyRoles(applyRule.ignoreforRoles());
+						// if role is not ignored
+						if(!skipApply){
+							String id = principal != null ? principal.getId() : null;
+							if(id != null){
+								User user = new User();
+								user.setId(id);
+								LOGGER.info("Applying principal to field: " + field.getName() + ", value: " + id);
+								field.set(resource, user);
+							}
+							else{
+								LOGGER.warn("User is anonymous, cannot apply principal to field: " + field.getName());
+							}
+						}
+						else{
+							LOGGER.info("Skipping setting principal to field: " + field.getName());
+						}
+					}
+				} catch (Exception e) {
+					throw new RuntimeException("Failed to apply ApplyCurrentPrincipal annotation", e);
+				}
+				
+			}
+			
+			
+		}
 	}
 
 
@@ -184,6 +254,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("update, resource: "+resource);
 		}
+		applyCurrentPrincipal(resource);
 		return super.update(id, resource);
 	}
 

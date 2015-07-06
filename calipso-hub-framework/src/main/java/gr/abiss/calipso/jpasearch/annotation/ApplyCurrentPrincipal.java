@@ -16,14 +16,14 @@ import gr.abiss.calipso.model.Role;
  */
 @Target(value = ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UserDetailsCriterion {
-	
+public @interface ApplyCurrentPrincipal {
+
     /**
      * (Optional) The names of roles to exclude from the 
      * current principal criterion
      *
      * <p> By default no roles are excluded.
      */
-    String[] excludeRoles() default {};
+    String[] ignoreforRoles() default {};
 
 }

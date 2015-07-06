@@ -35,8 +35,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 /**
  * A predicate that automatically enforces the current principal (i.e. loggedin user) id
  * as the parent of a many2one. The predicate is used  by {@link gr.abiss.calipso.jpasearch.specifications.GenericSpecifications} for entity attributes using the 
- * {@link gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion}.
- * @see gr.abiss.calipso.jpasearch.annotation.UserDetailsCriterion
+ * {@link gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate}.
+ * @see gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate
  * @see gr.abiss.calipso.jpasearch.specifications.GenericSpecifications
  */
 public class CurrentPrincipalPredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
