@@ -1707,27 +1707,11 @@ define("calipso", function(require) {
 		return "Calipso.model.ReportDataSetModel";
 	};
 
-	/*Calipso.model.ReportDataSetModel.prototype.getPathFragment = function() {
-		return "Calipso.model.ReportDataSetModel";
-	};*/
 
 	Calipso.model.ReportDataSetModel.prototype.getCollectionViewType = function() {
 		return Calipso.view.ModelDrivenReportView;
 	};
-/*
-	Calipso.model.ReportDataSetModel.prototype.getFormSchemas = function() {
-		console.log("ReportDatasetModel.prototype.getFormSchemas() called, will return undefined");
-		return {//
-			firstName : {
-				"search" : 'Text',
-				"default" : {
-					type : 'Text',
-					//validators : [ 'required' ]
-				}
-			},
-		};
-	};
-	*/
+
 	//////////////////////////////////////////////////
 	// UI components
 	//////////////////////////////////////////////////
