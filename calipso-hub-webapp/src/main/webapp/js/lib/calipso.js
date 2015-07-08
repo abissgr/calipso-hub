@@ -110,6 +110,21 @@ define("calipso", function(require) {
 	Calipso.navigate = function(url, options) {
 		Calipso.app.routers["MainRouter"].navigate(url, options);
 	};
+	Calipso.getObjectProperty = function(obj, propName, defaultValue) {
+		var prop;
+		if(obj){
+			if(obj.get && !_.isUndefined(obj.get(propName))){
+				prop = obj.get(propName);
+			}
+			else if(!_.isUndefined(obj[propName])){
+				prop = obj[propName];
+			}
+			else if(!_.isUndefined(defaultValue)){
+				prop = defaultValue;
+			}
+		}
+		return prop;
+	};
 	Calipso.initializeApp = function(customConfig) {
 		customConfig = customConfig || {};
 		var config = {
@@ -1956,8 +1971,12 @@ define("calipso", function(require) {
 				).on('typeahead:selected', function(e, suggestion, name) {
 					_this.setValue(suggestion, name);
 				});
-				_this.$el.find("#" + _this.id).val(_this.value.id ? _this.value.id : _this.value);
-				_this.$el.find("#" + _this.id + "Typeahead").typeahead('val', _this.value.name);
+				if(_this.value){
+					var val = Calipso.getObjectProperty(_this.value, "id", _this.value);
+					var nameVal = Calipso.getObjectProperty(_this.value, "name");
+					_this.$el.find("#" + _this.id).val(val);
+					_this.$el.find("#" + _this.id + "Typeahead").typeahead('val', nameVal);
+				}
 			}
 			// apply typeahead after the field has been added to the DOM
 			setTimeout(create, 250);
@@ -3460,6 +3479,7 @@ define("calipso", function(require) {
 			"keypress input[type=text]" : "commitOnEnter"
 		},
 		commitOnEnter : function(e) {
+		console.log("GenericFormView#commitOnEnter");
 			if (e.keyCode != 13) {
 				return;
 			} else {
@@ -3639,7 +3659,7 @@ define("calipso", function(require) {
 					<form class="form-horizontal" role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="btn btn-default"><%= submitButton %></button>\
+					<button type="submit" class="submit btn btn-default"><%= submitButton %></button>\
 					<% } %>\
 					</form>\
 			'),
@@ -3648,7 +3668,7 @@ define("calipso", function(require) {
 					<form class="navbar-form navbar-left" role="form">\
 					<span data-fields="*"></span>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="btn btn-primary"><%= submitButton %></button>\
+					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
 					<% } %>\
 					</form>\
 					</nav>\
@@ -3657,7 +3677,7 @@ define("calipso", function(require) {
 					<form class="form-inline" role="form">\
 					<span data-fields="*"></span>\
 					<% if (submitButton) { %>\
-					<div class="form-group"><button type="submit" class="btn btn-default"><%= submitButton %></button></div>\
+					<div class="form-group"><button type="submit" class="submit btn btn-default"><%= submitButton %></button></div>\
 					<% } %>\
 					</form>\
 			'),
@@ -3665,7 +3685,7 @@ define("calipso", function(require) {
 					<form role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="btn btn-default"><%= submitButton %></button>\
+					<button type="submit" class="submit btn btn-default"><%= submitButton %></button>\
 					<% } %>\
 					</form>\
 			')
