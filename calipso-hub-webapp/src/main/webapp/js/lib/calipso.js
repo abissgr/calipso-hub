@@ -534,8 +534,12 @@ define("calipso", function(require) {
 			if (options.url) {
 				this.url = options.url;
 			}
-
-
+		},
+		fetch : function(options) {
+			if(options && options.data){
+				this.state = this.parseState(options.data, this.queryParams, this.state, {});
+			}
+			return Backbone.PageableCollection.prototype.fetch.apply(this, arguments);
 		},
 		hasCriteria : function(){
 			var minData = 0;
@@ -566,7 +570,6 @@ define("calipso", function(require) {
 		},
 		parseState: function (resp, queryParams, state, options) {
       if (resp) {
-
         var newState = _.clone(state);
         var serverState = resp;
 
@@ -585,10 +588,19 @@ define("calipso", function(require) {
 						}
 					}
         });
+				//ize:10, number:0, sort:[{direction:"ASC", property:"price", ignoreCase:false, ascending:true}],
+				// totalElements:10, lastPage:true, totalPages:1, numberOfElements:10, firstPage:true})
 
         if (serverState.order) {
-          newState.order = _.invert(queryParams.directions)[serverState.order] * 1;
+          newState.order = _.invert(queryParams.directions)[serverState.order.toUpperCase()] * 1;
         }
+        else if (serverState.sort && serverState.sort.direction) {
+          newState.order = _.invert(queryParams.directions)[serverState.sort.direction.toUpperCase()] * 1;
+        }
+        else if (serverState.direction) {
+          newState.order = _.invert(queryParams.directions)[serverState.direction.toUpperCase()] * 1;
+        }
+
 				return newState;
       }
     },
