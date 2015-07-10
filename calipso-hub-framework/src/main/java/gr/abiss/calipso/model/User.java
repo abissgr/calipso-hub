@@ -111,6 +111,12 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@Column(name = "avatar_url")
 	private String avatarUrl;
 
+	@Column(nullable = true)
+	private String telephone;
+	
+	@Column(nullable = true)
+	private String cellphone;
+
 	@Column(name = "birthday")
 	@FormSchemas({
 		@FormSchemaEntry(json = FormSchemaEntry.TYPE_DATE)
@@ -352,6 +358,22 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	public void setAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
+	}
+
+	public String getTelephone() {
+		return telephone;
+	}
+
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	public String getCellphone() {
+		return cellphone;
+	}
+
+	public void setCellphone(String cellphone) {
+		this.cellphone = cellphone;
 	}
 
 	public Date getBirthDay() {

@@ -58,7 +58,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Provides access to domain class type and transactional write support
+ * JPA Entity CRUD and search service that uses a Spring Data repository implementation.
+ * You should extend it and inject your Repository bean by overriding setRepository.
+ *
+ * @param <T> Your resource class to manage, usually an entity class
+ * @param <ID> Resource id type, usually Long or String
+ * @param <R> The repository class
  */
 @Transactional(readOnly = true)
 public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends BaseRepository<T, ID>>

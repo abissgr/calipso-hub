@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @NoRepositoryBean
 public interface BaseRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
+
+	public EntityManager getEntityManager();
 
 	public T merge(T entity);
 
@@ -52,6 +56,4 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
 	public void removeMetadatum(ID subjectId, String predicate);
 
 	public Metadatum findMetadatum(ID subjectId, String predicate);
-	
-
 }

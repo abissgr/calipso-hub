@@ -115,6 +115,14 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 	public void setNotificationCount(Long notificationCount);
 
 	LocalUser getUser();
+
+	void setCellphone(String cellphone);
+
+	String getCellphone();
+
+	void setTelephone(String telephone);
+
+	String getTelephone();
 	
 
 }

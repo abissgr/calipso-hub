@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -71,6 +72,10 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private String lastName;
 
 	private String avatarUrl;
+
+	private String telephone;
+	private String cellphone;
+	
 	private String locale = "en";
 	private String dateFormat;
 
@@ -291,6 +296,39 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@Override
 	public void setAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
+	}
+	
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getTelephone()
+	 */
+	@Override
+	public String getTelephone() {
+		return telephone;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setTelephone(java.lang.String)
+	 */
+	@Override
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getCellphone()
+	 */
+	@Override
+	public String getCellphone() {
+		return cellphone;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setCellphone(java.lang.String)
+	 */
+	@Override
+	public void setCellphone(String cellphone) {
+		this.cellphone = cellphone;
 	}
 
 	/**

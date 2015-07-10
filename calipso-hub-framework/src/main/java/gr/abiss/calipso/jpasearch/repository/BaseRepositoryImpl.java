@@ -73,6 +73,16 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		return this.domainClass;
 	}
 
+	/**
+	 * @return the entityManager
+	 */
+	@Override
+	public EntityManager getEntityManager() {
+		return this.entityManager;
+	}
+
+	
+	
 	@Override
 	public T merge(T entity) {
 		return this.getEntityManager().merge(entity);
@@ -230,13 +240,5 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 			return super.findAll(pageable);
 		}
 	}
-
-	/**
-	 * @return the entityManager
-	 */
-	protected EntityManager getEntityManager() {
-		return entityManager;
-	}
-
 
 }
