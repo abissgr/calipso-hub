@@ -49,7 +49,6 @@ public abstract class AbstractAuditableRateable<U extends AbstractPersistable, R
 
 	private static final long serialVersionUID = 8809874829822002089L;
 
-	@JsonManagedReference(value = "businessRatings")
 	@Transient
 	private List<R> currentUserRatings;
 

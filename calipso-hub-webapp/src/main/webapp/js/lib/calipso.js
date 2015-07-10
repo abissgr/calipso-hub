@@ -1342,6 +1342,18 @@ define("calipso", function(require) {
 					validators : [ 'required', 'email' ]
 				}
 			},
+			telephone : {
+				"default" : {
+					type : 'Text',
+					dataType: "email",
+				}
+			},
+			cellphone : {
+				"default" : {
+					type : 'Text',
+					dataType: "tel",
+				},
+			},
 			roles : {
 				"search" : {
 					type : Backbone.Form.editors.ModelSelect2,
