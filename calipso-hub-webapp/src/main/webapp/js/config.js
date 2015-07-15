@@ -10,6 +10,7 @@ require.config({
 		// libs: no application code here
 		'cookie' : 'lib/jquery.cookie',
 		'jquery' : 'lib/jquery',
+		'jquery-color' : 'lib/jquery.color.plus-names',
 		'q' : 'lib/q',
 		'metis-menu' : 'lib/metisMenu/jquery.metisMenu',
 		'eve':          'lib/raphael/eve.0.3.4',
@@ -156,7 +157,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'q', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backgrid-responsive-grid', 'backbone-forms-select2', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'chart'],
+			deps : [ 'q', 'jquery-color', 'backbone', 'marionette','backbone-forms', 'backbone-forms-bootstrap3', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'backgrid-responsive-grid', 'backbone-forms-select2', 'metis-menu', 'morris', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'chart'],
 			exports : 'calipso'
 		},
 		'cookie': {
@@ -165,6 +166,10 @@ require.config({
 		'chai-jquery': {
 			deps: ['jquery', 'chai']
 		},
+      'jquery-color': {
+         deps: ['jquery'],
+         exports: 'jQuery.Color'
+     },
 //		'typeahead': {
 //         'deps': ['jquery'],
 //         'exports': 'jquery' // Make sure the noconflict configuration of jquery doesn't break this extension

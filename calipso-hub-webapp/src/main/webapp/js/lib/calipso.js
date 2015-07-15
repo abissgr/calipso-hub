@@ -19,6 +19,7 @@
 
 define("calipso", function(require) {
 
+
 	/**
 	 * Calipso namespace
 	 * @namespace
@@ -232,6 +233,14 @@ define("calipso", function(require) {
 		////////////////////////////////
 		// initialize header, footer, history
 		Calipso.app.on("start", function() {
+			// listen to the modal region
+			var modalSizeFixer = function () {
+		    $('.modal .modal-body').css('overflow-y', 'auto');
+		    $('.modal .modal-body').css('max-height', $(window).height() * 0.7);
+			}
+			$('#calipsoModalRegion').on('shown.bs.modal', modalSizeFixer);
+			$('#calipsoModalRegion').on('show.bs.modal', modalSizeFixer);
+
 			// console.log("app event start");
 			//	try "remember me"
 			Calipso.session.load();
@@ -1401,8 +1410,8 @@ define("calipso", function(require) {
 			name : "edit",
 			label : "",
 			editable : false,
-			cell : Calipso.components.backgrid.EditRowCell,
-			headerCell : Calipso.components.backgrid.CreateNewHeaderCell
+			cell : Calipso.components.backgrid.EditRowInModalCell,
+			headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
 		} ];
 	};
 	Calipso.model.UserModel.prototype.getOverviewSchema = function(instance) {
@@ -1484,8 +1493,8 @@ define("calipso", function(require) {
 			name : "edit",
 			label : "",
 			editable : false,
-			cell : Calipso.components.backgrid.EditRowCell,
-			headerCell : Calipso.components.backgrid.CreateNewHeaderCell
+			cell : Calipso.components.backgrid.EditRowInModalCell,
+			headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
 		} ];
 	};
 
@@ -1784,6 +1793,33 @@ define("calipso", function(require) {
 		    </div>\
 		  ')
 	};
+	Calipso.components.backgrid.SmartHighlightRow = Backgrid.Row.extend({
+  	initialize: function() {
+			Backgrid.Row.prototype.initialize.apply(this, arguments);
+      this.listenTo(this.model, 'change', function (model) {
+				console.log("Calipso.components.backgrid.SmartHighlightRow caught model change");
+        this.$el.toggleClass('bg-warning', model.hasChanged());
+      });
+      this.listenTo(this.model, 'sync', function (model) {
+				console.log("Calipso.components.backgrid.SmartHighlightRow caught model sync");
+				// creating an empty element and applying our class to it to get bootstrap class bg color
+				var origBg = this.$el.css("background-color");
+				var bgcolor = $("<div>").appendTo("body").addClass("bg-success").css("background-color");
+        this.$el.removeClass('bg-warning');
+				this.$el.animate({ backgroundColor: bgcolor }, {queue:true,duration:1500});
+				this.$el.animate({ backgroundColor: origBg }, {queue:true,duration:5000});
+      });
+      this.listenTo(this.model, 'added', function (model) {
+				console.log("Calipso.components.backgrid.SmartHighlightRow caught model added");
+				// creating an empty element and applying our class to it to get bootstrap class bg color
+				var origBg = this.$el.css("background-color");
+				var bgcolor = $("<div>").appendTo("body").addClass("bg-success").css("background-color");
+        this.$el.removeClass('bg-warning');
+				this.$el.animate({ backgroundColor: bgcolor }, {queue:true,duration:1500});
+				this.$el.animate({ backgroundColor: origBg }, {queue:true,duration:5000});
+      });
+    }
+	});
 	Calipso.components.backgrid.ViewRowCell = Backgrid.StringCell.extend(
 	/** @lends Calipso.components.backgrid.ViewRowCell.prototype */
 	{
@@ -1832,9 +1868,37 @@ define("calipso", function(require) {
 			Calipso.vent.trigger("genericShowContent", rowModel);
 		},
 		render : function() {
-			this.$el.html("<button class='btn btn-xs btn-info' title='Edit entry'><i class='glyphicon glyphicon-edit'></i></button>");
+			this.$el.html("<button class='btn btn-xs btn-info' title='Edit entry'><i class='glyphicon glyphicon-edit'></i>&nbsp;Edit</button>");
 			//this.delegateEvents();
 			return this;
+		}
+	});
+
+	Calipso.components.backgrid.EditRowInModalCell = Calipso.components.backgrid.EditRowCell.extend(
+	/** @lends Calipso.components.backgrid.EditRowCell.prototype */
+	{
+		editEntry: function(e) {
+			Calipso.stopEvent(e);
+			var rowModel = this.model;
+			var ContentViewType = rowModel.getItemViewType();
+			var contentView = new ContentViewType({
+				model : rowModel,
+				modal : true
+			});
+			var title = "Edit: ";
+			if(rowModel.get("name")){
+				title += rowModel.get("name");
+			}
+			else if(rowModel.get("label")){
+				title += rowModel.get("label");
+			}
+			else{
+				title += rowModel.get("id");
+			}
+			Calipso.vent.trigger("modal:showInLayout", {
+				view: contentView,
+				title: title
+			});
 		}
 	});
 
@@ -1904,15 +1968,41 @@ define("calipso", function(require) {
 		createNewForManualEdit : function(e) {
 			//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
 			Calipso.stopEvent(e);
-			Calipso.vent.trigger("layout:createModel", this.collection.model);
+			Calipso.vent.trigger("layout:createModel", {modelType: this.collection.model});
 		},
 		render : function() {
-			var html = $("<button title='Create new' class='btn btn-xs btn-success'><i class='glyphicon glyphicon-asterisk'></i></button>");
+			var html = $("<button title='Create new' class='btn btn-xs btn-success'><i class='fa fa-file-text'></i>&nbsp;New</button>");
 			this.$el.html(html);
 			//this.delegateEvents();
 			return this;
 		}
 	});
+
+	Calipso.components.backgrid.CreateNewInModalHeaderCell = Calipso.components.backgrid.CreateNewHeaderCell.extend({
+
+		createNewForManualEdit : function(e) {
+			Calipso.stopEvent(e);
+			var rowModel = this.collection.model.create();
+			var ContentViewType = rowModel.getItemViewType();
+			var contentView = new ContentViewType({
+				model : rowModel,
+				modal : true,
+				addToCollection : this.collection
+			});
+			var title = "New ";
+			if(this.collection.model.label){
+				title += this.collection.model.label;
+			}
+			else{
+				title += "entry";
+			}
+			Calipso.vent.trigger("modal:showInLayout", {
+				view: contentView,
+				title: title
+			});
+		},
+	});
+
 
 	/*
 	 *  based on typeahead/bloodhound 0.11.1, see
@@ -2350,10 +2440,17 @@ define("calipso", function(require) {
 			// vent handling might be overriden by subclasses
 			if (!options.dontListenTo) {
 				this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
-					_this.showItemViewForModel(itemModel, "view");
+					var options = {model: itemModel, formSchemaKey: "view"};
+					_this.showItemViewForModel(options);
 				}, this);
-				this.listenTo(Calipso.vent, "layout:createModel", function(itemModelType) {
-					_this.showItemViewForModel(itemModelType.create(), "create");
+				this.listenTo(Calipso.vent, "layout:createModel", function(options) {
+					if(!options.formSchemaKey){
+						options.formSchemaKey = "create"
+					}
+					if(!options.model && options.modelType){
+						options.model = options.modelType.create();
+					}
+					_this.showItemViewForModel(options);
 				}, this);
 //				this.listenTo(Calipso.vent, "layout:updateModel", function(itemModel) {
 //					_this.showItemViewForModel(itemModel, "update");
@@ -2838,11 +2935,11 @@ define("calipso", function(require) {
 			}
 			// fetch collection?
 			else if (this.options.forceFetch) {
-				console.log("TemplateBasedCollectionView#onShow, collecion size: " + this.collection.length);
+				console.log("TemplateBasedCollectionView#onShow,  size: " + this.collection.length);
 				_self.collection.fetch({
 					url : _self.collection.url,
 					success : function(collection, response, options) {
-						console.log("TemplateBasedCollectionView#onShow#renderCollectionItems, collecion size: " + collection.length);
+						console.log("TemplateBasedCollectionView#onShow#renderCollectionItems,  size: " + collection.length);
 						//Marionette.CollectionView.prototype.onShow.apply(this);
 					},
 					error : function(collection, response, options) {
@@ -3087,6 +3184,7 @@ define("calipso", function(require) {
 			this.backgrid = this.getGrid({
 				className : "backgrid responsive-table",
 				columns : gridSchema,
+				row : Calipso.components.backgrid.SmartHighlightRow,
 				collection : _self.collection,
 				emptyText : "No records found"
 			});
@@ -3099,7 +3197,7 @@ define("calipso", function(require) {
 				// the number of page handles to show. The sliding window
 				// will automatically show the next set of page handles when
 				// you click next at the end of a window.
-				windowSize : 20, // Default is 10
+				windowSize : 10, // Default is 10
 
 				// Used to multiple windowSize to yield a number of pages to slide,
 				// in the case the number is 5
@@ -3440,7 +3538,8 @@ define("calipso", function(require) {
 			return this.constructor.getFormTemplate(this, templateKey);
 		},
 		formTemplateKey : "horizontal",
-
+		modal : false,
+		addToCollection : null,
 		// Define view template
 		formSchemaKey : null,
 		template : require('hbs!template/md-form-view'),
@@ -3457,6 +3556,14 @@ define("calipso", function(require) {
 			console.log("GenericFormView#initialize, options.model: ");
 			console.log(options.model);
 
+			if (options.modal) {
+				this.modal = options.modal;
+			}
+
+			if (options.addToCollection) {
+				this.addToCollection = options.addToCollection;
+			}
+			console.log("GenericFormView.initialize, this.addToCollection: " + this.addToCollection);
 			if (options.model) {
 				this.model = options.model;
 			}
@@ -3526,6 +3633,10 @@ define("calipso", function(require) {
 				if (window.Placeholders) {
 					Placeholders.enable();
 				}
+				if (_this.modal) {
+					$(".modal-body").scrollTop(0);
+				}
+
 				console.log("GenericFormView#commit search, return false");
 				return false;
 			}
@@ -3539,8 +3650,20 @@ define("calipso", function(require) {
 
 					_this.model.save(null, {
 						success:function(model, response){
-				        console.log("Calipso.view.GenericFormView#commit model save success, triggering genericFormSaved");
-							Calipso.vent.trigger("genericFormSaved", model);
+							if(_this.addToCollection){
+								console.log("Calipso.view.GenericFormView#commit model save success, triggering added");
+
+								_this.addToCollection.add(_this.model);
+								_this.model.trigger("added");
+							}
+							if(_this.modal){
+					      console.log("Calipso.view.GenericFormView#commit model save success, triggering modal:destroy");
+								Calipso.vent.trigger("modal:destroy");
+							}
+							else{
+					      console.log("Calipso.view.GenericFormView#commit model save success, triggering genericFormSaved");
+								Calipso.vent.trigger("genericFormSaved", model);
+							}
 						},
 						error:function(){
 					        console.log("Calipso.view.GenericFormView#commit model save error");
@@ -3615,7 +3738,20 @@ define("calipso", function(require) {
 			var _self = this;
 			console.log("GenericFormView#renderForm called, schema key: " + _self.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-			var formSubmitButton = _self.model.get("calipsoFormSubmitButton")//;(_self.formSchemaKey);
+			var formSubmitButton = _self.model.getFormSubmitButton();
+			if(!formSubmitButton){
+				if(_self.formSchemaKey.indexOf("search") == 0){
+					formSubmitButton = "<i class=\"glyphicon glyphicon-search\"></i>&nbsp;Search";
+				}
+				else if(_self.formSchemaKey.indexOf("create") == 0
+					|| _self.formSchemaKey.indexOf("update") == 0){
+					formSubmitButton = "<i class=\"fa fa-floppy-o\"></i>&nbsp;Save";
+				}
+				else{
+					formSubmitButton = "SubmitSave";
+				}
+			}
+			//;(_self.formSchemaKey);
 			console.log("formSubmitButton: " + formSubmitButton);
 			// render form
 			var JsonableForm = Backbone.Form.extend({
@@ -3683,7 +3819,7 @@ define("calipso", function(require) {
 					<form class="form-horizontal" role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="submit btn btn-default"><%= submitButton %></button>\
+					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
 					<% } %>\
 					</form>\
 			'),
@@ -3701,7 +3837,7 @@ define("calipso", function(require) {
 					<form class="form-inline" role="form">\
 					<span data-fields="*"></span>\
 					<% if (submitButton) { %>\
-					<div class="form-group"><button type="submit" class="submit btn btn-default"><%= submitButton %></button></div>\
+					<div class="form-group"><button type="submit" class="submit btn btn-primary"><%= submitButton %></button></div>\
 					<% } %>\
 					</form>\
 			'),
@@ -3709,7 +3845,7 @@ define("calipso", function(require) {
 					<form role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
-					<button type="submit" class="submit btn btn-default"><%= submitButton %></button>\
+					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
 					<% } %>\
 					</form>\
 			')
@@ -4373,7 +4509,7 @@ define("calipso", function(require) {
 			return key;
 		},
 		/**
-		 * Obtain a cached collecion for the given model type, criteria and use case.
+		 * Obtain a cached  for the given model type, criteria and use case.
 		 * The method will return the cached collection if a match is available
 		 * with the same search criteria or a new one otherwise.
 		 *

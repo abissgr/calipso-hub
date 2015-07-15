@@ -46,6 +46,8 @@ public abstract class AbstractPersistable implements FormSchemaAware, Persistabl
 	private static final long serialVersionUID = 2131186735039838008L;
 	
 	public static interface FormSchemaAwareView {}
+    public static interface ItemView {}
+    public static interface CollectionView {}
 	
 	@Id
 	@GeneratedValue(generator = "system-uuid")

@@ -44,8 +44,8 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 		//  select a model VS a string value.
 		getValue : function() {
 			var simpleValue = this.$el.val();
-			console.log("Backbone.Form.editors.ModelSelect2#getValue, value: ");
-			console.log(simpleValue);
+//			console.log("Backbone.Form.editors.ModelSelect2#getValue, value: ");
+//			console.log(simpleValue);
 			var value;
 			if(simpleValue){
 
@@ -62,8 +62,8 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 					});
 				}
 			}
-			console.log("getValue, simpleValue: " + simpleValue + ", model value: ");
-			console.log(value);
+//			console.log("getValue, simpleValue: " + simpleValue + ", model value: ");
+//			console.log(value);
 			return value;
 		},
 		// https://github.com/powmedia/backbone-forms/issues/291

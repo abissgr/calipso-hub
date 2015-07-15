@@ -27,6 +27,7 @@ import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.model.dto.ReportDataSet;
+import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.service.GenericEntityService;
@@ -72,6 +73,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -204,6 +206,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     @ApiOperation(value = "create", notes = "Create a new resource", httpMethod = "POST")
+	@JsonView(AbstractPersistable.ItemView.class) 
 	////@ApiResponse(code = 201, message = "created")
 	public T create(@RequestBody T resource) {
 		applyCurrentPrincipal(resource);
@@ -261,6 +264,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
     @ResponseBody
     @ApiOperation(value = "update", notes = "Update a resource", httpMethod = "PUT")
+	@JsonView(AbstractPersistable.ItemView.class) 
 	//@ApiResponse(code = 200, message = "OK")
 	public T update(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id, @RequestBody T resource) {
 		if(LOGGER.isDebugEnabled()){

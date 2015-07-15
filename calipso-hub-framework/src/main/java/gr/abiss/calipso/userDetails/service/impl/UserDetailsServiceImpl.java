@@ -470,8 +470,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		return userDetails;
 	}
 
-	//@Override
-	public Iterable<UserDetails> findByIds(Set<String> ids) {
+	@Override
+	public Iterable<ICalipsoUserDetails> findByIds(Set<String> ids) {
 		throw new UnsupportedOperationException();
 	}
 

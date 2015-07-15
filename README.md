@@ -79,6 +79,9 @@ To build Calipso you need a Java Development Kit(JDK7 ) and Apache Maven install
 
     $ mvn clean install jetty:run
     
+Note: If you get a <code>[ERROR] No plugin found for prefix 'jetty' in the current project and in the plugin groups </code> you probably forgot step 4 above.
+
+    
 ## Browse Calipso
 
 After you complete the steps above, you can access Calipso using your web browser: 

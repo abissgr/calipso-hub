@@ -2,8 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:sec="http://www.springframework.org/schema/security"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 	
     <!-- choose the default user controller-->
      <bean id="userController" 
@@ -20,17 +21,19 @@
 	<!-- Do not create sessions -->
 	<bean id="securityContextPersistenceFilter"
 		class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
-		<property name='securityContextRepository'>
-		<bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
-		  <property name='allowSessionCreation' value='false' />
-		</bean>
-		</property>
+		   <constructor-arg>
+		        <bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
+		          <property name='allowSessionCreation' value='false' />
+		        </bean>
+		   </constructor-arg>
 	</bean>
 	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"  use-expressions="true"
 		disable-url-rewriting="true">
-		<!-- Enables Spring Security CSRF protection
-        <sec:csrf/>
+		<!-- Disable Spring Security CSRF protection since 
+		it requires sessions and we don't really want those 
+		in a stateless app
          -->
+        <sec:csrf disabled="true"/>
 		<sec:http-basic />
 		
 		<!-- REST client login -->
@@ -77,8 +80,8 @@
     --> 
     <bean id="expressionHandler"
         class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
-        <property name="permissionEvaluator" ref="customPermissionEvaluator" />
-        <property name = "roleHierarchy" ref="roleHierarchy"/>
+        <!--property name="permissionEvaluator" ref="customPermissionEvaluator" />
+        <property name = "roleHierarchy" ref="roleHierarchy"/-->
     </bean>
     
     
