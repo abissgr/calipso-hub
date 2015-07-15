@@ -299,6 +299,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
     //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
     @ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
+	@JsonView(AbstractPersistable.ItemView.class) 
 	public T findById(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
     	T resource = null;
     	

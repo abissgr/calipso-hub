@@ -14,7 +14,37 @@
         http://www.springframework.org/schema/mvc       http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
-
+ <!-- override resthub's MapperFeature.DEFAULT_VIEW_INCLUSION config -->
+    
+    <bean id="jsonObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
+        <property name="featuresToDisable">
+            <array>
+                <util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
+            </array>
+        </property>
+        <property name="featuresToEnable">
+            <array>
+                <util:constant static-field="com.fasterxml.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION"/>
+            </array>
+        </property>
+        <property name="modulesToInstall" ref="jacksonModules"/>
+    </bean>
+    
+    <bean id="xmlObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
+        <property name="featuresToDisable">
+            <array>
+                <util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
+            </array>
+        </property>
+        <property name="featuresToEnable">
+            <array>
+                <util:constant static-field="com.fasterxml.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION"/>
+            </array>
+        </property>
+        <property name="modulesToInstall" ref="jacksonModules"/>
+        <property name="objectMapper" ref="xmlMapper" />
+    </bean>
+    
     <bean id="userDetailsConfig"
         class="gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig">
         <constructor-arg value="calipso-sso" />
