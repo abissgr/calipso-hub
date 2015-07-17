@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.lucene.index.Fields;
 import org.resthub.common.exception.NotFoundException;
@@ -454,27 +455,47 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			
 			@RequestParam(value = "timeUnit", required = false, defaultValue = "DAY") TimeUnit timeUnit,
 			@RequestParam(value = "dateField", required = false, defaultValue = "createdDate") String dateField,
-			@RequestParam(value = "dateFrom", required = false) Date dateFrom,
-			@RequestParam(value = "dateTo", required = false) Date dateTo,
+			@RequestParam(value = "period", required = false) String period,
 			@RequestParam(value = "reportType", required = false) String reportType) {
-		// default date region is the current day
-		//Date now = new Date();
-
-		//if(dateFrom == null){
-			GregorianCalendar start = new GregorianCalendar();
-			start.set(Calendar.MONTH, start.get(Calendar.MONTH) - 1);
-			dateFrom = start.getTime();
-		//}
-		dateFrom = DateUtils.truncate(dateFrom, Calendar.DATE);
-		//if(dateTo == null){
-			dateTo = new Date();
-		//}
-		dateTo = DateUtils.addMilliseconds(DateUtils.ceiling(dateTo, Calendar.DATE), -1);
 		
+		if(StringUtils.isBlank(period)){
+			GregorianCalendar now = new GregorianCalendar();
+			StringBuffer buff = new StringBuffer();
+			if(timeUnit.equals(TimeUnit.DAY)){
+				buff.append(now.get(Calendar.MONTH)).append('/');
+			}
+			period = buff.append(now.get(Calendar.YEAR)).toString();
+		}
+		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", period: " + period +", reportName: " + reportType );
+		GregorianCalendar start = null;
+		GregorianCalendar end = null;
+		if(timeUnit.equals(TimeUnit.DAY)){
+			String[] monthYear = period.split("/");
+			start = new GregorianCalendar(Integer.parseInt(monthYear[1]), Integer.parseInt(monthYear[0]) - 1, 0);
+			end = new GregorianCalendar(Integer.parseInt(monthYear[1]), Integer.parseInt(monthYear[0]) - 1, 0);
+			end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+		}
+		else{
+			start = new GregorianCalendar(Integer.parseInt(period), 0, 0);
+			end = new GregorianCalendar(Integer.parseInt(period), 11, 0);
+			end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+		}
+
+			start.set(Calendar.HOUR_OF_DAY, start.getMinimum(Calendar.HOUR_OF_DAY));
+			start.set(Calendar.MINUTE, start.getMinimum(Calendar.MINUTE));
+			start.set(Calendar.SECOND, start.getMinimum(Calendar.SECOND));
+			start.set(Calendar.MILLISECOND, start.getMinimum(Calendar.MILLISECOND));
+			
+
+			end.set(Calendar.HOUR_OF_DAY, end.getMinimum(Calendar.HOUR_OF_DAY));
+			end.set(Calendar.MINUTE, end.getMinimum(Calendar.MINUTE));
+			end.set(Calendar.SECOND, end.getMinimum(Calendar.SECOND));
+			end.set(Calendar.MILLISECOND, end.getMinimum(Calendar.MILLISECOND));
+			
 		Map<String, String[]> paramsMap = request.getParameterMap();
-		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + dateFrom + ", dateTo: " + dateTo + ", reportName: " + reportType );
+		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + start + ", dateTo: " + end + ", reportName: " + reportType );
 		Pageable pageable = buildPageable(page, size, sort, direction, paramsMap);
-		Page<ReportDataSet> results = this.service.getReportDatasets(pageable, timeUnit, dateField, dateFrom, dateTo, reportType);
+		Page<ReportDataSet> results = this.service.getReportDatasets(pageable, timeUnit, dateField, start.getTime(), end.getTime(), reportType);
 		LOGGER.info("getReportDatasets returning " + results.getTotalElements());
 		return results;
 	}

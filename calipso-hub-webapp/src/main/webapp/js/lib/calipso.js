@@ -167,12 +167,12 @@ define("calipso", function(require) {
 
 			Calipso.modelTypesMap = {};
 			var parseModel = function(ModelType) {
-				var model = new ModelType();
-				// console.log("initialize model type: " + ModelType.prototype.getTypeName());
-				if (model.getTypeName() != "Calipso.model.GenericModel" && model.getTypeName() != "Calipso.model.ReportDataSetModel") {
+				if(ModelType.prototype.getTypeName() != "Calipso.model.ReportDataSetModel"
+					&& ModelType.prototype.getTypeName() != "Calipso.model.GenericModel"){
 
+					var model = new ModelType();
 					Calipso.modelTypesMap[model.getPathFragment()] = ModelType;
-					// console.log("initialized model type: " + model.getTypeName() + " and key: " + model.getPathFragment());
+
 				}
 			};
 			_(Calipso.model).each(parseModel);
@@ -1632,7 +1632,7 @@ define("calipso", function(require) {
 			formTemplateKey : "horizontal",
 			kpi : "sum",
 			timeUnit : "DAY",
-			reportType : null,
+			reportType : "Businesses",
 			calipsoFormSubmitButton : "Show Report"
 		},
 		initialize : function() {
@@ -1643,8 +1643,10 @@ define("calipso", function(require) {
 			console.log(subjectModelType);
 			console.log("Calipso.model.ReportDataSetModel#initialize, attributes: ");
 			console.log(this.attributes);
-			if(!(subjectModelType && subjectModelType.prototype.getPathFragment)){
-				console.log("option 'subjectModelType' is required and must extend Calipso.model.GenericModel");
+			if(!(_.isNull(subjectModelType) || _.isUndefined(subjectModelType))){
+				this.set("reportType", subjectModelType.prototype.getReportTypeOptions()[0]);
+				var now = new Date();
+				this.set("period", (now.getUTCMonth()+1) + '/' + now.getUTCFullYear());
 			}
 		},
 		getPathFragment : function(){
@@ -1708,7 +1710,7 @@ define("calipso", function(require) {
 				// validators : [ 'required' ]
 			};
 			formSchema.timeUnit = {
-				title: "Time Unit",
+				title: "by",
 				type: 'Select',
 				options : [
 					{ val: "DAY", label: 'Day' },
@@ -1717,6 +1719,21 @@ define("calipso", function(require) {
 				template: this.fieldTemplate
 				// TODO: validate option
 				// validators : [ 'required' ]
+			};
+
+			formSchema.period = {
+				title: "Period",
+				type: Calipso.components.backboneform.Datetimepicker,
+				template: this.fieldTemplate,
+				config: {
+					locale: 'en',
+          format: 'MM/YYYY',
+					viewMode: 'months',
+					widgetPositioning: {
+						horizontal : "right"
+					}
+				},
+				validators : [ 'required' ]
 			};
 			console.log("Calipso.model.ReportDataSetModel#getFormSchema formSchema: ");
 			console.log(formSchema);
@@ -1731,7 +1748,7 @@ define("calipso", function(require) {
 			}
 			var schema = [{
 				name : "label",
-				label : "Name",
+				label : "",
 				editable : false,
 				cell : "text",
 			}];
@@ -1769,6 +1786,10 @@ define("calipso", function(require) {
 		return "Calipso.model.ReportDataSetModel";
 	};
 
+
+	Calipso.model.ReportDataSetModel.prototype.getItemViewType = function() {
+		return Calipso.view.ReportFormView;
+	};
 
 	Calipso.model.ReportDataSetModel.prototype.getCollectionViewType = function() {
 		return Calipso.view.ModelDrivenReportView;
@@ -2135,6 +2156,10 @@ define("calipso", function(require) {
 				this.config = {locale : 'en'}
 			}
 		},
+		callDataFunction : function(functionName, param){
+			console.log("callDataFunction:  " + functionName + ", param: " + param);
+			this.$el.data("DateTimePicker")[functionName](param);
+		},
 		render : function() {
 			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
 			this.$el.datetimepicker(this.config);
@@ -2491,6 +2516,8 @@ define("calipso", function(require) {
 			}
 			//  get item view type for model
 			var ItemViewType = itemModel.getItemViewType();
+				console.log("Calipso.view.ModelDrivenBrowseLayout#showItemViewForModel, view type: " + ItemViewType.getTypeName());
+			console.log();
 			// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
 			// create new item view instance with model
 			var childView = new ItemViewType({
@@ -2560,7 +2587,7 @@ define("calipso", function(require) {
 			if (_this.config.skipToSingleResult && routeModel.wrappedCollection.length == 1) {
 				var singleModel = routeModel.wrappedCollection.first();
 				console.log("ModelDrivenBrowseLayout#getSearchResultsViewForModel, building ItemView for single result: " + singleModel.getTypeName() + '#' + singleModel.get("id"));
-				ContentViewType = routeModel.getItemViewType();
+				var ContentViewType = routeModel.getItemViewType();
 				searchResultsView = new ContentViewType({
 					model : singleModel
 				});
@@ -2583,7 +2610,8 @@ define("calipso", function(require) {
 			// create the search form view if not there
 			if(forceShow || !region.hasView()){
 				console.log("Calipso.view.ModelDrivenSearchLayout#showSidebar search form with formSchemaKey " + _this.model.getFormSchemaKey());
-				var formView = new Calipso.view.GenericFormView({
+				var ContentViewType = routeModel.getItemViewType();
+				var formView = new ContentViewType({
 					formSchemaKey :  _this.model.getFormSchemaKey(),
 					model : routeModel
 				});
@@ -3370,6 +3398,7 @@ define("calipso", function(require) {
 		},
 		onShow : function() {
 			Calipso.view.ModelDrivenCollectionGridView.prototype.onShow.apply(this);
+
 			var model = this.model, _this = this;
 		// Get the context of the canvas element we want to select
 			var canvas = this.$(".chart")[0];
@@ -3874,6 +3903,29 @@ define("calipso", function(require) {
 		getFormTemplate : function(instance, templateKey){
 			templateKey = templateKey ? templateKey : "horizontal";
 			return this.formTemplates[templateKey];
+		}
+	});
+
+
+	Calipso.view.ReportFormView = Calipso.view.GenericFormView.extend({
+		renderForm : function(){
+			Calipso.view.GenericFormView.prototype.renderForm.apply(this, arguments);
+			console.log("Calipso.view.ReportFormView renderForm... ");
+			var _this = this;
+			// switch period mode
+	    this.form.on('timeUnit:change', function(form, timeUnitEditor) {
+				console.log("Calipso.view.ReportFormView caught timeUnit:change");
+        var timeUnit = timeUnitEditor.getValue();
+				var viewMode = timeUnit == "DAY" ? "months" : "years";
+				var format = timeUnit == "DAY" ? 'MM/YYYY' : 'YYYY';
+				console.log("Calipso.view.ReportFormView timeUnit: " + timeUnit + ", viewMode: " + viewMode);
+				form.fields.period.editor.callDataFunction("viewMode", viewMode);
+				form.fields.period.editor.callDataFunction("format", format);
+	    });
+		}
+	}, {
+		getTypeName : function() {
+			return "Calipso.view.ReportFormView";
 		}
 	});
 
@@ -4757,6 +4809,7 @@ define("calipso", function(require) {
 			if (!ModelType) {
 				throw "No matching model type was found for key: " + modelModuleId;
 			}
+			console.log("getModelType, key: "+modelTypeKey+", type: "+ModelType.prototype.getPathFragment());
 			return ModelType;
 		},
 		/**
