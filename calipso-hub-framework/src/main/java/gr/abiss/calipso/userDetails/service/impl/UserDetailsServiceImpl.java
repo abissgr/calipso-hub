@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,6 +90,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Autowired(required = true)
+	@Qualifier("localUserService") // somehow required for CDI to work on 64bit JDK?
 	public void setLocalUserService(
 			LocalUserService<? extends Serializable, ? extends LocalUser> localUserService) {
 		this.localUserService = localUserService;

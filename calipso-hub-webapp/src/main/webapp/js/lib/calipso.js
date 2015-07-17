@@ -1307,16 +1307,24 @@ define("calipso", function(require) {
 		});
 		return {//
 			firstName : {
-				"search" : 'Text',
+				"search" : {
+					type : 'Text',
+					title : "First Name"
+				},
 				"default" : {
 					type : 'Text',
+					title : "First Name",
 					validators : [ 'required' ]
 				}
 			},
 			lastName : {
-				"search" : 'Text',
+				"search" :{
+					type : 'Text',
+					title : "Last Name"
+				},
 				"default" : {
 					type : 'Text',
+					title : "Last Name",
 					validators : [ 'required' ]
 				}
 			},
@@ -1342,11 +1350,13 @@ define("calipso", function(require) {
 			email : {
 				"search" : {
 					type : 'Text',
+					title: "Email",
 					dataType: "email",
 					validators : [ 'email' ]
 				},
 				"default" : {
 					type : 'Text',
+					title: "Email",
 					dataType: "email",
 					validators : [ 'required', 'email' ]
 				}
@@ -1354,22 +1364,26 @@ define("calipso", function(require) {
 			telephone : {
 				"default" : {
 					type : 'Text',
-					dataType: "email",
+					title: "Telephone",
+					dataType: "tel",
 				}
 			},
 			cellphone : {
 				"default" : {
 					type : 'Text',
+					title: "Cellphone",
 					dataType: "tel",
 				},
 			},
 			roles : {
 				"search" : {
+					title: "Roles",
 					type : Backbone.Form.editors.ModelSelect2,
 					options: rolesCollection,
 					multiple: true,
 				},
 				"default" : {
+					title: "Roles",
 					type : Backbone.Form.editors.ModelSelect2,
 					options: rolesCollection,
 					multiple: true,
@@ -1383,27 +1397,27 @@ define("calipso", function(require) {
 	Calipso.model.UserModel.prototype.getGridSchema = function(instance) {
 		return [ {
 			name : "username",
-			label : "username",
+			label : "Username",
 			cell : Calipso.components.backgrid.ViewRowCell,
 			editable : false
 		}, {
 			name : "firstName",
-			label : "firstName",
+			label : "First Name",
 			editable : false,
 			cell : "string"
 		}, {
 			name : "lastName",
-			label : "lastName",
+			label : "Last Name",
 			editable : false,
 			cell : "string"
 		}, {
 			name : "email",
-			label : "email",
+			label : "Email",
 			cell : "email",
 			editable : false
 		}, {
 			name : "createdDate",
-			label : "created",
+			label : "Created",
 			cell : "date",
 			editable : false
 		}, {
@@ -2893,7 +2907,7 @@ define("calipso", function(require) {
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			console.log("TemplateBasedItemView#initialize, item: " + this.model);
-		}
+		},
 	}, {
 		getTypeName : function() {
 			return "Calipso.view.TemplateBasedItemView";
@@ -4305,17 +4319,8 @@ define("calipso", function(require) {
 
 
 			/**
-			 * Format a date using Moment.js
-			 * http://momentjs.com/
-			 * @example {{momentFormat someDate "MMMM YYYY"}}
-			 */
-			Handlebars.registerHelper('momentFormat', function(date, pattern) {
-				return window.moment ? moment(date).format(pattern) : date;
-			});
-
-			/**
 			 * Calculate "from" now using the given date
-			 * @example {{momentFromNow someDate}}
+			 * @example {{#momentFromNow someDate}}
 			 */
 			Handlebars.registerHelper('momentFromNow', function(date) {
 				return window.moment ? moment(date).fromNow() : date;

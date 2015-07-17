@@ -39,6 +39,7 @@ require.config({
 		'marionette' : 'lib/backbone.marionette',
 		'handlebars-orig' : 'lib/handlebars',
 		'handlebars' : 'lib/resthub/handlebars-helpers',
+		'lodash' : 'lib/lodash',
 		'backbone-queryparams' : 'lib/backbone-queryparams',
 		'backbone.paginator': 'lib/backbone.paginator',
 		'async' : 'lib/async',
