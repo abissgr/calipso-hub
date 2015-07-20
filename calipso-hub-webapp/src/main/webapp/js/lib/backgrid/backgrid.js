@@ -1,22 +1,25 @@
 /*!
-  backgrid
+  backgrid 0.3.5
   http://github.com/wyuenho/backgrid
 
   Copyright (c) 2014 Jimmy Yuen Ho Wong and contributors <wyuenho@gmail.com>
   Licensed under the MIT license.
 */
 
-(function (factory) {
+(function (root, factory) {
 
-  // CommonJS
-  if (typeof exports == "object") {
-    module.exports = factory(module.exports,
-                             require("underscore"),
-                             require("backbone"));
-  }
-  // Browser
-  else factory(this, this._, this.Backbone);
-}(function (root, _, Backbone) {
+  if (typeof define === "function" && define.amd) {
+    // AMD (+ global for extensions)
+    define(["underscore", "backbone"], function (_, Backbone) {
+      return (root.Backgrid = factory(_, Backbone));
+    });
+  } else if (typeof exports === "object") {
+    // CommonJS
+    module.exports = factory(require("underscore"), require("backbone"));
+  } else {
+    // Browser
+    root.Backgrid = factory(root._, root.Backbone);
+  }}(this, function (_, Backbone) {
 
   "use strict";
 
@@ -63,7 +66,7 @@ function lpad(str, length, padstr) {
 
 var $ = Backbone.$;
 
-var Backgrid = root.Backgrid = {
+var Backgrid = {
 
   Extension: {},
 
@@ -1937,8 +1940,6 @@ var Row = Backgrid.Row = Backbone.View.extend({
      @return {Backgrid.Cell}
   */
   makeCell: function (column) {
-//	  console.log("makeCell, column: "+JSON.stringify(column));
-//	  console.log("makeCell, this.model: "+ this.model);
     return new (column.get("cell"))({
       column: column,
       model: this.model
@@ -2166,8 +2167,6 @@ var HeaderCell = Backgrid.HeaderCell = Backbone.View.extend({
  */
 var HeaderRow = Backgrid.HeaderRow = Backgrid.Row.extend({
 
-  requiredOptions: ["columns", "collection"],
-
   /**
      Initializer.
 
@@ -2319,6 +2318,7 @@ var Body = Backgrid.Body = Backbone.View.extend({
         emptyText: this.emptyText,
         columns: this.columns
       }));
+      return true;
     }
   },
 
@@ -2406,7 +2406,9 @@ var Body = Backgrid.Body = Backbone.View.extend({
     // removeRow() is called directly
     if (!options) {
       this.collection.remove(model, (options = collection));
-      this._unshiftEmptyRowMayBe();
+      if (this._unshiftEmptyRowMayBe()) {
+        this.render();
+      }
       return;
     }
 
@@ -2415,7 +2417,9 @@ var Body = Backgrid.Body = Backbone.View.extend({
     }
 
     this.rows.splice(options.index, 1);
-    this._unshiftEmptyRowMayBe();
+    if (this._unshiftEmptyRowMayBe()) {
+      this.render();
+    }
 
     return this;
   },
@@ -2496,7 +2500,7 @@ var Body = Backgrid.Body = Backbone.View.extend({
      Triggers a Backbone `backgrid:sorted` event from the collection when done
      with the column, direction and a reference to the collection.
 
-     @param {Backgrid.Column} column
+     @param {Backgrid.Column|string} column
      @param {null|"ascending"|"descending"} direction
 
      See [Backbone.Collection#comparator](http://backbonejs.org/#Collection-comparator)
@@ -2588,7 +2592,10 @@ var Body = Backgrid.Body = Backbone.View.extend({
     var i = this.collection.indexOf(model);
     var j = this.columns.indexOf(column);
     var cell, renderable, editable, m, n;
-
+    
+    // return if model being edited in a different grid
+    if (j === -1) return this;
+    
     this.rows[i].cells[j].exitEditMode();
 
     if (command.moveUp() || command.moveDown() || command.moveLeft() ||
@@ -2762,7 +2769,7 @@ var Grid = Backgrid.Grid = Backbone.View.extend({
     // Convert the list of column objects here first so the subviews don't have
     // to.
     if (!(options.columns instanceof Backbone.Collection)) {
-      options.columns = new Columns(options.columns);
+      options.columns = new Columns(options.columns || this.columns);
     }
     this.columns = options.columns;
 
@@ -2881,5 +2888,5 @@ var Grid = Backgrid.Grid = Backbone.View.extend({
   }
 
 });
-return Backgrid;
+  return Backgrid;
 }));

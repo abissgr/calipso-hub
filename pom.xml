@@ -717,9 +717,9 @@
 					<executions>
 						<execution>
 							<id>attach-sources</id>
-							<goals>
-								<goal>jar</goal>
-							</goals>
+		                    <goals>
+		                        <goal>jar-no-fork</goal>
+		                    </goals>
 						</execution>
 					</executions>
 				</plugin>

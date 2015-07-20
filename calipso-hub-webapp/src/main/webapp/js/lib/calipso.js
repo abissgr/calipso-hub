@@ -17,7 +17,20 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define("calipso", function(require) {
+define([
+	'underscore', 'handlebars', 'calipso-hbs',
+	'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',
+  'marionette',
+  'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
+  /*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker',
+  'jquery-color', 'q', 'chart'],
+function(
+	_, Handlebars, calipsoTemplates,
+	Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2,
+	BackboneMarionette,
+	Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
+	/*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker,
+	jqueryColor, q, Chart) {
 
 
 	/**
@@ -32,7 +45,8 @@ define("calipso", function(require) {
 		model : {},
 		customModel : {},
 		view : {},
-		controller : {}
+		controller : {},
+		hbs: {}
 	};
 
 	// Get the DOM manipulator for later use
@@ -126,6 +140,9 @@ define("calipso", function(require) {
 		}
 		return prop;
 	};
+	Calipso.getTemplate = function(name) {
+		return calipsoTemplates[name];
+	}
 	Calipso.initializeApp = function(customConfig) {
 		customConfig = customConfig || {};
 		var config = {
@@ -134,7 +151,7 @@ define("calipso", function(require) {
 			footerViewType : Calipso.view.FooterView,
 			loginViewType : Calipso.view.LoginView,
 			sessionType : Calipso.util.Session,
-			apiAuthPath : "/apiauth"
+			apiAuthPath : "/apiauth",
 		};
 		Calipso.config = _.defaults(customConfig, config);
 
@@ -463,7 +480,7 @@ define("calipso", function(require) {
 	// //////////////////////////////////////
 	// Collection
 	// //////////////////////////////////////
-	Calipso.collection.GenericCollection = Backbone.PageableCollection.extend(
+	Calipso.collection.GenericCollection = PageableCollection.extend(
 	/** @lends Calipso.collection.GenericCollection.prototype */
 	{
 		mode : "server",
@@ -480,7 +497,7 @@ define("calipso", function(require) {
 			pageSize : 10,
 		},
     /**
-     A translation map to convert Backbone.PageableCollection state attributes
+     A translation map to convert PageableCollection state attributes
      to the query parameters accepted by your server API.
 
      You can override the default state by extending this class or specifying
@@ -494,7 +511,7 @@ define("calipso", function(require) {
      @property {string} [queryParams.sortKey="properties"]
      @property {string} [queryParams.order="sort"]
      @property {string} [queryParams.directions={"-1": "ASC", "1": "DESC"}] A
-     map for translating a Backbone.PageableCollection#state.order constant to
+     map for translating a PageableCollection#state.order constant to
      the ones your server API accepts.
   	*/
     queryParams: {
@@ -513,7 +530,7 @@ define("calipso", function(require) {
 			return this.prototype.getTypeName();
 		},
 		initialize : function(attributes, options) {
-			Backbone.PageableCollection.prototype.initialize.apply(this, arguments);
+			PageableCollection.prototype.initialize.apply(this, arguments);
 			options || (options = {});
 			if (options.model && options.model.prototype.getTypeName()) {
 				this.model = options.model;
@@ -548,7 +565,7 @@ define("calipso", function(require) {
 			if(options && options.data){
 				this.state = this.parseState(options.data, this.queryParams, this.state, {});
 			}
-			return Backbone.PageableCollection.prototype.fetch.apply(this, arguments);
+			return PageableCollection.prototype.fetch.apply(this, arguments);
 		},
 		hasCriteria : function(){
 			var minData = 0;
@@ -2270,7 +2287,7 @@ define("calipso", function(require) {
 	});
 
 	Calipso.view.ModalLayout = Calipso.view.AbstractLayout.extend({
-		template : require('hbs!template/modal-layout'),
+		template : Calipso.getTemplate('modal-layout'),
 		events : {
 			"click a.modal-close" : "closeModal"
 		},
@@ -2335,7 +2352,7 @@ define("calipso", function(require) {
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
 		className: "container",
-		template : require('hbs!template/header'),
+		template : Calipso.getTemplate('header'),
 		id : "navbar-menu",
 		className : "col-sm-12",
 		events : {
@@ -2379,12 +2396,12 @@ define("calipso", function(require) {
 			} ];// header-menu-item
 			var MenuItemView = Backbone.Marionette.ItemView.extend({
 				tagName : "li",
-				template : require('hbs!template/header-menuitem')
+				template : Calipso.getTemplate('header-menuitem')
 			});
 
 //			var MenuCollectionView = Backbone.Marionette.CollectionView.extend({
 //				tagName : "ul",
-//				template : require('hbs!template/header-menuitem'),
+//				template : Calipso.getTemplate('header-menuitem'),
 //				childView : MenuItemView
 //			});
 //			this.menuRegion.show(new MenuCollectionView(menuModel));
@@ -2399,9 +2416,9 @@ define("calipso", function(require) {
 				var notificationsView = new Calipso.view.TemplateBasedCollectionView({
 					tagName : "ul",
 					className: "dropdown-menu dropdown-notifications",
-					template : require("hbs!template/headerNotificationsCollectionView"),
+					template : Calipso.getTemplate("headerNotificationsCollectionView"),
 					childViewOptions : {
-						template : require("hbs!template/headerNotificationsItemView"),
+						template : Calipso.getTemplate("headerNotificationsItemView"),
 					},
 					collection : notifications,
 				});
@@ -2437,7 +2454,7 @@ define("calipso", function(require) {
 	{
 		tagName : 'div',
 		id : "calipsoModelDrivenBrowseLayout",
-		template : require('hbs!template/md-browse-layout'),
+		template : Calipso.getTemplate('md-browse-layout'),
 		/**
 		 * Get the default config. Overwrites {Calipso.view.MainLayout#getDefaultConfig}
 		 */
@@ -2633,7 +2650,7 @@ define("calipso", function(require) {
 	{
 		tagName : 'div',
 		id : "calipsoModelDrivenSearchLayout",
-		template : require('hbs!template/md-search-layout'),
+		template : Calipso.getTemplate('md-search-layout'),
 		/**
 		 * Get the default config. Overwrites {Calipso.view.MainLayout#getDefaultConfig}
 		 */
@@ -2734,7 +2751,7 @@ define("calipso", function(require) {
 	Calipso.view.ModelDrivenReportLayout = Calipso.view.ModelDrivenSearchLayout.extend(
 	/** @lends Calipso.view.ModelDrivenReportLayout.prototype */
 	{
-		template : require('hbs!template/md-report-layout'),
+		template : Calipso.getTemplate('md-report-layout'),
 	}, {
 		getTypeName : function() {
 			return "Calipso.view.ModelDrivenReportLayout";
@@ -2742,7 +2759,7 @@ define("calipso", function(require) {
 	});
 	/*
 		var ModelDrivenOverviewLayout = MainLayout.extend({
-			template : require('hbs!template/md-overview-layout'),
+			template : Calipso.getTemplate('md-overview-layout'),
 			onShow : function() {
 				console.log("ModelDrivenOverviewLayout#onShow");
 				var tabLabelsView = new TabLabelsCollectionView({
@@ -2930,7 +2947,7 @@ define("calipso", function(require) {
 	Calipso.view.TemplateBasedItemView = Marionette.ItemView.extend(
 	/** @lends Calipso.view.TemplateBasedItemView.prototype */
 	{
-		template : require("hbs!template/templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
+		template : Calipso.getTemplate("templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
 		tagName : "li",
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
@@ -2944,7 +2961,7 @@ define("calipso", function(require) {
 	Calipso.view.TemplateBasedCollectionView = Marionette.CompositeView.extend(
 	/** @lends Calipso.view.TemplateBasedCollectionView.prototype */
 	{
-		template : require("hbs!template/templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
+		template : Calipso.getTemplate("templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
 		tagName : "ul",
 		childView : Calipso.view.TemplateBasedItemView,
 		pollCollectionAfterDestroy : false,
@@ -3025,7 +3042,7 @@ define("calipso", function(require) {
 	/** @lends Calipso.view.NotFoundView.prototype */
 	{
 		className : 'container span8 home',
-		template : require('hbs!template/notfound')
+		template : Calipso.getTemplate('notfound')
 	}, {
 		getTypeName : function() {
 			return "NotFoundView";
@@ -3035,7 +3052,7 @@ define("calipso", function(require) {
 	/** @lends Calipso.view.FooterView.prototype */
 	{
 		className : "container",
-		template : require('hbs!template/footer'),
+		template : Calipso.getTemplate('footer'),
 		id : "navbar-menu",
 		className : "col-sm-12"
 	}, {
@@ -3170,7 +3187,7 @@ define("calipso", function(require) {
 	 * */
 	{
 		// Define view template
-		template : require('hbs!template/md-collection-grid-view'),
+		template : Calipso.getTemplate('md-collection-grid-view'),
 		events : {
 			"click button.btn-windowcontrols-destroy" : "back"
 		},
@@ -3324,7 +3341,7 @@ define("calipso", function(require) {
 	Calipso.view.ModelDrivenReportView = Calipso.view.ModelDrivenCollectionGridView.extend({
 		tagName: "div",
 		// Define view template
-		template : require('hbs!template/md-report-view'),
+		template : Calipso.getTemplate('md-report-view'),
 		chartOptions : {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -3514,7 +3531,7 @@ define("calipso", function(require) {
 	Calipso.view.MainContentNavView = Marionette.ItemView.extend({
 
 		// Define view template
-		template : require('hbs!template/MainContentNavView'),
+		template : Calipso.getTemplate('MainContentNavView'),
 
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
@@ -3585,7 +3602,7 @@ define("calipso", function(require) {
 		addToCollection : null,
 		// Define view template
 		formSchemaKey : null,
-		template : require('hbs!template/md-form-view'),
+		template : Calipso.getTemplate('md-form-view'),
 		templateHelpers : {
 			formSchemaKey : function() {
 				return this.formSchemaKey;
@@ -3970,7 +3987,7 @@ define("calipso", function(require) {
 	 * Calipso.initializeApp({loginViewType: Foobar})
 	 */
 	Calipso.view.LoginView = Marionette.ItemView.extend({
-		template : require('hbs!template/login'),
+		template : Calipso.getTemplate('login'),
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			console.log("CCalipso.view.LoginView#initialize");
@@ -4086,7 +4103,7 @@ define("calipso", function(require) {
 
 	Calipso.view.AppLayout = Calipso.view.MainLayout.extend({
 		tagName : "div",
-		template : require('hbs!template/applayout'),// _.template(templates.applayout),
+		template : Calipso.getTemplate('applayout'),// _.template(templates.applayout),
 		regions : {
 			navRegion : "#calipsoAppLayoutNavRegion",
 			contentRegion : "#calipsoAppLayoutContentRegion"
@@ -4122,7 +4139,7 @@ define("calipso", function(require) {
 	};
 
 	Calipso.view.TabLayout = Backbone.Marionette.LayoutView.extend({
-		template : require('hbs!template/generic-crud-layout'),
+		template : Calipso.getTemplate('generic-crud-layout'),
 		tagName : "div",
 		className : "col-sm-12",
 		regions : {
@@ -4150,7 +4167,7 @@ define("calipso", function(require) {
 	Calipso.view.TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
 		className : 'nav nav-pills',
 		tagName : 'ul',
-		itemTemplate : require('hbs!template/tab-label'),
+		itemTemplate : Calipso.getTemplate('tab-label'),
 		childViewContainer : '.nav-tabs',
 		initialize : function(options) {
 			Marionette.CollectionView.prototype.initialize.apply(this, arguments);
@@ -4724,7 +4741,7 @@ define("calipso", function(require) {
 			});
 
 			var view = new Calipso.config.loginViewType({
-				template : require('hbs!template/loginRegistered'),
+				template : Calipso.getTemplate('loginRegistered'),
 				model : loginModel
 			});
 

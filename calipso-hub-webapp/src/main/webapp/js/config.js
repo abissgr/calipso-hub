@@ -44,7 +44,7 @@ require.config({
 		'backbone.paginator': 'lib/backbone.paginator',
 		'async' : 'lib/async',
 		'keymaster' : 'lib/keymaster',
-		'hbs' : 'lib/resthub/require-handlebars',
+//		'hbs' : 'lib/resthub/require-handlebars',
 		'moment' : 'lib/moment',
 		'template' : '../template',
 		'json2' : 'lib/json2',

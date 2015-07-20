@@ -50,7 +50,7 @@ define([ 'calipso', 'modules-config'],
 	
 	// initialize/configure application
 	Calipso.initializeApp({
-		contextPath: "calipso/"
+		contextPath: "calipso/",
 	});
   
   return Calipso.app;});
