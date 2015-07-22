@@ -18,7 +18,7 @@
  */
 
 define([
-'hbs!template//modal-layout', 
+'hbs!template/modal-layout', 
 'hbs!template/header', 
 'hbs!template/header-menuitem', 
 'hbs!template/md-browse-layout', 
