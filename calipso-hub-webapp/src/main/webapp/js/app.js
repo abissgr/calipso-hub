@@ -17,8 +17,12 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define([ 'calipso', 'modules-config'],
-	function( Calipso, modulesConfig) {
+define([
+  'jquery', 'underscore', 'underscore-inflection', 'backbone', 'bootstrap',
+  'calipso', 'backbone', 'modules-config', 'routers/MainRouter' ],
+function(
+	$, _, _inflection, Backbone, bootstrap,
+	Calipso, Backbone, modulesConfig, MainRouter) {
 
 
 	//////////////////////////////////
@@ -45,12 +49,56 @@ define([ 'calipso', 'modules-config'],
         }
       });
       return Backbone.$.ajax.apply(Backbone.$, arguments);
-	}
+	};
 	
-	
-	// initialize/configure application
+	// initialize/configure application 
 	Calipso.initializeApp({
 		contextPath: "calipso/",
 	});
-  
-  return Calipso.app;});
+
+
+	//////////////////////////////////
+	// intercept links
+	//////////////////////////////////
+	$(document).on("click", "a", function(event) {
+		var href = $(this).attr("href");
+		console.log("Cought link: " + href);
+		if (href && href.match(/^\/.*/) 
+				&& !$(this).attr("target")) {
+			Calipso.stopEvent(event);
+			console.log("stopped link: " + href);
+			Backbone.history.navigate(href, true);
+		}
+	});
+
+	//////////////////////////////////
+	// Bootstrap: enable tooltips
+	//////////////////////////////////
+	$(document).ready(function() {
+		$(document.body).tooltip({
+			selector : "[data-toggle=tooltip]",
+			html : true
+		});
+
+	});
+    //////////////////////////////////
+    // Use POST instead of PUT/PATCH/DELETE
+    //////////////////////////////////
+    Backbone.emulateHTTP = true;
+
+	//////////////////////////////////
+	// Start the app
+	//////////////////////////////////
+	var options = {};
+	options.routers = {};
+	options.routers.main = MainRouter;
+	options.menu = [ {
+		label: "Users",
+		url: "users"
+	},{
+		label: "Hosts",
+		url: "hosts"
+	} ];
+    
+	Calipso.app.start(options);
+});

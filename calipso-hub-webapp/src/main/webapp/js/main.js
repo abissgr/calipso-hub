@@ -1,120 +1,169 @@
-require([
-// Libraries
-'jquery', 'underscore', 'underscore-inflection', 'backbone', 'bootstrap',
-// Main App Object
-'app',
-// Application routers
-'routers/MainRouter' ],
+require.config({
+	// main.js is the application entry point
+	deps : [ 'main' ],
+	waitSeconds: 200,
 
-function(
-// Libraries
-$, _, _inflection, Backbone, bootstrap,
-// Main App Object
-CalipsoApp,
-// Application routers
-MainRouter) {
+	paths : {
+		'cookie' : 'lib/jquery.cookie',
+		'jquery' : 'lib/jquery',
+		'jquery-color' : 'lib/jquery.color.plus-names',
+		'q' : 'lib/q',
+		'underscore' : 'lib/underscore',
+		'underscore-string' : 'lib/underscore-string',
+		'underscore-inflection' : 'lib/underscore-inflection',
+		'backbone' : 'lib/backbone',
+		'resthub' : 'lib/resthub/resthub',
+		'localstorage' : 'lib/localstorage',
+		'text' : 'lib/text',
+		'i18n' : 'lib/i18n',
+		'pubsub' : 'lib/resthub/pubsub',
+		'bootstrap' : 'lib/bootstrap',
+		'backbone-validation-orig' : 'lib/backbone-validation',
+		'backbone-bootstrap-modal' : 'lib/backbone-bootstrap-modal',
+		'backbone-forms' : 'lib/backbone-forms',
+		'backbone-forms-bootstrap3' : 'lib/backbone-forms-bootstrap3',
+		'bootstrap-datetimepicker' : 'lib/bootstrap-datetimepicker',
+		'bootstrap-markdown' : 'lib/bootstrap-markdown',
+		'backbone-validation' : 'lib/resthub/backbone-validation-ext',
+		'marionette' : 'lib/backbone.marionette',
+		'handlebars-orig' : 'lib/handlebars',
+		'handlebars' : 'lib/resthub/handlebars-helpers',
+		'backbone-queryparams' : 'lib/backbone-queryparams',
+		'backbone.paginator': 'lib/backbone.paginator',
+		'async' : 'lib/async',
+		'keymaster' : 'lib/keymaster',
+		'moment' : 'lib/moment',
+		'template' : '../template',
+		'json2' : 'lib/json2',
+		'console' : 'lib/resthub/console', 
+		'backgrid' : 'lib/backgrid/backgrid',
+		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
+		"backgrid-moment" : 'lib/backgrid/extensions/moment/backgrid-moment-cell',
+		"backgrid-text" : 'lib/backgrid/extensions/text/backgrid-text-cell',
+		'backgrid-responsive-grid' : 'lib/backgrid/extensions/responsive-grid/responsive-grid',
+		"calipso" : 'lib/calipso',
+		"calipso-hbs" : 'lib/calipso-hbs',
+		// Mocha testing
+		'mocha' : 'lib/mocha/mocha',
+		'chai' : 'lib/chai/chai',
+		//'chai-jquery' : 'lib/chai/chai-jquery',
+		'sinon' : 'lib/sinon/chai-jquery',
+		'calendar' : 'lib/calendar',
+      'select2' : 'lib/select2',
+      'raty' : 'lib/jquery.raty-fa',
+      'bootstrap-fileInput' : 'lib/fileinput',
+      'backbone-forms-select2' : 'lib/backbone-forms-select2',
+      'typeahead' : 'lib/typeahead.jquery',
+      'bloodhound': 'lib/bloodhound',
+      'google-maps-loader' : 'lib/google-maps-loader',
+      'humanize' : 'lib/humanize-duration',
+      'chart': 'lib/Chart',
 
-	function createNamedConstructor(name, constructor) {
+	},
+	wrapShim: true,
+	shim : {
 
-		var fn = new Function('constructor', 'return function ' + name + '()\n' + '{\n' + '    // wrapper function created dynamically for "' + name + '" constructor to allow instances to be identified in the debugger\n' + '    constructor.apply(this, arguments);\n' + '};');
-		return fn(constructor);
+		'underscore' : {
+			exports : '_'
+		},
+		'underscore-string' : {
+			deps : [ 'underscore' ]
+		},
+		'underscore-inflection' : {
+			deps : [ 'underscore' ]
+		},
+		'handlebars-orig' : {
+			exports : 'Handlebars'
+		},
+
+		'backbone': {
+			deps: ['underscore'],
+			exports: function() {
+				return this.Backbone;
+			}
+		},
+		'marionette' : {
+			deps : [ 'jquery', 'underscore', 'backbone' ],
+			exports : 'Marionette'
+		},
+	    'backgrid': {
+	       deps: ['jquery', 'underscore', 'backbone', 'backbone.paginator'],
+	       exports: 'Backgrid',
+	       init: function(jQuery, underscore, Backbone, PageableCollection){
+	      	 Backbone.PageableCollection = PageableCollection;
+	       }
+	     },
+		'backbone-bootstrap-modal' : {
+			deps : [ 'jquery', 'underscore', 'backbone', 'bootstrap'],
+			exports : 'Backbone.BootstrapModal'
+		},
+		'backbone-forms' : {
+			deps : [ 'jquery', 'underscore', 'backbone'],
+			exports : 'Backbone.Form'
+		},
+		'backbone.paginator' : {
+			deps : [ 'underscore', 'backbone'],
+			exports : 'PageableCollection'
+		},
+		'backbone-forms-bootstrap3' : {
+			deps : [ 'jquery', 'underscore', 'backbone', 'backbone-forms' ]
+		},
+		'backgrid-paginator' : {
+			deps : [ 'underscore', 'backbone', 'backgrid', 'backbone.paginator' ],
+			exports : 'Backgrid.Extension.Paginator'
+		},
+		'backgrid-moment' : {
+			deps : [ 'backgrid', 'moment' ],
+			exports : 'Backgrid.Extension.Moment'
+		},
+		'backgrid-text' : {
+			deps : [ 'backgrid' ],
+			exports : 'Backgrid.Extension.Text'
+		},
+		'backgrid-responsive-grid' : {
+			deps : [ 'jquery', 'underscore', 'backbone', 'backgrid' ],
+			exports : 'Backgrid.Extension.ResponsiveGrid'
+		},
+		'bootstrap' : {
+			deps : [ 'jquery' ]
+		},
+		'calendar': {
+			deps : [ 'jquery' ]
+		},
+		'bootstrap-markdown' : {
+			deps : [ 'jquery' ],
+			exports : 'Markdown'
+		},
+		'keymaster' : {
+			exports : 'key'
+		},
+		'async' : {
+			exports : 'async'
+		},
+		'calipso' : {
+			deps : [ 'underscore', 'handlebars', 'calipso-hbs', 
+			         'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',  
+			         'marionette', 
+			         'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator', 
+			         'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 
+			         'jquery-color', 'q', 'chart'],
+			exports : 'calipso',
+		},
+		
+		'cookie': { 
+			deps: ['jquery']
+		},
+		'chai-jquery': { 
+			deps: ['jquery', 'chai']
+		},
+      'jquery-color': {
+         deps: ['jquery'],
+         exports: 'jQuery.Color'
+     },
+		
 	}
 
-	// set up named constructors
-	var originalExtend = Backbone.View.extend; // Model, Collection, Router and View shared the same extend function
-	var nameProp = 'getTypeName';
-	var newExtend = function(protoProps, classProps) {
-		if (protoProps && protoProps.hasOwnProperty(nameProp)) {
-			// TODO - check that name is a valid identifier
-			var name = protoProps[nameProp]();
-			// wrap constructor from protoProps if supplied or 'this' (the function we are extending)
-			var constructor = protoProps.hasOwnProperty('constructor') ? protoProps.constructor : this;
-			protoProps = _.extend(protoProps, {
-				constructor : createNamedConstructor(name, constructor)
-			});
-		}
-		return originalExtend.call(this, protoProps, classProps);
-	};
-
-	Backbone.Model.extend = Backbone.Collection.extend = Backbone.Router.extend = Backbone.View.extend = newExtend;
-
-	//////////////////////////////////
-	// intercept links
-	//////////////////////////////////
-	$(document).on("click", "a", function(event) {
-		var href = $(this).attr("href");
-		console.log("Cought link: " + href);
-		// if (href && href.match(/^\/.*/) && $(this).attr("target") !==
-		// "_blank") {
-		if (href && href.indexOf("/") != 0 && !event.currentTarget.hasClass("dropdown-toggle") && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-			event.preventDefault();
-			console.log("stopped link: " + href);
-			Backbone.history.navigate(href, true);
-		}
-	});
-
-	/*
-	# Globally capture clicks. If they are internal and not in the pass 
-	# through list, route them through Backbone's navigate method.
-	$(document).on "click", "a[href^='/']", (event) ->
-
-	href = $(event.currentTarget).attr('href')
-
-	# chain 'or's for other black list routes
-	passThrough = href.indexOf('sign_out') >= 0
-
-	# Allow shift+click for new tabs, etc.
-	if !passThrough && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey
-	event.preventDefault()
-
-	# Remove leading slashes and hash bangs (backward compatablility)
-	url = href.replace(/^\//,'').replace('\#\!\/','')
-
-	# Instruct Backbone to trigger routing events
-	App.router.navigate url, { trigger: true }
-
-	return false
-
-	 */
-	//////////////////////////////////
-	// Bootstrap: enable tooltips
-	//////////////////////////////////
-	$(document).ready(function() {
-		$(document.body).tooltip({
-			selector : "[data-toggle=tooltip]",
-			html : true
-		});
-
-	});
-
-	//////////////////////////////////
-	// SB Admin 2 js
-	//////////////////////////////////
-	$(function() {
-
-		$('#side-menu').metisMenu();
-
-	});
-
-    //////////////////////////////////
-    // Use POST instead of PUT/PATCH/DELETE
-    //////////////////////////////////
-    Backbone.emulateHTTP = true;
-    
-	//////////////////////////////////
-	// Start the app
-	//////////////////////////////////
-	var options = {};
-	options.routers = {};
-	options.routers.main = MainRouter;
-	options.menu = [ {
-		label: "Users",
-		url: "users"
-	},{
-		label: "Hosts",
-		url: "hosts"
-	} ];
-	
-	CalipsoApp.start(options);
-
 });
+
+//Load our app module and pass it to our definition function
+require(['app']);
