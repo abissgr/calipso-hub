@@ -16,6 +16,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @MappedSuperclass
 public abstract class AuditableResource<T extends AuditableResource<T>> extends AbstractAuditable<User> {
 
+	private static final String PATH_SEPARATOR = "/";
+
 	/**
 	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
 	 */
@@ -38,7 +41,7 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 	/**
 	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
 	 */
-	@Column(name = "path", length = 500, nullable = false)
+	@Column(name = "path", length = 1500, nullable = false)
 	private String path;
 	
 	/**
@@ -72,6 +75,12 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 		this.setParent(parent);
 	}
 	
+	@JsonIgnore
+	@Transient
+	public String getPathSeparator(){
+		return PATH_SEPARATOR;
+	}
+	
 	@PreUpdate
     @PrePersist
     public void normalizePath() throws UnsupportedEncodingException{
@@ -81,12 +90,12 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 			if(this.getParent() != null){
 				path.append(this.getParent().getPath());
 			}
-			path.append('/');
+			path.append(getPathSeparator());
 			path.append(this.getName());
 			this.setPath(path.toString());
 		}
 		// set path level
-		Integer pathLevel = StringUtils.countMatches(this.getPath(), "/");
+		Integer pathLevel = StringUtils.countMatches(this.getPath(), getPathSeparator());
 		this.setPathLevel(pathLevel.shortValue());
 		
 	}
