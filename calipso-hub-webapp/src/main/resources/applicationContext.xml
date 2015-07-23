@@ -16,7 +16,7 @@
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
  <!-- override resthub's MapperFeature.DEFAULT_VIEW_INCLUSION config -->
     
-    <bean id="jsonObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
+    <bean id="jsonObjectMapperFactory" class="gr.abiss.calipso.utils.spring.JsonClientJackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
         <property name="featuresToDisable">
             <array>
                 <util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
@@ -30,7 +30,7 @@
         <property name="modulesToInstall" ref="jacksonModules"/>
     </bean>
     
-    <bean id="xmlObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
+    <bean id="xmlObjectMapperFactory" class="gr.abiss.calipso.utils.spring.JsonClientJackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
         <property name="featuresToDisable">
             <array>
                 <util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
@@ -57,6 +57,7 @@
 	    <property name="converters">
 	        <!-- converters is a set of both converters and converterfactories -->
 	        <bean class="gr.abiss.calipso.model.serializers.CustomEnumConverterFactory" />
+	        
 	    </property>
 	</bean>
     
