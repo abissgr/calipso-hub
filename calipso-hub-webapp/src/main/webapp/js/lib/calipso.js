@@ -2179,11 +2179,18 @@ function(
 		},
 		render : function() {
 			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
-			this.$el.datetimepicker(this.config);
-			if (this.value) {
-				var initValue = new Date(this.value);
-				this.$el.data("DateTimePicker").date(initValue);
+			var _this = this;
+			var doRender = function(){
+				_this.$el.parent().addClass("input-group");
+				_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
+				_this.$el.parent().datetimepicker(_this.config);
+				if (_this.value) {
+					var initValue = new Date(_this.value);
+					_this.$el.data("DateTimePicker").date(initValue);
+				}
 			}
+			// apply picker after the field has been added to the DOM
+			setTimeout(doRender, 250);
 			return this;
 		},
 	});
