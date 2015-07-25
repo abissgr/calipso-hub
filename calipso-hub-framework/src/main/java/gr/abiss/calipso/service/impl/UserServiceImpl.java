@@ -106,8 +106,6 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 			LOGGER.info("create, forcing active: false");
 			resource.setActive(false);
 		}
-		// TODO: remove
-		resource.setActive(true);
 		if(!resource.getActive()){
 			LOGGER.info("create, creating confirmation key");
 			resource.setConfirmationToken(generator.generateKey());
@@ -121,10 +119,10 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 			try {
 				LOGGER.info("Sending account confirmation email...");
 				emailService.sendAccountConfirmation(user);
+				LOGGER.info("Account confirmation email sent");
 			} catch (MessagingException e) {
 				LOGGER.error("Could not create account confirmation email", e);
 			}
-			LOGGER.info("Account confirmation email sent");
 		}
 		LOGGER.info("created user: " + user);
 		return user;

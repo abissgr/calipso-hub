@@ -5096,7 +5096,9 @@ function(
 	 */
 	Calipso.model.UserRegistrationModel = Calipso.model.UserModel .extend(
 	/** @lends Calipso.model.UserRegistrationModel */{
-
+		getFormSubmitButton : function(){
+			return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Register"
+		}
 	}, {
 		// static members
 		parent: Calipso.model.UserModel
@@ -5105,9 +5107,6 @@ function(
 	Calipso.model.UserRegistrationModel.prototype.showInMenu = false;
 	Calipso.model.UserRegistrationModel.prototype.getTypeName = function(instance) {
 		return "UserRegistrationModel";
-	};
-	Calipso.model.UserRegistrationModel.prototype.getPathFragment = function(instance) {
-		return "userRegistrations";
 	};
 	/**
 	 * Get the model class URL fragment corresponding this class
