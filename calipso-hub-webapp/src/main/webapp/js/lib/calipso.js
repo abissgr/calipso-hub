@@ -1584,13 +1584,109 @@ function(
 	};
 
 
+		// User Registration Model
+		// -----------------------
+
+		/**
+		 * Subclasses UserModel to provide layout, forms etc. configuration
+		 * for user registration flows.
+		 */
+		Calipso.model.UserRegistrationModel = Calipso.model.UserModel .extend(
+		/** @lends Calipso.model.UserRegistrationModel */{
+			label: "Register",
+			getFormSubmitButton : function(){
+				return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Register"
+			},
+			getFormTemplateKey : function(){
+				return "auth";
+			}
+		}, {
+			// static members
+			parent: Calipso.model.UserModel,
+			label: "Register"
+		});
+
+		Calipso.model.UserRegistrationModel.prototype.showInMenu = false;
+		Calipso.model.UserRegistrationModel.prototype.getTypeName = function(instance) {
+			return "UserRegistrationModel";
+		};
+
+		Calipso.model.UserRegistrationModel.prototype.getItemViewType = function(instance) {
+			return Calipso.view.GenericFormPanelView;
+		};
+		/**
+		 * Get the model class URL fragment corresponding this class
+		 * @returns the URL path fragment as a string
+
+		Calipso.model.UserRegistrationModel.prototype.getPathFragment = function(instance) {
+			return "userRegistrations";
+		};*/
+		/**
+		 * Override this to define a default layout view at a static context for your subclass,
+		 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
+		 */
+		Calipso.model.UserRegistrationModel.prototype.getLayoutViewType = function(instance) {
+			console.log("UserRegistrationModel.prototype.getLayoutViewType() called, will return ModelDrivenSearchLayout");
+			return Calipso.view.UserRegistrationLayout;
+		};
+		Calipso.model.UserRegistrationModel.prototype.getPrototypeFormSchemas = function(instance) {
+			console.log("UserRegistrationModel.prototype.getPrototypeFormSchemas for " + instance.getTypeName());
+			var requiredText = {
+				type : 'Text',
+				validators : [ 'required' ]
+			};
+			var passwordText = {
+				type : 'Password',
+				validators : [ 'required' ]
+			};
+			var passwordConfirm = {
+				type : 'Password',
+				validators: [{
+					type: 'match', field: 'password', message: 'Passwords must match!'
+				}]
+			};
+			return {//
+				firstName : {
+					"create" : requiredText,
+					"update" : requiredText
+				},
+				lastName : {
+					"create" : requiredText,
+					"update" : requiredText
+				},
+				username : {
+					"create" : requiredText,
+					"update" : requiredText
+				},
+				email : {
+					"search" : {
+						title : "Username or email",
+						type : 'Text',
+					},
+					"default" : {
+						type : 'Text',
+						validators : [ 'required', 'email' ]
+					}
+				},
+				password : {
+					"create" : passwordText,
+					"update" : passwordText
+				},
+				passwordConfirm : {
+					"create" : passwordConfirm,
+					"update" : passwordConfirm
+				},
+			};
+
+		};
+
+
 	Calipso.model.UserDetailsConfirmationModel = Calipso.model.UserDetailsModel.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
-
-			getFormSubmitButton : function(){
-				return "Confirm";
-			},
+		getFormSubmitButton : function(){
+			return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Confirm"
+		}
 	},
 	{
 		label: "Email Confirmation"
@@ -3605,16 +3701,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				return this.formSchemaKey;
 			},
 			formTitle : function() {
-				var title = "";
-				if(this.model.get("label")){
-					title += this.model.get("label");
-				}
-				else if(this.model.get("name")){
-					title += this.model.get("name");
-				}
-				else{
-					title += this.model.get("id");
-				}
+				var title = Calipso.getObjectProperty(this.model, "label", "");
 				return title;
 			},
 		},
@@ -3916,6 +4003,34 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
 					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
+					<% } %>\
+					</form>\
+			'),
+			auth : _.template('\
+					<form role="form">\
+					<div data-fieldsets></div>\
+					<% if (submitButton) { %>\
+					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
+					<span class="pull-right">\
+						<% if (submitButton.indexOf("Reg") == -1) { %>\
+					   <small>Need an account?</small>\
+					   <a title="Click to register" class="btn btn-success" href="/register">Register</a>\
+						<% } %>\
+					   <small>or sign-in with</small>\
+					    <div role="group" class="btn-group">\
+					        <a class="btn btn-default btn-social-login btn-social-login-facebook">\
+					            <i class="fa fa-facebook-f"></i><!-- &#160;facebook -->\
+					        </a>\
+					        <a class="btn btn-default btn-social-login btn-social-login-linkedin">\
+					            <i class="fa fa-linkedin"></i><!-- &#160;linkedin  -->\
+					        </a>\
+					        <!--a class="btn btn-default btn-social-login btn-social-login-twitter">\
+					            <i class="fa fa-twitter"></i><!-- &#160;twitter -->\
+					        <a class="btn btn-default btn-social-login btn-social-login-google">\
+					            <i class="fa fa-google-plus"></i><!-- &#160;google+ -->\
+					        </a>\
+					    </div>\
+					</span>\
 					<% } %>\
 					</form>\
 			')
@@ -5092,100 +5207,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			return "UserRegistrationLayout";
 		}
 	});
-
-	// User Registration Model
-	// -----------------------
-
-	/**
-	 * Subclasses UserModel to provide layout, forms etc. configuration
-	 * for user registration flows.
-	 */
-	Calipso.model.UserRegistrationModel = Calipso.model.UserModel .extend(
-	/** @lends Calipso.model.UserRegistrationModel */{
-		label: "Register",
-		getFormSubmitButton : function(){
-			return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Register"
-		}
-	}, {
-		// static members
-		parent: Calipso.model.UserModel,
-		label: "Register"
-	});
-
-	Calipso.model.UserRegistrationModel.prototype.showInMenu = false;
-	Calipso.model.UserRegistrationModel.prototype.getTypeName = function(instance) {
-		return "UserRegistrationModel";
-	};
-
-	Calipso.model.UserRegistrationModel.prototype.getItemViewType = function(instance) {
-		return Calipso.view.GenericFormPanelView;
-	};
-	/**
-	 * Get the model class URL fragment corresponding this class
-	 * @returns the URL path fragment as a string
-
-	Calipso.model.UserRegistrationModel.prototype.getPathFragment = function(instance) {
-		return "userRegistrations";
-	};*/
-	/**
-	 * Override this to define a default layout view at a static context for your subclass,
-	 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
-	 */
-	Calipso.model.UserRegistrationModel.prototype.getLayoutViewType = function(instance) {
-		console.log("UserRegistrationModel.prototype.getLayoutViewType() called, will return ModelDrivenSearchLayout");
-		return Calipso.view.UserRegistrationLayout;
-	};
-	Calipso.model.UserRegistrationModel.prototype.getPrototypeFormSchemas = function(instance) {
-		console.log("UserRegistrationModel.prototype.getPrototypeFormSchemas for " + instance.getTypeName());
-		var requiredText = {
-			type : 'Text',
-			validators : [ 'required' ]
-		};
-		var passwordText = {
-			type : 'Password',
-			validators : [ 'required' ]
-		};
-		var passwordConfirm = {
-			type : 'Password',
-			validators: [{
-				type: 'match', field: 'password', message: 'Passwords must match!'
-			}]
-		};
-		return {//
-			firstName : {
-				"create" : requiredText,
-				"update" : requiredText
-			},
-			lastName : {
-				"create" : requiredText,
-				"update" : requiredText
-			},
-			username : {
-				"create" : requiredText,
-				"update" : requiredText
-			},
-			email : {
-				"search" : {
-					title : "Username or email",
-					type : 'Text',
-				},
-				"default" : {
-					type : 'Text',
-					validators : [ 'required', 'email' ]
-				}
-			},
-			password : {
-				"create" : passwordText,
-				"update" : passwordText
-			},
-			passwordConfirm : {
-				"create" : passwordConfirm,
-				"update" : passwordConfirm
-			},
-		};
-
-	};
-
 	// AMD define happens at the end for compatibility with AMD loaders
 	// that don't enforce next-turn semantics on modules.
 
