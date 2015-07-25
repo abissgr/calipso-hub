@@ -1546,39 +1546,14 @@ function(
 		return "BaseNotificationModel";
 	};
 
-	Calipso.model.UserDetailsModel = Backbone.Model.extend(
+	Calipso.model.UserDetailsModel = Calipso.model.UserModel.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
 		isSearchModel : function(){
 			return false;
 		},
-		getItemViewType : function() {
-			return Calipso.view.GenericFormView;
-		},
-		getLayoutViewType : function() {
-			return Calipso.view.UserRegistrationLayout;
-		},
-		getPathFragment : function() {
-			return this.prototype.getPathFragment();
-		},
-		getTypeName : function() {
-			return this.prototype.getTypeName();
-		},
-		getFormSchema : function(key) {
-			return this.prototype.getFormSchema();
-		},
 		toString : function() {
 			return this.get("username");
-		},
-		getFormSchemaKey : function(){
-			var formSchemaKey;
-			if(this.isSearchModel()){
-				formSchemaKey = "search";
-			}
-			else{
-				formSchemaKey = this.isNew() ? "create" : "update";
-			}
-			return formSchemaKey;
 		},
 		sync : function(method, model, options) {
 			var _this = this;
@@ -1601,14 +1576,25 @@ function(
 	Calipso.model.UserDetailsModel.prototype.getPathFragment = function() {
 		return "userDetails";
 	};
-
 	Calipso.model.UserDetailsModel.prototype.getTypeName = function() {
 		return "UserDetailsModel";
 	};
+	Calipso.model.UserDetailsModel.prototype.getLayoutViewType = function() {
+		return Calipso.view.UserRegistrationLayout;
+	};
+
 
 	Calipso.model.UserDetailsConfirmationModel = Calipso.model.UserDetailsModel.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
-	{});
+	{
+
+			getFormSubmitButton : function(){
+				return "Confirm";
+			},
+	},
+	{
+		label: "Email Confirmation"
+	});
 	/**
 	 * Get the model class URL fragment corresponding this class
 	 * @returns the URL path fragment as a string
@@ -1624,8 +1610,11 @@ function(
 				validators : [ 'required' ]
 			}
 		};
-
 	};
+Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function() {
+	return Calipso.view.GenericFormPanelView;
+};
+
 
 		// Report Dataset Model
 		// This model is used by the router controller when a
@@ -3609,10 +3598,24 @@ function(
 		addToCollection : null,
 		// Define view template
 		formSchemaKey : null,
+		formTitle: "options.formTitle",
 		template : Calipso.getTemplate('md-form-view'),
 		templateHelpers : {
 			formSchemaKey : function() {
 				return this.formSchemaKey;
+			},
+			formTitle : function() {
+				var title = "";
+				if(this.model.get("label")){
+					title += this.model.get("label");
+				}
+				else if(this.model.get("name")){
+					title += this.model.get("name");
+				}
+				else{
+					title += this.model.get("id");
+				}
+				return title;
 			},
 		},
 
@@ -3805,7 +3808,7 @@ function(
 			var _self = this;
 			console.log("GenericFormView#renderForm called, schema key: " + _self.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-			var formSubmitButton = _self.model.getFormSubmitButton();
+			var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
 			if(!formSubmitButton){
 				if(_self.formSchemaKey.indexOf("search") == 0){
 					formSubmitButton = "<i class=\"glyphicon glyphicon-search\"></i>&nbsp;Search";
@@ -3815,7 +3818,7 @@ function(
 					formSubmitButton = "<i class=\"fa fa-floppy-o\"></i>&nbsp;Save";
 				}
 				else{
-					formSubmitButton = "SubmitSave";
+					formSubmitButton = "Submit";
 				}
 			}
 			//;(_self.formSchemaKey);
@@ -3931,6 +3934,9 @@ function(
 	});
 
 
+	Calipso.view.GenericFormPanelView = Calipso.view.GenericFormView.extend({
+		template : Calipso.getTemplate('md-formpanel-view'),
+	},{});
 	Calipso.view.ReportFormView = Calipso.view.GenericFormView.extend({
 		renderForm : function(){
 			Calipso.view.GenericFormView.prototype.renderForm.apply(this, arguments);
@@ -5096,17 +5102,23 @@ function(
 	 */
 	Calipso.model.UserRegistrationModel = Calipso.model.UserModel .extend(
 	/** @lends Calipso.model.UserRegistrationModel */{
+		label: "Register",
 		getFormSubmitButton : function(){
 			return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Register"
 		}
 	}, {
 		// static members
-		parent: Calipso.model.UserModel
+		parent: Calipso.model.UserModel,
+		label: "Register"
 	});
 
 	Calipso.model.UserRegistrationModel.prototype.showInMenu = false;
 	Calipso.model.UserRegistrationModel.prototype.getTypeName = function(instance) {
 		return "UserRegistrationModel";
+	};
+
+	Calipso.model.UserRegistrationModel.prototype.getItemViewType = function(instance) {
+		return Calipso.view.GenericFormPanelView;
 	};
 	/**
 	 * Get the model class URL fragment corresponding this class
