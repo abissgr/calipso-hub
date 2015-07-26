@@ -498,8 +498,7 @@ width: 100%;
 
 .tt-dropdown-menu, .tt-menu {
 	z-index:2500;
-    width: 100%;
-    min-width: 160px;
+    min-width: 100%;
     margin-top: 2px;
     padding: 5px 0;
     background-color: #fff;
@@ -516,6 +515,8 @@ width: 100%;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding;
     background-clip: padding-box;
+    display: inline-block;
+    white-space: nowrap;
 }
 .tt-suggestion {
     display: block;

@@ -141,7 +141,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'underscore', 'handlebars', 'calipso-hbs', 
+			deps : [ 'underscore', 'handlebars', 'calipso-hbs', 'moment',
 			         'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',  
 			         'marionette', 
 			         'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator', 

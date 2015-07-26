@@ -71,6 +71,9 @@ import com.wordnik.swagger.annotations.ApiModel;
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject {
 
 	private static final long serialVersionUID = -7942906897981646998L;
+
+	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
+	private String searchName;
 	
 	@Formula("concat(first_name, ' ', last_name )")
 	private String name;
@@ -237,6 +240,16 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 		}
 
+	}
+	
+	
+
+	public String getSearchName() {
+		return searchName;
+	}
+
+	public void setSearchName(String searchName) {
+		this.searchName = searchName;
 	}
 
 	/**

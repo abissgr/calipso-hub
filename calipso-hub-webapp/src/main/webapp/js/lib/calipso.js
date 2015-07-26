@@ -18,14 +18,14 @@
  */
 
 define([
-	'underscore', 'handlebars', 'calipso-hbs',
+	'underscore', 'handlebars', 'calipso-hbs', 'moment',
 	'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',
   'marionette',
   'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
   /*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker',
   'jquery-color', 'q', 'chart'],
 function(
-	_, Handlebars, calipsoTemplates,
+	_, Handlebars, calipsoTemplates, moment,
 	Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2,
 	BackboneMarionette,
 	Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
@@ -2030,7 +2030,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				title += rowModel.get("label");
 			}
 			else{
-				title += rowModel.get("id");
+				//title += rowModel.get("id");
 			}
 			Calipso.vent.trigger("modal:showInLayout", {
 				view: contentView,
@@ -2269,14 +2269,21 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				_this.$el.parent().addClass("input-group");
 				_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
 				_this.$el.parent().datetimepicker(_this.config);
-				if (_this.value) {
-					var initValue = new Date(_this.value);
-					_this.$el.data("DateTimePicker").date(initValue);
+				console.log("Calipso.components.backboneform.Datetimepicker#render, _this.value: " + _this.value);
+				var value = _this.schema.fromProperty
+					? _this.model.get(_this.schema.fromProperty)
+					: _this.value;
+				if (value) {
+					var initValue = new Date(value);
+					_this.$el.parent().data("DateTimePicker").date(initValue);
 				}
 			}
 			// apply picker after the field has been added to the DOM
 			setTimeout(doRender, 250);
 			return this;
+		},
+		getValue : function() {
+			return this.$el.parent().data("DateTimePicker").date();
 		},
 	});
 	//////////////////////////////////////////////////

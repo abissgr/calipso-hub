@@ -46,6 +46,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -227,7 +228,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 				
 				// if property is not already set
 				try {
-					if(field.get(resource) == null){
+					if(PropertyUtils.getProperty(resource, field.getName()) == null){
 						boolean skipApply = this.hasAnyRoles(applyRule.ignoreforRoles());
 						// if role is not ignored
 						if(!skipApply){
@@ -236,7 +237,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 								User user = new User();
 								user.setId(id);
 								LOGGER.info("Applying principal to field: " + field.getName() + ", value: " + id);
-								field.set(resource, user);
+								PropertyUtils.setProperty(resource, field.getName(), user);
 							}
 							else{
 								LOGGER.warn("User is anonymous, cannot apply principal to field: " + field.getName());
