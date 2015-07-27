@@ -22,6 +22,7 @@ build.calipso.initData=true
 build.calipso.domain=localhost
 build.calipso.cookies.httpOnly=false
 build.calipso.cookies.secure=false
+build.log.rootlevel=warn
 
 # Email
 build.mail.server.host=MAIL.YOU.COM

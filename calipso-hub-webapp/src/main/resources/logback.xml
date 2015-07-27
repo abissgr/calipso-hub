@@ -39,7 +39,7 @@
     <logger name="gr.abiss">
         <level value="debug" />
     </logger>
-    <root level="info">
+    <root level="@build.log.rootlevel@">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
