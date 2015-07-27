@@ -30,7 +30,7 @@ function(
 	BackboneMarionette,
 	Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 	/*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker,
-	jqueryColor, q, Chart) {
+	jqueryColor, q, chartjs) {
 
 
 	/**
