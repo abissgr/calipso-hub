@@ -2257,6 +2257,11 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			} else {
 				this.config = {locale : 'en'}
 			}
+			var allowInputToggle = this.config.allowInputToggle;
+			// enable allowInputToggle by default
+			if(_.isNull(allowInputToggle) || _.isUndefined(allowInputToggle)){
+				this.config.allowInputToggle = true;
+			}
 		},
 		callDataFunction : function(functionName, param){
 			console.log("callDataFunction:  " + functionName + ", param: " + param);
@@ -2266,6 +2271,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
 			var _this = this;
 			var doRender = function(){
+				_this.$el.attr('autocomplete','off');
 				_this.$el.parent().addClass("input-group");
 				_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
 				_this.$el.parent().datetimepicker(_this.config);
