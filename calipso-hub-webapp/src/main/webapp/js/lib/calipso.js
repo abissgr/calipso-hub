@@ -3986,7 +3986,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 		formTemplates : {
 			horizontal : _.template('\
-					<form class="form-horizontal" role="form">\
+					<form autocomplete=\"off\" class="form-horizontal" role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
 					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
@@ -3995,7 +3995,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			'),
 			nav : _.template('\
 					<nav class="navbar navbar-default">\
-					<form class="navbar-form navbar-left" role="form">\
+					<form autocomplete=\"off\" class="navbar-form navbar-left" role="form">\
 					<span data-fields="*"></span>\
 					<% if (submitButton) { %>\
 					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
@@ -4004,7 +4004,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 					</nav>\
 			'),
 			inline : _.template('\
-					<form class="form-inline" role="form">\
+					<form autocomplete=\"off\" class="form-inline" role="form">\
 					<span data-fields="*"></span>\
 					<% if (submitButton) { %>\
 					<div class="form-group"><button type="submit" class="submit btn btn-primary"><%= submitButton %></button></div>\
@@ -4012,7 +4012,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 					</form>\
 			'),
 			vertical : _.template('\
-					<form role="form">\
+					<form autocomplete=\"off\" role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
 					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
@@ -4020,7 +4020,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 					</form>\
 			'),
 			auth : _.template('\
-					<form role="form">\
+					<form autocomplete=\"off\" role="form">\
 					<div data-fieldsets></div>\
 					<% if (submitButton) { %>\
 					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
