@@ -4978,10 +4978,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				modelForRoute.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
 
 			}
-
 			//console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.prototype.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.session.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
 			return modelForRoute;
-
 		},
 		mainNavigationReportRoute : function(mainRoutePart, queryString) {
 			// console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
@@ -5109,6 +5107,11 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				this.lastContentNavTabName = contentNavTabName;
 			}
 		},
+		/**
+		* route for template-based pages ('page/:templateName')
+		* @member BacCalipso.controller.AbstractController
+		* @param {string} formattedData
+		*/
 		templatePage : function(templateName) {
  			var pageView = new Calipso.view.TemplateBasedItemView({
  				template: Calipso.getTemplate(templateName)
