@@ -5109,6 +5109,12 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				this.lastContentNavTabName = contentNavTabName;
 			}
 		},
+		templatePage : function(templateName) {
+ 			var pageView = new Calipso.view.TemplateBasedItemView({
+ 				template: Calipso.getTemplate(templateName)
+ 			});
+ 			Calipso.vent.trigger("app:show", pageView);
+ 		},
 		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart) {
 			if (typeof this[mainRoutePart] == 'function') {
 				// render explicit route
