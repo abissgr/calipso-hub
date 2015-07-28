@@ -2457,7 +2457,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		events : {
 			"click a.login" : "login",
 			"click a.register" : "register",
-			"click a.logout" : "logout"
+			"click a.logout" : "logout",
 		},
 		regions : {
 			//menuRegion : "#calipsoHeaderView-menuRegion",
