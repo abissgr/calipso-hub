@@ -304,7 +304,6 @@ function(
 
 			}
 			var startRoot = contextPath + "client/";
-			console.log("Calipso.app.on start, startRoot: " + startRoot);
 			Backbone.history.start({
 				root : startRoot,
 				pushState : pushStateSupported
@@ -314,9 +313,6 @@ function(
 
 		Calipso.vent.on('app:show', function(appView, navigaeToUrl) {
 			var $wrapper = $("#container");
-			console.log("Calipso.vent.on app:show, container: " + $wrapper);
-			console.log("Calipso.vent.on app:show, appView.containerClass: " + appView.containerClass);
-			console.log("Calipso.vent.on app:show, container class: " + $wrapper.attr("class"));
 			if (appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")) {
 				$wrapper.attr("class", appView.containerClass);
 			}
@@ -433,7 +429,6 @@ function(
 		 * @example Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"});
 		 */
 		Calipso.vent.on('modal:showInLayout', function(properties) {
-			console.log("vent event modal:showInLayout");
 			// make sure a view is provided
 			if (!properties.view) {
 				throw "A 'view' property is required on vent trigger 'modal:showInLayout'.";
@@ -1061,7 +1056,6 @@ function(
 		 * @todo implement optional merging of superclass schemas by using the supermodel.parent property
 		 */
 		getFormSchema : function(actionName) {
-			console.log("GenericModel#getFormSchema actionName: "+ actionName);
 			// decide based on model persistence state if no action was given
 			if (!actionName) {
 				//console.log("GenericModel#getFormSchema actionName: "+ actionName);
@@ -3676,7 +3670,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
 			if (!_this.model.isNew() && options.forceFetch) {
 				var modelUrl = Calipso.session.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
-				console.log("GenericView#initialize, fetching model " + modelUrl);
+				//console.log("GenericView#initialize, fetching model " + modelUrl);
 				this.model.fetch({
 					async : false,
 					url : modelUrl
@@ -3721,10 +3715,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			console.log("GenericFormView#initialize, this.model: ");
-			console.log(this.model);
-			console.log("GenericFormView#initialize, options.model: ");
-			console.log(options.model);
 
 			if (options.modal) {
 				this.modal = options.modal;
@@ -3733,7 +3723,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if (options.addToCollection) {
 				this.addToCollection = options.addToCollection;
 			}
-			console.log("GenericFormView.initialize, this.addToCollection: " + this.addToCollection);
+
 			if (options.model) {
 				this.model = options.model;
 			}
@@ -3768,7 +3758,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			//
 			this.formTemplate = this.getFormTemplate(options.formTemplateKey ? options.formTemplateKey : this.formTemplateKey);
 
-			console.log("GenericFormView.initialize, this.formSchemaKey: " + this.formSchemaKey + ", type " + this.model.getTypeName());
 
 		},
 		events : {
@@ -3780,7 +3769,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			"keypress input[type=text]" : "commitOnEnter"
 		},
 		commitOnEnter : function(e) {
-		console.log("GenericFormView#commitOnEnter");
 			if (e.keyCode != 13) {
 				return;
 			} else {
@@ -3788,10 +3776,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			}
 		},
 		commit : function(e) {
-		console.log("GenericFormView#commit");
 			var _this = this;
 			Calipso.stopEvent(e);
-			console.log("commit, schemaKey: " + this.formSchemaKey);
 			if (window.Placeholders) {
 				Placeholders.disable();
 			}
@@ -3807,7 +3793,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 					$(".modal-body").scrollTop(0);
 				}
 
-				console.log("GenericFormView#commit search, return false");
 				return false;
 			}
 			// if no validation errors
@@ -3815,38 +3800,28 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				// Case: create/update
 				if (_this.formSchemaKey == "create" || _this.formSchemaKey == "update") {
 					// persist changes
-					console.log("Calipso.view.GenericFormView#commit persist, _this.url: " + _this.url);
-					console.log("Calipso.view.GenericFormView#commit persist, model url: " + _this.model.get("url"));
 
 					_this.model.save(null, {
 						success:function(model, response){
 							if(_this.addToCollection){
-								console.log("Calipso.view.GenericFormView#commit model save success, triggering added");
 
 								_this.addToCollection.add(_this.model);
 								_this.model.trigger("added");
 							}
 							if(_this.modal){
-					      console.log("Calipso.view.GenericFormView#commit model save success, triggering modal:destroy");
-								Calipso.vent.trigger("modal:destroy");
+					      Calipso.vent.trigger("modal:destroy");
 							}
 							else{
-					      console.log("Calipso.view.GenericFormView#commit model save success, triggering genericFormSaved");
-								Calipso.vent.trigger("genericFormSaved", model);
+					      Calipso.vent.trigger("genericFormSaved", model);
 							}
 						},
 						error:function(){
-					        console.log("Calipso.view.GenericFormView#commit model save error");
-								alert("Failed persisting changes");
+					      alert("Failed persisting changes");
 					    }
 					});
 				}
 				else{
-
-
-					console.log("GenericFormView#commit, saving search data to session");
 					var newData = this.form.toJson();
-					console.log(newData);
 					this.searchResultsCollection.data = newData;
 					this.searchResultsCollection.fetch({
 						reset : true,
@@ -3854,7 +3829,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 						success : function() {
 							// signal successful retreival of search results
 							// for the currently active layout to handle presentation
-							console.log("GenericFormView#commit: search success, triggering: genericFormSearched");
 							Calipso.vent.trigger("genericFormSearched", _this.model);
 						},
 
@@ -3878,22 +3852,17 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			var _self = this;
 
 			// get appropriate schema
-			console.log("GenericFormView.onShow, this.formSchemaKey: "+this.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-			console.log("GenericFormView#onShow, formSchemaKey: " + this.formSchemaKey + ", model id: " + this.model.get("id") + ", schema: ");
-			console.log(formSchema);
 
 			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering)
 			if (formSchema && _.size(formSchema) > 0) {
 				_self.renderForm();
 			} else {
 				var fetchScemaUrl = Calipso.session.getBaseUrl() + "/" + _self.model.getPathFragment() + '/' + (_self.model.isNew() ? "new" : _self.model.get("id"));
-				console.log("GenericFormView#onShow, fetching model from server to obtain form schema from: " + fetchScemaUrl);
 
 				_self.model.fetch({
 					url : fetchScemaUrl,
 					success : function(model, response, options) {
-						console.log("Fetched model from server");
 						_self.renderForm();
 					},
 					error : function(model, response, options) {
@@ -3906,7 +3875,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 		renderForm : function() {
 			var _self = this;
-			console.log("GenericFormView#renderForm called, schema key: " + _self.formSchemaKey);
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 			var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
 			if(!formSubmitButton){
@@ -3922,7 +3890,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				}
 			}
 			//;(_self.formSchemaKey);
-			console.log("formSubmitButton: " + formSubmitButton);
+
 			// render form
 			var JsonableForm = Backbone.Form.extend({
 				toJson : function() {
@@ -3937,7 +3905,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			});
 
 			if (Calipso.session.searchData && (!_self.searchResultsCollection.data)) {
-				console.log("GenericFormView#onShow, Adding session.searchData to form model");
 				_self.model.set(Calipso.session.searchData);
 				_self.searchResultsCollection.data = Calipso.session.searchData;
 			} else {
@@ -4068,15 +4035,12 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	Calipso.view.ReportFormView = Calipso.view.GenericFormView.extend({
 		renderForm : function(){
 			Calipso.view.GenericFormView.prototype.renderForm.apply(this, arguments);
-			console.log("Calipso.view.ReportFormView renderForm... ");
 			var _this = this;
 			// switch period mode
 	    this.form.on('timeUnit:change', function(form, timeUnitEditor) {
-				console.log("Calipso.view.ReportFormView caught timeUnit:change");
-        var timeUnit = timeUnitEditor.getValue();
+			  var timeUnit = timeUnitEditor.getValue();
 				var viewMode = timeUnit == "DAY" ? "months" : "years";
 				var format = timeUnit == "DAY" ? 'MM/YYYY' : 'YYYY';
-				console.log("Calipso.view.ReportFormView timeUnit: " + timeUnit + ", viewMode: " + viewMode);
 				form.fields.period.editor.callDataFunction("viewMode", viewMode);
 				form.fields.period.editor.callDataFunction("format", format);
 	    });
@@ -4094,7 +4058,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if (!options || !options.id) {
 				this.id = _.uniqueId(this.getTypeName() + "_");
 				$(this.el).attr('id', this.id);
-				console.log("Created dynamic id: " + options.id);
 			}
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 		},
@@ -4131,7 +4094,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		template : Calipso.getTemplate('login'),
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			console.log("CCalipso.view.LoginView#initialize");
 			$(window).scrollTop(0);
 		},
 		/**
@@ -4148,7 +4110,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			"submit .form-login" : "commit",
 		},
 		commit : function(e) {
-			console.log("Calipso.view.LoginView#commit");
 			Calipso.stopEvent(e);
 			var _this = this;
 			var userDetails = new Calipso.model.UserModel({
@@ -4160,9 +4121,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			Calipso.session.save(userDetails);
 		},
 		socialLogin : function(e) {
-			console.log("Calipso.view.LoginView#socialLogin, stop event: " + e);
 			Calipso.stopEvent(e);
-			console.log("Calipso.view.LoginView#socialLogin");
 			var clicked = $(e.currentTarget);
 
 			//console.log("Calipso.view.LoginView#socialLogin, clicked:");
@@ -4177,7 +4136,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 					break;
 				}
 			}
-			console.log("Calipso.view.LoginView#socialLogin, providerName: " + providerName);
+
 			if(!providerName){
 				throw "Clicked element does not match a social provider";
 			}
@@ -4331,12 +4290,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				}, this);
 				 */
 				viewTab : function(e) {
-					console.log("TabLabelsCollectionView.childView#viewTab");
 					Calipso.stopEvent(e);
 					CalipsoApp.vent.trigger("viewTab", this.model);
 				},
 				destroyTab : function(e) {
-					console.log("TabLabelsCollectionView.childView#destroyTab");
 					Calipso.stopEvent(e);
 					//					this.model.collection.remove(this.model);
 					this.destroy();
@@ -4355,17 +4312,14 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if (!someItemSpecificView) {
 				someItemSpecificView = Calipso.view.GenericFormView;
 			}
-			console.log("TabContentsCollectionView#getItemView for item class " + item.className + " returns: " + someItemSpecificView.className);
 			return someItemSpecificView;
 		},
 		buildItemView : function(item, ItemViewClass) {
-			console.log("TabContentsCollectionView#buildItemView, ItemView: " + ItemViewClass.className + ", item: " + item.getClassName());
 
 			var options = {
 				model : item
 			};
 			if (item && item.wrappedCollection) {
-				console.log("item.wrappedCollection: " + item.wrappedCollection.length);
 				options.searchResultsCollection = item.wrappedCollection;
 			}
 			// do custom stuff here
@@ -4409,7 +4363,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	//////////////////////////////////////////////////
 	// vent
 	//////////////////////////////////////////////////
-	console.log("Setting up Calipso.vent...");
+
 	Calipso.util.Vent = Backbone.Wreqr.EventAggregator.extend({
 
 		constructor : function(debug) {
@@ -4437,7 +4391,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		}
 	});
 	Calipso.vent = new Calipso.util.Vent();
-	console.log("Calipso.vent has been configured");
 
 	//////////////////////////////////////////////////
 	// session
@@ -4454,7 +4407,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				// fallback, will only work with a root web application context
 				Calipso._baseUrl = window.location.protocol + "//" + window.location.host;
 			}
-			console.log("Calipso.getBaseUrl configured to: "  + Calipso._baseUrl );
 		}
 		return Calipso._baseUrl;
 	}
@@ -4494,6 +4446,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			// and replace _this.userDetails with Calipso.session.userDetails
 			Handlebars.registerHelper("ifUserInRole", function() {
 				var hasRole = false;
+
 				// only process if the user is authenticated
 				if (_this.isAuthenticated()) {
 					//Last argument is the options object.
@@ -4501,23 +4454,20 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 
 					// now get input roles, the ones to check for just a single match
 					var inputRoles = [];
-					for (var i = 0; i < arguments.length - 1; ++i) {
+					for (var i = 0; i < arguments.length-1; i++) {
 						inputRoles.push(arguments[i]);
 					}
-					// console.log("ifHasRole, inputRoles: " + inputRoles);
+					;
 					// now check if user has any of the given roles
 					if (inputRoles) {
+						var ownedRoles = _this.userDetails.get("roles");
 						var inputRole;
 						for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
 							inputRole = inputRoles[j];
-							var ownedRoles = _this.userDetails.get("roles");
-							for (var k = 0; k < ownedRoles.length; k++) {
+							for (var k = 0; k < ownedRoles.length && hasRole == false; k++) {
 								var ownedRole = ownedRoles[k];
-//								console.log("ifHasRole, comparing input role '" + inputRole +
-//										"' to user rolee '" + ownedRole.name);
 								if (inputRole == ownedRole.name) {
 									hasRole = true;
-									break;
 								}
 							}
 						}
@@ -4737,12 +4687,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			}
 
 
-			console.log("Calipso.cache.getCollection, collectionOptions: " );
-			console.log(collectionOptions);
-			console.log("Calipso.cache.getCollection, collectionOptions.model: " );
-			console.log(collectionOptions.model);
-			console.log("Calipso.cache.getCollection, collectionOptions.model.prototype.getTypeName(): " );
-			console.log(collectionOptions.model.prototype.getTypeName());
 			if(!collectionOptions.model || !collectionOptions.model.prototype.getTypeName){
 				throw "Calipso.cache.getCollection: options.model is required and must be a GenericModel subtype";
 			}
@@ -4852,7 +4796,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 
 		login : function() {
-			console.log("Calipso.controller.AbstractController#login");
 			var loginModel = new Calipso.model.UserModel( {
 				email : Calipso.session.get('email'),
 				issuer: Calipso.session.get('issuer'),
@@ -4871,7 +4814,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			Calipso.vent.trigger('app:show', view);
 		},
 		loginRegistered : function() {
-			console.log("Calipso.controller.AbstractController#loginRegistered");
 			var loginModel = new Calipso.model.UserModel( {
 				email : Calipso.session.get('email'),
 				issuer: Calipso.session.get('issuer'),
@@ -4915,7 +4857,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			window.parent.destroy();
 		},
 		register : function(){
-			console.log("Calipso.controller.AbstractController#register");
 			this.showLayoutForModel(new Calipso.model.UserRegistrationModel());
 
 		},
@@ -4926,17 +4867,15 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
 		showLayoutForModel : function(givenModel, GivenModelLayoutType){
-			console.log("Calipso.controller.AbstractController#showLayoutForModel");
-			console.log(givenModel);
-				// make sure to choose a layout type
-				if(!GivenModelLayoutType){
-					GivenModelLayoutType = givenModel.getLayoutViewType();
-				}
-				// instantiate and show the layout
-				var layout = new GivenModelLayoutType({
-					model : givenModel
-				});
-				Calipso.vent.trigger("app:show", layout);
+			// make sure to choose a layout type
+			if(!GivenModelLayoutType){
+				GivenModelLayoutType = givenModel.getLayoutViewType();
+			}
+			// instantiate and show the layout
+			var layout = new GivenModelLayoutType({
+				model : givenModel
+			});
+			Calipso.vent.trigger("app:show", layout);
 		},
 		notFoundRoute : function(path) {
 			// console.log("notFoundRoute, path: "+path);
@@ -4951,7 +4890,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			var ModelType;
 			if (Calipso.modelTypesMap[modelTypeKey]) {
 				ModelType = Calipso.modelTypesMap[modelTypeKey];
-				console.log("AbstractController#getModelType, modelTypeKey: " + modelTypeKey + ", ModelType: " + ModelType.prototype.getTypeName());
+				// console.log("AbstractController#getModelType, modelTypeKey: " + modelTypeKey + ", ModelType: " + ModelType.prototype.getTypeName());
 			} else {
 				var modelForRoute;
 				var modelModuleId = "model/" + _.singularize(modelTypeKey);
@@ -4967,7 +4906,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if (!ModelType) {
 				throw "No matching model type was found for key: " + modelModuleId;
 			}
-			console.log("getModelType, key: "+modelTypeKey+", type: "+ModelType.prototype.getPathFragment());
+			// console.log("getModelType, key: "+modelTypeKey+", type: "+ModelType.prototype.getPathFragment());
 			return ModelType;
 		},
 		/**
@@ -4997,25 +4936,25 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		 * @see Calipso.model.GenericModel.prototype.getBusinessKey
 		 */
 		getModelForRoute : function(ModelType, modelId, httpParams) {
-			console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams + ", type: " + ModelType.prototype.getTypeName());
+			// console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams + ", type: " + ModelType.prototype.getTypeName());
 
 			// Obtain a model for the view:
 			// if a model id is present, obtain a promise
 			// for the corresponding instance
 			var modelForRoute;
 			if (modelId) {
-				console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
+				// console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
 				modelForRoute = ModelType.all().get(modelId);
 				if (modelForRoute) {
-					console.log("getModelForRoute, cached model: " + modelForRoute);
+					// console.log("getModelForRoute, cached model: " + modelForRoute);
 				} else {
-					console.log("getModelForRoute, creating model: " + modelForRoute);
+					// console.log("getModelForRoute, creating model: " + modelForRoute);
 					modelForRoute = ModelType.create({
 						id : modelId,
 					//url : Calipso.session.getBaseUrl() + "/api/rest/" + modelModuleId + "/" + id
 					});
 
-					console.log("getModelForRoute, created model: " + modelForRoute);
+					// console.log("getModelForRoute, created model: " + modelForRoute);
 				}
 			}
 			else {
@@ -5045,11 +4984,11 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 
 		},
 		mainNavigationReportRoute : function(mainRoutePart, queryString) {
-			console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
+			// console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
 
 			// TODO: temp fix
 			var isReport = window.location.href.indexOf("/reports") > -1 ;
-			console.log("AbstractController#mainNavigationReportRoute, isReport: " + isReport);
+			// console.log("AbstractController#mainNavigationReportRoute, isReport: " + isReport);
 			if(!isReport) {
 				this.mainNavigationSearchRoute(mainRoutePart, queryString);
 			}
@@ -5080,12 +5019,12 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 
 				// fetch and render report
 				var renderFetchable = function() {
-					console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
+					// console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
 					// show the layout type corresponding to the requested model
 					reportModel.wrappedCollection = reporDataSetCollection;
 					_self.showLayoutForModel(reportModel);
 				};
-				console.log("AbstractController#mainNavigationReportRoute calling reporDataSetCollection.fetch");
+				// console.log("AbstractController#mainNavigationReportRoute calling reporDataSetCollection.fetch");
 				reporDataSetCollection.fetch({
 					//url : collectionUrl,
 					data : reporDataSetCollection.data
@@ -5123,7 +5062,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			var fetchable = modelForRoute.get("id") ? modelForRoute : modelForRoute.wrappedCollection;
 			var skipDefaultSearch = modelForRoute.skipDefaultSearch &&  modelForRoute.wrappedCollection.hasCriteria();
 			// promise to fetch then render
-			console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
+			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
 			var renderFetchable = function() {
 
 				// show the layout type corresponding to the requested model
@@ -5142,7 +5081,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 		notFoundRoute : function() {
 			// build the model instancde representing the current request
-			console.log("AbstractController#notFoundRoute");
 			Calipso.vent.trigger("app:show", new Calipso.view.NotFoundView());
 
 		},
@@ -5195,21 +5133,21 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	{
 		initialize : function(options) {
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-			console.log("Calipso.view.UserRegistrationLayout#initialize");
+			// console.log("Calipso.view.UserRegistrationLayout#initialize");
 		},
 
 		onGenericFormSaved : function(model){
 			// if the user is active just navigate to login
 			// TODO: add message
 			if(model.get("active") == true){
-				console.log("Calipso.view.UserRegistrationLayout#onGenericFormSaved, user is active, saving to session");
+				// console.log("Calipso.view.UserRegistrationLayout#onGenericFormSaved, user is active, saving to session");
 
 				Calipso.navigate("loginRegistered", {
 					trigger : true
 				});
 			}
 			else{
-				console.log("Calipso.view.UserRegistrationLayout#onGenericFormSaved, user is active, fwrding to confirmation form");
+				// console.log("Calipso.view.UserRegistrationLayout#onGenericFormSaved, user is active, fwrding to confirmation form");
 				var confirmationModel = new Calipso.model.UserDetailsConfirmationModel();
 				this.showContent(confirmationModel);
 			}
