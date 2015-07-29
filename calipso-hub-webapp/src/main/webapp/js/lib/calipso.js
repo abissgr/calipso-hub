@@ -198,7 +198,9 @@ function(
 		// console.log("Calipso.app has been configured");
 
 		// register a handlebars helper for menuentries
-
+		Handlebars.registerHelper("baseUrl", function() {
+			return Calipso.getBaseUrl();
+		});
 		Handlebars.registerHelper("menuEntries", function() {
 			// console.log("menu entries...");
 
