@@ -198,7 +198,7 @@ function(
 		// console.log("Calipso.app has been configured");
 
 		// register a handlebars helper for menuentries
-		Handlebars.registerHelper("baseUrl", function() {
+		Handlebars.registerHelper("menuEntries", function() {
 			return Calipso.getBaseUrl();
 		});
 		Handlebars.registerHelper("menuEntries", function() {
@@ -2146,6 +2146,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		//className: "form-control",
 		typeaheadSource : null,
 		minLength: 2,
+		placeholder : "",
 		initialize : function(options) {
 			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
 			// set the options source
@@ -2157,8 +2158,11 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if (this.schema.minLength) {
 				this.minLength = this.schema.minLength;
 			}
+			if (this.schema.placeholder) {
+				this.placeholder = " placeholder=\"this.schema.placeholder\" ";
+			}
 			this.$el.removeAttr("id class name type autocomplete");
-			this.$el.html('<input type="text" id="' + this.id + '" name="' + this.getName() + '"  class="form-control"  autocomplete="off" />');
+			this.$el.html('<input type="text" id="' + this.id + '" name="' + this.getName() + '"  class="form-control"  autocomplete="off" ' + this.placeholder + '/>');
 		},
 		/**
 		 * Adds the editor to the DOM
@@ -2193,16 +2197,17 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			Calipso.components.backboneform.Typeahead.prototype.initialize.call(this, options);
 			this.$el.removeAttr("id class name type autocomplete");
 			this.$el.html('<input type="hidden" id="' + this.id + '" name="' + this.getName() + '" />' +
-					'<input type="text" class="form-control" id="' + this.id + 'Typeahead" name="' + this.getName() + 'Typeahead" autocomplete="off" />');
+					'<input type="text" class="form-control" id="' + this.id + 'Typeahead" name="' + this.getName() + 'Typeahead" autocomplete="off" ' + this.placeholder + '/>');
 		},
 		/**
 		 * Adds the editor to the DOM
 		 */
 		render : function() {
 			var _this = this;
+			var $hidden = _this.$el.find("#" + _this.id);
+			var $el = _this.$el.find("#" + _this.id + "Typeahead");
 			function create() {
 
-				var $el = _this.$el.find("#" + _this.id + "Typeahead");
 //				var editorAttrs = _this.schema.editorAttrs;
 //				if(editorAttrs){
 //					$.each(editorAttrs, function() {
@@ -2221,8 +2226,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				if(_this.value){
 					var val = Calipso.getObjectProperty(_this.value, "id", _this.value);
 					var nameVal = Calipso.getObjectProperty(_this.value, "name");
-					_this.$el.find("#" + _this.id).val(val);
-					_this.$el.find("#" + _this.id + "Typeahead").typeahead('val', nameVal);
+					$hidden.val(val);
+					$el.typeahead('val', nameVal);
 				}
 			}
 			// apply typeahead after the field has been added to the DOM

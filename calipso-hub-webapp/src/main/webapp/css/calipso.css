@@ -498,9 +498,10 @@ width: 100%;
 
 .tt-dropdown-menu, .tt-menu {
 	z-index:2500;
-    min-width: 100%;
+    min-width: 120%; 
+    max-height: 250px;
+    overflow-y: auto;
     margin-top: 2px;
-    padding: 5px 0;
     background-color: #fff;
     border: 1px solid #ccc;
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -522,7 +523,8 @@ width: 100%;
     display: block;
     padding: 3px 20px;
 }
-.twitter-typeahead .tt-suggestion.tt-cursor {
+.twitter-typeahead .tt-suggestion.tt-cursor,
+.twitter-typeahead .tt-suggestion:hover {
     color: #fff;
     background-color: #0081c2;
     background-image: -moz-linear-gradient(top, #0088cc, #0077b3);

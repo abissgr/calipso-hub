@@ -55,7 +55,6 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 	@JoinColumn(name = "same_as", referencedColumnName = "id", nullable = true)
 	private T sameAs;
 
-	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent", referencedColumnName = "id", nullable = true)
 	private T parent;
