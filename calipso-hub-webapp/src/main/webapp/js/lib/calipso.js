@@ -2175,6 +2175,49 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	});
 
 
+		/*
+		 * shows remaining chars
+		 */
+		Calipso.components.backboneform.LengthText = Backbone.Form.editors.Text.extend({
+			maxLength: null,
+			initialize : function(options) {
+				Backbone.Form.editors.Text.prototype.initialize.call(this, options);
+				if (this.schema.maxLength) {
+					this.maxLength = this.schema.maxLength;
+				}
+			},
+			/**
+			 * Adds the editor to the DOM
+			 */
+			render : function() {
+				var _this = this;
+				function create() {
+					if(_this.maxLength){
+						var pHelp = _this.$el.parent().parent().find('.help-block:not([data-error])').first();
+						pHelp.append("<span class=\"chars-remaining\">" + _this.maxLength + ' characters remaining</span>');
+
+				    _this.$el.keyup(function() {
+				        var text_length = _this.getValue() ? _this.getValue().length : 0;
+				        var text_remaining = _this.maxLength - text_length;
+								var c = text_remaining == 1 ? "character" : "characters"
+						    var $msgElem = _this.$el.parent().parent().find('.chars-remaining');
+								$msgElem.html(text_remaining + ' '+c+' remaining');
+
+								if(text_remaining < 0){
+									$msgElem.addClass('text-danger');
+								}
+								else{
+									$msgElem.removeClass('text-danger');
+								}
+
+				    });
+					}
+				}
+
+				setTimeout(create, 250);
+				return this;
+			}
+		});
 	/*
 	 *  based on typeahead/bloodhound 0.11.1, see
 	 * https://github.com/twitter/typeahead.js
