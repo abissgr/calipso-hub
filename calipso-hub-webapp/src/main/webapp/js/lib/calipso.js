@@ -117,6 +117,43 @@ function(
 		return Calipso.config[propertyName];
 	};
 	/**
+	 * Get a conbfiguration property
+	 * @param  {[String]} the property name
+	 * @return {[type]}
+	 */
+	Calipso.socialLogin = function(e) {
+
+			console.log("Calipso.socialLogin, clicked:");
+			Calipso.stopEvent(e);
+			var clicked = $(e.currentTarget);
+
+			console.log(clicked);
+			var providerNames = ["facebook", "linkedin", "twitter", "google"];
+			var providerName;
+
+			for(var i=0; i < providerNames.length; i++){
+				console.log("Calipso.socialLogin looking for className: " + "btn-social-login-" + providerNames[i]);
+				if(clicked.hasClass("btn-social-login-" + providerNames[i])){
+					providerName = providerNames[i];
+					break;
+				}
+			}
+
+			if(!providerName){
+				throw "Clicked element does not match a social provider";
+			}
+			// target='SignIn'
+			var formHtml = "<form class='social-signin-form' action='" +
+				Calipso.getBaseUrl() + "/signin/" + providerName +"' method='POST' role='form'>" +
+			//"<input type='hidden' name='scope' value='email' />" +
+			//"<input type='hidden' name='scope' value='emailure' />" +
+			//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" +
+				"</form>";
+			$("div.social-form-container").html(formHtml);
+			$("form.social-signin-form").submit();
+			return false;
+	};
+	/**
 	 * Use the MainRouter to navigate to the given route
 	 * @param  {[String]} the route URL
 	 * @param  {[Object]} the options hash
@@ -198,7 +235,7 @@ function(
 		// console.log("Calipso.app has been configured");
 
 		// register a handlebars helper for menuentries
-		Handlebars.registerHelper("menuEntries", function() {
+		Handlebars.registerHelper("baseUrl", function() {
 			return Calipso.getBaseUrl();
 		});
 		Handlebars.registerHelper("menuEntries", function() {
@@ -326,7 +363,8 @@ function(
 			}
 		});
 
-		Calipso.vent.on('session:social', function(providerId) {
+
+		Calipso.vent.on('session:social-popup', function(providerId) {
 			// remove any pre-existing form
 			$("#calipso-social-signin-form").remove();
 			var oForm = document.getElementById("calipso-social-signin-form");
@@ -3768,6 +3806,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 
 		},
 		events : {
+			"click a.btn-social-login" : "socialLogin",
 			"click button.submit" : "commit",
 			"submit form" : "commit",
 			"click button.cancel" : "cancel",
@@ -3951,7 +3990,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			});
 
 			return indexed_array;
-		}
+		},
+		socialLogin : function(e) {
+			Calipso.socialLogin(e);
+		},
 	},
 	// static members
 	{
@@ -4128,35 +4170,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			Calipso.session.save(userDetails);
 		},
 		socialLogin : function(e) {
-			Calipso.stopEvent(e);
-			var clicked = $(e.currentTarget);
-
-			//console.log("Calipso.view.LoginView#socialLogin, clicked:");
-			//console.log(clicked);
-			var providerNames = ["facebook", "linkedin", "twitter", "google"];
-			var providerName;
-
-			for(var i=0; i < providerNames.length; i++){
-				//console.log("Calipso.view.LoginView#socialLogin looking for className: " + "btn-social-login-" + providerNames[i]);
-				if(clicked.hasClass("btn-social-login-" + providerNames[i])){
-					providerName = providerNames[i];
-					break;
-				}
-			}
-
-			if(!providerName){
-				throw "Clicked element does not match a social provider";
-			}
-			// target='SignIn'
-			var formHtml = "<form class='social-signin-form' action='" +
-				Calipso.getBaseUrl() + "/signin/" + providerName +"' method='POST' role='form'>" +
-			//"<input type='hidden' name='scope' value='email' />" +
-			//"<input type='hidden' name='scope' value='emailure' />" +
-			//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" +
-				"</form>";
-			this.$el.find("div.social-form-container").html(formHtml);
-			this.$el.find("form.social-signin-form").submit();
-			return false;
+			Calipso.socialLogin(e);
 		},
 		/*
 		register : function(e) {
