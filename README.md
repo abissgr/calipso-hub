@@ -1,7 +1,7 @@
 - [Checkout and run](#checkout-and-run)
-    - [Checkout using Eclipse](#checkout-eclipse)
-    - [Checkout using the Command Line](#checkout-cmd)
-    - [Maven build](#howto-build)
+    - [Checkout using Eclipse](#checkout-using-eclipse)
+    - [Checkout using the Command Line](#checkout-using-the-command-line)
+    - [Maven build](#maven-build)
     - [Browse Calipso](#browse-calipso)
     - [Browse the Database Console](#browse-the-database-console)
     - [Use a custom database](#use-a-custom-database)
@@ -10,7 +10,7 @@
     - [Front-end Client](#front-end-client)
         - [Available APIs](#available-apis)
     - [Service Back-end](#service-back-end)
-        - [Create a RESTful service](#create-a-service)
+        - [Create a RESTful service](#create-a-restful-service)
 
 
 ## Checkout and run
@@ -52,7 +52,9 @@ Right click on the "calipso-hub" then click on "Import". Choose "Existing Maven 
 
 See https://help.github.com/articles/importing-a-git-repository-using-the-command-line/
  
-### Howto Build [![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
+### Maven build 
+
+[![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
 
 To build Calipso you need a Java Development Kit(JDK7 ) and Apache Maven installed. 
 
