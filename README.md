@@ -1,15 +1,19 @@
-- [Checkout](#checkout)
+- [Checkout and run](#checkout-and-run)
     - [Checkout using Eclipse](#checkout-eclipse)
     - [Checkout using the Command Line](#checkout-cmd)
-- [Modules](#modules)
-- [Howto Build](#howto-build)
-- [Browse Calipso](#browse-calipso)
-- [Browse the Database Console](#browse-the-database-console)
-- [Use a custom database](#use-a-custom-database)
-- [Create a RESTful service](#create-a-service)
+    - [Maven build](#howto-build)
+    - [Browse Calipso](#browse-calipso)
+    - [Browse the Database Console](#browse-the-database-console)
+    - [Use a custom database](#use-a-custom-database)
+- [Developer Guide](#developer-guide)
+    - [Modules](#modules)
+    - [Front-end Client](#front-end-client)
+        - [Available APIs](#available-apis)
+    - [Service Back-end](#service-back-end)
+        - [Create a RESTful service](#create-a-service)
 
 
-## Checkout
+## Checkout and run
 
 To build Calipso you need a Java Development Kit version (1.)7, Git and Apache Maven. Eclipse (Java or JEE) IDE users need EGit and m2eclipse plugins, those are included in Eclipse Java/JEE Luna and above. Read bellow for instructions to checkout the source using eclipse or the command line.
 
@@ -47,15 +51,8 @@ Right click on the "calipso-hub" then click on "Import". Choose "Existing Maven 
 ### Checkout using the Command Line
 
 See https://help.github.com/articles/importing-a-git-repository-using-the-command-line/
-
-## Modules
-- calipso-hub (this one)
-    - [calipso-hub-framework]: development framework components
-    - [calipso-hub-utilities]: utility components
-    - [calipso-hub-webapp]: deployable web application (WAR)
-
  
-## Howto Build [![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
+### Howto Build [![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
 
 To build Calipso you need a Java Development Kit(JDK7 ) and Apache Maven installed. 
 
@@ -102,8 +99,26 @@ The database console is available at:
 You can use a database like MySQL by commenting out the H2 database section in your dev.properties, 
 then uncommenting the MySQL section. Other databases can be also be used.  
     
+# Developer Guide
 
-## Create a RESTful service
+## Modules
+- calipso-hub (this one)
+    - [calipso-hub-framework]: development framework components
+    - [calipso-hub-utilities]: utility components
+    - [calipso-hub-webapp]: deployable web application (WAR)
+
+
+## Front-end Client
+
+TThe browser client provides a UI to interact with RESTful services using JSON(P) over HTTP
+
+### Available APIs
+
+The calipso-hub-webapp module provides components like models, views, controllers and UI elements based on [Backbone], [Marionette] and [Bootstrap]. Dependencies are managed using [RequireJS]. The code is available in the folders under src/main/webapp.
+
+## Service Back-end 
+
+### Create a RESTful service
 
 1) Create a domain/entity class, something like:
 
@@ -121,7 +136,13 @@ then uncommenting the MySQL section. Other databases can be also be used.
 4) Create a service implementation, something like:
 
     https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/service/impl/RoleServiceImpl.java
-
+    
+    
 [calipso-hub-framework]:calipso-hub-framework
 [calipso-hub-utilities]:calipso-hub-utilities
 [calipso-hub-webapp]:calipso-hub-webapp
+[Backbone]:http://backbonejs.org
+[Marionette]:http://marionettejs.com
+[Bootstrap]:http://getbootstrap.com
+[RequireJS]:http://requirejs.org
+    
