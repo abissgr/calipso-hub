@@ -124,8 +124,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.googlecode.flyway</groupId>
-			<artifactId>flyway-core</artifactId>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
 			<version>${flyway-core.version}</version>
 		</dependency>
 

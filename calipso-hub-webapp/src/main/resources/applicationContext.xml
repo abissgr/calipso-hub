@@ -64,11 +64,14 @@
     <bean id="jpaProperties" parent="resthubCoreJpaProperties">
 	    <property name="sourceMap">
 	        <map merge="true">
+	           <entry key="jadira.usertype.autoRegisterUserTypes" value="true" />
 	            <entry key="jboss.as.jpa.providerModule" value="application" />
 	            <entry key="jboss.as.jpa.managed" value="false" />
 	        </map>
 	    </property>
 	</bean>
+	
+	
     <jpa:auditing auditor-aware-ref="auditorBean"/>
 	<context:component-scan base-package="
     	gr.abiss.calipso, 
@@ -142,10 +145,7 @@
 			<util:properties location="classpath:javamail.properties" />
 		</property>
 	</bean>
-
-	<!-- Flyway: automated databace migration <bean id="flyway" class="com.googlecode.flyway.core.Flyway" 
-		init-method="migrate"> <property name="dataSource" ref="dataSource"/> <property 
-		name="initOnMigrate" value="true"/> </bean> -->
+	
 	<!-- JSP views setup -->
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">

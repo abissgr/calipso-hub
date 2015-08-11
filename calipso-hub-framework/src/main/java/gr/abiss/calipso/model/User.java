@@ -66,7 +66,7 @@ import com.wordnik.swagger.annotations.ApiModel;
  */
 @Entity
 @ApiModel(description = "Human users")
-@Table(name = "\"user\"")
+@Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject {
 

@@ -71,7 +71,7 @@ public class AppInitializer {
 	public void init() {
 		Configuration config = ConfigurationFactory.getConfiguration();
 		boolean initData = config.getBoolean(ConfigurationFactory.INIT_DATA, true);
-		if(initData){
+		if(initData && this.userService.count() == 0){
 			
 
 			Role adminRole = new Role(Role.ROLE_ADMIN, "System Administrator.");
