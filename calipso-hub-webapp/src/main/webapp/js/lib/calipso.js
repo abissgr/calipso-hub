@@ -206,7 +206,7 @@ function(
 		Calipso.app.addRegions({
 			headerRegion : "#calipsoHeaderRegion",
 			mainContentRegion : "#calipsoMainContentRegion",
-			modal : Calipso.view.ModalRegion,
+			modalRegion : Calipso.view.ModalRegion,
 			footerRegion : "#calipsoFooterRegion"
 		});
 
@@ -289,15 +289,7 @@ function(
 		////////////////////////////////
 		// initialize header, footer, history
 		Calipso.app.on("start", function() {
-			// listen to the modal region
-			var modalSizeFixer = function () {
-		    $('.modal .modal-body').css('overflow-y', 'auto');
-		    $('.modal .modal-body').css('max-height', $(window).height() * 0.7);
-			}
-			$('#calipsoModalRegion').on('shown.bs.modal', modalSizeFixer);
-			$('#calipsoModalRegion').on('show.bs.modal', modalSizeFixer);
 
-			// console.log("app event start");
 			//	try "remember me"
 			Calipso.session.load();
 
@@ -462,8 +454,8 @@ function(
 
 		});
 		Calipso.vent.on('modal:show', function(view) {
-			// console.log("vent event modal:show");
-			Calipso.app.modal.show(view);
+			console.log("vent event modal:show");
+			Calipso.app.modalRegion.show(view);
 		});
 		/**
 		 * @example Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"});
@@ -481,13 +473,13 @@ function(
 			if (!properties.template) {
 				layoutProperties.template = properties.template;
 			}
-			// show modal
+			// show
 			var modalLayoutView = new Calipso.view.ModalLayout(layoutProperties);
-			Calipso.app.modal.show(modalLayoutView);
+			Calipso.app.modalRegion.show(modalLayoutView);
 		});
 		Calipso.vent.on('modal:destroy', function() {
 			// console.log("vent event modal:destroy");
-			Calipso.app.modal.closeModal();
+			Calipso.app.modalRegion.closeModal();
 		});
 
 	};
@@ -498,8 +490,21 @@ function(
 	Calipso.view.ModalRegion = Marionette.Region.extend(/** @lends Calipso.view.ModalRegion.prototype */
 	{
 		el : "#calipsoModalRegion",
+		initialize : function(options){
 
-		onShow : function(view) {
+				// listen to the modal region
+				var showHandler = function (e) {
+					$('.modal .modal-body')
+						.css('overflow-y', 'auto')
+						.css('max-height', $(window).height() * 0.7)
+						.find('input[type=text],textarea,select').filter(':visible:enabled:first').focus();
+				};
+
+				var $el = $(this.el);
+				$el.on('shown.bs.modal', showHandler);
+				$el.on('show.bs.modal', showHandler);
+		},
+		onShow : function(view, region, options) {
 			view.on("destroy", this.hideModal, this);
 			this.$el.modal('show');
 		},
@@ -1417,6 +1422,7 @@ function(
 					type : 'Text',
 					title: "Telephone",
 					dataType: "tel",
+					validators : [ Calipso.components.backboneform.validators.digitsOnly ]
 				}
 			},
 			cellphone : {
@@ -1424,6 +1430,7 @@ function(
 					type : 'Text',
 					title: "Cellphone",
 					dataType: "tel",
+					validators : [ Calipso.components.backboneform.validators.digitsOnly ]
 				},
 			},
 			roles : {
@@ -1936,6 +1943,16 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	//////////////////////////////////////////////////
 	Calipso.components.backgrid = {};
 	Calipso.components.backboneform = {};
+	Calipso.components.backboneform.validators = {
+		digitsOnly : function (value, formValues) {
+         var reg = /^\d+$/;
+         if (!reg.test(value)){
+         	return {
+               message: 'Numerical digits only'
+				};
+         }
+      },
+	};
 	Calipso.components.backboneformTemplates = {
 			vertical :  _.template('\
 		    <div class="form-group field-<%= key %>">\
@@ -2078,9 +2095,9 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			// replace square to dot notation and split
 			var parameters = this.column.get("name").replace(/\[(.*?)\]/g,'.$1').split(".");
 			var result = this.walk(this.model, parameters);
-
-			var value = result ? this.formatter.fromRaw(result) : "-";
-			this.$el.text(value);
+			if(!(_.isUndefined(result) || _.isNull(result))){
+				this.$el.text(result);
+			}
 			this.delegateEvents();
 			return this;
 		},
@@ -2106,9 +2123,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			// replace square to dot notation and split
 			var parameters = this.column.get("name").replace(/\[(.*?)\]/g,'.$1').split(".");
 			var result = this.walk(this.model, parameters);
-
-			var value = result ? (result % 1 === 0 ? result : this.formatter.fromRaw(result))  : "0";
-			this.$el.text(value);
+			if(!(_.isUndefined(result) || _.isNull(result))){
+				console.log("type of result: "+	(typeof result));
+				this.$el.text(this.formatter.fromRaw(result));
+			}
 			this.delegateEvents();
 			return this;
 		},
@@ -2135,6 +2153,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		className : "renderable backgrid-create-new-header-cell",
 		events : {
 			"click" : "createNewForManualEdit"
+		},
+		initialize : function(options) {
+			Backgrid.HeaderCell.prototype.initialize.apply(this, arguments);
+			console.log("Calipso.components.backgrid.CreateNewHeaderCell#nitialize");
 		},
 		createNewForManualEdit : function(e) {
 			//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
@@ -2174,7 +2196,16 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 	});
 
-
+	Calipso.components.backboneform.NumberText = Backbone.Form.editors.Text.extend({
+		getValue : function() {
+			if(!(_.isUndefined(this.value) || _.isNull(this.value))){
+				return this.value + 0;
+			}
+			else {
+				return this.value;
+			}
+		},
+	});
 		/*
 		 * shows remaining chars
 		 */
@@ -2304,6 +2335,9 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				).on('typeahead:selected', function(e, suggestion, name) {
 					_this.setValue(suggestion, name);
 				});
+				$el.bind('typeahead:change', function(e, query) {
+					_this.setValue(null);
+				});
 				if(_this.value){
 					var val = Calipso.getObjectProperty(_this.value, "id", _this.value);
 					var nameVal = Calipso.getObjectProperty(_this.value, "name");
@@ -2316,7 +2350,11 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			return this;
 		},
 		setValue : function(value, name) {
+			console.log("Calipso.components.backboneform.TypeaheadObject#setValue, value: '" + value + "', name: " + name);
 			var _this = this;
+			if(!value){
+				value = null;
+			}
 			this.value = value;
 			if(name){
 				_this.$el.find("#" +this.id).attr("name", name);
@@ -2324,7 +2362,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			}
 		},
 		getValue : function() {
-			return this.value;
+			console.log("Calipso.components.backboneform.TypeaheadObject#getValue, value: '" + this.value + "'");
+			return this.value ? this.value : null;
 		},
 	});
 
@@ -3898,10 +3937,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 								_this.model.trigger("added");
 							}
 							if(_this.modal){
-					      Calipso.vent.trigger("modal:destroy");
+								Calipso.vent.trigger("modal:destroy");
 							}
 							else{
-					      Calipso.vent.trigger("genericFormSaved", model);
+								Calipso.vent.trigger("genericFormSaved", model);
 							}
 						},
 						error:function(){
@@ -4010,8 +4049,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			}
 			this.form = new JsonableForm(formOptions).render();
 			this.$el.find(".generic-form-view").append(this.form.el);
-
-
+			this.$el.find('input[type=text],textarea,select').filter(':visible:enabled:first').focus();
 			// generic-form-view
 			//					$(selector + ' textarea[data-provide="markdown"]').each(function() {
 			//						var $this = $(this);
