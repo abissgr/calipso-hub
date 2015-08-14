@@ -279,9 +279,7 @@ _.extend(NumberFormatter.prototype, {
   fromRaw: function (number, model) {
     if (_.isNull(number) || _.isUndefined(number)) return '';
     number = number * 1;
-    console.log("fromRaw number: "+number);
     number = number.toFixed(~~this.decimals);
-    console.log("fromRaw number toFixed: "+number);
 
     var parts = number.split('.');
     var integerPart = parts[0];

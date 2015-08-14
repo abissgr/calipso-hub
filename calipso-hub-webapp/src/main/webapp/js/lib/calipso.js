@@ -1945,13 +1945,15 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	Calipso.components.backboneform = {};
 	Calipso.components.backboneform.validators = {
 		digitsOnly : function (value, formValues) {
-         var reg = /^\d+$/;
-         if (!reg.test(value)){
-         	return {
-               message: 'Numerical digits only'
-				};
-         }
-      },
+      if(value){
+				var reg = /^\d+$/;
+	      if (!reg.test(value)){
+	       	return {
+	        	message: 'Numerical digits only'
+					};
+	      }
+			}
+    },
 	};
 	Calipso.components.backboneformTemplates = {
 			vertical :  _.template('\
