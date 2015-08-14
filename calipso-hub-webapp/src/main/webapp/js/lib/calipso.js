@@ -1993,7 +1993,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				// creating an empty element and applying our class to it to get bootstrap class bg color
 				var origBg = this.$el.css("background-color");
 				var bgcolor = $("<div>").appendTo("body").addClass("bg-success").css("background-color");
-        this.$el.removeClass('bg-warning');
+
+				this.$el.removeClass('bg-warning');
 				this.$el.animate({ backgroundColor: bgcolor }, {queue:true,duration:1500});
 				this.$el.animate({ backgroundColor: origBg }, {queue:true,duration:5000});
       });
@@ -2091,9 +2092,16 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	});
 
 	Calipso.components.backgrid.ChildStringAttributeCell = Backgrid.StringCell.extend({
-		render : function() {
+		getPathSteps : function(){
+			var path = this.column.get("path");
+			if(!path){
+				path = this.column.get("name");
+			}
 			// replace square to dot notation and split
-			var parameters = this.column.get("name").replace(/\[(.*?)\]/g,'.$1').split(".");
+			return path.replace(/\[(.*?)\]/g,'.$1').split(".");
+		},
+		render : function() {
+			var parameters = this.getPathSteps();
 			var result = this.walk(this.model, parameters);
 			if(!(_.isUndefined(result) || _.isNull(result))){
 				this.$el.text(result);
@@ -2119,9 +2127,16 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	});
 
 	Calipso.components.backgrid.ChildNumberAttributeCell = Backgrid.NumberCell.extend({
-		render : function() {
+		getPathSteps : function(){
+			var path = this.column.get("path");
+			if(!path){
+				path = this.column.get("name");
+			}
 			// replace square to dot notation and split
-			var parameters = this.column.get("name").replace(/\[(.*?)\]/g,'.$1').split(".");
+			return path.replace(/\[(.*?)\]/g,'.$1').split(".");
+		},
+		render : function() {
+			var parameters = this.getPathSteps();
 			var result = this.walk(this.model, parameters);
 			if(!(_.isUndefined(result) || _.isNull(result))){
 				console.log("type of result: "+	(typeof result));
@@ -2198,11 +2213,12 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 
 	Calipso.components.backboneform.NumberText = Backbone.Form.editors.Text.extend({
 		getValue : function() {
-			if(!(_.isUndefined(this.value) || _.isNull(this.value))){
-				return this.value + 0;
+			var value = Backbone.Form.editors.Text.prototype.getValue.apply(this, arguments);
+			if(!(_.isUndefined(value) || _.isNull(value) || value == "")){
+				return value * 1;
 			}
 			else {
-				return this.value;
+				return null;
 			}
 		},
 	});
@@ -2363,7 +2379,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 		getValue : function() {
 			console.log("Calipso.components.backboneform.TypeaheadObject#getValue, value: '" + this.value + "'");
-			return this.value ? this.value : null;
+			var value = this.value;
+			var query = this.$el.find("#" + this.id + "Typeahead").typeahead('val');
+			// if empty value or input, return plain
+			return value && query ? value : null;
 		},
 	});
 
