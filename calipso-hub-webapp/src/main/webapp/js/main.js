@@ -24,6 +24,7 @@ require.config({
 		'backbone-forms-bootstrap3' : 'lib/backbone-forms-bootstrap3',
 		'bootstrap-datetimepicker' : 'lib/bootstrap-datetimepicker',
 		'bootstrap-markdown' : 'lib/bootstrap-markdown',
+		'bootstrap-switch' : 'lib/bootstrap-switch',
 		'backbone-validation' : 'lib/resthub/backbone-validation-ext',
 		'marionette' : 'lib/backbone.marionette',
 		'handlebars-orig' : 'lib/handlebars',
@@ -134,6 +135,10 @@ require.config({
 			deps : [ 'jquery' ],
 			exports : 'Markdown'
 		},
+		'bootstrap-switch' : {
+			deps : [ 'jquery' ],
+			exports : 'BootstrapSwitch'
+		},
 		'keymaster' : {
 			exports : 'key'
 		},
@@ -145,7 +150,7 @@ require.config({
 			         'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',  
 			         'marionette', 
 			         'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator', 
-			         'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 
+			         'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 
 			         'jquery-color', 'q', 'chart'],
 			exports : 'calipso',
 		},

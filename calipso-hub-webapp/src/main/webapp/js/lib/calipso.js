@@ -22,14 +22,14 @@ define([
 	'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',
   'marionette',
   'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
-  /*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker',
+  /*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker','bootstrap-switch',
   'jquery-color', 'q', 'chart'],
 function(
 	_, Handlebars, calipsoTemplates, moment,
 	Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2,
 	BackboneMarionette,
 	Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
-	/*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker,
+	/*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch,
 	jqueryColor, q, chartjs) {
 
 
@@ -2042,6 +2042,9 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	});
 
 	//
+	
+
+
 	Calipso.components.backgrid.EditRowCell = Backgrid.Cell.extend(
 	/** @lends Calipso.components.backgrid.EditRowCell.prototype */
 	{
