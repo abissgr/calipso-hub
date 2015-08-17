@@ -222,6 +222,7 @@ function(
 			Calipso.modelTypesMap = {};
 			var parseModel = function(ModelType) {
 				if(ModelType.prototype.getTypeName() != "Calipso.model.ReportDataSetModel"
+					&& ModelType.prototype.getTypeName() != "Calipso.model.UserRegistrationModel"
 					&& ModelType.prototype.getTypeName() != "Calipso.model.GenericModel"){
 
 					var model = new ModelType();
@@ -1433,6 +1434,17 @@ function(
 					validators : [ Calipso.components.backboneform.validators.digitsOnly ]
 				},
 			},
+			active : {
+				"create" : {
+					type : 'Checkbox',
+					title: "Active",
+					help: "Select to skip email confirmation"
+				},
+				"update" : {
+					type : 'Checkbox',
+					title: "Active",
+				},
+			},
 			roles : {
 				"search" : {
 					title: "Roles",
@@ -1632,7 +1644,7 @@ function(
 		 * Subclasses UserModel to provide layout, forms etc. configuration
 		 * for user registration flows.
 		 */
-		Calipso.model.UserRegistrationModel = Calipso.model.UserModel .extend(
+		Calipso.model.UserRegistrationModel = Calipso.model.GenericModel.extend(
 		/** @lends Calipso.model.UserRegistrationModel */{
 			label: "Register",
 			getFormSubmitButton : function(){
@@ -1647,9 +1659,12 @@ function(
 			label: "Register"
 		});
 
+		Calipso.model.UserRegistrationModel.prototype.getPathFragment = function(instance) {
+		return "users";
+		};
 		Calipso.model.UserRegistrationModel.prototype.showInMenu = false;
 		Calipso.model.UserRegistrationModel.prototype.getTypeName = function(instance) {
-			return "UserRegistrationModel";
+			return "Calipso.model.UserRegistrationModel";
 		};
 
 		Calipso.model.UserRegistrationModel.prototype.getItemViewType = function(instance) {
@@ -2042,8 +2057,19 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	});
 
 	//
-	
 
+	Calipso.components.backgrid.BootstrapSwitchCell = Backgrid.BooleanCell.extend(
+	/** @lends Calipso.components.backgrid.BootstrapSwitchCell.prototype */
+	{
+		render : function() {
+			Backgrid.BooleanCell.prototype.render.apply(this, arguments);
+			var _this = this;
+			setTimeout(function(){
+				_this.$el.find("input").bootstrapSwitch();
+			}, 250);
+			return this;
+		}
+	});
 
 	Calipso.components.backgrid.EditRowCell = Backgrid.Cell.extend(
 	/** @lends Calipso.components.backgrid.EditRowCell.prototype */
