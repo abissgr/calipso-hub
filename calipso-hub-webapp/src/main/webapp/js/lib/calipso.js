@@ -1752,7 +1752,7 @@ function(
 	 * @returns the URL path fragment as a string
 	 */
 	Calipso.model.UserDetailsConfirmationModel.prototype.getPathFragment = function() {
-		return "confirmation";
+		return "accountConfirmations";
 	};
 	Calipso.model.UserDetailsConfirmationModel.prototype.getFormSchema = function(instance) {
 		return {//
@@ -4735,12 +4735,12 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		// The cookie should not be accessible by js. Here we let the server pick
 		// it up
 		// by itself and return the user details if appropriate
-		load : function() {
+		load : function(loadUrl) {
 			var _self = this;
 			// Backbone.methodOverride = true;
 			new Calipso.model.UserDetailsModel().fetch({
 				async : false,
-				url : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails/remembered",
+				url : loadUrl ? loadUrl : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails/remembered",
 				success : function(model, response, options) {
 					if (model.id) {
 						_self.userDetails = model;
@@ -5029,10 +5029,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			});
 			Calipso.vent.trigger("app:show", layout);
 		},
-		notFoundRoute : function(path) {
-			// console.log("notFoundRoute, path: "+path);
-			this.layout.contentRegion.show(new Calipso.view.NotFoundView());
-		},
 		/**
 		 * Get the model type corresponding to the given
 		 * business key/URI componenent
@@ -5276,7 +5272,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				this[mainRoutePart](secondaryRoutePart);
 			}
 		},
-
+		notFoundRoute : function(path) {
+			// console.log("notFoundRoute, path: "+path);
+			this.layout.contentRegion.show(new Calipso.view.NotFoundView());
+		},
 		editItem : function(item) {
 			console.log("MainController#editItem, item: " + item);
 		}
