@@ -1764,7 +1764,23 @@ function(
 		};
 	};
 Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function() {
-	return Calipso.view.GenericFormPanelView;
+	return Calipso.view.GenericFormPanelView.extend(
+		{
+			commit : function(e) {
+					Calipso.stopEvent(e);
+					if(!this.isFormValid()){
+						return false;
+					}
+					// if no validation errors,
+					// use the email confirmation link route
+					else{
+						Calipso.navigate("accountConfirmations/" + this.model.get("confirmationToken"), {
+							trigger : true
+						});
+					}
+			}
+		});
+
 };
 
 
@@ -3953,9 +3969,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				this.commit(e);
 			}
 		},
-		commit : function(e) {
-			var _this = this;
-			Calipso.stopEvent(e);
+		isFormValid : function(){
+			var isValid = false;
 			if (window.Placeholders) {
 				Placeholders.disable();
 			}
@@ -3970,7 +3985,17 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				if (_this.modal) {
 					$(".modal-body").scrollTop(0);
 				}
+			}
+			else{
+				isValid = true;
+			}
 
+			return isValid;
+		},
+		commit : function(e) {
+			var _this = this;
+			Calipso.stopEvent(e);
+			if(!this.isFormValid()){
 				return false;
 			}
 			// if no validation errors
@@ -4984,7 +5009,19 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			//consolelog("AbstractController#login, showing login view");
 			Calipso.vent.trigger('app:show', view);
 		},
-
+ 		accountConfirm : function(confirmationToken) {
+ 			if(confirmationToken){
+ 	 			var url = Calipso.session.getBaseUrl() +
+ 	 				Calipso.getConfigProperty("apiAuthPath") +
+ 	 				"/accountConfirmations/" + confirmationToken;
+ 	 			var options = Calipso.app.routeOptions;
+ 	 			// TODO: leave any forward at Calipso.app.fw
+ 	 			Calipso.session.load(url);
+ 			}
+ 			else{
+ 				throw "accountConfirm route requires the confirmation token as a URI component";
+ 			}
+ 		},
 		authenticate : function(args) {
 			// console.log('MainController authenticate called');
 			var self = this;

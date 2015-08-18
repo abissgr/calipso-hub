@@ -87,31 +87,12 @@ public abstract class AbstractUserDetailsController<S extends UserDetailsService
 	 * @param token
 	 * @return
 	 */
-	@RequestMapping(value = "confirmation/{token}", method = {RequestMethod.GET})
+	@RequestMapping(value = "accountConfirmations/{token}", method = {RequestMethod.GET})
 	@ResponseBody
 	public ICalipsoUserDetails confirmRegistrationAndLoginFromEmailLink(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable String token) {
 		ICalipsoUserDetails userDetails = this.service.confirmPrincipal(token);
 		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
-		if ("GET".equalsIgnoreCase(request.getMethod())) {
-			// check for a comment to redirect to exists
-			if (StringUtils.isNotEmpty(userDetails.getRedirectUrl())) {
-				try {
-					response.sendRedirect(userDetails.getRedirectUrl());
-				} catch (IOException e) {
-					LOGGER.error("Could not redirect to contribution URL", e);
-				}
-			}
-			else{
-				LOGGER.warn("Asked to confirm registration by GET but no redirectUrl was found in result userDetails object "
-						+ "for user " + userDetails.getUsername() + ", redirecting to home");
-				try {
-					response.sendRedirect(request.getContextPath());
-				} catch (IOException e) {
-					LOGGER.error("Could not redirect to manager area", e);
-				}
-			}
-		}
 		return userDetails;
 	}
 
