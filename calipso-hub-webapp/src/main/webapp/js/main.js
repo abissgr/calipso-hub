@@ -137,7 +137,6 @@ require.config({
 		},
 		'bootstrap-switch' : {
 			deps : [ 'jquery' ],
-			exports : 'BootstrapSwitch'
 		},
 		'keymaster' : {
 			exports : 'key'
