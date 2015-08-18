@@ -739,6 +739,6 @@
       onInit: function() {},
       onSwitchChange: function() {}
     };
-  })(window.jQuery, window);
+  })($, window);
 
 }).call(this);
