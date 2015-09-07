@@ -15,27 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.model.dynabean;
+package gr.abiss.calipso.model.contactDetails.base;
 
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-
+import javax.persistence.Column;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 
-/**
- * Abstract base persistent class for dynamic bean properties
- */
 @MappedSuperclass
-public abstract class AbstractPredicateType<O extends PredicateObject> extends
-		AbstractSystemUuidPersistable {
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) 
+public abstract class AbstractMailingAddressDetail {
+	
+	@Column(name = "postal_code", length = 50, nullable = false)
+	private String postalCode;
+	
+	@Column(name = "address_or_pobox", length = 300, nullable = false)
+	private String streetAddressOrPoBox;
+	
+	public AbstractMailingAddressDetail(){
+		
+	}
 
-	private static final long serialVersionUID = -1468517690700208260L;
+	public String getPostalCode() {
+		return postalCode;
+	}
 
-	private Class<O> objectType;
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
 
-	private String name;
-	private String caption;
-	private String placeholder;
-	private String options;
-
-
+	
+	
 }

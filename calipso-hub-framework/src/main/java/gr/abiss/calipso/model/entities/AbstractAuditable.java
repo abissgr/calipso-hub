@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.model.entities;
 
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
 
 import java.util.Date;
@@ -41,9 +42,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * Abstract base class for all auditable persistent entities
  */
 @MappedSuperclass
-public abstract class AbstractAuditable<U extends AbstractPersistable> extends
-		AbstractPersistable
-		implements Auditable<U, String> {
+public abstract class AbstractAuditable<U extends AbstractSystemUuidPersistable> 
+	extends AbstractSystemUuidPersistable
+	implements Auditable<U, String> {
 
 	private static final long serialVersionUID = 8809874829822002089L;
 

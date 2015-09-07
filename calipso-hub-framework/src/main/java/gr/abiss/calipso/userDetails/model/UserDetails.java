@@ -41,10 +41,10 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.wordnik.swagger.annotations.ApiModel;
+//import com.wordnik.swagger.annotations.ApiModel;
 
 
-@ApiModel
+//@ApiModel
 @XmlRootElement(name = "loggedInUserDetails")
 public class UserDetails implements  ICalipsoUserDetails{
 	

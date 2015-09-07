@@ -15,11 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.model.entities;
+package gr.abiss.calipso.model.base;
+
+import java.io.Serializable;
 
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AuditableResource;
+import gr.abiss.calipso.model.entities.FormSchemaAware;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -36,24 +39,17 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  * Abstract base class for all persistent entities.
+ * @param <ID> The id Serializable
  */
 @MappedSuperclass
-// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
-// property = "id")
+public abstract class AbstractPersistable<ID extends Serializable> implements FormSchemaAware, Persistable<ID> {
 
-public abstract class AbstractPersistable implements FormSchemaAware, Persistable<String> {
+	private static final long serialVersionUID = -6009587976502456848L;
 
-	private static final long serialVersionUID = 2131186735039838008L;
-	
 	public static interface FormSchemaAwareView {}
     public static interface ItemView {}
     public static interface CollectionView {}
 	
-	@Id
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
-	@Column(name = "id", unique = true)
-	private String id;
 	
 	//@JsonView(FormSchemaAwareView.class)
 	@Transient
@@ -61,6 +57,10 @@ public abstract class AbstractPersistable implements FormSchemaAware, Persistabl
 
 	public AbstractPersistable() {
 		super();
+	}
+	
+	public AbstractPersistable(ID id) {
+		this.setId(id);
 	}
 
 	@Override
@@ -73,18 +73,13 @@ public abstract class AbstractPersistable implements FormSchemaAware, Persistabl
 	 * @see org.springframework.data.domain.Persistable#getId()
 	 */
 	@Override
-	public String getId() {
-
-		return id;
-	}
+	public abstract ID getId();
 
 	/**
 	 * Set the entity's primary key
 	 * @param id the id to set
 	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+	public abstract void setId(ID id);
 
 	public FormSchema getFormSchema() {
 		return formSchema;
@@ -92,15 +87,6 @@ public abstract class AbstractPersistable implements FormSchemaAware, Persistabl
 
 	public void setFormSchema(FormSchema formSchema) {
 		this.formSchema = formSchema;
-	}
-
-	/**
-	 * @see org.springframework.data.domain.Persistable#isNew()
-	 */
-	@Override
-	public boolean isNew() {
-
-		return null == getId();
 	}
 
 	/** 
@@ -129,11 +115,8 @@ public abstract class AbstractPersistable implements FormSchemaAware, Persistabl
 	 */
 	@Override
 	public int hashCode() {
-
 		int hashCode = 17;
-
 		hashCode += null == getId() ? 0 : getId().hashCode() * 31;
-
 		return hashCode;
 	}
 }

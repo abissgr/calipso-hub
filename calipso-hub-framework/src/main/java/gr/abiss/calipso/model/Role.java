@@ -35,14 +35,14 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wordnik.swagger.annotations.ApiModel;
+//import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  */
 @Entity
 @Table(name = "role")
 @Inheritance(strategy = InheritanceType.JOINED)
-@ApiModel(value = "Role", description = "User principal roles. Roles are principals themselves and can be assigned to users.")
+//@ApiModel(value = "Role", description = "User principal roles. Roles are principals themselves and can be assigned to users.")
 public class Role extends AbstractAuditable<User> implements GrantedAuthority {
 
 	private static final long serialVersionUID = 3558291745762331656L;

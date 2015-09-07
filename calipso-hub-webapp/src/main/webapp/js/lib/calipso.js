@@ -71,9 +71,9 @@ function(
 		return urlParams;
 	};
 	/**
-	 * Utility method to stop events, covers IE8+
-	 * @param  {[event]}
-	 * @return {[void]}
+	 * Utility method to stop events.
+	 * @param  {event} e
+	 * @return {void}
 	 */
 	Calipso.stopEvent = function(e) {
 		Calipso.vent.trigger("calipso:stoppedEvent given: ", e);
@@ -162,6 +162,57 @@ function(
 	Calipso.navigate = function(url, options) {
 		Calipso.app.routers["MainRouter"].navigate(url, options);
 	};
+
+	Calipso.walk =  function(currentStepValue, pathSteps, stepIndex){
+		var value;
+		if(stepIndex == undefined){
+			stepIndex = 0;
+		}
+		var propName = pathSteps[stepIndex];
+		if(currentStepValue && propName){
+			value = Calipso.getObjectProperty(currentStepValue, propName);
+			stepIndex++;
+			if(value && stepIndex < pathSteps.length){
+				value = Calipso.walk(value, pathSteps, stepIndex);
+			}
+		}
+		return value;
+	};
+
+
+	Calipso.setPathValue = function(obj, path, value) {
+		var pathOrig = path;
+		if(path.indexOf(".") >= 0 || path.indexOf("[") >= 0){
+			path = path.replace(/\[(.*?)\]/g,'.$1');
+		}
+		var steps = path.split(".");
+		var targetProp = steps.pop();
+		if(steps.length > 0){
+			obj = Calipso.walk(obj, steps);
+		}
+		if(!obj){
+			throw "Calipso.setPathValue: invalid path " + pathOrig;
+		}
+		if(obj.set){
+			obj.set(targetProp, value);
+		}
+		else{
+			obj[targetProp] = value;
+		}
+	};
+	Calipso.getPathValue = function(obj, path, defaultValue) {
+		if(path.indexOf(".") >= 0 || path.indexOf("[") >= 0){
+			path = path.replace(/\[(.*?)\]/g,'.$1');
+		}
+		var value = Calipso.walk(obj, path.split("."));
+		if(defaultValue
+			&& (_.isUndefined(value) || _.isNull(value))){
+			value = defaultValue;
+		}
+		return value;
+	};
+
+
 	Calipso.getObjectProperty = function(obj, propName, defaultValue) {
 		var prop;
 		if(obj){
@@ -850,10 +901,11 @@ function(
 	// Models
 	//////////////////////////////////////////
 	/**
-	 * Abstract model implementation to inherit from your own models.
+	 * Abstract model implementation to extend through your own models.
 	 * Subclasses of this model should follow the model driven
 	 * design conventions used in the Calipso backbone stack, note the " REQUIRED" parts
-	 * of the example for details.
+	 * of the example for details. Properly extending this class allows
+	 * "model driven" routes, forms, grids and selection of item/collection/layout views.
 	 *
 	 * @example
 	 * // Load module
@@ -863,10 +915,7 @@ function(
 	 * 		// add stuff here
 	 * 	},
 	 * 	// static members
-	 * 	{
-	 * 		// REQUIRED: the model superclass
-	 * 		parent: GenericModel,
-	 * 		// OPTIONAL: set the form schema cache behavior
+	 * 	{	// OPTIONAL: set the form schema cache behavior
 	 * 		formSchemaCache : this.FORM_SCHEMA_CACHE_CLIENT
 	 * 	});
 	 *
@@ -875,9 +924,9 @@ function(
 	 * 		return "PersonModel";
 	 * 	}
 	 * 	// REQUIRED: our subclass URL path fragment,
-	 * 	// e.g. "persons" for PersonModel
+	 * 	// e.g. "persons" for PersonModel. Used for dynamic MArionette router routes.
 	 * 	PersonModel.prototype.getPathFragment = function() {
-	 * 		//...
+	 * 		return "persons";
 	 * 	}
 	 *
 	 * 	// REQUIRED: our subclass grid schema
@@ -918,9 +967,8 @@ function(
 	 * });
 	 * @constructor
 	 * @requires Backbone
-	 * @requires Supermodel
 	 * @requires Backgrid
-	 * @augments module:Supermodel.Model
+	 * @augments module:Backbone.Model
 	 */
 	Calipso.model.GenericModel = Backbone.Model.extend(
 	/** @lends Calipso.model.GenericModel.prototype */
@@ -930,8 +978,8 @@ function(
 		},
 		skipDefaultSearch : false,
 		/**
-		 * Prefer the collection URL if any for more specific CRUD, fallback to
-		 * own otherwise
+		 * Returns the URL for this model, giving precedence  to the collection URL if the model belongs to one,
+		 * or a URL based on the model path fragment otherwise.
 		 */
 		url : function() {
 			var sUrl = this.collection && _.result(this.collection, 'url') ? _.result(this.collection, 'url') : Calipso.session.getBaseUrl() + '/api/rest/' + this.getPathFragment()/*_.result(this, 'urlRoot')*/|| urlError();
@@ -942,9 +990,18 @@ function(
 			// console.log("GenericModel#url: " + sUrl + ", is new: " + this.isNew() + ", id: " + this.get("id"));
 			return sUrl;
 		},
+		/**
+		 * Retusn true if the model is just a search collection wrapper, false otherwise
+		 */
 		isSearchModel : function(){
 			return this.wrappedCollection ? true :false;
 		},
+		/*
+		 * Will return <code>search</code> if the model is a search model,
+		 * <code>create</code> if the model is new ans not a search model,
+		 * <code>update</code> otherwise. The method is used to choose an appropriate
+		 * form schema during form generation, see GenericFormView
+		 */
 		getFormSchemaKey : function(){
 			var formSchemaKey;
 			if(this.isSearchModel()){
@@ -2138,53 +2195,29 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		}
 	});
 
+
 	Calipso.components.backgrid.ChildStringAttributeCell = Backgrid.StringCell.extend({
-		getPathSteps : function(){
+		render : function() {
 			var path = this.column.get("path");
 			if(!path){
 				path = this.column.get("name");
 			}
-			// replace square to dot notation and split
-			return path.replace(/\[(.*?)\]/g,'.$1').split(".");
-		},
-		render : function() {
-			var parameters = this.getPathSteps();
-			var result = this.walk(this.model, parameters);
+			var result = Calipso.getPathValue(this.model, path);
 			if(!(_.isUndefined(result) || _.isNull(result))){
 				this.$el.text(result);
 			}
 			this.delegateEvents();
 			return this;
 		},
-		walk : function(currentStepValue, pathSteps, stepIndex){
-			var value;
-			if(stepIndex == undefined){
-				stepIndex = 0;
-			}
-			var stepName = pathSteps[stepIndex];
-			if(currentStepValue && stepName){
-				value = currentStepValue.get ? currentStepValue.get(stepName) :  currentStepValue[stepName];
-				stepIndex++;
-				if(value && stepIndex < pathSteps.length){
-					value = this.walk(value, pathSteps, stepIndex);
-				}
-			}
-			return value;
-		}
 	});
 
 	Calipso.components.backgrid.ChildNumberAttributeCell = Backgrid.NumberCell.extend({
-		getPathSteps : function(){
+		render : function() {
 			var path = this.column.get("path");
 			if(!path){
 				path = this.column.get("name");
 			}
-			// replace square to dot notation and split
-			return path.replace(/\[(.*?)\]/g,'.$1').split(".");
-		},
-		render : function() {
-			var parameters = this.getPathSteps();
-			var result = this.walk(this.model, parameters);
+			var result = Calipso.getPathValue(this.model, path);
 			if(!(_.isUndefined(result) || _.isNull(result))){
 				console.log("type of result: "+	(typeof result));
 				this.$el.text(this.formatter.fromRaw(result));
@@ -2192,21 +2225,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			this.delegateEvents();
 			return this;
 		},
-		walk : function(currentStepValue, pathSteps, stepIndex){
-			var value;
-			if(stepIndex == undefined){
-				stepIndex = 0;
-			}
-			var stepName = pathSteps[stepIndex];
-			if(currentStepValue && stepName){
-				value = currentStepValue.get ? currentStepValue.get(stepName) :  currentStepValue[stepName];
-				stepIndex++;
-				if(value && stepIndex < pathSteps.length){
-					value = this.walk(value, pathSteps, stepIndex);
-				}
-			}
-			return value;
-		}
 	});
 
 	Calipso.components.backgrid.CreateNewHeaderCell  = Backgrid.HeaderCell.extend({
@@ -2256,6 +2274,90 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				title: title
 			});
 		},
+	});
+
+
+	Calipso.components.backboneform.Form = Backbone.Form.extend({
+			hintRequiredFields: true,
+			capitalizeKeys : true,
+
+		  /**
+		   * Constructor
+		   *
+		   * @param {Object} [options.schema]
+		   * @param {Backbone.Model} [options.model]
+		   * @param {Object} [options.data]
+		   * @param {String[]|Object[]} [options.fieldsets]
+		   * @param {String[]} [options.fields]
+		   * @param {String} [options.idPrefix]
+		   * @param {Form.Field} [options.Field]
+		   * @param {Form.Fieldset} [options.Fieldset]
+		   * @param {Function} [options.template]
+		   * @param {Boolean|String} [options.submitButton]
+		   * @param {Boolean|String} [options.hintRequiredFields]
+		   */
+		  initialize: function(options) {
+				var hintRequiredFields = options.hintRequiredFields;
+				if(!_.isUndefined(hintRequiredFields)){
+					this.hintRequiredFields = hintRequiredFields;
+				}
+				Backbone.Form.prototype.initialize.apply(this, arguments);
+			},
+			isRequired : function(schema){
+				var required = schema.required;
+				if(!required && schema.validators){
+					required = $.inArray('required', schema.validators) > -1;
+				}
+				return required;
+			},
+		  /**
+		   * Creates a Field instance
+		   *
+		   * @param {String} key
+		   * @param {Object} schema       Field schema
+		   *
+		   * @return {Form.Field}
+		   */
+		  createField: function(key, schema) {
+				if(this.hintRequiredFields && this.isRequired(schema)){
+					var suffix = "";
+					var hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
+					var title = schema.titleHTML;
+					if(!title){
+						title = schema.title;
+						if(!title){
+							title = key;
+							if(this.capitalizeKeys){
+								// insert a space before all caps
+						    title = title.replace(/([A-Z])/g, ' $1')
+						    // uppercase the first character
+						    .replace(/^./, function(str){ return str.toUpperCase(); });
+							}
+						}
+						schema.title = undefined;
+					}
+					var length = title.length;
+					title.trim();
+					for(var i = title.length; i < length; i++){
+						suffix += ' ';
+					}
+					if(title.lastIndexOf(":") == title.length - 1){
+						title = title.substring(0, title.length - 1);
+						suffix = ":" + suffix;
+					}
+					schema.titleHTML = title + hint + suffix;
+				}
+				return Backbone.Form.prototype.createField.apply(this, arguments);
+		  },
+			toJson : function() {
+				var nodeName = this.$el[0].nodeName.toLowerCase();
+				return _.reduce((nodeName == "form" ? this.$el : this.$("form")).serializeArray(), function(hash, pair) {
+					if (pair.value) {
+						hash[pair.name] = pair.value;
+					}
+					return hash;
+				}, {});
+			},
 	});
 
 	Calipso.components.backboneform.NumberText = Backbone.Form.editors.Text.extend({
@@ -4095,18 +4197,6 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			//;(_self.formSchemaKey);
 
 			// render form
-			var JsonableForm = Backbone.Form.extend({
-				toJson : function() {
-					var nodeName = this.$el[0].nodeName.toLowerCase();
-					return _.reduce((nodeName == "form" ? this.$el : this.$("form")).serializeArray(), function(hash, pair) {
-						if (pair.value) {
-							hash[pair.name] = pair.value;
-						}
-						return hash;
-					}, {});
-				},
-			});
-
 			if (Calipso.session.searchData && (!_self.searchResultsCollection.data)) {
 				_self.model.set(Calipso.session.searchData);
 				_self.searchResultsCollection.data = Calipso.session.searchData;
@@ -4122,7 +4212,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if(formSubmitButton){
 				formOptions.submitButton = formSubmitButton;
 			}
-			this.form = new JsonableForm(formOptions).render();
+			this.form = new Calipso.components.backboneform.Form(formOptions).render();
 			this.$el.find(".generic-form-view").append(this.form.el);
 			this.$el.find('input[type=text],textarea,select').filter(':visible:enabled:first').focus();
 			// generic-form-view

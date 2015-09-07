@@ -30,10 +30,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.wordnik.swagger.annotations.Api;
+//import com.wordnik.swagger.annotations.Api;
 
 
-@Api(value = "Roles")
+//@Api(value = "Roles")
 @Controller
 @RequestMapping(value = "/api/rest/roles", produces = { "application/json", "application/xml" })
 public class RoleController extends AbstractServiceBasedRestController<Role, String, RoleService> {

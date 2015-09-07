@@ -8,12 +8,12 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 
-import gr.abiss.calipso.model.entities.AbstractPersistable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 
 @Entity
 @Table(name = "notification_type")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class NotificationType extends AbstractPersistable {
+public class NotificationType extends AbstractSystemUuidPersistable {
 
 	private static final long serialVersionUID = 6168668373348817558L;
 

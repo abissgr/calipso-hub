@@ -2,7 +2,7 @@ package gr.abiss.calipso.model;
 
 import java.util.Date;
 
-import gr.abiss.calipso.model.entities.AbstractPersistable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

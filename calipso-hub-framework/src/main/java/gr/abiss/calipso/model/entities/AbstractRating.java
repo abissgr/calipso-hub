@@ -1,5 +1,7 @@
 package gr.abiss.calipso.model.entities;
 
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
@@ -9,7 +11,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * Abstract base class for all persistent entities representing a rating
  */
 @MappedSuperclass
-public abstract class AbstractRating<U extends AbstractPersistable> extends AbstractAuditable<U>{
+public abstract class AbstractRating<U extends AbstractSystemUuidPersistable> extends AbstractAuditable<U>{
 
 	@Column(name = "rating")
 	private Float rating;

@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>calipso-hub</artifactId>
 		<groupId>gr.abiss.calipso</groupId>
-        <version>1.2-SNAPSHOT</version>
+		<version>1.2-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -18,7 +18,7 @@
 	</properties>
 	<build>
 		<filters>
-            <filter>${project.parent.basedir}/${build.profile.filters}</filter>
+			<filter>${project.parent.basedir}/${build.profile.filters}</filter>
 		</filters>
 		<resources>
 			<resource>
@@ -26,7 +26,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-    	<plugins>
+		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -35,46 +35,46 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-    	</plugins>
-    </build>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
-		
-        <!--  Commons -->
-    	<dependency>
-    		<groupId>org.apache.commons</groupId>
+
+		<!-- Commons -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-    	</dependency>
-    	<dependency>
+		</dependency>
+		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
-    	<dependency>
+		<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 		</dependency>
-    	<!-- RestHub -->
-        <dependency>
-            <groupId>org.resthub</groupId>
-            <artifactId>resthub-jpa</artifactId>
-            
-            <exclusions>
-                 <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.resthub</groupId>
-            <artifactId>resthub-web-server</artifactId>
-        </dependency>      
+		<!-- RestHub -->
+		<dependency>
+			<groupId>org.resthub</groupId>
+			<artifactId>resthub-jpa</artifactId>
 
-        <!--  Spring -->
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.resthub</groupId>
+			<artifactId>resthub-web-server</artifactId>
+		</dependency>
+
+		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -87,135 +87,121 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 		</dependency>
-        <!-- Spring security -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-acl</artifactId>
-        </dependency>
+		<!-- Spring security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-acl</artifactId>
+		</dependency>
 		<!-- needed for caching of ACLs -->
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
 		</dependency>
-        
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
-        </dependency>
-        
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 		</dependency>
-		<!--dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-autoconfigure</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency-->
+		<!--dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-autoconfigure</artifactId> 
+			<version>${spring-boot.version}</version> </dependency -->
 		<!-- spring social -->
 		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-core</artifactId>
-		</dependency> 
-		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-security</artifactId>
-		</dependency> 
-		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-web</artifactId>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-core</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-facebook</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-twitter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-linkedin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-github</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-google</artifactId>
-        </dependency>
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-security</artifactId>
 		</dependency>
-		
-		
-    <dependency>
-        
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-    </dependency>
 		<dependency>
-			<groupId>com.mangofactory</groupId>
-			<artifactId>swagger-springmvc</artifactId>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-facebook</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-twitter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-linkedin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-github</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-google</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 
-            <exclusions>
-                 <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
+		<!-- springfox swagger -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
 		</dependency>
+		
 		<!-- elastisearch -->
 		<dependency>
-		    <groupId>org.springframework.data</groupId>
-		    <artifactId>spring-data-elasticsearch</artifactId>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-elasticsearch</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.elasticsearch</groupId>
-		    <artifactId>elasticsearch-transport-wares</artifactId>
-        </dependency>
-		<!-- Thymeleaf Template Engine-->
-		
-	    <dependency>
-	      <groupId>org.thymeleaf</groupId>
-	      <artifactId>thymeleaf</artifactId>
-	      <scope>compile</scope>
-	    </dependency>
-	    
-	    <dependency>
-	      <groupId>org.thymeleaf</groupId>
-	      <artifactId>thymeleaf-spring3</artifactId>
-	      <scope>compile</scope>
-	    </dependency>
-    
-    	<!-- Joda Time -->
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch-transport-wares</artifactId>
+		</dependency>
+		<!-- Thymeleaf Template Engine -->
+
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring3</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Joda Time -->
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.jadira.usertype</groupId>
-            <artifactId>usertype.core</artifactId>
-        </dependency>
-        <dependency>
-           <groupId>com.fasterxml.jackson.datatype</groupId>
-           <artifactId>jackson-datatype-joda</artifactId>
-        </dependency>
-		
+		<dependency>
+			<groupId>org.jadira.usertype</groupId>
+			<artifactId>usertype.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-joda</artifactId>
+		</dependency>
+
 		<!-- generic type tools -->
 		<dependency>
 			<groupId>org.jodah</groupId>
 			<artifactId>typetools</artifactId>
 		</dependency>
-		
-    	<!-- OWASP HTML filtering -->
-    	<dependency>
+
+		<!-- OWASP HTML filtering -->
+		<dependency>
 			<groupId>org.owasp</groupId>
 			<artifactId>antisamy</artifactId>
 			<exclusions>
@@ -225,26 +211,26 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-    	
-	    <!-- JavaMail -->
-	    <dependency>
-	        <groupId>javax.mail</groupId>
-	        <artifactId>mail</artifactId>
-	    </dependency>
-	    <dependency>
-	        <groupId>javax.activation</groupId>
-	        <artifactId>activation</artifactId>
-	    </dependency>
+
+		<!-- JavaMail -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
-		
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
-        
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>

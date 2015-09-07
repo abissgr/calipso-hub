@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.model.entities;
 
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.Rateable;
 import gr.abiss.calipso.model.serializers.DoublePlacesFloatSerializer;
 
@@ -43,7 +44,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @see gr.abiss.calipso.jpasearch.repository.RateableRepository
  */
 @MappedSuperclass
-public abstract class AbstractAuditableRateable<U extends AbstractPersistable, R extends AbstractRating> 
+public abstract class AbstractAuditableRateable<U extends AbstractSystemUuidPersistable, R extends AbstractRating> 
 	extends AbstractAuditable<U> 
 	implements Rateable<R>{
 

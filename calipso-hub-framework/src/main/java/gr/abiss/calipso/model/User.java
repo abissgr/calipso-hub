@@ -18,22 +18,21 @@
  */
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
 import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
+import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
+import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
+import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.MD5Utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -42,7 +41,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -52,20 +52,16 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.wordnik.swagger.annotations.ApiModel;
+//import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  */
 @Entity
-@ApiModel(description = "Human users")
+//@ApiModel(description = "Human users")
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject {
@@ -152,6 +148,10 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	@Transient
 	private String redirectUrl;
+
+//	@OneToOne(optional = true, fetch=FetchType.LAZY)
+//	@MapsId
+//	private LocalRegionMailingAddress mailingAddress;
 	
 	//@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -467,6 +467,14 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	public List<? extends GrantedAuthority> getRoles() {
 		return this.roles;
 	}
+
+//	public LocalRegionMailingAddress getMailingAddress() {
+//		return mailingAddress;
+//	}
+//
+//	public void setMailingAddress(LocalRegionMailingAddress mailingAddress) {
+//		this.mailingAddress = mailingAddress;
+//	}
 
 
 }

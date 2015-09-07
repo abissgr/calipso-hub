@@ -31,10 +31,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.wordnik.swagger.annotations.Api;
+//import com.wordnik.swagger.annotations.Api;
 
 
-@Api(value = "Users")
+//@Api(value = "Users")
 @RequestMapping(value = "/api/rest/users", produces = { "application/json", "application/xml" })
 public class UserController extends AbstractServiceBasedRestController<User, String, UserService> {
 

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.entities.AbstractPersistable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
 
 import javax.persistence.Column;
@@ -24,7 +24,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.wordnik.swagger.annotations.ApiModel;
+//import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  * Base notification class, corresponds to a Log Table that aggregates basic information for all 
@@ -32,10 +32,10 @@ import com.wordnik.swagger.annotations.ApiModel;
  */
 @CurrentPrincipalIdPredicate( path = "recepient", ignoreforRoles = {"ROLE_ADMIN", "ROLE_SITE_OPERATOR"} )
 @Entity
-@ApiModel
+//@ApiModel
 @Table(name = "base_notification")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class BaseNotification extends AbstractPersistable {
+public class BaseNotification extends AbstractSystemUuidPersistable {
 
 	
 	private static final long serialVersionUID = -473785131521745319L;

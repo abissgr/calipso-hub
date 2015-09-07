@@ -35,13 +35,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+//
+//import com.wordnik.swagger.annotations.Api;
+//import com.wordnik.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
-@Api(description = "All generic operations for entities", value = "")
+//@Api(description = "All generic operations for entities", value = "")
 public abstract class ReadOnlyServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
 		extends
 		AbstractServiceBasedRestController<T, ID, S> {
@@ -72,7 +72,7 @@ public abstract class ReadOnlyServiceBasedRestController<T extends Persistable<I
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
+	//@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
 	public Page<T> findPaginated(
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,

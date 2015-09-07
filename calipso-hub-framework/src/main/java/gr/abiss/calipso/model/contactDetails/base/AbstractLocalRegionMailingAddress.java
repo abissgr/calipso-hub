@@ -15,27 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.model.dynabean;
+package gr.abiss.calipso.model.contactDetails.base;
 
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import gr.abiss.calipso.model.geography.LocalRegion;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
-/**
- * Abstract base persistent class for dynamic bean properties
- */
 @MappedSuperclass
-public abstract class AbstractPredicateType<O extends PredicateObject> extends
-		AbstractSystemUuidPersistable {
+public class AbstractLocalRegionMailingAddress extends AbstractMailingAddressDetail {
 
-	private static final long serialVersionUID = -1468517690700208260L;
-
-	private Class<O> objectType;
-
-	private String name;
-	private String caption;
-	private String placeholder;
-	private String options;
-
-
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "region_id", referencedColumnName = "id", nullable = false)
+	private LocalRegion city;
+	
+	public AbstractLocalRegionMailingAddress(){
+		
+	}
+	
+	
 }

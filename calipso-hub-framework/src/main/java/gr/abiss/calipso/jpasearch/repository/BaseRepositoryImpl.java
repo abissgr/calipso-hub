@@ -17,8 +17,8 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.dto.ReportDataSet;
-import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;

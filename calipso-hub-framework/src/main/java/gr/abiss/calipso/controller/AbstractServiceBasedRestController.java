@@ -25,9 +25,9 @@ import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.model.dto.ReportDataSet;
-import gr.abiss.calipso.model.entities.AbstractPersistable;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.service.GenericEntityService;
@@ -76,13 +76,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+//import com.wordnik.swagger.annotations.Api;
+//import com.wordnik.swagger.annotations.ApiOperation;
+//import com.wordnik.swagger.annotations.ApiParam;
 
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
-@Api(description = "All generic operations for entities", value = "")
+//@Api(description = "All generic operations for entities", value = "")
 public abstract class AbstractServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> {
 
@@ -111,7 +111,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
+	//@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
 	public Page<T> findPaginated(
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
@@ -207,8 +207,8 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    @ApiOperation(value = "create", notes = "Create a new resource", httpMethod = "POST")
-	@JsonView(AbstractPersistable.ItemView.class) 
+    //@ApiOperation(value = "create", notes = "Create a new resource", httpMethod = "POST")
+	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
 	////@ApiResponse(code = 201, message = "created")
 	public T create(@RequestBody T resource) {
 		applyCurrentPrincipal(resource);
@@ -265,10 +265,10 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@Override
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
     @ResponseBody
-    @ApiOperation(value = "update", notes = "Update a resource", httpMethod = "PUT")
-	@JsonView(AbstractPersistable.ItemView.class) 
+    //@ApiOperation(value = "update", notes = "Update a resource", httpMethod = "PUT")
+	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
 	//@ApiResponse(code = 200, message = "OK")
-	public T update(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id, @RequestBody T resource) {
+	public T update(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id, @RequestBody T resource) {
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("update, resource: "+resource);
 		}
@@ -282,7 +282,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@Override
 	@RequestMapping(method = RequestMethod.GET, params="page=no", produces="application/json")
     @ResponseBody
-    @ApiOperation(value = "find all", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)", httpMethod = "GET")
+    //@ApiOperation(value = "find all", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)", httpMethod = "GET")
 	//@ApiResponse(code = 200, message = "OK")
 	public Iterable<T> findAll() {
 		return super.findAll();
@@ -300,9 +300,9 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
-    @ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
-	@JsonView(AbstractPersistable.ItemView.class) 
-	public T findById(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
+    //@ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
+	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
+	public T findById(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id) {
     	T resource = null;
     	
     	return super.findById(id);
@@ -315,7 +315,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
     @RequestMapping(value = "new", method = RequestMethod.GET)
     //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
-    @ApiOperation(value = "obtain new unpersisted instance", notes = "Instantiates and returns a new reszource object", httpMethod = "GET")
+    //@ApiOperation(value = "obtain new unpersisted instance", notes = "Instantiates and returns a new reszource object", httpMethod = "GET")
 	public T getSchemaWrapperInstance() {
     	T resource = null;
     	try {
@@ -340,8 +340,8 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
      */
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "delete", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
-	public void delete(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
+    //@ApiOperation(value = "delete", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
+	public void delete(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id) {
 		// TODO Auto-generated method stub
 		super.delete(id);
 	}
@@ -363,7 +363,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@RequestMapping(value = "query", produces = { "application/json" }, method = RequestMethod.POST)
 	@ResponseBody
 	@Deprecated
-	@ApiOperation(value = "deprecated: find paginated with restrictions", httpMethod = "POST")
+	//@ApiOperation(value = "deprecated: find paginated with restrictions", httpMethod = "POST")
 	public Page<T> findPaginatedWithRestrictions(
 			@RequestBody Restriction restriction) {
 		return this.service.findAll(new RestrictionBackedPageRequest(restriction));
@@ -372,7 +372,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 //	// TODO: refactor to OPTIONS on base path?
 //	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
 //	@ResponseBody
-//    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "GET")
+//    //@ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "GET")
 //	public FormSchema getSchema(
 //			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
 //		mode = mode.toUpperCase();
@@ -393,7 +393,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 //	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
 //	@ResponseBody
-//    @ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "OPTIONS")
+//    //@ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "OPTIONS")
 //	public FormSchema getSchemas(
 //			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
 //		return this.getSchema(mode);
@@ -428,7 +428,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	// @Secured("ROLE_ADMIN")
 	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
 	@ResponseBody
-    @ApiOperation(value = "add metadatum", notes = "Add or updated a resource metadatum", httpMethod = "GET")
+    //@ApiOperation(value = "add metadatum", notes = "Add or updated a resource metadatum", httpMethod = "GET")
 	public void addMetadatum(@PathVariable ID subjectId,
 			@RequestBody MetadatumDTO dto) {
 		service.addMetadatum(subjectId, dto);
@@ -437,7 +437,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	// @Secured("ROLE_ADMIN")
 	@RequestMapping(value = "{subjectId}/metadata/{predicate}", method = RequestMethod.DELETE)
 	@ResponseBody
-    @ApiOperation(value = "remove metadatum", notes = "Remove a resource metadatum if it exists", httpMethod = "DELETE")
+    //@ApiOperation(value = "remove metadatum", notes = "Remove a resource metadatum if it exists", httpMethod = "DELETE")
 	public void removeMetadatum(@PathVariable ID subjectId,
 			@PathVariable String predicate) {
 		service.removeMetadatum(subjectId, predicate);
@@ -446,7 +446,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 	@RequestMapping(value = "reports", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "reports", httpMethod = "GET")
+	//@ApiOperation(value = "reports", httpMethod = "GET")
 	public Page<ReportDataSet> getReportDatasets(
 
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,

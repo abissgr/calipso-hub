@@ -18,7 +18,7 @@
  */
 package gr.abiss.calipso.model.dto;
 
-import gr.abiss.calipso.model.entities.AbstractPersistable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
 import gr.abiss.calipso.model.types.TimeUnit;
 

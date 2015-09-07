@@ -28,11 +28,11 @@
 			</resource>
 		</resources>
 		<plugins>
-			<!--plugin> <groupId>org.codehaus.enunciate</groupId> <artifactId>maven-enunciate-plugin</artifactId> 
-				<version>1.8.1</version> <executions> <execution> <goals> <goal>assemble</goal> 
-				</goals> </execution> </executions> <dependencies> <dependency> <groupId>com.sun</groupId> 
-				<artifactId>tools</artifactId> <version>1.0</version> <scope>system</scope> 
-				<systemPath>/usr/lib/jvm/jdk1.7.0/lib/tools.jar</systemPath> </dependency> 
+			<!--plugin> <groupId>org.codehaus.enunciate</groupId> <artifactId>maven-enunciate-plugin</artifactId>
+				<version>1.8.1</version> <executions> <execution> <goals> <goal>assemble</goal>
+				</goals> </execution> </executions> <dependencies> <dependency> <groupId>com.sun</groupId>
+				<artifactId>tools</artifactId> <version>1.0</version> <scope>system</scope>
+				<systemPath>/usr/lib/jvm/jdk1.7.0/lib/tools.jar</systemPath> </dependency>
 				</dependencies> </plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -56,7 +56,7 @@
 						<resourceBase>${project.build.directory}/${project.name}-${project.version}</resourceBase>
 					</resourceBases>
 
-					<!-- We use non NIO connector in order to avoid read only static files 
+					<!-- We use non NIO connector in order to avoid read only static files
 						under windows -->
 					<connectors>
 						<connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
@@ -67,8 +67,8 @@
 						</connector>
 					</connectors>
 					<webApp>
-						<!-- 
-						
+						<!--
+
 						 -->
 						 <contextPath>/calipso</contextPath>
 					</webApp>
@@ -91,9 +91,9 @@
 					<lenient>true</lenient>
 					<recursive>true</recursive>
 					<sourceFiles>
-                        <sourceFile>${basedir}/src/main/webapp/js/app.js</sourceFile>
-                        <sourceFile>${basedir}/src/main/webapp/js/main.js</sourceFile>
-                        <sourceFile>${basedir}/src/main/webapp/js/lib/calipso.js</sourceFile>
+              <!--sourceFile>${basedir}/src/main/webapp/js/app.js</sourceFile>
+              <sourceFile>${basedir}/src/main/webapp/js/main.js</sourceFile-->
+              <sourceFile>${basedir}/src/main/webapp/js/lib/calipso.js</sourceFile>
 					</sourceFiles>
 				</configuration>
 			</plugin>
@@ -151,10 +151,10 @@
 			<groupId>taglibs</groupId>
 			<artifactId>standard</artifactId>
 		</dependency>
-		
-            <dependency> 
-                 <groupId>org.springframework</groupId> 
-                 <artifactId>spring-aspects</artifactId> 
+
+            <dependency>
+                 <groupId>org.springframework</groupId>
+                 <artifactId>spring-aspects</artifactId>
             </dependency>
 	</dependencies>
 

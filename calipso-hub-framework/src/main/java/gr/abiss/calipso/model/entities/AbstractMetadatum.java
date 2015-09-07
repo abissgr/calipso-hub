@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.model.entities;
 
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 
@@ -41,7 +42,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 		@UniqueConstraint(columnNames = { "subject", "predicate" }) 
 	})
 public abstract class AbstractMetadatum<S extends MetadataSubject>
-		extends AbstractPersistable implements Metadatum<S> {
+		extends AbstractSystemUuidPersistable implements Metadatum<S> {
 
 	private static final long serialVersionUID = -1468517690700208260L;
 

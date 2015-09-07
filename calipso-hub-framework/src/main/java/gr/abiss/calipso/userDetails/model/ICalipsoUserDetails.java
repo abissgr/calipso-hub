@@ -10,7 +10,6 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
 
-import com.wordnik.swagger.annotations.ApiModel;
 
 public interface ICalipsoUserDetails extends SocialUserDetails {
 

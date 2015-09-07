@@ -48,12 +48,12 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.wordnik.swagger.annotations.ApiModel;
+//import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  */
 @Entity
-@ApiModel()
+//@ApiModel()
 @Table(name = "host")
 public class Host extends AbstractAuditable<User> {
 

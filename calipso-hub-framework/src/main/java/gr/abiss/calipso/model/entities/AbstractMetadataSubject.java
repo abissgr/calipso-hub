@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.model.entities;
 
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.serializers.MetadataMapDeserializer;
@@ -45,7 +46,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @MappedSuperclass
 public abstract class AbstractMetadataSubject<M extends Metadatum>
-		extends AbstractPersistable implements MetadataSubject<M> {
+		extends AbstractSystemUuidPersistable implements MetadataSubject<M> {
 
 	private static final long serialVersionUID = -1468517690700208260L;
 

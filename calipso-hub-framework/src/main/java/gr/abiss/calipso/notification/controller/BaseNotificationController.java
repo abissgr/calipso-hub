@@ -30,11 +30,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.wordnik.swagger.annotations.Api;
+//import com.wordnik.swagger.annotations.Api;
 
 
 @Controller
-@Api(value = "Notifications")
+//@Api(value = "Notifications")
 @RequestMapping(value = "/api/rest/baseNotifications", produces = { "application/json", "application/xml" })
 public class BaseNotificationController extends AbstractServiceBasedRestController<BaseNotification, String, BaseNotificationService> {
 

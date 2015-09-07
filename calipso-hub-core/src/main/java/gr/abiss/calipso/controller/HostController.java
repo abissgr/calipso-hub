@@ -30,11 +30,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.wordnik.swagger.annotations.Api;
+//import com.wordnik.swagger.annotations.Api;
 
 
 @Controller
-@Api(value = "Hosts")
+//@Api(value = "Hosts")
 @RequestMapping(value = "/api/rest/hosts", produces = { "application/json", "application/xml" })
 public class HostController extends AbstractServiceBasedRestController<Host, String, HostService> {
 

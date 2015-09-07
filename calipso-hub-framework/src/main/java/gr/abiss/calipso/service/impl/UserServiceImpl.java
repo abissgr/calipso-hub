@@ -101,31 +101,30 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
 		ICalipsoUserDetails currentPrincipal = this.getPrincipal();
-		if(currentPrincipal == null 
+		if(!resource.getActive() 
+				|| currentPrincipal == null 
 				|| (!currentPrincipal.isAdmin() && !currentPrincipal.isSiteAdmin())){
 			LOGGER.info("create, forcing active: false");
 			resource.setActive(false);
-		}
-		if(!resource.getActive()){
 			LOGGER.info("create, creating confirmation key");
 			resource.setConfirmationToken(generator.generateKey());
 		}
 		LOGGER.info("create, user: " + resource);
-		User user = super.create(resource);
-		roleRepository.save(userRole);
+		resource = super.create(resource);
+		//roleRepository.save(userRole);
 		LOGGER.info("create, created user: " + resource);
 
-		if (user != null && !user.getActive()) {
+		if (resource != null && !resource.getActive()) {
 			try {
 				LOGGER.info("Sending account confirmation email...");
-				emailService.sendAccountConfirmation(user);
+				emailService.sendAccountConfirmation(resource);
 				LOGGER.info("Account confirmation email sent");
 			} catch (MessagingException e) {
 				LOGGER.error("Could not create account confirmation email", e);
 			}
 		}
-		LOGGER.info("created user: " + user);
-		return user;
+		LOGGER.info("created user: " + resource);
+		return resource;
 	}
 
 

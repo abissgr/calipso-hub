@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
-import com.wordnik.swagger.annotations.Api;
+//import com.mangofactory.swagger.annotations.ApiIgnore;
+//import com.wordnik.swagger.annotations.Api;
 
 
 
 
 //@Controller
 //@Api(value = "Logged-in user details")
-@ApiIgnore
+//@ApiIgnore
 @RequestMapping(value = "/apiauth", produces = { "application/json", "application/xml" })
 public class UserDetailsController extends AbstractUserDetailsController<UserDetailsService> {
 

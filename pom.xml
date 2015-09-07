@@ -93,48 +93,51 @@
 		<java-version>1.6</java-version>
 		<maven-compiler-plugin.failOnError>true</maven-compiler-plugin.failOnError>
 
-        <!-- Resthub -->
+		<!-- Resthub -->
 		<resthub.spring.stack.version>2.2.1-SNAPSHOT</resthub.spring.stack.version>
-        
-        <!-- Spring -->
-		<spring.version>4.1.7.RELEASE</spring.version>
-        <spring.aspects.version>${spring.version}</spring.aspects.version>
-        
-        <!-- Spring Security-->
-		<spring-security.version>4.0.1.RELEASE</spring-security.version>
-        <spring.security.taglibs.version>${spring-security.version}</spring.security.taglibs.version>
-        <org.springframework.security.crypto-version>${spring-security.version}</org.springframework.security.crypto-version>
 
-        <!-- Spring Data-->
-        <spring-data-jpa-version>1.8.1.RELEASE</spring-data-jpa-version>
-        <spring-data-commons-version>1.10.1.RELEASE</spring-data-commons-version>
-        <spring-data-elasticsearch-version>1.0.0.M1</spring-data-elasticsearch-version>
-        
-        <!-- Spring Social-->
+		<!-- Spring -->
+		<spring.version>4.1.7.RELEASE</spring.version>
+		<spring.aspects.version>${spring.version}</spring.aspects.version>
+
+		<!-- Spring Security -->
+		<spring-security.version>4.0.1.RELEASE</spring-security.version>
+		<spring.security.taglibs.version>${spring-security.version}</spring.security.taglibs.version>
+		<org.springframework.security.crypto-version>${spring-security.version}</org.springframework.security.crypto-version>
+
+		<!-- Spring Data -->
+		<spring-data-jpa-version>1.8.1.RELEASE</spring-data-jpa-version>
+		<spring-data-commons-version>1.10.1.RELEASE</spring-data-commons-version>
+		<spring-data-elasticsearch-version>1.0.0.M1</spring-data-elasticsearch-version>
+
+		<!-- Spring Social -->
 		<spring-social.version>1.1.0.RELEASE</spring-social.version>
 		<spring-social-facebook-version>2.0.1.RELEASE</spring-social-facebook-version>
 		<spring-social-linkedin-version>1.0.0.RELEASE</spring-social-linkedin-version>
 		<spring-social-github-version>1.0.0.M4</spring-social-github-version>
 		<spring-social-twitter-version>1.1.0.RELEASE</spring-social-twitter-version>
 		<spring-social-google-version>1.0.0.RELEASE</spring-social-google-version>
-        <org.springframework.social.web-version>1.1.0.M4</org.springframework.social.web-version>
-		
-		<!-- Apache Commons -->
-        <commons-lang3.version>3.4</commons-lang3.version>
-        <commons-configuration.version>1.9</commons-configuration.version>
-        <commons-beanutils.version>1.9.1</commons-beanutils.version>
+		<org.springframework.social.web-version>1.1.0.M4</org.springframework.social.web-version>
+
+        <!-- springfox swagger -->
+        <springfox.version>2.2.2</springfox.version>
         
-        <!-- Misc -->
+		<!-- Apache Commons -->
+		<commons-lang3.version>3.4</commons-lang3.version>
+		<commons-configuration.version>1.9</commons-configuration.version>
+		<commons-beanutils.version>1.9.1</commons-beanutils.version>
+
+		<!-- Misc -->
 		<thymeleaf.version>2.0.16</thymeleaf.version>
 		<joda-time.version>2.8.1</joda-time.version>
 		<org.jadira.usertype.core.version>3.2.0.GA</org.jadira.usertype.core.version>
-		<jackson-datatype-joda.version>2.4.0</jackson-datatype-joda.version>   
+		<jackson-datatype-joda.version>2.4.0</jackson-datatype-joda.version>
 		<urlrewritefilter.version>4.0.3</urlrewritefilter.version>
 		<flyway-core.version>3.2.1</flyway-core.version>
 		<servlet-api.version>3.0.1</servlet-api.version>
 		<handlebars-maven-plugin.version>1.1.3-SNAPSHOT</handlebars-maven-plugin.version>
 
-        <!-- Jetty -->
+		<!-- Jetty -->
 		<jetty.version>8.1.7.v20120910</jetty.version>
 		<jetty.port>8080</jetty.port>
 	</properties>
@@ -210,48 +213,48 @@
 			</dependency>
 			<!-- Spring -->
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-framework-bom</artifactId>
-            <version>${spring.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aop</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aspects</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-orm</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>${spring.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aop</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aspects</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-orm</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-web</artifactId>
@@ -299,11 +302,11 @@
 				<artifactId>spring-security-taglibs</artifactId>
 				<version>${spring.security.taglibs.version}</version>
 			</dependency>
-	        <dependency>
-	            <groupId>org.springframework.security</groupId>
-	            <artifactId>spring-security-web</artifactId>
-	            <version>${spring-security.version}</version>
-	        </dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-web</artifactId>
+				<version>${spring-security.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.social</groupId>
 				<artifactId>spring-social-web</artifactId>
@@ -408,49 +411,14 @@
 				<version>${spring-data-jpa-version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.springframework.data</groupId>
-			    <artifactId>spring-data-commons</artifactId>
-                <version>${spring-data-commons-version}</version>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-commons</artifactId>
+				<version>${spring-data-commons-version}</version>
 			</dependency>
-			
 
 
 
-			<!-- -->
 
-			<dependency>
-				<groupId>com.mangofactory</groupId>
-				<artifactId>swagger-springmvc</artifactId>
-				<version>0.8.8</version>
-				<exclusions>
-					<exclusion>
-						<groupId>com.google.collections</groupId>
-						<artifactId>google-collections</artifactId>
-
-					</exclusion>
-
-					<exclusion>
-						<groupId>com.google.guava</groupId>
-						<artifactId>guava</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-webmvc</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-web</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j12</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
 			<dependency>
 				<groupId>org.elasticsearch</groupId>
 				<artifactId>elasticsearch-transport-wares</artifactId>
@@ -528,16 +496,16 @@
 				<artifactId>joda-time</artifactId>
 				<version>${joda-time.version}</version>
 			</dependency>
-	        <dependency>
-	            <groupId>org.jadira.usertype</groupId>
-	            <artifactId>usertype.core</artifactId>
-	            <version>${org.jadira.usertype.core.version}</version>
-	        </dependency>
-	        <dependency>
-	           <groupId>com.fasterxml.jackson.datatype</groupId>
-	           <artifactId>jackson-datatype-joda</artifactId>
-	           <version>${jackson-datatype-joda.version}</version>
-	        </dependency> 
+			<dependency>
+				<groupId>org.jadira.usertype</groupId>
+				<artifactId>usertype.core</artifactId>
+				<version>${org.jadira.usertype.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.datatype</groupId>
+				<artifactId>jackson-datatype-joda</artifactId>
+				<version>${jackson-datatype-joda.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.owasp</groupId>
 				<artifactId>antisamy</artifactId>
@@ -567,10 +535,10 @@
 				<version>0.3.0</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.flywaydb</groupId>
-			    <artifactId>flyway-core</artifactId>
-                <version>${flyway-core.version}</version>
-            </dependency>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-core</artifactId>
+				<version>${flyway-core.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.reflections</groupId>
 				<artifactId>reflections</artifactId>
@@ -582,14 +550,16 @@
 				<version>5.1.22</version>
 			</dependency>
 			<dependency>
-			    <groupId>com.h2database</groupId>
-			    <artifactId>h2</artifactId>
-			    <!-- 
-			    see https://groups.google.com/forum/#!topic/h2-database/A9WnxtFwk48
-			     -->
-			    <version>1.4.181</version>
-            </dependency>
-
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<!-- see https://groups.google.com/forum/#!topic/h2-database/A9WnxtFwk48 -->
+				<version>1.4.181</version>
+			</dependency>
+			<dependency>
+			    <groupId>io.springfox</groupId>
+			    <artifactId>springfox-swagger2</artifactId>
+			    <version>${springfox.version}</version>
+			</dependency>
 		</dependencies>
 
 	</dependencyManagement>
@@ -604,7 +574,7 @@
 					<bottom>Copyright 2005 - 2014 ${pom.organization.name}. All Rights
 						Reserved | Dependency:
 						${project.packaging}:${project.groupId}:${project.artifactId}:${project.version}</bottom>
-					<doclet>org.jboss.apiviz.APIviz</doclet> 
+					<doclet>org.jboss.apiviz.APIviz</doclet>
 					<docletArtifact>
 						<groupId>org.jboss.apiviz</groupId>
 						<artifactId>apiviz</artifactId>
@@ -717,9 +687,9 @@
 					<executions>
 						<execution>
 							<id>attach-sources</id>
-		                    <goals>
-		                        <goal>jar-no-fork</goal>
-		                    </goals>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
 						</execution>
 					</executions>
 				</plugin>
@@ -728,6 +698,33 @@
 	</build>
 
 	<repositories>
+        <!-- For springfox/swagger -->
+        <repository>
+            <id>jcenter-snapshots</id>
+            <name>jcenter</name>
+            <url>https://jcenter.bintray.com/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+		<repository>
+			<id>sonatype-release</id>
+			<url>https://oss.sonatype.org/content/repositories/releases</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 		<!-- Contains all RESThub artifacts and transitive dependencies <repository> 
 			<id>resthub</id> <url>http://nexus.pullrequest.org/content/groups/resthub</url> 
 			</repository> -->
@@ -773,21 +770,6 @@
 
 			<snapshots>
 				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>sonatype-release</id>
-			<url>https://oss.sonatype.org/content/repositories/releases</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-			<snapshots>
-				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 	</repositories>

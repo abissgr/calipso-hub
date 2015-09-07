@@ -1,11 +1,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:task="http://www.springframework.org/schema/task" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task" 
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
         http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context-3.2.xsd
         http://www.springframework.org/schema/util      http://www.springframework.org/schema/util/spring-util.xsd
@@ -115,7 +119,7 @@
             <list>
                 <value>classpath:calipso.defaults.properties</value>
                 <value>classpath:calipso.properties</value>
-                <value>classpath:swagger.properties</value>
+                <!-- value>classpath:swagger.properties</value-->
             </list>
         </property> 
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
@@ -159,7 +163,7 @@
 	<import resource="applicationContext-security.xml" />
     <!-- import resource="applicationContext-acl.xml" /-->
 	<!--import resource="applicationContext-social.xml" /-->
-	<import resource="applicationContext-swagger.xml" />
+	<!--import resource="applicationContext-swagger.xml" /-->
 
 
 
@@ -170,5 +174,9 @@
 	<!-- DB data initializers -->
 	<bean id="appInitializer" class="gr.abiss.calipso.AppInitializer">
     </bean>
+    
+    
+    <!-- Include a swagger configuration-->
+    <bean name="/applicationSwaggerConfig" class="gr.abiss.calipso.utils.swagger.ApplicationSwaggerConfig"/>
 
 </beans>

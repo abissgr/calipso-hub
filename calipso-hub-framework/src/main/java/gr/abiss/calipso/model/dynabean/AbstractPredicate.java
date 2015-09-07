@@ -17,7 +17,7 @@
  */
 package gr.abiss.calipso.model.dynabean;
 
-import gr.abiss.calipso.model.entities.AbstractPersistable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 
 import javax.persistence.MappedSuperclass;
 
@@ -25,7 +25,7 @@ import javax.persistence.MappedSuperclass;
  * Abstract base persistent class for dynamic bean properties
  */
 @MappedSuperclass
-public abstract class AbstractPredicate<V> extends AbstractPersistable {
+public abstract class AbstractPredicate<V> extends AbstractSystemUuidPersistable {
 
 	private static final long serialVersionUID = -1468517690700208260L;
 
