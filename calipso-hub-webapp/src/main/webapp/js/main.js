@@ -7,6 +7,7 @@ require.config({
 		'cookie' : 'lib/jquery.cookie',
 		'jquery' : 'lib/jquery',
 		'jquery-color' : 'lib/jquery.color.plus-names',
+		"jquery-intlTelInput" : 'lib/intlTelInput',
 		'q' : 'lib/q',
 		'underscore' : 'lib/underscore',
 		'underscore-string' : 'lib/underscore-string',
@@ -150,7 +151,7 @@ require.config({
 			         'marionette', 
 			         'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator', 
 			         'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 
-			         'jquery-color', 'q', 'chart'],
+			         'jquery-color', 'jquery-intlTelInput', 'q', 'chart'],
 			exports : 'calipso',
 		},
 		

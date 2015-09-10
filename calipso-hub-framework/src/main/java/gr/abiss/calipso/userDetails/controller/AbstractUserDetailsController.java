@@ -177,9 +177,10 @@ HttpServletRequest request,
 					.create(resource) : null;
 
 			LOGGER.info("create userDetails: " + userDetails);
-			if (userDetails != null) {
+			if (userDetails != null && userDetails.getId() != null) {
 				SecurityUtil.login(request, response, userDetails, userDetailsConfig);
 			} else {
+				SecurityUtil.logout(request, response, userDetailsConfig);
 				userDetails = new UserDetails();
 			}
 		}

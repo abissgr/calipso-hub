@@ -26,6 +26,7 @@ import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
@@ -57,6 +58,8 @@ import org.resthub.common.exception.NotFoundException;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -256,7 +259,23 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			
 		}
 	}
+	
+	protected void copyBeanProperties(
+		    final Object source,
+		    final Object target,
+		    final Iterable<String> properties){
 
+		    final BeanWrapper src = new BeanWrapperImpl(source);
+		    final BeanWrapper trg = new BeanWrapperImpl(target);
+
+		    for(final String propertyName : properties){
+		        trg.setPropertyValue(
+		            propertyName,
+		            src.getPropertyValue(propertyName)
+		        );
+		    }
+
+		}
 
 
     /**
@@ -273,6 +292,12 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 			LOGGER.debug("update, resource: "+resource);
 		}
 		applyCurrentPrincipal(resource);
+		// handle partial updates
+		if(PartiallyUpdateable.class.isAssignableFrom(resource.getClass())){
+			T persisted = this.service.findById(id);
+			this.copyBeanProperties(resource, persisted, ((PartiallyUpdateable) resource ).getChangedAttributes());
+			resource = persisted;
+		}
 		return super.update(id, resource);
 	}
 

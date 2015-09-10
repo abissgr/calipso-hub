@@ -39,7 +39,8 @@ define([
 'hbs!template/headerNotificationsCollectionView',
 'hbs!template/headerNotificationsItemView',
 'hbs!template/templateBasedItemView',
-'hbs!template/templateBasedCollectionView' ]
+'hbs!template/templateBasedCollectionView',
+'hbs!template/wizard-layout' ]
 ,
 
 function(
@@ -64,7 +65,8 @@ function(
 		headerNotificationsCollectionView,
 		headerNotificationsItemView,
 		templateBasedItemView,
-		templateBasedCollectionView
+		templateBasedCollectionView,
+		wizardLayout
 ) {
 	return {
 
@@ -80,7 +82,7 @@ function(
 	"md-report-view":md_report_view,
 	"MainContentNavView":MainContentNavView,
 	"md-form-view":md_form_view,
-	"md-formpanel-view":md_formpanel_view, 
+	"md-formpanel-view":md_formpanel_view,
 	"generic-crud-layout":generic_crud_layout,
 	"login":login,
 	"applayout":applayout,
@@ -89,7 +91,8 @@ function(
 	"headerNotificationsCollectionView":headerNotificationsCollectionView,
 	"headerNotificationsItemView":headerNotificationsItemView,
 	"templateBasedItemView":templateBasedItemView,
-	"templateBasedCollectionView":templateBasedCollectionView
+	"templateBasedCollectionView":templateBasedCollectionView,
+	"wizard-layout":wizardLayout,
 
 	};
 

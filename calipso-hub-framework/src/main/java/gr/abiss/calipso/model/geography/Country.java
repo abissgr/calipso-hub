@@ -43,15 +43,19 @@ public class Country extends AbstractFormalRegion<Continent> {
 
 	private static final long serialVersionUID = 3723330183409907891L;
 	
-	@Column(unique = true, nullable = false, length = 50)
+	@Column(unique = true, nullable = true, length = 50)
 	private String nativeName;
-	@Column(unique = true, nullable = false, length = 15)
+	
+	@Column(unique = false, nullable = true, length = 15)
 	private String callingCode;
-	@Column(unique = true, nullable = false, length = 50)
+	
+	@Column(unique = false, nullable = true, length = 50)
 	private String capital;
-	@Column(unique = false, nullable = false, length = 30)
+	
+	@Column(unique = false, nullable = true, length = 30)
 	private String currency;
-	@Column(unique = false, nullable = false, length = 30)
+	
+	@Column(unique = false, nullable = true, length = 30)
 	private String languages;
 
 	public Country() {

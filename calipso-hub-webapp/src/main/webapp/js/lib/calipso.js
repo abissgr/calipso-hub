@@ -23,14 +23,14 @@ define([
   'marionette',
   'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
   /*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker','bootstrap-switch',
-  'jquery-color', 'q', 'chart'],
+  'jquery-color', 'jquery-intlTelInput', 'q', 'chart'],
 function(
 	_, Handlebars, calipsoTemplates, moment,
 	Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2,
 	BackboneMarionette,
 	Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 	/*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch,
-	jqueryColor, q, chartjs) {
+	jqueryColor, intlTelInput, q, chartjs) {
 
 
 	/**
@@ -70,6 +70,27 @@ function(
 		;
 		return urlParams;
 	};
+
+	Calipso.getDefaultFetchOptions = function(){
+		return {
+			// use traditional HTTP params
+			traditional: true,
+			// handle status codes
+			statusCode: {
+				401: function(){
+					console.log("Backbone.$.ajaxSetup 401");
+					window.alert("Your session has expired");
+					Calipso.navigate("login");
+				},
+				403: function() {
+					console.log("Backbone.$.ajaxSetup 403");
+					window.alert("Your session has expired");
+					Calipso.navigate("login");
+				}
+			}
+		};
+
+	}
 	/**
 	 * Utility method to stop events.
 	 * @param  {event} e
@@ -792,7 +813,7 @@ function(
 		 */
 		_backbonePollSettings : {
 			refresh : 60000, // rate at which the plugin fetches data, default one minute
-			fetchOptions : {}, // options for the fetch request
+			fetchOptions : Calipso.getDefaultFetchOptions(), // options for the fetch request
 			retryRequestOnFetchFail : true
 		// automatically retry request on fetch failure
 		},
@@ -1184,17 +1205,38 @@ function(
 					// if a schema exists for the property
 					if (propertySchema) {
 						// try obtaining a schema for the specific action
-						propertySchemaForAction = propertySchema[actionName];
-						// support wild card entries
-						if (!propertySchemaForAction) {
-							propertySchemaForAction = propertySchema["default"];
+						var partialSchema = propertySchema[actionName];
+						// support default fallback
+						if (!partialSchema) {
+							partialSchema = propertySchema["default"];
 						}
+						if(partialSchema){
+							propertySchemaForAction = {};
+							// extend on top of "extend" if avalable
+							if(partialSchema.extend){
+								var extendArr = partialSchema.extend;
+								if(!$.isArray(extendArr) ){
+									extendArr = [extendArr];
+								}
+								for(var i = 0; i < extendArr.length; i++){
+									var toAdd = extendArr[i];
+									// if ref to another action key, resolve it
+									if(toAdd instanceof String || typeof toAdd === "string"){
+										toAdd = propertySchema[toAdd+''];
+									}
+									$.extend(true, propertySchemaForAction, toAdd);
+								}
+							}
+							// add explicit schema for action key
+							$.extend(true, propertySchemaForAction, partialSchema);
+						}
+						// add final schema for field
 						if (propertySchemaForAction) {
 							formSchema[propertyName] = propertySchemaForAction;
 						}
 					}
 					else{
-						console.log("WARNING GenericModel#getFormSchema, no "+ propertyName + "schema found for property: "+ actionName);
+						console.log("WARNING GenericModel#getFormSchema, no "+ actionName + "schema found for property: "+ propertyName);
 					}
 				}
 				else{
@@ -1219,7 +1261,14 @@ function(
 					return;
 				}
 			});
-		}
+		},
+		sync: function() {
+			// partial update hints
+			if(!this.isNew()){
+				this.set("changedAttributes", this.changedAttributes());
+			}
+			return Backbone.Model.prototype.sync.apply(this, arguments);
+		},
 	}, {
 		// static members
 		/** (Default) 0Do not retrieve the form schema from the server */
@@ -1419,47 +1468,20 @@ function(
 			},
 			model : Calipso.model.RoleModel,
 		});
+		var text = {type : 'Text'};
+		var textRequired = {type : 'Text', validators : [ 'required' ]};
 		return {//
 			firstName : {
-				"search" : {
-					type : 'Text',
-					title : "First Name"
-				},
-				"default" : {
-					type : 'Text',
-					title : "First Name",
-					validators : [ 'required' ]
-				}
+				"search" : text,
+				"default" : textRequired,
 			},
 			lastName : {
-				"search" :{
-					type : 'Text',
-					title : "Last Name"
-				},
-				"default" : {
-					type : 'Text',
-					title : "Last Name",
-					validators : [ 'required' ]
-				}
+				"search" : text,
+				"default" : textRequired,
 			},
 			username : {
-				"search" : {
-					title: "Username",
-					type : 'Text'
-				},
-				"update" : {
-					title: "Username",
-					type : 'Text',
-					validators : [ 'required' ],
-					editorAttrs : {
-						'readonly' : 'readonly'
-					}
-				},
-				"default" : {
-					title: "Username",
-					type : 'Text',
-					validators : [ 'required' ]
-				}
+				"search" : text,
+				"default" : textRequired,
 			},
 			email : {
 				"search" : {
@@ -1477,45 +1499,57 @@ function(
 			},
 			telephone : {
 				"default" : {
-					type : 'Text',
-					title: "Telephone",
+					type : Calipso.components.backboneform.Tel,
 					dataType: "tel",
 					validators : [ Calipso.components.backboneform.validators.digitsOnly ]
 				}
 			},
 			cellphone : {
 				"default" : {
-					type : 'Text',
-					title: "Cellphone",
+					type : Calipso.components.backboneform.Tel,
 					dataType: "tel",
 					validators : [ Calipso.components.backboneform.validators.digitsOnly ]
 				},
 			},
 			active : {
-				"create" : {
+				"base" : {
 					type : 'Checkbox',
 					title: "Active",
+				},
+				"create" : {
+					extend: "base",
 					help: "Select to skip email confirmation"
 				},
 				"update" : {
-					type : 'Checkbox',
-					title: "Active",
+					extend: "base",
 				},
 			},
 			roles : {
+				"base" : {
+					title: "Roles",
+					type : Backbone.Form.editors.ModelSelect2,
+					options: rolesCollection,
+					multiple: true,
+				},
 				"search" : {
 					title: "Roles",
 					type : Backbone.Form.editors.ModelSelect2,
 					options: rolesCollection,
 					multiple: true,
 				},
-				"default" : {
+				"create" : {
 					title: "Roles",
 					type : Backbone.Form.editors.ModelSelect2,
 					options: rolesCollection,
 					multiple: true,
 					validators : [ 'required' ],
-				}
+				},
+				"update" : {
+					title: "Roles",
+					type : Backbone.Form.editors.ModelSelect2,
+					options: rolesCollection,
+					multiple: true,
+				},
 			}
 		};
 
@@ -2349,6 +2383,90 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				}
 				return Backbone.Form.prototype.createField.apply(this, arguments);
 		  },
+
+		  render: function() {
+		    var self = this,
+		        fields = this.fields,
+		        $ = Backbone.$;
+
+		    //Render form
+		    var $form = $($.trim(this.template(_.result(this, 'templateData'))));
+		    if(this.$el){
+					console.log("render: preserving given el");
+					var attributes = $form.prop("attributes");
+					// loop through <select> attributes and apply them on <div>
+					$.each(attributes, function() {
+							if(this.name == "class"){
+					    	self.$el.addClass(this.value);
+							}
+							else if(this.name != "id"){
+					    	self.$el.attr(this.name, this.value);
+							}
+					});
+					this.$el.html($form.html());
+					$form = this.$el;
+				}
+				else{
+		    	this.setElement($form);
+				}
+		    //Render standalone editors
+		    $form.find('[data-editors]').add($form).each(function(i, el) {
+		      var $container = $(el),
+		          selection = $container.attr('data-editors');
+
+		      if (_.isUndefined(selection)) return;
+
+		      //Work out which fields to include
+		      var keys = (selection == '*')
+		        ? self.selectedFields || _.keys(fields)
+		        : selection.split(',');
+
+		      //Add them
+		      _.each(keys, function(key) {
+		        var field = fields[key];
+
+		        $container.append(field.editor.render().el);
+		      });
+		    });
+
+		    //Render standalone fields
+		    $form.find('[data-fields]').add($form).each(function(i, el) {
+		      var $container = $(el),
+		          selection = $container.attr('data-fields');
+
+		      if (_.isUndefined(selection)) return;
+
+		      //Work out which fields to include
+		      var keys = (selection == '*')
+		        ? self.selectedFields || _.keys(fields)
+		        : selection.split(',');
+
+		      //Add them
+		      _.each(keys, function(key) {
+		        var field = fields[key];
+
+		        $container.append(field.render().el);
+		      });
+		    });
+
+		    //Render fieldsets
+		    $form.find('[data-fieldsets]').add($form).each(function(i, el) {
+		      var $container = $(el),
+		          selection = $container.attr('data-fieldsets');
+
+		      if (_.isUndefined(selection)) return;
+
+		      _.each(self.fieldsets, function(fieldset) {
+		        $container.append(fieldset.render().el);
+		      });
+		    });
+
+		    //Set class
+		    $form.addClass(this.className);
+
+		    return this;
+		  },
+
 			toJson : function() {
 				var nodeName = this.$el[0].nodeName.toLowerCase();
 				return _.reduce((nodeName == "form" ? this.$el : this.$("form")).serializeArray(), function(hash, pair) {
@@ -2371,49 +2489,61 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			}
 		},
 	});
-		/*
-		 * shows remaining chars
-		 */
-		Calipso.components.backboneform.LengthText = Backbone.Form.editors.Text.extend({
-			maxLength: null,
-			initialize : function(options) {
-				Backbone.Form.editors.Text.prototype.initialize.call(this, options);
-				if (this.schema.maxLength) {
-					this.maxLength = this.schema.maxLength;
-				}
-			},
-			/**
-			 * Adds the editor to the DOM
-			 */
-			render : function() {
-				var _this = this;
-				function create() {
-					if(_this.maxLength){
-						var pHelp = _this.$el.parent().parent().find('.help-block:not([data-error])').first();
-						pHelp.append("<span class=\"chars-remaining\">" + _this.maxLength + ' characters remaining</span>');
 
-				    _this.$el.keyup(function() {
-				        var text_length = _this.getValue() ? _this.getValue().length : 0;
-				        var text_remaining = _this.maxLength - text_length;
-								var c = text_remaining == 1 ? "character" : "characters"
-						    var $msgElem = _this.$el.parent().parent().find('.chars-remaining');
-								$msgElem.html(text_remaining + ' '+c+' remaining');
+	Calipso.components.backboneform.Tel = Backbone.Form.editors.Text.extend({
+		render : function() {
+			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
+			var _this = this;
 
-								if(text_remaining < 0){
-									$msgElem.addClass('text-danger');
-								}
-								else{
-									$msgElem.removeClass('text-danger');
-								}
-
-				    });
-					}
-				}
-
-				setTimeout(create, 250);
-				return this;
+			setTimeout(function(){
+				_this.$el.intlTelInput();
+			}, 250);
+			return this;
+		},
+	});
+	/*
+	 * shows remaining chars
+	 */
+	Calipso.components.backboneform.LengthText = Backbone.Form.editors.Text.extend({
+		maxLength: null,
+		initialize : function(options) {
+			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
+			if (this.schema.maxLength) {
+				this.maxLength = this.schema.maxLength;
 			}
-		});
+		},
+		/**
+		 * Adds the editor to the DOM
+		 */
+		render : function() {
+			var _this = this;
+			function create() {
+				if(_this.maxLength){
+					var pHelp = _this.$el.parent().parent().find('.help-block:not([data-error])').first();
+					pHelp.append("<span class=\"chars-remaining\">" + _this.maxLength + ' characters remaining</span>');
+
+			    _this.$el.keyup(function() {
+			        var text_length = _this.getValue() ? _this.getValue().length : 0;
+			        var text_remaining = _this.maxLength - text_length;
+							var c = text_remaining == 1 ? "character" : "characters"
+					    var $msgElem = _this.$el.parent().parent().find('.chars-remaining');
+							$msgElem.html(text_remaining + ' '+c+' remaining');
+
+							if(text_remaining < 0){
+								$msgElem.addClass('text-danger');
+							}
+							else{
+								$msgElem.removeClass('text-danger');
+							}
+
+			    });
+				}
+			}
+
+			setTimeout(create, 250);
+			return this;
+		}
+	});
 	/*
 	 *  based on typeahead/bloodhound 0.11.1, see
 	 * https://github.com/twitter/typeahead.js
@@ -2618,7 +2748,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if(requiredOptionNames && requiredOptionNames.length > 0){
 				for(var i=0; i < requiredOptionNames.length; i++){
 					var requiredOptionName = requiredOptionNames[i];
-					var finalOption = this.config.option[requiredOptionName];
+					var finalOption = this.config[requiredOptionName];
 					if(finalOption == undefined || finalOption == null){
 						missing.push(requiredOptionName);
 					}
@@ -4084,7 +4214,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 				if (window.Placeholders) {
 					Placeholders.enable();
 				}
-				if (_this.modal) {
+				if (this.modal) {
 					$(".modal-body").scrollTop(0);
 				}
 			}
@@ -4103,7 +4233,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			// if no validation errors
 			else{
 				// Case: create/update
-				if (_this.formSchemaKey == "create" || _this.formSchemaKey == "update") {
+				if (_this.formSchemaKey.indexOf("create") == 0 || _this.formSchemaKey.indexOf("update") == 0) {
 					// persist changes
 
 					_this.model.save(null, {
@@ -4212,8 +4342,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			if(formSubmitButton){
 				formOptions.submitButton = formSubmitButton;
 			}
-			this.form = new Calipso.components.backboneform.Form(formOptions).render();
-			this.$el.find(".generic-form-view").append(this.form.el);
+			this.form = new Calipso.components.backboneform.Form(formOptions);
+			this.form.setElement(this.$el.find(".generic-form-view").first()).render();
 			this.$el.find('input[type=text],textarea,select').filter(':visible:enabled:first').focus();
 			// generic-form-view
 			//					$(selector + ' textarea[data-provide="markdown"]').each(function() {
@@ -4405,14 +4535,16 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			"submit .form-login" : "commit",
 		},
 		commit : function(e) {
+			console.log("Calipso.view.LoginView#commit");
 			Calipso.stopEvent(e);
 			var _this = this;
-			var userDetails = new Calipso.model.UserModel({
+			var userDetails = new Calipso.model.UserDetailsModel({
 				email : this.$('.input-email').val(),
 				password : this.$('.input-password').val(),
 				newPassword : this.$('.new-password').val(),
 				newPasswordConfirm : this.$('.new-password-confirm').val()
 			});
+				console.log(userDetails);
 			Calipso.session.save(userDetails);
 		},
 		socialLogin : function(e) {
@@ -4757,7 +4889,8 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		// Returns true if the user is authenticated.
 		isAuthenticated : function() {
 			var isAuth = this.userDetails && this.userDetails.get && this.userDetails.get("id");
-			// console.log("session#isAuthenticated: " + isAuth);
+			console.log("session#isAuthenticated: " + isAuth);
+			console.log(this.userDetails);
 			return isAuth;
 		},
 		ensureLoggedIn : function() {
@@ -4812,14 +4945,11 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 		// Saving will try to login the user
 		save : function(model) {
-			//consolelog("session.save called");
+			console.log("session.save called");
+			console.log(model);
 			var _self = this;
 			var usernameOrEmail = model.get('email') ? model.get('email') : model.get('username');
-			new Calipso.model.UserDetailsModel().save({
-				email : usernameOrEmail,
-				password : model.get('password'),
-				metadata : model.get('metadata'),
-			}, {
+			model.save( null, {
 				success : function(model, response) {
 					// If the login was successful set the user for the whole
 					// application.
@@ -5211,7 +5341,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		 * @see Calipso.model.GenericModel.prototype.getBusinessKey
 		 */
 		getModelForRoute : function(ModelType, modelId, httpParams) {
-			// console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams + ", type: " + ModelType.prototype.getTypeName());
+			//console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams + ", type: " + ModelType.prototype.getTypeName());
 
 			// Obtain a model for the view:
 			// if a model id is present, obtain a promise
@@ -5219,7 +5349,7 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			var modelForRoute;
 			if (modelId) {
 				// console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.prototype.getTypeName());
-				modelForRoute = ModelType.all().get(modelId);
+				//modelForRoute = ModelType.all().get(modelId);
 				if (modelForRoute) {
 					// console.log("getModelForRoute, cached model: " + modelForRoute);
 				} else {

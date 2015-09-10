@@ -168,7 +168,7 @@ public class AppInitializer {
 		  countryRepository.save(new Country("AL", "Albania", "Shqipëria", "355", EU, "Tirana", "ALL", "sq"));
 		  countryRepository.save(new Country("AM", "Armenia", "Հայաստան", "374", AS, "Yerevan", "AMD", "hy,ru"));
 		  countryRepository.save(new Country("AO", "Angola", "Angola", "244", AF, "Luanda", "AOA", "pt"));
-		  countryRepository.save(new Country("AQ", "Antarctica", "", "", AN, "", "", ""));
+		  countryRepository.save(new Country("AQ", "Antarctica", null, null, AN, null, null, null));
 		  countryRepository.save(new Country("AR", "Argentina", "Argentina", "54", SA, "Buenos Aires", "ARS", "es,gn"));
 		  countryRepository.save(new Country("AS", "American Samoa", "American Samoa", "1684", OC, "Pago Pago", "USD", "en,sm"));
 		  countryRepository.save(new Country("AT", "Austria", "Österreich", "43", EU, "Vienna", "EUR", "de"));
@@ -193,7 +193,7 @@ public class AppInitializer {
 		  countryRepository.save(new Country("BR", "Brazil", "Brasil", "55", SA, "Brasília", "BRL", "pt"));
 		  countryRepository.save(new Country("BS", "Bahamas", "Bahamas", "1242", NA, "Nassau", "BSD", "en"));
 		  countryRepository.save(new Country("BT", "Bhutan", "ʼbrug-yul", "975", AS, "Thimphu", "BTN,INR", "dz"));
-		  countryRepository.save(new Country("BV", "Bouvet Island", "Bouvetøya", "", AN, "", "NOK", ""));
+		  countryRepository.save(new Country("BV", "Bouvet Island", "Bouvetøya", null, AN, null, "NOK", null));
 		  countryRepository.save(new Country("BW", "Botswana", "Botswana", "267", AF, "Gaborone", "BWP", "en,tn"));
 		  countryRepository.save(new Country("BY", "Belarus", "Белару́сь", "375", EU, "Minsk", "BYR", "be,ru"));
 		  countryRepository.save(new Country("BZ", "Belize", "Belize", "501", NA, "Belmopan", "BZD", "en,es"));
@@ -255,7 +255,7 @@ public class AppInitializer {
 		  countryRepository.save(new Country("GW", "Guinea-Bissau", "Guiné-Bissau", "245", AF, "Bissau", "XOF", "pt"));
 		  countryRepository.save(new Country("GY", "Guyana", "Guyana", "592", SA, "Georgetown", "GYD", "en"));
 		  countryRepository.save(new Country("HK", "Hong Kong", "香港", "852", AS, "City of Victoria", "HKD", "zh,en"));
-		  countryRepository.save(new Country("HM", "Heard Island and McDonald Islands", "Heard Island and McDonald Islands", "", AN, "", "AUD", "en"));
+		  countryRepository.save(new Country("HM", "Heard Island and McDonald Islands", "Heard Island and McDonald Islands", null, AN, null, "AUD", "en"));
 		  countryRepository.save(new Country("HN", "Honduras", "Honduras", "504", NA, "Tegucigalpa", "HNL", "es"));
 		  countryRepository.save(new Country("HR", "Croatia", "Hrvatska", "385", EU, "Zagreb", "HRK", "hr"));
 		  countryRepository.save(new Country("HT", "Haiti", "Haïti", "509", NA, "Port-au-Prince", "HTG,USD", "fr,ht"));
@@ -307,7 +307,7 @@ public class AppInitializer {
 		  countryRepository.save(new Country("ML", "Mali", "Mali", "223", AF, "Bamako", "XOF", "fr"));
 		  countryRepository.save(new Country("MM", "Myanmar [Burma]", "Myanma", "95", AS, "Naypyidaw", "MMK", "my"));
 		  countryRepository.save(new Country("MN", "Mongolia", "Монгол улс", "976", AS, "Ulan Bator", "MNT", "mn"));
-		  countryRepository.save(new Country("MO", "Macao", "澳門", "853", AS, "", "MOP", "zh,pt"));
+		  countryRepository.save(new Country("MO", "Macao", "澳門", "853", AS, null, "MOP", "zh,pt"));
 		  countryRepository.save(new Country("MP", "Northern Mariana Islands", "Northern Mariana Islands", "1670", OC, "Saipan", "USD", "en,ch"));
 		  countryRepository.save(new Country("MQ", "Martinique", "Martinique", "596", NA, "Fort-de-France", "EUR", "fr"));
 		  countryRepository.save(new Country("MR", "Mauritania", "موريتانيا", "222", AF, "Nouakchott", "MRO", "ar"));
@@ -317,7 +317,7 @@ public class AppInitializer {
 		  countryRepository.save(new Country("MV", "Maldives", "Maldives", "960", AS, "Malé", "MVR", "dv"));
 		  countryRepository.save(new Country("MW", "Malawi", "Malawi", "265", AF, "Lilongwe", "MWK", "en,ny"));
 		  countryRepository.save(new Country("MX", "Mexico", "México", "52", NA, "Mexico City", "MXN", "es"));
-		  countryRepository.save(new Country("MY", "Malaysia", "Malaysia", "60", AS, "Kuala Lumpur", "MYR", ""));
+		  countryRepository.save(new Country("MY", "Malaysia", "Malaysia", "60", AS, "Kuala Lumpur", "MYR", null));
 		  countryRepository.save(new Country("MZ", "Mozambique", "Moçambique", "258", AF, "Maputo", "MZN", "pt"));
 		  countryRepository.save(new Country("NA", "Namibia", "Namibia", "264", AF, "Windhoek", "NAD,ZAR", "en,af"));
 		  countryRepository.save(new Country("NC", "New Caledonia", "Nouvelle-Calédonie", "687", OC, "Nouméa", "XPF", "fr"));
@@ -375,7 +375,7 @@ public class AppInitializer {
 		  countryRepository.save(new Country("SZ", "Swaziland", "Swaziland", "268", AF, "Lobamba", "SZL", "en,ss"));
 		  countryRepository.save(new Country("TC", "Turks and Caicos Islands", "Turks and Caicos Islands", "1649", NA, "Cockburn Town", "USD", "en"));
 		  countryRepository.save(new Country("TD", "Chad", "Tchad", "235", AF, "N'Djamena", "XAF", "fr,ar"));
-		  countryRepository.save(new Country("TF", "French Southern Territories", "Territoire des Terres australes et antarctiques fr", "", AN, "Port-aux-Français", "EUR", "fr"));
+		  countryRepository.save(new Country("TF", "French Southern Territories", "Territoire des Terres australes et antarctiques fr", null, AN, "Port-aux-Français", "EUR", "fr"));
 		  countryRepository.save(new Country("TG", "Togo", "Togo", "228", AF, "Lomé", "XOF", "fr"));
 		  countryRepository.save(new Country("TH", "Thailand", "ประเทศไทย", "66", AS, "Bangkok", "THB", "th"));
 		  countryRepository.save(new Country("TJ", "Tajikistan", "Тоҷикистон", "992", AS, "Dushanbe", "TJS", "tg,ru"));
@@ -391,7 +391,7 @@ public class AppInitializer {
 		  countryRepository.save(new Country("TZ", "Tanzania", "Tanzania", "255", AF, "Dodoma", "TZS", "sw,en"));
 		  countryRepository.save(new Country("UA", "Ukraine", "Україна", "380", EU, "Kiev", "UAH", "uk"));
 		  countryRepository.save(new Country("UG", "Uganda", "Uganda", "256", AF, "Kampala", "UGX", "en,sw"));
-		  countryRepository.save(new Country("UM", "U.S. Minor Outlying Islands", "United States Minor Outlying Islands", "", OC, "", "USD", "en"));
+		  countryRepository.save(new Country("UM", "U.S. Minor Outlying Islands", "United States Minor Outlying Islands", null, OC, null, "USD", "en"));
 		  countryRepository.save(new Country("US", "United States", "United States", "1", NA, "Washington D.C.", "USD,USN,USS", "en"));
 		  countryRepository.save(new Country("UY", "Uruguay", "Uruguay", "598", SA, "Montevideo", "UYI,UYU", "es"));
 		  countryRepository.save(new Country("UZ", "Uzbekistan", "O‘zbekiston", "998", AS, "Tashkent", "UZS", "uz,ru"));
