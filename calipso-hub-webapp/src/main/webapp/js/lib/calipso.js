@@ -2463,10 +2463,14 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 
 		    //Set class
 		    $form.addClass(this.className);
-
+				this.trigger("attach");
 		    return this;
 		  },
-
+			close : function(){
+				this.trigger("close");
+				this.remove();
+				this.unbind();
+			},
 			toJson : function() {
 				var nodeName = this.$el[0].nodeName.toLowerCase();
 				return _.reduce((nodeName == "form" ? this.$el : this.$("form")).serializeArray(), function(hash, pair) {
@@ -2478,7 +2482,48 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			},
 	});
 
-	Calipso.components.backboneform.NumberText = Backbone.Form.editors.Text.extend({
+	Calipso.components.backboneform.Text = Backbone.Form.editors.Text.extend({
+		initialize : function(options) {
+			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
+			if(this.form){
+				var _this = this;
+				this.listenToOnce(this.form, "attach", function(){_this.onFormAttach();});
+				this.listenToOnce(this.form, "close", function(){_this.onFormClose();});
+			}
+		},
+		onFormAttach : function() {
+			var _this = this;
+			if(_this.schema.maxLength){
+				var pHelp = _this.$el.parent().parent().find('.help-block:not([data-error])').first();
+				pHelp.append("<span class=\"chars-remaining\">" + _this.schema.maxLength + ' characters remaining</span>');
+
+				_this.$el.keyup(function() {
+						var text_length = _this.getValue() ? _this.getValue().length : 0;
+						var text_remaining = _this.schema.maxLength - text_length;
+						var c = text_remaining == 1 ? "character" : "characters"
+						var $msgElem = _this.$el.parent().parent().find('.chars-remaining');
+						$msgElem.html(text_remaining + ' '+c+' remaining');
+
+						if(text_remaining < 0){
+							$msgElem.addClass('text-danger');
+						}
+						else{
+							$msgElem.removeClass('text-danger');
+						}
+
+				});
+			}
+		},
+		onFormClose : function() {
+			if (this.onBeforeClose){
+				this.onBeforeClose();
+			}
+			this.remove();
+			this.unbind();
+		},
+	});
+
+	Calipso.components.backboneform.NumberText = Calipso.components.backboneform.Text.extend({
 		getValue : function() {
 			var value = Backbone.Form.editors.Text.prototype.getValue.apply(this, arguments);
 			if(!(_.isUndefined(value) || _.isNull(value) || value == "")){
@@ -2490,72 +2535,26 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 	});
 
-	Calipso.components.backboneform.Tel = Backbone.Form.editors.Text.extend({
-		render : function() {
-			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
-			var _this = this;
-
-			setTimeout(function(){
-				_this.$el.intlTelInput();
-			}, 250);
-			return this;
+	Calipso.components.backboneform.Tel = Calipso.components.backboneform.Text.extend({
+		onFormAttach : function() {
+			this.$el.intlTelInput();
 		},
-	});
-	/*
-	 * shows remaining chars
-	 */
-	Calipso.components.backboneform.LengthText = Backbone.Form.editors.Text.extend({
-		maxLength: null,
-		initialize : function(options) {
-			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
-			if (this.schema.maxLength) {
-				this.maxLength = this.schema.maxLength;
-			}
+		onBeforeClose : function() {
+			this.$el.intlTelInput("destroy");
 		},
-		/**
-		 * Adds the editor to the DOM
-		 */
-		render : function() {
-			var _this = this;
-			function create() {
-				if(_this.maxLength){
-					var pHelp = _this.$el.parent().parent().find('.help-block:not([data-error])').first();
-					pHelp.append("<span class=\"chars-remaining\">" + _this.maxLength + ' characters remaining</span>');
-
-			    _this.$el.keyup(function() {
-			        var text_length = _this.getValue() ? _this.getValue().length : 0;
-			        var text_remaining = _this.maxLength - text_length;
-							var c = text_remaining == 1 ? "character" : "characters"
-					    var $msgElem = _this.$el.parent().parent().find('.chars-remaining');
-							$msgElem.html(text_remaining + ' '+c+' remaining');
-
-							if(text_remaining < 0){
-								$msgElem.addClass('text-danger');
-							}
-							else{
-								$msgElem.removeClass('text-danger');
-							}
-
-			    });
-				}
-			}
-
-			setTimeout(create, 250);
-			return this;
-		}
 	});
 	/*
 	 *  based on typeahead/bloodhound 0.11.1, see
 	 * https://github.com/twitter/typeahead.js
 	 */
-	Calipso.components.backboneform.Typeahead = Backbone.Form.editors.Text.extend({
+	Calipso.components.backboneform.Typeahead = Calipso.components.backboneform.Text.extend({
 		tagName : 'div',
 		//className: "form-control",
 		typeaheadSource : null,
 		minLength: 2,
 		placeholder : "",
 		initialize : function(options) {
-			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
+			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
 			// set the options source
 			if (this.schema && this.schema.typeaheadSource) {
 				this.typeaheadSource = this.schema.typeaheadSource;
@@ -2574,10 +2573,9 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		/**
 		 * Adds the editor to the DOM
 		 */
-		render : function() {
+		onFormAttach : function() {
 			var _this = this;
-			function create() {
-				var $el = _this.$el.find("#" + _this.id);
+			var $el = _this.$el.find("#" + _this.id);
 
 //				var editorAttrs = _this.schema.editorAttrs;
 //				if(editorAttrs){
@@ -2585,19 +2583,19 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 //						$el.attr(this.name, this.value);
 //					});
 //				}
-				$el.typeahead({
-							minLength : _this.minLength,
-							highlight : true,
-							hint : true
-						},
-						_this.typeaheadSource
-				);
-
-			}
-			// apply typeahead after the field has been added to the DOM
-			setTimeout(create, 250);
-			return this;
-		}
+			$el.typeahead({
+						minLength : _this.minLength,
+						highlight : true,
+						hint : true
+					},
+					_this.typeaheadSource
+			);
+		},
+		onBeforeClose : function() {
+			var _this = this;
+			var $el = _this.$el.find("#" + _this.id);
+			this.$el.typeahead("destroy");
+		},
 	});
 	Calipso.components.backboneform.TypeaheadObject = Calipso.components.backboneform.Typeahead.extend({
 		initialize : function(options) {
@@ -2609,40 +2607,35 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		/**
 		 * Adds the editor to the DOM
 		 */
-		render : function() {
+		onFormAttach : function() {
 			var _this = this;
 			var $hidden = _this.$el.find("#" + _this.id);
 			var $el = _this.$el.find("#" + _this.id + "Typeahead");
-			function create() {
 
-//				var editorAttrs = _this.schema.editorAttrs;
-//				if(editorAttrs){
-//					$.each(editorAttrs, function() {
-//						$el.attr(this.name, this.value);
-//					});
-//				}
-				$el.typeahead({
-						minLength : _this.minLength,
-						highlight : true,
-						hint : true
-					},
-					_this.typeaheadSource
-				).on('typeahead:selected', function(e, suggestion, name) {
-					_this.setValue(suggestion, name);
-				});
-				$el.bind('typeahead:change', function(e, query) {
-					_this.setValue(null);
-				});
-				if(_this.value){
-					var val = Calipso.getObjectProperty(_this.value, "id", _this.value);
-					var nameVal = Calipso.getObjectProperty(_this.value, "name");
-					$hidden.val(val);
-					$el.typeahead('val', nameVal);
-				}
+			$el.typeahead({
+					minLength : _this.minLength,
+					highlight : true,
+					hint : true
+				},
+				_this.typeaheadSource
+			).on('typeahead:selected', function(e, suggestion, name) {
+				_this.setValue(suggestion, name);
+			});
+			$el.bind('typeahead:change', function(e, query) {
+				_this.setValue(null);
+			});
+			if(_this.value){
+				var val = Calipso.getObjectProperty(_this.value, "id", _this.value);
+				var nameVal = Calipso.getObjectProperty(_this.value, "name");
+				$hidden.val(val);
+				$el.typeahead('val', nameVal);
 			}
-			// apply typeahead after the field has been added to the DOM
-			setTimeout(create, 250);
-			return this;
+		},
+		onBeforeClose : function() {
+			var _this = this;
+			var $el = _this.$el.find("#" + _this.id + "Typeahead");
+
+			$el.typeahead("destroy");
 		},
 		setValue : function(value, name) {
 			console.log("Calipso.components.backboneform.TypeaheadObject#setValue, value: '" + value + "', name: " + name);
@@ -2666,10 +2659,10 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 	});
 
 	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
-	Calipso.components.backboneform.Datetimepicker = Backbone.Form.editors.Text.extend({
+	Calipso.components.backboneform.Datetimepicker = Calipso.components.backboneform.Text.extend({
 
 		initialize : function(options) {
-			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
+			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
 			// set the options source
 			if (this.schema && this.schema.config) {
 				this.config = this.schema.config;
@@ -2686,26 +2679,23 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 			console.log("callDataFunction:  " + functionName + ", param: " + param);
 			this.$el.data("DateTimePicker")[functionName](param);
 		},
-		render : function() {
-			Backbone.Form.editors.Text.prototype.render.apply(this, arguments);
+		onFormAttach : function() {
 			var _this = this;
-			var doRender = function(){
-				_this.$el.attr('autocomplete','off');
-				_this.$el.parent().addClass("input-group");
-				_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
-				_this.$el.parent().datetimepicker(_this.config);
-				console.log("Calipso.components.backboneform.Datetimepicker#render, _this.value: " + _this.value);
-				var value = _this.schema.fromProperty
-					? _this.model.get(_this.schema.fromProperty)
-					: _this.value;
-				if (value) {
-					var initValue = new Date(value);
-					_this.$el.parent().data("DateTimePicker").date(initValue);
-				}
+			_this.$el.attr('autocomplete','off');
+			_this.$el.parent().addClass("input-group");
+			_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
+			_this.$el.parent().datetimepicker(_this.config);
+			console.log("Calipso.components.backboneform.Datetimepicker#render, _this.value: " + _this.value);
+			var value = _this.schema.fromProperty
+				? _this.model.get(_this.schema.fromProperty)
+				: _this.value;
+			if (value) {
+				var initValue = new Date(value);
+				_this.$el.parent().data("DateTimePicker").date(initValue);
 			}
-			// apply picker after the field has been added to the DOM
-			setTimeout(doRender, 250);
-			return this;
+		},
+		onBeforeClose : function() {
+			this.$el.parent().data("DateTimePicker").destroy();
 		},
 		getValue : function() {
 			return this.$el.parent().data("DateTimePicker").date();
@@ -4369,6 +4359,9 @@ Calipso.model.UserDetailsConfirmationModel.prototype.getItemViewType = function(
 		},
 		socialLogin : function(e) {
 			Calipso.socialLogin(e);
+		},
+		onBeforeDestroy : function(e) {
+			this.form.close();
 		},
 	},
 	// static members
