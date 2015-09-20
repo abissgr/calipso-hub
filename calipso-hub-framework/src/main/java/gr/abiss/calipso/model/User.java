@@ -20,6 +20,7 @@ package gr.abiss.calipso.model;
 
 import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
 import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
+import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
@@ -64,7 +65,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 //@ApiModel(description = "Human users")
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject {
+public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject, PartiallyUpdateable {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 
@@ -86,7 +87,10 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	@Column(name = "user_password")
 	private String password;
-
+	
+	@Transient
+	List<String> changedAttributes = null;
+	
 	@JsonIgnore
 	@Column(name = "confirmation_token")
 	private String confirmationToken;
@@ -467,6 +471,16 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	public List<? extends GrantedAuthority> getRoles() {
 		return this.roles;
 	}
+
+	public List<String> getChangedAttributes() {
+		return changedAttributes;
+	}
+
+	public void setChangedAttributes(List<String> changedAttributes) {
+		this.changedAttributes = changedAttributes;
+	}
+	
+	
 
 //	public LocalRegionMailingAddress getMailingAddress() {
 //		return mailingAddress;

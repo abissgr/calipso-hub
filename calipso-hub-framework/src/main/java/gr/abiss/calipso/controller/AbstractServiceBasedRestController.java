@@ -288,15 +288,15 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
 	//@ApiResponse(code = 200, message = "OK")
 	public T update(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id, @RequestBody T resource) {
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("update, resource: "+resource);
-		}
 		applyCurrentPrincipal(resource);
 		// handle partial updates
 		if(PartiallyUpdateable.class.isAssignableFrom(resource.getClass())){
-			T persisted = this.service.findById(id);
-			this.copyBeanProperties(resource, persisted, ((PartiallyUpdateable) resource ).getChangedAttributes());
-			resource = persisted;
+			List<String> changedAttributes = ((PartiallyUpdateable) resource ).getChangedAttributes();
+			if(CollectionUtils.isNotEmpty(changedAttributes)){
+				T persisted = this.service.findById(id);
+				this.copyBeanProperties(resource, persisted, changedAttributes);
+				resource = persisted;
+			}
 		}
 		return super.update(id, resource);
 	}

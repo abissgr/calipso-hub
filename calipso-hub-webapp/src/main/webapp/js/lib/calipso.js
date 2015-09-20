@@ -1263,9 +1263,14 @@ function(
 			});
 		},
 		sync: function() {
-			// partial update hints
+			// apply partial update hints
 			if(!this.isNew()){
-				this.set("changedAttributes", this.changedAttributes());
+				var changed = this.changedAttributes();
+				//console.log("sync, changed attributes: " + changed);
+				if(changed != false){
+					//console.log(_.keys(changed));
+					this.set("changedAttributes", _.keys(changed));
+				}
 			}
 			return Backbone.Model.prototype.sync.apply(this, arguments);
 		},
