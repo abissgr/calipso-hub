@@ -8,7 +8,7 @@ The Maven modules of this project produce a WAR that can be used as an overlay i
  - Email services with Thymeleaf templates for email verification, password reset etc.
  - CRUD and Search RESTful services for arbitrary Entity Model classes
  - Similarly domain-driven single-page client based on backbone.marionette
- - JPA and NoSQL pesristance
+ - JPA and NoSQL persistence
 
 ## Contents
 
