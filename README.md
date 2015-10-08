@@ -110,19 +110,18 @@ then uncommenting the MySQL section. Other databases can be also be used.
     - [calipso-hub-webapp]: deployable web application (WAR)
 
 
-## Front-end Client
+## Webapp
 
-TThe browser client provides a UI to interact with RESTful services using JSON(P) over HTTP
+TThe browser client in the calipso-hub-webapp module provides WAR that serves a single-page application as the UI to interact with RESTful services using JSON(P) over HTTP. The  module provides components like models, views, controllers and UI elements based on [Backbone], [Marionette] and [Bootstrap]. Dependencies are managed using [RequireJS]. The code is available in the folders under calipso-hub-webapp/src/main/webapp.
 
-### Available APIs
+## Quick tutorial: CRUD and Search for an Entity Model
 
-The calipso-hub-webapp module provides components like models, views, controllers and UI elements based on [Backbone], [Marionette] and [Bootstrap]. Dependencies are managed using [RequireJS]. The code is available in the folders under src/main/webapp.
+This guide will help you create RESTful services and the UI to provide CRUD and Search functionality for an entity model representing a business role and named <code>Role</code>. 
 
-## Service Back-end 
 
-### Create a RESTful service
+## Back-end 
 
-1) Create a domain/entity class, something like:
+1) Create a domain/entity class, something like (Replace:
 
     https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/model/Role.java
 

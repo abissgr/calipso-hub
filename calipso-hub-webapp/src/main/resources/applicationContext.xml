@@ -175,8 +175,5 @@
 	<bean id="appInitializer" class="gr.abiss.calipso.AppInitializer">
     </bean>
     
-    
-    <!-- Include a swagger configuration-->
-    <bean name="/applicationSwaggerConfig" class="gr.abiss.calipso.utils.swagger.ApplicationSwaggerConfig"/>
 
 </beans>

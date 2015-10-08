@@ -19,7 +19,7 @@
 	</properties>
 	<build>
 		<filters>
-            <filter>${project.parent.basedir}/${build.profile.filters}</filter>
+      <filter>${project.parent.basedir}/${build.profile.filters}</filter>
 		</filters>
 		<resources>
 			<resource>
@@ -160,44 +160,42 @@
 
 	<profiles>
 		<profile>
-			<id>optimize</id>
+            <id>prod</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+                <scriptmain>mainmin</scriptmain>
+                <build.profile.filters>${basedir}../	production.properties</build.profile.filters>
+                <jetty.daemon>true</jetty.daemon>
+                <jetty.jvmArgs>-Xms2048m -Xmx5120m -XX:MaxPermSize=512m -XX:-UseParallelGC -Djava.awt.headless=true </jetty.jvmArgs>
+                <requirejs.resources>${project.build.directory}/requirejs/build</requirejs.resources>
+            </properties>
+
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>com.github.mcheely</groupId>
-						<artifactId>requirejs-maven-plugin</artifactId>
-						<version>1.0.4</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>optimize</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<!-- path to optimizer json config file -->
-							<configFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/build-maven-config.js</configFile>
-							<!-- optional path to optimizer executable -->
-							<optimizerFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/r.js</optimizerFile>
-							<!-- whether or not to process config with maven filters -->
-							<filterConfig>true</filterConfig>
-							<!-- Skip requirejs optimization if true -->
-							<skip>false</skip>
-						</configuration>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<version>2.3</version>
-						<configuration>
-							<warSourceExcludes>js/**,css/**</warSourceExcludes>
-							<packagingExcludes>%regex[js/libs/(?!require).*],js/templates/**</packagingExcludes>
-						</configuration>
-					</plugin>
 				</plugins>
 			</build>
 		</profile>
+
+			<profile>
+				<id>local</id>
+				<activation>
+					<file>
+						<exists>${basedir}/../dev.properties</exists>
+					</file>
+				</activation>
+				<properties>
+					<maven.test.skip>true</maven.test.skip>
+          <jetty.daemon>true</jetty.daemon>
+          <jetty.jvmArgs>-XX:MaxPermSize=512m</jetty.jvmArgs>
+          <scriptmain>main</scriptmain>
+					<requirejs.resources>${project.build.directory}/requirejs/source</requirejs.resources>
+					<build.profile.filters>dev.properties</build.profile.filters>
+				</properties>
+			</profile>
 	</profiles>
 
 </project>

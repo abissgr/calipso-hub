@@ -21,27 +21,10 @@ define([ 'calipso' ], function(Calipso) {
 	// static members
 	{
 		parent : Calipso.model.GenericModel,
-	});
-
-	HostModel.prototype.showInMenu = true;
-
-	/**
-	 * Get the model class URL fragment corresponding this class
-	 * @returns the URL path fragment as a string
-	 */
-	HostModel.prototype.getPathFragment = function() {
-		return "hosts";
-	}
-
-	HostModel.prototype.getTypeName = function() {
-		return "HostModel";
-	}
-	HostModel.prototype.getLayoutViewType = function() {
-		return Calipso.view.ModelDrivenSearchLayout
-	}
-	HostModel.prototype.getFormSchemas = function() {
-		console.log("HostModel.prototype.getFormSchemas() called, will return undefined");
-		return {//
+		pathFragment : "hosts",
+		typeName : "HostModel",
+		layoutViewType : Calipso.view.ModelDrivenSearchLayout,
+		formSchemas : {
 			domain : {
 				"search" : 'Text',
 				"default" : {
@@ -49,22 +32,23 @@ define([ 'calipso' ], function(Calipso) {
 					validators : [ 'required' ]
 				}
 			},
-		};
-	}
-	HostModel.prototype.getGridSchema = function() {
-		return [ {
-			name : "domain",
-			label : "domain",
-			editable : false,
-			cell : Calipso.components.backgrid.ViewRowCell
+		},
+		gridSchema : [ 
+			{
+				name : "domain",
+				label : "domain",
+				editable : false,
+				cell : Calipso.components.backgrid.ViewRowCell
+	
+			}, {
+				name : "edit",
+				label : "edit",
+				editable : false,
+				cell : Calipso.components.backgrid.EditRowCell,
+				headerCell : Calipso.components.backgrid.CreateNewHeaderCell
+			} 
+		]
+	});
 
-		}, {
-			name : "edit",
-			label : "edit",
-			editable : false,
-			cell : Calipso.components.backgrid.EditRowCell,
-			headerCell : Calipso.components.backgrid.CreateNewHeaderCell
-		} ];
-	}
 	return HostModel;
 });
