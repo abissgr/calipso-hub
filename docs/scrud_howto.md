@@ -98,8 +98,7 @@ The back-end is composed by your actual entity class and some skeleton code. The
 
 ### Entity
 
-You can implement your entity extending and/or implementing a number of interfaces related to ID type, base your entity in 
-
+You can implement your entity extending and/or implementing a number of base classes and/or interfaces related to ID type, auditing, metadata, partial  updates etc. For example the AbstractSystemUuidPersistable used bellow is a simple JPA @MappedSuperclass that provides a UUID primary key strategy.
 
 ```java
 package gr.abiss.calipsoexample.model;
@@ -127,7 +126,6 @@ public class Book extends AbstractSystemUuidPersistable{
         this.name = name;
     }
 }
-
 ```
 
 ### Repository
