@@ -91,7 +91,7 @@ You can implement your entity extending and/or implementing a number of interfac
 
 
 ```java
-package com.github.mbatsis.booker.model;
+package gr.abiss.calipsoexample.model;
 
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import javax.persistence.Column;
@@ -119,19 +119,105 @@ public class Book extends AbstractSystemUuidPersistable{
 
 ```
 
-2) Create a repository class, something like:
+### Repository
 
-    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/repository/RoleRepository.java
-    
-3) Create a service interface, something like:
+You can implement your repository just by extending the BaseRepository<T, ID> interface, with T and ID being the entity and class respectively. 
 
-    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/service/RoleService.java    
-    
-   
-4) Create a service implementation, something like:
+```java
+package gr.abiss.calipsoexample.repository;
 
-    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/service/impl/RoleServiceImpl.java
+import gr.abiss.calipsoexample.model.Book;
+import gr.abiss.calipso.jpasearch.repository.BaseRepository;
+
+public interface BookRepository extends BaseRepository<Book, String> {
+    // that's all!
+}
+```
+### Service
+
+A service requires both interface and implementation classes. However, no implementation code is actually required.
+
+### Service Interface
+
+Just extend the GenericEntityService<T, ID> interface, with T and ID being the entity and class respectively. 
+
+```java
+package gr.abiss.calipsoexample.service;
+
+import gr.abiss.calipsoexample.model.Book;
+import gr.abiss.calipso.service.GenericEntityService;
+
+public interface BookService extends GenericEntityService<Book, String> {
+
+}
+```
+
+### Service Implementation
+
+```java
+package gr.abiss.calipsoexample.service.impl;
+
+import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import gr.abiss.calipsoexample.model.Book;
+import gr.abiss.calipsoexample.repository.BookRepository;
+import gr.abiss.calipsoexample.service.BookService;
+
+@Named("bookService")
+public class BookServiceImpl extends GenericEntityServiceImpl<Book, String, BookRepository> 
+    implements BookService{
     
+    @Override
+    @Inject
+    @Qualifier("bookRepository")
+    public void setRepository(BookRepository repository) {
+        super.setRepository(repository);
+    }   
+}
+```
+    
+### Controller
+
+Just extend the AbstractServiceBasedRestController<T, ID, S> interface, with T, ID and S being the entity, id and service classes respectively. 
+
+*Note* the convention for the controller request mapping being  "/api/rest/books", with "books" being the Entity URL Fragment.
+
+```java
+package gr.abiss.calipsoexample.controller;
+
+import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import gr.abiss.calipsoexample.model.Book;
+import gr.abiss.calipsoexample.service.BookService;
+
+
+@Controller
+@RequestMapping(value = "/api/rest/books", produces = { "application/json", "application/xml" })
+public class BookController extends AbstractServiceBasedRestController<Book, String, BookService> {
+
+    @Override
+    @Inject
+    @Qualifier("bookService") // somehow required for CDI to work on 64bit JDK?
+    public void setService(BookService service) {
+        this.service = service;
+    }
+    
+}
+```
+
     
 [calipso-hub-framework]:calipso-hub-framework
 [calipso-hub-utilities]:calipso-hub-utilities
