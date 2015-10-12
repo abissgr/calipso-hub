@@ -12,11 +12,15 @@ This guide will help you create CRUD, View and Search services for an entity, al
     - [Update](#update)
     - [Search](#search)
     - [Delete](#delete)
-- [Create the Back-end](#create the-back-end)
+- [Create the Back-End](#create the-back-end)
     - [Entity](#entity)
     - [Repository](#repository)
     - [Service](#service)
     - [Controller](#controller)
+- [Create the Front-End](#create the-front-end)
+    - [Create the Model](#create-the-model)
+    - [Configure the Router](#configure-the-router)
+    - [Test the Interface](#test-the-interface)
 
 ## Service URLs and HTTP methods
 
@@ -83,7 +87,7 @@ DELETE http://localhost:8080/calipso/books/someId
 Delete the book having "someId" as the id value.
 
 
-## Create the Back-end
+## Create the Back-End
 
 The back-end is composed by your actual entity class and some skeleton code. The latter is used to bootstrap the defaults for exposing RESTful services for your entity and provide ways to easily extend with more functionality if needed in any of the following tiers:
 
@@ -225,6 +229,23 @@ public class BookController extends AbstractServiceBasedRestController<Book, Str
     
 }
 ```
+
+### Create Sample Data
+
+
+
+## Create the Front-End
+
+### Create the Model
+
+### Configure the Router
+
+### Test the Interface
+
+#### Search
+
+#### Create/Update
+
 
     
 [calipso-hub-framework]:calipso-hub-framework
