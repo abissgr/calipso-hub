@@ -10,7 +10,7 @@ The Maven modules of this project produce a WAR that can be used as an overlay i
  - Similarly domain-driven single-page client based on backbone.marionette
  - JPA and NoSQL persistence
 
-## Contents
+## Guides
 
-Check out the [Documentation](docs).
-
+- [Checkout and run](checkout_and_build.md)
+- [Create a SCRUD service](scrud_service.md)
