@@ -67,7 +67,7 @@ PUT http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz
 Get a paginated collection of all books matching the given criteria. No actual java implementation is required for your entity models, their properties are dynamically mapped to the HTTP parameters by the default. additionally, the following predefined parameters are supported:
 
 Name       | Required | Default | Description
------------+----------+---------+-------------
+---------- | -------- | ------- | --------------
 page       | false    | 0       | Page number starting from 0 (default)
 size       | false    | 10      | Page size, default to 10
 properties | false    | "id"    | Ordered list of comma-separeted property names used for sorting results. Default is "id"
