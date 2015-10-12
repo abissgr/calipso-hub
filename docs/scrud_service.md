@@ -2,7 +2,7 @@
 # Overview 
 
 
-Or "How to implement CRUD and Search for a new Entity Model".
+Or "How to implement CRUD, View and Search functionality for a new Entity Model".
 
 This guide will help you create CRUD, View and Search services for an entity, along with the Single Page Application as the browser UI to use them. 
 
@@ -13,7 +13,8 @@ This guide will help you create CRUD, View and Search services for an entity, al
     - [Create](#create)
     - [View](#view)
     - [Update](#update)
-    - [Search](#update)
+    - [Search](#search)
+    - [Delete](#delete)
 - [Back-end](#back-end)
     - [Entity class](#entity-class)
 
@@ -23,12 +24,11 @@ Calipso exposes CRUD, View and Search services for entity models in a regular wa
 
 HTTP Method   | HTTP URL | Action
 ------------- | ---------|--------------
-POST          | localhost:8080/calipso/books | Create
-GET           | localhost:8080/calipso/books/someId | View
-PUT           | localhost:8080/calipso/books/someId | Update
-GET           | localhost:8080/calipso/books?foo=bar&foo.subFoo=baz | Search
-DELETE        | localhost:8080/calipso/books/someId | Delete the book having "someId" as the id value
-
+POST          | localhost:8080/calipso/books | [Create](#create)
+GET           | localhost:8080/calipso/books/someId | [View](#view)
+PUT           | localhost:8080/calipso/books/someId | [Update](#update)
+GET           | localhost:8080/calipso/books?foo=bar&foo.subFoo=baz | [Search](#search)
+DELETE        | localhost:8080/calipso/books/someId | [Delete](#delete)
 
 
 ### Create

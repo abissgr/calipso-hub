@@ -1,14 +1,17 @@
-- [Checkout and run](#checkout-and-build)
-    - [Checkout using Eclipse](#checkout-using-eclipse)
-    - [Checkout using the Command Line](#checkout-using-the-command-line)
-    - [Maven build](#maven-build)
-    - [Browse Calipso](#browse-calipso)
-    - [Browse the Database Console](#browse-the-database-console)
-    - [Use a custom database](#use-a-custom-database)
-    
-## Checkout and build
+
+## Overview
 
 To build Calipso you need a Java Development Kit version (1.)7, Git and Apache Maven. Eclipse (Java or JEE) IDE users need EGit and m2eclipse plugins, those are included in Eclipse Java/JEE Luna and above. Read bellow for instructions to checkout the source using eclipse or the command line.
+
+## Contents
+
+- [Checkout using Eclipse](#checkout-using-eclipse)
+- [Checkout using the Command Line](#checkout-using-the-command-line)
+- [Maven build](#maven-build)
+- [Browse Calipso](#browse-calipso)
+- [Browse the Database Console](#browse-the-database-console)
+- [Use a custom database](#use-a-custom-database)
+    
 
 ### Checkout using Eclipse
 
