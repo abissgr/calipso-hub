@@ -479,10 +479,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	public void setChangedAttributes(List<String> changedAttributes) {
 		this.changedAttributes = changedAttributes;
 	}
-
-	public void setRoles(List<Role> roles) {
-		this.roles = roles;
-	}
 	
 	
 

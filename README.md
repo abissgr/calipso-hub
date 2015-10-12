@@ -1,4 +1,24 @@
 
+## Overview
+
+The Maven modules of this project produce a WAR that can be used as an overlay in your project. The artifact makes it easy to quickly prototype the full stack of a Spring application and provides many ready to use features such as:
+
+ - Authentication and authorization services, including RESTful Single Sign On
+ - OAuth integration with social netorks (facebook, linkedin, google+ etc.), including implicit sign-in and transparent user registration
+ - Email services with Thymeleaf templates for email verification, password reset etc.
+ - CRUD and Search RESTful services for arbitrary Entity Model classes
+ - Similarly domain-driven single-page client based on backbone.marionette
+ - JPA and NoSQL persistence
+
+## Contents
+
+- [Checkout and run](#checkout-and-run)
+    - [Checkout using Eclipse](#checkout-using-eclipse)
+    - [Checkout using the Command Line](#checkout-using-the-command-line)
+    - [Maven build](#maven-build)
+    - [Browse Calipso](#browse-calipso)
+    - [Browse the Database Console](#browse-the-database-console)
+    - [Use a custom database](#use-a-custom-database)
 - [Developer Guide](#developer-guide)
     - [Modules](#modules)
     - [Front-end Client](#front-end-client)
@@ -7,6 +27,94 @@
         - [Create a RESTful service](#create-a-restful-service)
 
 
+## Checkout and run
+
+To build Calipso you need a Java Development Kit version (1.)7, Git and Apache Maven. Eclipse (Java or JEE) IDE users need EGit and m2eclipse plugins, those are included in Eclipse Java/JEE Luna and above. Read bellow for instructions to checkout the source using eclipse or the command line.
+
+### Checkout using Eclipse
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/010_import_dialog.png)
+
+Right-click in Eclipse's Package/Project Explorer and click Import, then choose Git > Projects from Git
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/011_clone_uri.png)
+
+Select the "Clone URI" option, then click "Next"
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/012_import_from_git.png)
+
+Enter https://github.com/abissgr/calipso-hub.git as the clone URI
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/014_local_dest.png)
+
+Select your local files location (independent to your Eclipse workspace)
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/015_wizard.png)
+
+Select the "Import as general project" wizard
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/016_project_name.png)
+
+Use "calipso-hub" as the project name
+
+![alt tag](https://github.com/abissgr/calipso-hub/blob/master/src/main/site/img/readme/017_import_existing_maven.png)
+
+Right click on the "calipso-hub" then click on "Import". Choose "Existing Maven projects". Browse to the project folder for eclipse to discover the maven submodules, then click "Finish".
+
+
+### Checkout using the Command Line
+
+See https://help.github.com/articles/importing-a-git-repository-using-the-command-line/
+ 
+### Maven build 
+
+[![Build Status](https://travis-ci.org/abissgr/calipso-hub.png?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
+
+To build Calipso you need a Java Development Kit(JDK7 ) and Apache Maven installed. 
+
+1) Change to the root project directory:
+
+    $ cd calipso-hub
+
+2) Rename HOWTO.txt to dev.properties and (optionally) edit it: 
+
+    $ mv HOWTO.txt dev.properties
+
+3) Build the project 
+
+    $ mvn clean install
+
+4) Change to webapp module directory 
+
+    $ cd calipso-hub-webapp
+
+5) Start the Jetty server 
+
+    $ mvn clean install jetty:run
+    
+Note: If you get a <code>[ERROR] No plugin found for prefix 'jetty' in the current project and in the plugin groups </code> you probably forgot step 4 above.
+
+    
+## Browse Calipso
+
+After you complete the steps above, you can access Calipso using your web browser: 
+
+    http://localhost:8080/calipso
+    
+## Browse the Database Console 
+
+By default, Calipso uses H2, an in-memory database that works great for development.
+A fresh copy is created with test data each time you start Jetty using mvn:run. 
+The database console is available at: 
+
+	http://localhost:8080/calipso/console/database/
+	
+
+## Use a custom database 
+
+You can use a database like MySQL by commenting out the H2 database section in your dev.properties, 
+then uncommenting the MySQL section. Other databases can be also be used.  
+    
 # Developer Guide
 
 ## Modules
@@ -15,116 +123,22 @@
     - [calipso-hub-utilities]: utility components
     - [calipso-hub-webapp]: deployable web application (WAR)
 
-TThe browser client in the calipso-hub-webapp module provides WAR that serves a single-page application as the UI to interact with RESTful services using JSON(P) over HTTP. The  module provides components like models, views, controllers and UI elements based on [Backbone], [Marionette] and [Bootstrap]. Dependencies are managed using [RequireJS]. The code is available in the folders under calipso-hub-webapp/src/main/webapp.
 
-## Service URLs and HTTP methods
+## Front-end Client
 
-Calipso exposes CRUD, View and Search services for entity models in a regular way. Consider the RESTful URLs for an entity model representing a book. The <e>Entity URL Fragment</e> for that would be "books". Bellow are the service URLs for that EUF.
+TThe browser client provides a UI to interact with RESTful services using JSON(P) over HTTP
 
-HTTP Method   | HTTP URL | Action
-------------- | ---------|--------------
-POST          | localhost:8080/calipso/books | Create
-GET           | localhost:8080/calipso/books/someId | View
-PUT           | localhost:8080/calipso/books/someId | Update
-GET           | localhost:8080/calipso/books?foo=bar&foo.subFoo=baz | Search
-DELETE        | localhost:8080/calipso/books/someId | Delete the book having "someId" as the id value
+### Available APIs
 
+The calipso-hub-webapp module provides components like models, views, controllers and UI elements based on [Backbone], [Marionette] and [Bootstrap]. Dependencies are managed using [RequireJS]. The code is available in the folders under src/main/webapp.
 
+## Service Back-end 
 
-### Create
+### Create a RESTful service
 
-```
-POST http://localhost:8080/calipso/books
-```
+1) Create a domain/entity class, something like:
 
-Create a new book using the request body and return it in the response.
-
-
-### View
-
-```
-GET http://localhost:8080/calipso/books/someId
-```
-
-Find the book having "someId" as the id value and return it in the response. Throw an 404 HTTP error if no match is found.
-
-
-### Update
-
-```
-PUT http://localhost:8080/calipso/books/someId
-```
-
-Update the book with id "someId" using the request body and return the result in the response. Partial updates are easily supported, just mark your Java entity class using <code>implements PartiallyUpdateable</code> to support partial updates. No actual implementation is needed. 
-
-
-### Search
-
-```
-PUT http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz
-```
-
-Get a paginated collection of all books matching the given criteria. No actual java implementation is required for your entity models, their properties are dynamically mapped to the HTTP parameters by the default. additionally, the following predefined parameters are supported:
-
-Name       | Required | Default | Description
------------+----------+---------+-------------
-page       | false    | 0       | Page number starting from 0 (default)
-size       | false    | 10      | Page size, default to 10
-properties | false    | "id"    | Ordered list of comma-separeted property names used for sorting results. Default is "id"
-direction  | false    | "ASC"   | Optional sort direction, either "ASC" or "DESC". Default is "ASC".
-
-
-### Delete
-
-```
-DELETE http://localhost:8080/calipso/books/someId
-```
-
-Delete the book having "someId" as the id value.
-
-
-## Quick tutorial
-
-Or "How to implement CRUD and Search for a new Entity Model".
-
-This guide will help you create RESTful services and the UI to provide CRUD and Search functionality for an entity model representing a business role and named <code>Role</code>. 
-
-
-## Back-end 
-
-### Entity class
-
-You can implement your entity extending and/or implementing a number of interfaces related to ID type, base your entity in 
-
-
-```java
-package com.github.mbatsis.booker.model;
-
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "book")
-public class Book extends AbstractSystemUuidPersistable{
-    
-    @Column(length = 500, nullable = false)
-    private String name;
-    
-    public Book() {
-        super();
-    }
-
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-}
-
-```
+    https://github.com/abissgr/calipso-hub/blob/master/calipso-hub-framework/src/main/java/gr/abiss/calipso/model/Role.java
 
 2) Create a repository class, something like:
 

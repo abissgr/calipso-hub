@@ -103,11 +103,13 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 	 * REST webservice published : GET
 	 * /search?page=0&size=20&properties=sortPropertyName&direction=asc
 	 * 
-	 * @param page Page number starting from 0 (default)
-	 * @param size Page size, default to 10
-	 * @param properties Ordered list of comma-separeted property names used for sorting results. Default is "id" 
-	 * @param direction Optional sort direction, either "ASC" or "DESC". Default is "ASC"
-     * @return OK http status code if the request has been correctly processed, with the a paginated collection of all resource enclosed in the body.
+	 * @param page
+	 *            Page number starting from 0 (default)
+	 * @param size
+	 *            Number of resources by pages. default to 10
+	 * @return OK http status code if the request has been correctly processed,
+	 *         with the a paginated collection of all resource enclosed in the
+	 *         body.
 	 */
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
