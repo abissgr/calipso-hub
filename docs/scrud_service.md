@@ -15,8 +15,11 @@ This guide will help you create CRUD, View and Search services for an entity, al
     - [Update](#update)
     - [Search](#search)
     - [Delete](#delete)
-- [Back-end](#back-end)
-    - [Entity class](#entity-class)
+- [Create the Back-end](#create the-back-end)
+    - [Entity](#entity)
+    - [Repository](#repository)
+    - [Service](#service)
+    - [Controller](#controller)
 
 ## Service URLs and HTTP methods
 
@@ -83,16 +86,16 @@ DELETE http://localhost:8080/calipso/books/someId
 Delete the book having "someId" as the id value.
 
 
-## Back-end 
+## Create the Back-end
 
-The backend is composed by your actual entity class and some skeleton code. The latter is used to bootstrap the defaults for exposing RESTful services for your entity and provide ways to easily extend with more functionality if needed in any of the following tiers:
+The back-end is composed by your actual entity class and some skeleton code. The latter is used to bootstrap the defaults for exposing RESTful services for your entity and provide ways to easily extend with more functionality if needed in any of the following tiers:
 
 * Repository: Provides the persistence tier, supports relational databased via JPA and NoSQL stores like ElasticSearch and MongoDB 
 * Service: Provides a tier for business logic
 * Controller: Per MVC, provides the web tier through RESTful services
 
 
-### Entity class
+### Entity
 
 You can implement your entity extending and/or implementing a number of interfaces related to ID type, base your entity in 
 
