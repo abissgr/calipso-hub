@@ -1,7 +1,10 @@
 
-# How to implement CRUD, View and Search for a new Entity Model
+# Howto: CRUD, View and Search for a new Entity Model
 
-This guide will help you create CRUD, View and Search services for an entity, along with the Single Page Application as the browser UI to use them. 
+This guide will only take a few minutes. After completion, you will have produced:
+
+- CRUD, View and Search services for your entity class
+- The client-side UI to use them through any modern. 
 
 
 ## Contents
