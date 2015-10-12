@@ -61,7 +61,7 @@ Update the book with id "someId" using the request body and return the result in
 ### Search
 
 ```
-PUT http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz
+GET http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz
 ```
 
 Get a paginated collection of all books matching the given criteria. No actual java implementation is required for your entity models, their properties are dynamically mapped to the HTTP parameters by the default. additionally, the following predefined parameters are supported:
@@ -84,6 +84,13 @@ Delete the book having "someId" as the id value.
 
 
 ## Back-end 
+
+The backend is composed by your actual entity class and some skeleton code. The latter is used to bootstrap the defaults for exposing RESTful services for your entity and provide ways to easily extend with more functionality if needed in any of the following tiers:
+
+* Repository: Provides the persistence tier, supports relational databased via JPA and NoSQL stores like ElasticSearch and MongoDB 
+* Service: Provides a tier for business logic
+* Controller: Per MVC, provides the web tier through RESTful services
+
 
 ### Entity class
 
@@ -133,11 +140,12 @@ public interface BookRepository extends BaseRepository<Book, String> {
     // that's all!
 }
 ```
+
 ### Service
 
 A service requires both interface and implementation classes. However, no implementation code is actually required.
 
-### Service Interface
+#### Service Interface
 
 Just extend the GenericEntityService<T, ID> interface, with T and ID being the entity and class respectively. 
 
@@ -152,7 +160,7 @@ public interface BookService extends GenericEntityService<Book, String> {
 }
 ```
 
-### Service Implementation
+#### Service Implementation
 
 ```java
 package gr.abiss.calipsoexample.service.impl;
