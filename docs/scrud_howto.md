@@ -17,7 +17,7 @@ This guide will help you create CRUD, View and Search services for an entity, al
     - [Repository](#repository)
     - [Service](#service)
     - [Controller](#controller)
-- [Create the Front-End](#create the-front-end)
+- [Create the Front-End](#create-the-front-end)
     - [Create the Model](#create-the-model)
     - [Configure the Router](#configure-the-router)
     - [Test the Interface](#test-the-interface)
