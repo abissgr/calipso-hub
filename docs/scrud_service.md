@@ -17,7 +17,7 @@ This guide will help you create CRUD, View and Search services for an entity, al
         - [Update](#update)
         - [Search](#update)
     - [Back-end](#back-end)
-        - [Entity class](#entity-classe)
+        - [Entity class](#entity-class)
 
 ## Modules
 - calipso-hub (this one)
