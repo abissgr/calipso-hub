@@ -29,4 +29,4 @@ TThe browser client in the calipso-hub-webapp module provides WAR that serves a 
 ## Guides
 
 - [Checkout and run](checkout_and_build.md)
-- [Create a SCRUD service](scrud_service.md)
+- [How to implement CRUD, View and Search for a new Entity Model](scrud_howto.md)

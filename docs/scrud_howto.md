@@ -1,8 +1,5 @@
 
-# Overview 
-
-
-Or "How to implement CRUD, View and Search functionality for a new Entity Model".
+# How to implement CRUD, View and Search for a new Entity Model
 
 This guide will help you create CRUD, View and Search services for an entity, along with the Single Page Application as the browser UI to use them. 
 
