@@ -9,23 +9,13 @@ This guide will help you create CRUD, View and Search services for an entity, al
 
 ## Contents
 
-- [Developer Guide](#developer-guide)
-    - [Modules](#modules)
-    - [Service URLs and HTTP methods](#service-urls-and-http-methods)
-        - [Create](#create)
-        - [View](#view)
-        - [Update](#update)
-        - [Search](#update)
-    - [Back-end](#back-end)
-        - [Entity class](#entity-class)
-
-## Modules
-- calipso-hub (this one)
-    - [calipso-hub-framework]: development framework components
-    - [calipso-hub-utilities]: utility components
-    - [calipso-hub-webapp]: deployable web application (WAR)
-
-TThe browser client in the calipso-hub-webapp module provides WAR that serves a single-page application as the UI to interact with RESTful services using JSON(P) over HTTP. The  module provides components like models, views, controllers and UI elements based on [Backbone], [Marionette] and [Bootstrap]. Dependencies are managed using [RequireJS]. The code is available in the folders under calipso-hub-webapp/src/main/webapp.
+- [Service URLs and HTTP methods](#service-urls-and-http-methods)
+    - [Create](#create)
+    - [View](#view)
+    - [Update](#update)
+    - [Search](#update)
+- [Back-end](#back-end)
+    - [Entity class](#entity-class)
 
 ## Service URLs and HTTP methods
 
