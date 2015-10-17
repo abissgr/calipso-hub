@@ -23,9 +23,9 @@ This guide will only take a few minutes. After completion, you will have produce
     - [Initialize Sample Data](#initialize-sample-data)
 - [Create the Front-End](#create-the-front-end)
     - [Create the Model](#create-the-model)
-    - [Model Configuration](#model-configuration)
     - [Configure the Router](#configure-the-router)
     - [Test the Interface](#test-the-interface)
+    - [Advanced Model Configuration](#advanced-model-configuration)
 
 ## Service URLs and HTTP methods
 
