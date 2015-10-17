@@ -1,5 +1,5 @@
 
-# Howto: CRUD, View and Search for a new Entity Model
+# Howto: CRUD, View and Search for your Entity Model
 
 This guide will only take a few minutes. After completion, you will have produced:
 
@@ -20,6 +20,7 @@ This guide will only take a few minutes. After completion, you will have produce
     - [Repository](#repository)
     - [Service](#service)
     - [Controller](#controller)
+    - [Initialize Sample Data](#initialize-sample-data)
 - [Create the Front-End](#create-the-front-end)
     - [Create the Model](#create-the-model)
     - [Configure the Router](#configure-the-router)
@@ -171,12 +172,9 @@ public interface BookService extends GenericEntityService<Book, String> {
 package gr.abiss.calipsoexample.service.impl;
 
 import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.springframework.beans.factory.annotation.Qualifier;
-
 import gr.abiss.calipsoexample.model.Book;
 import gr.abiss.calipsoexample.repository.BookRepository;
 import gr.abiss.calipsoexample.service.BookService;
@@ -206,15 +204,11 @@ package gr.abiss.calipsoexample.controller;
 import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import gr.abiss.calipsoexample.model.Book;
-import gr.abiss.calipsoexample.service.BookService;
+import com.github.mbatsis.booker.model.Book;
+import com.github.mbatsis.booker.service.BookService;
 
 
 @Controller
@@ -223,15 +217,15 @@ public class BookController extends AbstractServiceBasedRestController<Book, Str
 
     @Override
     @Inject
-    @Qualifier("bookService") // somehow required for CDI to work on 64bit JDK?
+    @Qualifier("bookService")
     public void setService(BookService service) {
         this.service = service;
-    }
-    
+    } 
 }
+
 ```
 
-### Create Sample Data
+### Initialize Sample Data
 
 
 
