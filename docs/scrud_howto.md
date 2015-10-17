@@ -345,19 +345,19 @@ Hit http://localhost:8080/eclipseexample/client/books?page=0&size=10
 
 ### Advanced Model Configuration
 
-The following is a list of static model type members used to configure the UI.
+The following is a list of static model type members used to configure the UI. You can also override the static getter for each of the following if the declarative approach is not sufficient for your needs.
 
 Static member | Description
 -------------- | ---------|--
+pathFragment   | The model type's <e>Entity URL Fragment</e>, e.gl "books", "users" etc.
 typeName       | The model type as a string, e.g. "Calipso.model.GenericModel"
 label          | A descriptive label, e.g. "generic model"
 public         | Whether the routes arew public by default, default is false 
-businessKey    |  The model identifier. The identifier may be either a primary or business key, depending on your server side implementation. The default property name in client side models is "name". You can override GenericModel.businessKey to define another property name.
-layoutViewType | The LayoutView type for this model 
-layoutOptions  | The options to pass in the model LayoutView 
-collectionViewType | The CollectionView type for this model 
-itemViewType   | The ItemView type for this model 
-reportViewType | The Report View type for this model 
+businessKey    |  The model identifier. The identifier may be either a primary or business key, depending on yourYou can override GenericModel.businessKey to define another property name.
+layoutViewType | The LayoutView type for this model. The default is Calipso.view.ModelDrivenSearchLayout.
+collectionViewType | The CollectionView type for this model. The default is Calipso.view.ModelDrivenCollectionGridView.
+itemViewType   | The ItemView type for this model. The default is Calipso.view.GenericFormView.
+reportViewType | The Report View type for this model. The default is Calipso.view.ModelDrivenReportView.
 
     
 [calipso-hub-framework]:calipso-hub-framework
