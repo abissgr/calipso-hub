@@ -305,13 +305,10 @@ define([ 'calipso' ], function(Calipso) {
         getGridSchema : function() {
             return [ {
                 name : "name",
-                label : "name",
                 editable : false,
                 cell : Calipso.components.backgrid.ViewRowCell
             }, {
                 name : "edit",
-                label : "edit",
-                editable : false,
                 cell : Calipso.components.backgrid.EditRowInModalCell,
                 headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
             } ];
@@ -337,8 +334,13 @@ Add the following line in src/main/webapp/js/modules-config.js:
 
 #### Search
 
+Hit http://localhost:8080/eclipseexample/client/books?page=0&size=10
+
+<img src="img/book-scrud-searchform.png" />
+
 #### Create/Update
 
+<img src="img/book-scrud-editform.png" />
 
     
 [calipso-hub-framework]:calipso-hub-framework
