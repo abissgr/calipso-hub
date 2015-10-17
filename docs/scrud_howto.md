@@ -336,7 +336,7 @@ Add the following line in src/main/webapp/js/modules-config.js:
 
 Hit http://localhost:8080/eclipseexample/client/books?page=0&size=10
 
-<img src="img/book-scrud-searchform.png" />
+<img src="img/book-scrud-searchview.png" />
 
 #### Create/Update
 
