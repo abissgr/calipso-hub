@@ -345,7 +345,7 @@ Hit http://localhost:8080/eclipseexample/client/books?page=0&size=10
 
 ### Advanced Model Configuration
 
-The following is a list of static model type members used to configure the UI. You can also override the static getter for each of the following if the declarative approach is not sufficient for your needs.
+The following is a list of **static** model type members used to configure the UI. You can also override the static getter for each of the following if the declarative approach is not sufficient for your needs.
 
 Static member | Description
 -------------- | ---------|--
