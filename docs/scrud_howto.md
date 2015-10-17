@@ -250,7 +250,10 @@ public class BookerInitializer extends AppInitializer {
 
     @PostInitialize
     public void init() {
-        String[] titles = {"Clash of the Saga", "The 10th Game", "Hell Mirror", "Everlasting Giant", "Mega Gamer", "Day Jupiter"};
+        String[] titles = {"Clash of the Saga", "The 10th Game", 
+                "Hell Mirror", "Everlasting Giant", "Mega Gamer", "Day Jupiter", 
+                "District Revenge", "The Extraordinary Zombie", "Dragon Raider", 
+                "Heaven Castle", "District Earth", "Heaven Shuttle"};
         //create the books
         for(String title : titles){
             Book book = new Book();
@@ -267,6 +270,9 @@ For the front implementation you only have to create and register a model type. 
 
 
 ### Create the Model
+
+Add a JS file for the model, e.g. src/main/webapp/js/model/BookModel.js:
+
 ```js
 define([ 'calipso' ], function(Calipso) {
     var BookModel = Calipso.model.GenericModel.extend({},
@@ -277,9 +283,9 @@ define([ 'calipso' ], function(Calipso) {
         typeName : "BookModel",
         layoutViewType : Calipso.view.ModelDrivenSearchLayout,
         getFormSchemas : function() {
-            console.log("BookModel.getFormSchemas() called, will return undefined");
-            return {//
+            return {
                 name : {
+                    // use typeaghead-based autocomplete for search forms
                     "search" : {
                         name: "name",
                         type : Calipso.components.backboneform.Typeahead, //'Text'
@@ -318,6 +324,14 @@ define([ 'calipso' ], function(Calipso) {
 
 
 ### Configure the Router
+
+Add the following line in src/main/webapp/js/modules-config.js:
+
+```js
+    // Dont forget to import BookModel in define()
+    Calipso.customModel[BookModel.getPathFragment()] = BookModel;
+```
+
 
 ### Test the Interface
 
