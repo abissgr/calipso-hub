@@ -23,6 +23,7 @@ This guide will only take a few minutes. After completion, you will have produce
     - [Initialize Sample Data](#initialize-sample-data)
 - [Create the Front-End](#create-the-front-end)
     - [Create the Model](#create-the-model)
+    - [Model Configuration](#model-configuration)
     - [Configure the Router](#configure-the-router)
     - [Test the Interface](#test-the-interface)
 
@@ -319,7 +320,6 @@ define([ 'calipso' ], function(Calipso) {
 
 ```
 
-
 ### Configure the Router
 
 Add the following line in src/main/webapp/js/modules-config.js:
@@ -341,6 +341,23 @@ Hit http://localhost:8080/eclipseexample/client/books?page=0&size=10
 #### Create/Update
 
 <img src="img/book-scrud-editform.png" />
+
+
+### Advanced Model Configuration
+
+The following is a list of static model type members used to configure the UI.
+
+Static member | Description
+-------------- | ---------|--
+typeName       | The model type as a string, e.g. "Calipso.model.GenericModel"
+label          | A descriptive label, e.g. "generic model"
+public         | Whether the routes arew public by default, default is false 
+businessKey    |  The model identifier. The identifier may be either a primary or business key, depending on your server side implementation. The default property name in client side models is "name". You can override GenericModel.businessKey to define another property name.
+layoutViewType | The LayoutView type for this model 
+layoutOptions  | The options to pass in the model LayoutView 
+collectionViewType | The CollectionView type for this model 
+itemViewType   | The ItemView type for this model 
+reportViewType | The Report View type for this model 
 
     
 [calipso-hub-framework]:calipso-hub-framework
