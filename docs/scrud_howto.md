@@ -207,8 +207,8 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.github.mbatsis.booker.model.Book;
-import com.github.mbatsis.booker.service.BookService;
+import gr.abiss.calipsoexample.model.Book;
+import gr.abiss.calipsoexample.service.BookService;
 
 
 @Controller
@@ -227,11 +227,95 @@ public class BookController extends AbstractServiceBasedRestController<Book, Str
 
 ### Initialize Sample Data
 
+```java
+package gr.abiss.calipsoexample.init;
 
+import gr.abiss.calipso.AppInitializer;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.resthub.common.util.PostInitialize;
+
+import gr.abiss.calipsoexample.model.Book;
+import gr.abiss.calipsoexample.service.BookService;
+
+
+@Named("bookerInitializer")
+public class BookerInitializer extends AppInitializer {
+
+    @Inject
+    @Named("bookService")
+    private BookService bookService;
+
+    @PostInitialize
+    public void init() {
+        String[] titles = {"Clash of the Saga", "The 10th Game", "Hell Mirror", "Everlasting Giant", "Mega Gamer", "Day Jupiter"};
+        //create the books
+        for(String title : titles){
+            Book book = new Book();
+            book.setName(title);
+            book = this.bookService.create(book);
+        }
+    };
+}
+```
 
 ## Create the Front-End
+.
+For the front implementation you only have to create and register a model type. The MVC route/URL is dynamic and conventional, so you don't need to define any. You also don't have to create any views etc. for your model type unless you want to override the defailt rendering strategies.
+
 
 ### Create the Model
+```js
+define([ 'calipso' ], function(Calipso) {
+    var BookModel = Calipso.model.GenericModel.extend({},
+    // static members
+    {
+        parent : Calipso.model.GenericModel,
+        pathFragment : "books",
+        typeName : "BookModel",
+        layoutViewType : Calipso.view.ModelDrivenSearchLayout,
+        getFormSchemas : function() {
+            console.log("BookModel.getFormSchemas() called, will return undefined");
+            return {//
+                name : {
+                    "search" : {
+                        name: "name",
+                        type : Calipso.components.backboneform.Typeahead, //'Text'
+                        typeaheadSource : {
+                            displayKey : "name",
+                            source: BookModel.getTypeaheadSource({query: "?name=%25wildcard%25"}),
+                        }
+                    },
+                    "default" : {
+                        name: "name",
+                        type : 'Text',
+                        validators : [ 'required' ]
+                    }
+                },
+            };
+        },
+        getGridSchema : function() {
+            return [ {
+                name : "name",
+                label : "name",
+                editable : false,
+                cell : Calipso.components.backgrid.ViewRowCell
+            }, {
+                name : "edit",
+                label : "edit",
+                editable : false,
+                cell : Calipso.components.backgrid.EditRowInModalCell,
+                headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
+            } ];
+        }
+    });
+    return BookModel;
+});
+
+```
+
 
 ### Configure the Router
 
