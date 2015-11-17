@@ -123,8 +123,8 @@ public class AppInitializer {
 			textService.create(t3);
 			
 			User u0 = new User("info@abiss.gr");
-			u0.setFirstName("admin");
-			u0.setLastName("user");
+			u0.setFirstName("Admin");
+			u0.setLastName("User");
 			u0.setUsername("admin");
 			u0.setPassword("admin");
 			u0.setLastVisit(now);

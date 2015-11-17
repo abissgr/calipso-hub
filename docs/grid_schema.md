@@ -358,8 +358,8 @@ layoutViewType | The LayoutView type for this model. The default is Calipso.view
 collectionViewType | The CollectionView type for this model. The default is Calipso.view.ModelDrivenCollectionGridView.
 itemViewType   | The ItemView type for this model. The default is Calipso.view.GenericFormView.
 reportViewType | The Report View type for this model. The default is Calipso.view.ModelDrivenReportView.
-gridSchema     | The [grid schemas] columns schema 
-formsSchema    | The [form schemas]. 
+gridSchema     | The [Backgrid] columns schema 
+formsSchema    | The form schemas. Those are based on [Backbone Forms], only for each field a different schema applied for different acions (search, create etc.)
 
     
 [calipso-hub-framework]:calipso-hub-framework
@@ -369,7 +369,7 @@ formsSchema    | The [form schemas].
 [Marionette]:http://marionettejs.com
 [Bootstrap]:http://getbootstrap.com
 [RequireJS]:http://requirejs.org
-[grid schemas]:http://backgridjs.com
-[form schemas]:form_schemas.md
+[Backgrid]:http://backgridjs.com
+[Backbone Forms]:https://github.com/powmedia/backbone-forms
 
     

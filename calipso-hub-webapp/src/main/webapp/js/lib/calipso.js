@@ -5181,16 +5181,16 @@ function(
 		 * @param  {Calipso.view.MainLayout]} the layout type to use. If absent the method will
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
-		showLayoutForModel : function(givenModel, GivenModelLayoutType){
+		showLayoutForModel : function(givenModel, ViewType, viewOptions){
+			viewOptions || (viewOptions = {});
+			viewOptions.model = givenModel;
 			// make sure to choose a layout type
-			if(!GivenModelLayoutType){
-				GivenModelLayoutType = givenModel.getLayoutViewType();
+			if(!ViewType){
+				ViewType = givenModel.getLayoutViewType();
 			}
 			// instantiate and show the layout
-			var layout = new GivenModelLayoutType({
-				model : givenModel
-			});
-			Calipso.vent.trigger("app:show", layout);
+			var view = new ViewType(viewOptions);
+			Calipso.vent.trigger("app:show", view);
 		},
 		/**
 		 * Get the model type corresponding to the given
@@ -5325,24 +5325,36 @@ function(
 					}
 					collectionOptions.data = httpParams;
 				}
-				var reporDataSetCollection = Calipso.util.cache.getCollection(collectionOptions);
 
-				// fetch and render report
-				var renderFetchable = function() {
-					// console.log("AbstractController#mainNavigationReportRoute calling showLayoutForModel");
-					// show the layout type corresponding to the requested model
-					reportModel.wrappedCollection = reporDataSetCollection;
-					_self.showLayoutForModel(reportModel);
-				};
-				// console.log("AbstractController#mainNavigationReportRoute calling reporDataSetCollection.fetch");
-				reporDataSetCollection.fetch({
-					//url : collectionUrl,
-					data : reporDataSetCollection.data
-				}).then(renderFetchable);
+				reportModel.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);;
+				this.renderFetchable(reportModel);
 
 			}
 
 		},
+		renderFetchable : function(model, ViewType, viewOptions){
+			var _self = this;
+			var fetchable = model.wrappedCollection ? model.wrappedCollection : model;
+			var skipDefaultSearch = model.skipDefaultSearch &&  model.wrappedCollection.hasCriteria();
+			// promise to fetch then render
+			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
+			var renderFetchable = function() {
+
+				// show the layout type corresponding to the requested model
+				_self.showLayoutForModel(model, ViewType, viewOptions);
+
+				// update page header tabs etc.
+				_self.syncMainNavigationState(model);
+			};
+			if (!skipDefaultSearch && fetchable.length == 0) {
+				fetchable.fetch({
+					data : fetchable.data
+				}).then(renderFetchable);
+			} else {
+				renderFetchable();
+			}
+		},
+
 		/**
 		 *
 		 */
@@ -5368,26 +5380,7 @@ function(
 				return this._redir("login");
 			}
 			var modelForRoute = this.getModelForRoute(ModelType, modelId, httpParams);
-			// decide whether we are fetching a model or a collection
-			var fetchable = modelForRoute.get("id") ? modelForRoute : modelForRoute.wrappedCollection;
-			var skipDefaultSearch = modelForRoute.skipDefaultSearch &&  modelForRoute.wrappedCollection.hasCriteria();
-			// promise to fetch then render
-			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
-			var renderFetchable = function() {
-
-				// show the layout type corresponding to the requested model
-				_self.showLayoutForModel(modelForRoute);
-
-				// update page header tabs etc.
-				_self.syncMainNavigationState(modelForRoute);
-			};
-			if (!skipDefaultSearch && fetchable.length == 0) {
-				fetchable.fetch({
-					data : fetchable.data
-				}).then(renderFetchable);
-			} else {
-				renderFetchable();
-			}
+			this.renderFetchable(modelForRoute);
 		},
 		notFoundRoute : function() {
 			// build the model instancde representing the current request
