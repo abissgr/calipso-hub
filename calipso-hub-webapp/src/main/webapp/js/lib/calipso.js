@@ -1117,7 +1117,6 @@ function(
 		 * @see {@link Calipso.model.GenericModel.getItemViewType}
 		 */
 		getItemViewType : function() {
-
 			// console.log("GenericModel.getItemViewType() called, will return GenericFormView");
 			return this.constructor.getItemViewType(this);
 		},
@@ -1648,7 +1647,8 @@ function(
 			"click" : "viewRow"
 		},
 		viewRow : function(e) {
-			// console.log("ViewRowCell#viewRow, rowModel: " + this.model.getTypeName());
+			console.log("ViewRowCell#viewRow, rowModel type: " + this.model.getTypeName());
+			console.log("ViewRowCell#viewRow, this.viewRowEvent: " + this.viewRowEvent);
 			Calipso.stopEvent(e);
 			Calipso.vent.trigger(this.viewRowEvent, this.model);
 		},
@@ -2953,15 +2953,17 @@ function(
 			console.log("Calipso.view.ModelDrivenBrowseLayout#onGenericShowContent");
 			this.showContent(model);
 		},
-		showItemViewForModel : function(itemModel, formSchemaKey) {
+		showItemViewForModel : function(options) {
 			console.log("Calipso.view.ModelDrivenBrowseLayout#showItemViewForModel");
+			var itemModel = options.model;
+			var formSchemaKey = options.formSchemaKey;
 			if (!formSchemaKey) {
 				formSchemaKey = "view";
 			}
 			//  get item view type for model
+			console.log(itemModel);
+			console.log("Calipso.view.ModelDrivenBrowseLayout#showItemViewForModel, view type: " + itemModel.getTypeName());
 			var ItemViewType = itemModel.getItemViewType();
-				console.log("Calipso.view.ModelDrivenBrowseLayout#showItemViewForModel, view type: " + ItemViewType.getTypeName());
-			console.log();
 			// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
 			// create new item view instance with model
 			var childView = new ItemViewType({
