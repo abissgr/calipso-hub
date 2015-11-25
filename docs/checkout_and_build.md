@@ -97,3 +97,7 @@ The database console is available at:
 You can use a database like MySQL by commenting out the H2 database section in your dev.properties, 
 then uncommenting the MySQL section. Other databases can be also be used.  
     
+    
+## Add a Service
+
+See [How to implement CRUD, View and Search for a new Entity Model](scrud_howto.md)
