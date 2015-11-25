@@ -26,6 +26,8 @@ This guide will only take a few minutes. After completion, you will have produce
     - [Configure the Router](#configure-the-router)
     - [Test the Interface](#test-the-interface)
     - [Advanced Model Configuration](#advanced-model-configuration)
+        - [Grid Schema](#grid-schema)
+        - [Form Schemas](#form-schemas)
 
 ## Service URLs and HTTP methods
 
@@ -358,9 +360,64 @@ layoutViewType | The LayoutView type for this model. The default is Calipso.view
 collectionViewType | The CollectionView type for this model. The default is Calipso.view.ModelDrivenCollectionGridView.
 itemViewType   | The ItemView type for this model. The default is Calipso.view.GenericFormView.
 reportViewType | The Report View type for this model. The default is Calipso.view.ModelDrivenReportView.
-gridSchema     | The [grid schemas] columns schema 
-formsSchema    | The [form schemas]. 
+gridSchema     | See  <a href="#grid-schema">Grid Schema</a>. You may also override static or instance getGridSchema() instead.
+formsSchema    | See  <a href="#form-schemas">Form Schemas</a>. You may also override static or instance getFormSchemas() instead.
 
+#### Grid Schema
+
+Grid schemas are based on [Backgridjs]:
+
+
+```js
+   // You may also override a model's static gridSchema property instead.
+    getGridSchema : function() {
+        return [ {
+            name : "name",
+            editable : false,
+            cell : Calipso.components.backgrid.ViewRowCell
+        }, {
+            name : "edit",
+            cell : Calipso.components.backgrid.EditRowInModalCell,
+            headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
+        } ];
+    }
+```
+
+#### Form Schemas
+
+Form schemas are based on [Backbone Forms]. the main difference is that each field introduces schemas for multiple actions (search, create, update etc.). For example, consider the following backbone forms schema:
+
+```js
+    name : {
+        name: "name",
+        type : 'Text',
+        validators : [ 'required' ]
+    },
+```
+
+In calipso, the schema hierarchy is extended to cover multiple actions, for example a "default" and a "search" schema:
+
+```js
+    // You may also override a model's static or instance getFormSchemas() instead.
+    formsSchema: {
+        name : {
+            "default" : {
+                name: "name",
+                type : "Text",
+                validators : [ "required" ]
+            },
+            // use typeaghead-based autocomplete for search forms
+            "search" : {
+                name: "name",
+                type : Calipso.components.backboneform.Typeahead, 
+                typeaheadSource : {
+                    displayKey : "name",
+                    source: BookModel.getTypeaheadSource({query: "?name=%25wildcard%25"}),
+                }
+            },
+        },
+    }
+```
     
 [calipso-hub-framework]:calipso-hub-framework
 [calipso-hub-utilities]:calipso-hub-utilities
@@ -368,8 +425,8 @@ formsSchema    | The [form schemas].
 [Backbone]:http://backbonejs.org
 [Marionette]:http://marionettejs.com
 [Bootstrap]:http://getbootstrap.com
+[Backgridjs]:http://backgridjs.com
+[Backbone Forms]:https://github.com/powmedia/backbone-forms
 [RequireJS]:http://requirejs.org
-[grid schemas]:http://backgridjs.com
-[form schemas]:form_schemas.md
 
     

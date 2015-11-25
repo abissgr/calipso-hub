@@ -5150,6 +5150,12 @@ function(
  				throw "accountConfirm route requires the confirmation token as a URI component";
  			}
  		},
+		changePassword : function(){
+			if (!Calipso.isAuthenticated()) {
+				window.alert("Please login to change your password");
+			}
+
+		},
 		authenticate : function(args) {
 			// console.log('MainController authenticate called');
 			var self = this;

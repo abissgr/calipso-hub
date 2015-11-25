@@ -19,7 +19,7 @@
         http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
  <!-- override resthub's MapperFeature.DEFAULT_VIEW_INCLUSION config -->
-    
+ 
     <bean id="jsonObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
         <property name="featuresToDisable">
             <array>
@@ -175,8 +175,4 @@
 	<bean id="appInitializer" class="gr.abiss.calipso.AppInitializer">
     </bean>
     
-    
-    <!-- Include a swagger configuration-->
-    <bean name="/applicationSwaggerConfig" class="gr.abiss.calipso.utils.swagger.ApplicationSwaggerConfig"/>
-
 </beans>

@@ -31,7 +31,27 @@ import java.util.Map;
  */
 public interface LocalUserService<ID extends Serializable, T extends LocalUser> {
 
+	/**
+	 * Find the user matching the given username or email
+	 * @param userNameOrEmail the username or email of the user
+	 * @return the matching user, if any
+	 */
 	public T findByUserNameOrEmail(String userNameOrEmail);
+	
+	/**
+	 * Update the password for the user matching the given credentials
+	 * @param userNameOrEmail the username or email of the user
+	 * @param oldPassword the user's current password
+	 * @param newPassword the new password 
+	 * @param newPasswordConfirm the confirmation for the new password
+	 * @return the matching user, if any, with the persistent password already updated 
+	 */
+	public T changePassword(String userNameOrEmail, String oldPassword, String newPassword, String newPasswordConfirm);
+	/**
+	 * Find the user with the given ID
+	 * @param userId
+	 * @return
+	 */
 	public T findById(String userId);
 	public T createForImplicitSignup(LocalUser user) throws DuplicateEmailException;
 

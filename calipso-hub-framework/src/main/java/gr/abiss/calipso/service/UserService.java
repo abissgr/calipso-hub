@@ -26,6 +26,13 @@ import gr.abiss.calipso.userDetails.integration.LocalUserService;
 
 public interface UserService extends GenericEntityService<User, String>, LocalUserService<String, User> {
 
+	/**
+	 * Get the user matching the given credentials
+	 * @param userNameOrEmail the username or email of the user
+	 * @param  password the user's current password
+	 * @param  metadata the metadata to add to the user
+	 * @return the matching user, if any
+	 */
 	User findByCredentials(String userNameOrEmail, String password, Map metadata);
 
 }

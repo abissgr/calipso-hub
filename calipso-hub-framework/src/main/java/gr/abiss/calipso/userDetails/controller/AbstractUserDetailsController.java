@@ -200,6 +200,10 @@ HttpServletRequest request,
 		return userDetails;
 	}
 
+	/**
+	 * @deprecated use {@link #delete(HttpServletRequest,HttpServletResponse)} instead.  
+	 */
+	@Deprecated
 	@RequestMapping(value = "userDetails/logout", method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST})
 	@ResponseBody
 	public void logout(HttpServletRequest request,

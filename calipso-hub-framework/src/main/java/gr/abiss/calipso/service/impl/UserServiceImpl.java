@@ -72,7 +72,7 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public User findByCredentials(String userNameOrEmail, 	String password, Map metadata) {
+	public User findByCredentials(String userNameOrEmail, String password, Map metadata) {
 		if(LOGGER.isDebugEnabled()) LOGGER.debug("findByCredentials, userNameOrEmail: " + userNameOrEmail + ", password: " + password + ", metadata: " + metadata);
 		User user = null;
 		try {
@@ -233,6 +233,31 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 //			LOGGER.debug("createForImplicitSignup returning local user: " + user);
 //		}
 		return existing != null ? existing : createActive(user);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	public User changePassword(String userNameOrEmail, String oldPassword, String newPassword,
+			String newPasswordConfirm) {
+		
+		// make sure we have all params
+		String[] params = {userNameOrEmail, oldPassword, newPassword, newPasswordConfirm};
+		Assert.noNullElements(params, "Failed updating user pass: Username/email, old password, new password and new password confirmation must be provided ");
+		
+		// make sure new password and confirm match
+		Assert.isTrue(newPassword.equals(newPasswordConfirm), "Failed updating user pass: New password and new password confirmation must be equal");
+		
+		// make sure a user matching the credentials is found
+		User u = this.findByCredentials(userNameOrEmail, oldPassword, null);
+		Assert.notNull(u, "Failed updating user pass: A user could not be found with the given credentials");
+		
+		// update password and return user
+		u.setPassword(newPassword);
+		u = this.update(u);
+		return u;
 	}
 
 
