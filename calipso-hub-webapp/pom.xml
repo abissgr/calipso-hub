@@ -16,6 +16,12 @@
 	<packaging>war</packaging>
 	<properties>
 		<project.parent.basedir>../</project.parent.basedir>
+		
+                <maven.test.skip>true</maven.test.skip>
+                <jetty.daemon>true</jetty.daemon>
+                <jetty.jvmArgs>-XX:MaxPermSize=512m</jetty.jvmArgs>
+                <scriptmain>main</scriptmain>
+                <build.profile.filters>dev.properties</build.profile.filters>
 	</properties>
 	<build>
 		<filters>
@@ -97,9 +103,26 @@
 					</sourceFiles>
 				</configuration>
 			</plugin>
+			
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp</directory>
+                            <includes>
+                                <include>**/*.jsp</include>
+                            </includes>
+                            <!-- enable filtering -->
+                            <filtering>true</filtering>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
-
 
 
 	<dependencies>
@@ -186,15 +209,6 @@
 						</configuration>
 					</plugin>
 
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<version>2.3</version>
-						<configuration>
-							<warSourceExcludes>js/**,css/**</warSourceExcludes>
-							<packagingExcludes>%regex[js/libs/(?!require).*],js/templates/**</packagingExcludes>
-						</configuration>
-					</plugin>
 				</plugins>
 			</build>
 		</profile>

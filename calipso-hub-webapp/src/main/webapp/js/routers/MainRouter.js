@@ -30,11 +30,11 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			'home' : 'home',
 			'login' : 'login',
 			'loginRegistered' : 'loginRegistered',
+			'changePassword' : 'changePassword', 
 			'logout' : 'logout',
 			'register' : 'register',
 
 			'page/:templateName' : 'templatePage',
-
 			':mainRoutePart/reports' : 'mainNavigationReportRoute',
 			':mainRoutePart/reports/' : 'mainNavigationReportRoute',
 			':mainRoutePart/reports/?*queryString' : 'mainNavigationReportRoute',

@@ -13,6 +13,8 @@ import org.springframework.social.security.SocialUserDetails;
 
 public interface ICalipsoUserDetails extends SocialUserDetails {
 
+	public String getEmailOrUsername();
+	
 	public String getId();
 
 	public void setId(String id);
@@ -105,7 +107,14 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public void setUsername(String username);
 
+	public String getPassword();
 	public void setPassword(String password);
+
+	public String getPasswordConfirmation();
+	public void setPasswordConfirmation(String passwordConfirmation);
+
+	public String getCurrentPassword();
+	public void setCurrentPassword(String password);
 
 	public void setAuthorities(List<? extends GrantedAuthority> authorities);
 

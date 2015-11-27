@@ -63,6 +63,15 @@ require.config({
 
 	},
 	wrapShim: true,
+   packages: [{
+	   // Include hbs as a package, so it will find hbs-builder when needed
+	   name: "hbs",
+	   location: "lib/hbs",
+	   main: "hbs",
+	}],
+	hbs: {
+		templateExtension: ".hbs",
+   },
 	shim : {
 
 		'underscore' : {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2007 - 2014 www.Abiss.gr
  *
@@ -32,7 +33,7 @@ define([
 'hbs!template/md-form-view',
 'hbs!template/md-formpanel-view',
 'hbs!template/generic-crud-layout',
-'hbs!template/login',
+'hbs!template/userDetails-layout',
 'hbs!template/applayout',
 'hbs!template/tab-label',
 'hbs!template/loginRegistered',
@@ -58,7 +59,7 @@ function(
 		md_form_view,
 		md_formpanel_view,
 		generic_crud_layout,
-		login,
+		userDetails_layout,
 		applayout,
 		tab_label,
 		loginRegistered,
@@ -84,7 +85,7 @@ function(
 	"md-form-view":md_form_view,
 	"md-formpanel-view":md_formpanel_view,
 	"generic-crud-layout":generic_crud_layout,
-	"login":login,
+	"userDetails-layout":userDetails_layout,
 	"applayout":applayout,
 	"tab-label":tab_label,
 	"loginRegistered":loginRegistered,

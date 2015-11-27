@@ -19,6 +19,7 @@ package gr.abiss.calipso.userDetails.model;
 
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import gr.abiss.calipso.model.serializers.SkipPropertyDeserializer;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 
 import java.util.Collection;
@@ -40,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 //import com.wordnik.swagger.annotations.ApiModel;
 
@@ -63,6 +65,13 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	private String password;
+	
+	@JsonSerialize(using = SkipPropertySerializer.class)
+	private String passwordConfirmation;
+	
+	@JsonSerialize(using = SkipPropertySerializer.class)
+	private String currentPassword;
+	
 	private Date lastPassWordChangeDate;
 
 	private String email;
@@ -96,6 +105,8 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private boolean isAdmin = false;
 	private boolean isSiteAdmin = false;
 
+
+	@JsonDeserialize(using = SkipPropertyDeserializer.class)
 	@JsonProperty(value = "roles")
 	private List<? extends GrantedAuthority> authorities;
 	private Map<String, String> metadata;
@@ -164,6 +175,9 @@ public class UserDetails implements  ICalipsoUserDetails{
 			.append("id", id)
 			.append("username", username)
 			.append("email", email)
+			.append("passwordConfirmation", this.passwordConfirmation)
+			.append("currentPassword", this.currentPassword)
+			.append("password", this.password)
 			.append("metadata", metadata)
 			.append("authorities", authorities)
 			.toString();
@@ -266,6 +280,14 @@ public class UserDetails implements  ICalipsoUserDetails{
 		this.email = email;
 	}
 
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getEmailOrUsername()
+	 */
+	@Override
+	public String getEmailOrUsername() {
+		return email != null ? email : username;
+	}
+	
 	/**
 	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getEmailHash()
 	 */
@@ -686,5 +708,37 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 	public void setUser(LocalUser user) {
 		this.user = user;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getOldPassword()
+	 */
+	@Override
+	public String getCurrentPassword() {
+		return currentPassword;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setOldPassword(String)
+	 */
+	@Override
+	public void setCurrentPassword(String currentPassword) {
+		this.currentPassword = currentPassword;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getPasswordConfirmation()
+	 */
+	@Override
+	public String getPasswordConfirmation() {
+		return passwordConfirmation;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setPasswordConfirmation(String)
+	 */
+	@Override
+	public void setPasswordConfirmation(String passwordConfirmation) {
+		this.passwordConfirmation = passwordConfirmation;
 	}
 }

@@ -258,8 +258,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Override
+	@Transactional(readOnly = false)
 	public ICalipsoUserDetails update(ICalipsoUserDetails resource) {
-		throw new UnsupportedOperationException();
+		LocalUser user = this.localUserService.changePassword(resource.getEmailOrUsername(), resource.getCurrentPassword(), resource.getPassword(), resource.getPasswordConfirmation());
+		return UserDetails.fromUser(user);
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import gr.abiss.calipso.userDetails.integration.LocalUserService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -256,6 +257,7 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		
 		// update password and return user
 		u.setPassword(newPassword);
+		u.setLastPassWordChangeDate(new Date());
 		u = this.update(u);
 		return u;
 	}

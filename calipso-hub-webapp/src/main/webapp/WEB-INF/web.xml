@@ -99,6 +99,7 @@
     <filter-mapping>
         <filter-name>restRequestNormalizerFilter</filter-name>
         <url-pattern>/api/*</url-pattern>
+        <url-pattern>/apiauth/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>

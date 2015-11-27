@@ -168,19 +168,51 @@ HttpServletRequest request,
 	@RequestMapping(value = "userDetails", method = RequestMethod.POST)
 	@ResponseBody
 	public ICalipsoUserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
+		return this.create(request, response, resource, true);
+	}
+
+	/**
+	 * Update the user details object, i.e. change the user password
+	 * @param request
+	 * @param response
+	 * @param resource
+	 * @return
+	 */
+	@RequestMapping(value = "userDetails", method = RequestMethod.PUT)
+	@ResponseBody
+	public UserDetails update(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
+		LOGGER.info("updatePassword, resource: " + resource);
+		resource = (UserDetails) this.service.update(resource);
+		SecurityUtil.login(request, response, resource, userDetailsConfig);
+		return resource;
+	}
+
+
+	@RequestMapping(value = "verifyPassword", method = RequestMethod.POST)
+	@ResponseBody
+	public ICalipsoUserDetails verifyPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
+		return this.create(request, response, resource, false);
+	}
+	
+	protected ICalipsoUserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource, boolean apply) {
 		ICalipsoUserDetails userDetails = null;
+
+		LOGGER.info("Trying to " + (apply?"login":"confirm password") + " with: "+resource);
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("Trying to login with: "+resource);
+			LOGGER.debug("Trying to " + (apply?"login":"confirm password") + " with: "+resource);
 		}
 		try {
-			userDetails = resource != null ? this.service
-					.create(resource) : null;
+			userDetails = resource != null ? this.service.create(resource) : null;
 
 			LOGGER.info("create userDetails: " + userDetails);
 			if (userDetails != null && userDetails.getId() != null) {
-				SecurityUtil.login(request, response, userDetails, userDetailsConfig);
+				if(apply){
+					SecurityUtil.login(request, response, userDetails, userDetailsConfig);
+				}
 			} else {
-				SecurityUtil.logout(request, response, userDetailsConfig);
+				if(apply){
+					SecurityUtil.logout(request, response, userDetailsConfig);
+				}
 				userDetails = new UserDetails();
 			}
 		}
@@ -208,10 +240,15 @@ HttpServletRequest request,
 	@ResponseBody
 	public void logout(HttpServletRequest request,
 			HttpServletResponse response) {
-		// logout
+		LOGGER.warn("@RequestMapping \"userDetails/logout\" is deprecated");
 		this.delete(request, response);
 	}
-	
+
+	/**
+	 * Log out the user
+	 * @param request
+	 * @param response
+	 */
 	@RequestMapping(value = "userDetails", method = RequestMethod.DELETE)
 	@ResponseBody
 	public void delete(HttpServletRequest request,
@@ -220,6 +257,6 @@ HttpServletRequest request,
 		SecurityUtil.logout(request, response, userDetailsConfig);
 		
 	}
-
+	
 
 }
