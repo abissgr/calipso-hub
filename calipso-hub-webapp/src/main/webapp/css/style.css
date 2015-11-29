@@ -15,127 +15,16 @@ label {
 }
 
 /*
- * Required Stack Styles.
- *
- * You must provide a container that flows to the
- * correct size for the stacked content. This will
- * force the stacks wrapper, and each stack item, 
- * to fill the container.
- */
-.stacks {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  transform: translate3d(0,0,0);
-}
-.stack-item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform: translate3d(0,0,0);
-}
-
-/* End Required Stack Styles */
-
-/*
- * Animations to transition stack items in/out.
- *
- * Use these exactly as is, or provide your own and
- * set the following StackView options as needed:
- * - `inTransitionClass`
- * - `outTransitionClass`
- * - `transitionDelay`
- */
-
-@keyframes slideInFromRight {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(0%);
-  }
-}
-
-.slideInFromRight {
-  animation-name: slideInFromRight;
-}
-
-@keyframes slideOutToRight {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.slideOutToRight {
-  animation-name: slideOutToRight;
-}
-
-/* End Animations */
-
-/*
  * Visual styles for this demo
  */
 body, html {
   height: 100%;
   
-  /* provide a 2-column container
-   * with no padding or margins for 
-   * full-width and full-height content.
-   */
-  > .container-fluid {
-    height: 100%;
-    padding: 0;
-    
-    > .row-fluid {
-      height: 100%; 
-      
-      > .span6 {
-        width: 50%;
-        margin: 0; 
-      }
-    }
-  }
-  
-  /* ensure the description content can scroll */
-  .description {
-    height: 100%;
-    padding: 20px; 
-    overflow-y:auto;
-  }
 }
+html, body, #full-height-wrapper { height: 100%; }
+body > #full-height-wrapper { height: auto; min-height: 100%; 
+ position: relative;}
 
-/* 
- * The container for our stacks.
- * The stacks will fill this container 100%.
- * For this demo the stacks container does 
- * not scroll. You can style your stackItem
- * content to scroll using overflow-y if needed.
- */
-#stackView {
-  height: 100%;
-  position: relative;
-  background: white;
-}
-
-.stacks {
-  .stack-item {
-    background: white;
-    box-shadow: 0 0 15px 0 rgba(0,0,0,0.7);
-    text-align: center;
-    line-height: 300px;
-  }
-  .stack-item.hiddenToRight {
-    transform: translateX(100%);
-  }
-  .stack-item:first-child {
-    background: white; 
-  }
+.panel-title a[data-toggle="collapse"]{
+	display: block;
 }

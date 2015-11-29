@@ -8,17 +8,21 @@
     <nav id="calipsoHeaderRegion" role="navigation" class="navbar navbar-inverse navbar-fixed-top">
         <!-- -->
     </nav>
-    <div id="calipsoMainContentRegion">
-        <!-- -->
+    <div id="full-height-wrapper">
+	    <div id="calipsoMainContentRegion">
+	        <!-- -->
+	    </div>
+	    <div id="calipsoModalRegion" class="modal fade" tabindex='-1'></div>
+	    <div id="hiddenWrapper" style="display: none"></div>
+	    
+	    <div class="social-form-container">
+	    </div>
+	    
+	    <div id="calipsoFooterRegion">
+	        <!-- -->
+	    </div>
     </div>
-    <div id="calipsoFooterRegion">
-        <!-- -->
-    </div>
-    <div id="calipsoModalRegion" class="modal fade" tabindex='-1'></div>
-    <div id="hiddenWrapper" style="display: none"></div>
     
-    <div class="social-form-container">
-    </div>
     <!-- Placed at the end of the document so the pages load faster -->
     <script data-main="${basePath}/js/@scriptmain@" id="calipso-script-main" src="${basePath}/js/lib/require.js">
     </script>

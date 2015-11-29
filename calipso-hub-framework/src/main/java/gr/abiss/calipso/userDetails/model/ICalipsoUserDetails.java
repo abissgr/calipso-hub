@@ -14,10 +14,17 @@ import org.springframework.social.security.SocialUserDetails;
 public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public String getEmailOrUsername();
-	
+
 	public String getId();
 
 	public void setId(String id);
+	
+
+	public Boolean getIsResetPasswordReguest();
+
+	public void setIsResetPasswordReguest(Boolean isReset);
+	
+	
 
 	public String getFirstName();
 

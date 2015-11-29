@@ -30,6 +30,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
@@ -111,9 +112,8 @@ HttpServletRequest request,
 			HttpServletResponse response, @RequestBody UserDetails user,
 			@PathVariable String token) {
 
-		String userNameOrEmail = user.getUsername() != null ? user
-				.getUsername() : user.getEmail();
-				ICalipsoUserDetails userDetails = service.resetPassword(
+		String userNameOrEmail = user.getEmailOrUsername();
+		ICalipsoUserDetails userDetails = service.resetPassword(
 				userNameOrEmail, token, user.getPassword());
 		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
 		return userDetails;
@@ -122,6 +122,9 @@ HttpServletRequest request,
 	@RequestMapping(value = "password-reset-request/{userNameOrEmail}", method = RequestMethod.POST)
 	@ResponseBody
 	public void handlePasswordResetRequest(@PathVariable String userNameOrEmail) {
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("handlePasswordResetRequest: Trying to reset password");
+		}
 		service.handlePasswordResetRequest(userNameOrEmail);
 	}
 
@@ -129,6 +132,7 @@ HttpServletRequest request,
 	@ResponseBody
 	public ICalipsoUserDetails getRemembered(HttpServletRequest request,
 			HttpServletResponse response) {
+		
 		UserDetails resource = null;
 
 		Cookie tokenCookie = null;
@@ -168,6 +172,10 @@ HttpServletRequest request,
 	@RequestMapping(value = "userDetails", method = RequestMethod.POST)
 	@ResponseBody
 	public ICalipsoUserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("create1");
+		}
 		return this.create(request, response, resource, true);
 	}
 
@@ -181,9 +189,8 @@ HttpServletRequest request,
 	@RequestMapping(value = "userDetails", method = RequestMethod.PUT)
 	@ResponseBody
 	public UserDetails update(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
-		LOGGER.info("updatePassword, resource: " + resource);
 		resource = (UserDetails) this.service.update(resource);
-		SecurityUtil.login(request, response, resource, userDetailsConfig);
+		SecurityUtil.login(request, response, resource, userDetailsConfig);	
 		return resource;
 	}
 
@@ -197,10 +204,37 @@ HttpServletRequest request,
 	protected ICalipsoUserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource, boolean apply) {
 		ICalipsoUserDetails userDetails = null;
 
-		LOGGER.info("Trying to " + (apply?"login":"confirm password") + " with: "+resource);
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("Trying to " + (apply?"login":"confirm password") + " with: "+resource);
+		if(resource != null){
+
+			if(BooleanUtils.isTrue(resource.getIsResetPasswordReguest())){
+				if(LOGGER.isDebugEnabled()){
+					LOGGER.debug("Forgotten password request, will createg token");
+				}
+				this.handlePasswordResetRequest(resource.getEmailOrUsername());
+				userDetails = resource;
+				
+			}
+			else if(resource.getResetPasswordToken() != null){
+				if(LOGGER.isDebugEnabled()){
+					LOGGER.debug("Trying to change password ewith reset token anf login");
+				}
+				userDetails = this.resetPasswordAndLogin(request, response, resource, resource.getResetPasswordToken());
+				
+			}
+			else{
+				if(LOGGER.isDebugEnabled()){
+					LOGGER.debug("Trying to " + (apply?"login":"confirm password") + " with: "+resource);
+				}
+				userDetails = login(request, response, resource, apply, userDetails);
+			}
+			
 		}
+		return userDetails;
+	}
+
+	protected ICalipsoUserDetails login(HttpServletRequest request,
+			HttpServletResponse response, UserDetails resource, boolean apply,
+			ICalipsoUserDetails userDetails) {
 		try {
 			userDetails = resource != null ? this.service.create(resource) : null;
 
@@ -228,7 +262,6 @@ HttpServletRequest request,
 					"UserDetailsController failed creating new userDetails",
 					e);
 		}
-
 		return userDetails;
 	}
 

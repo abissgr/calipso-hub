@@ -555,6 +555,8 @@ width: 100%;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+/*
+
 .container {
   margin: 5% 3%;
 }
@@ -569,6 +571,7 @@ width: 100%;
     max-width: 75em;
   }
 }
+*/
 
 .responsive-table {
   width: 100%;

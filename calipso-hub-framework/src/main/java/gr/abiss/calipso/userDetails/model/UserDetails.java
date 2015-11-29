@@ -119,6 +119,8 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@JsonIgnore
 	private LocalUser user;
 
+	private Boolean isResetPasswordReguest = false;
+
 	public static ICalipsoUserDetails fromUser(LocalUser user) {
 		UserDetails details = null;
 		if (user != null) {
@@ -740,5 +742,16 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@Override
 	public void setPasswordConfirmation(String passwordConfirmation) {
 		this.passwordConfirmation = passwordConfirmation;
+	}
+
+	@Override
+	public Boolean getIsResetPasswordReguest() {
+		// TODO Auto-generated method stub
+		return this.isResetPasswordReguest ;
+	}
+
+	@Override
+	public void setIsResetPasswordReguest(Boolean isResetPasswordReguest) {
+		this.isResetPasswordReguest = isResetPasswordReguest;
 	}
 }

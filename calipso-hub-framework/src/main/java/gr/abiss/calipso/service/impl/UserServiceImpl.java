@@ -166,8 +166,11 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
-		user.setResetPasswordToken(this.generator.generateKey());
-		user = this.userRepository.save(user);
+		// keep any existing token
+		if(user.getResetPasswordToken() == null){
+			user.setResetPasswordToken(this.generator.generateKey());
+			user = this.userRepository.save(user);
+		}
 		try {
 			emailService.sendPasswordResetLink(user);
 		} catch (MessagingException e) {

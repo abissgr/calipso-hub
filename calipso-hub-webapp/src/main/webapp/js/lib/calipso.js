@@ -258,7 +258,6 @@ function(
 			contextPath : "/",
 			headerViewType : Calipso.view.HeaderView,
 			footerViewType : Calipso.view.FooterView,
-			loginViewType : Calipso.view.LoginView,
 			sessionType : Calipso.util.Session,
 			apiAuthPath : "/apiauth",
 		};
@@ -1001,10 +1000,10 @@ function(
 		getViewTitle : function(){
 			var schemaKey = this.getFormSchemaKey();
 			var title = "";
-			if(schemaKey == "create"){
+			if(schemaKeyindexOf("create") == 0){
 				title += "New ";
 			}
-			else	if(schemaKey == "update"){
+			if(schemaKeyindexOf("update") == 0){
 				title += "Edit ";
 			}
 
@@ -1052,12 +1051,14 @@ function(
 		 * form schema during form generation, see GenericFormView
 		 */
 		getFormSchemaKey : function(){
-			var formSchemaKey;
-			if(this.isSearchModel()){
-				formSchemaKey = "search";
-			}
-			else{
-				formSchemaKey = this.isNew() ? "create" : "update";
+			var formSchemaKey = this.get("formSchemaKey");
+			if(!formSchemaKey){
+				if(this.isSearchModel()){
+					formSchemaKey = "search";
+				}
+				else{
+					formSchemaKey = this.isNew() ? "create" : "update";
+				}
 			}
 			return formSchemaKey;
 		},
@@ -1196,10 +1197,8 @@ function(
 		 */
 		getFormSchema : function(actionName) {
 			// decide based on model persistence state if no action was given
+				console.log("GenericModel#getFormSchema actionName: "+ actionName);
 			if (!actionName) {
-				//console.log("GenericModel#getFormSchema actionName: "+ actionName);
-				// console.log("GenericModel.prototype.schema, this: " + this);
-				// console.log("GenericModel.prototype.schema, caller is " + arguments.callee.caller.toString());
 				actionName = this.getFormSchemaKey();
 				//console.log("GenericModel#getFormSchema actionName: "+ actionName);
 			}
@@ -1262,6 +1261,8 @@ function(
 				propertySchema = false;
 				propertySchemaForAction = false;
 			}
+
+				console.log("GenericModel#getFormSchema formSchema: "+ formSchema.toSource());
 			return formSchema;
 		},
 		initialize : function() {
@@ -1870,34 +1871,35 @@ function(
 		   * @return {Form.Field}
 		   */
 		  createField: function(key, schema) {
-				if(this.hintRequiredFields && this.isRequired(schema)){
-					var suffix = "";
-					var hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
-					var title = schema.titleHTML;
-					if(!title){
-						title = schema.title;
-						if(!title){
-							title = key;
-							if(this.capitalizeKeys){
-								// insert a space before all caps
-						    title = title.replace(/([A-Z])/g, ' $1')
-						    // uppercase the first character
-						    .replace(/^./, function(str){ return str.toUpperCase(); });
-							}
+				//console.log("createField, key: " + key + ", schema: " + schema.toSource());
+				if(!schema.hidden){
+					if(!schema.titleHTML){
+						schema.titleHTML = schema.title;
+					}
+					schema.title = undefined;
+					if(!schema.titleHTML){
+						if(this.capitalizeKeys){
+							// insert a space before all caps
+							schema.titleHTML = key.replace(/([A-Z])/g, ' $1')
+							// uppercase the first character
+							.replace(/^./, function(str){ return str.toUpperCase(); });
 						}
-						schema.title = undefined;
 					}
-					var length = title.length;
-					title.trim();
-					for(var i = title.length; i < length; i++){
-						suffix += ' ';
+					if(this.hintRequiredFields && this.isRequired(schema)){
+						var suffix = "";
+						var hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
+						schema.titleHTML.trim();
+						for(var i = schema.titleHTML.length; i < length; i++){
+							suffix += ' ';
+						}
+						if(schema.titleHTML.lastIndexOf(":") == schema.titleHTML.length - 1){
+							schema.titleHTML = title.substring(0, schema.titleHTML.length - 1);
+							suffix = ":" + suffix;
+						}
 					}
-					if(title.lastIndexOf(":") == title.length - 1){
-						title = title.substring(0, title.length - 1);
-						suffix = ":" + suffix;
-					}
-					schema.titleHTML = title + hint + suffix;
 				}
+
+				//console.log("createField, apply key: " + key + ", schema: " + schema.toSource());
 				return Backbone.Form.prototype.createField.apply(this, arguments);
 		  },
 
@@ -2300,7 +2302,7 @@ function(
 				if(schemaKey == "create"){
 					title += "Login ";
 				}
-				else	if(schemaKey == "update"){
+				else	if(schemaKey.indexOf("update") == 0){
 					title += "Change Password ";
 				}
 				return title;
@@ -2357,18 +2359,37 @@ function(
 					id : {
 						"update" : {
 							type : 'Hidden',
+							hidden : true,
 						}
+					},
+					isResetPasswordReguest : {
+						"update-createToken" : {
+								type : 'Hidden',
+								hidden : true,
+						},
 					},
 					email : {
 						"create" : {
 							type : 'Text',
-							validators : [ 'required' ]}
+							label : "Username or Email",
+							validators : [ 'required' ],
+						},
+						"update-createToken" : {
+							type : 'Text',
+							validators : [ 'required', 'email' ],
+						},
+					},
+					resetPasswordToken : {
+						"create-withToken" : {
+							type : 'Text',
+							validators : [ 'required' ]},
+							help : "A reset token has been been sent. Please check your email."
 					},
 					currentPassword : {
 						"update" : {
 							type : 'Password',
 							validators : [
-								'required'/*,
+								'required',
 								function checkPassword(value, formValues) {
 				          // verify current password
 									var userDetails = new Calipso.model.UserDetailsModel({
@@ -2386,16 +2407,24 @@ function(
 									console.log("checkPassword: ");
 									console.log(userDetails);
 			            if (!userDetails.get("id")) return err;
-			        	}*/
+			        	}
 							],//validators
-						}
+						},
 					},
 					password : {
 						"create" : passwordText,
-						"update" : passwordText
+						"update" : {
+							type : 'Password',
+							validators : [ 'required' ],
+							title : "New Password"
+						},
+						"create-withToken" : {
+							extend : "update",
+						},
 					},
 					passwordConfirmation : {
-						"update" : passwordConfirm
+						"update" : passwordConfirm,
+						"create-withToken" : passwordConfirm,
 					},
 				};
 			}
@@ -3045,7 +3074,7 @@ function(
 		},
 		showItemViewForModel : function(options) {
 			var itemModel = options.model;
-			var formSchemaKey = options.formSchemaKey;
+			var formSchemaKey = model.formSchemaKey;
 			if (!formSchemaKey) {
 				formSchemaKey = "view";
 			}
@@ -3138,7 +3167,6 @@ function(
 			if(forceShow || !region.hasView()){
 				var ContentViewType = routeModel.getItemViewType();
 				var formView = new ContentViewType({
-					formSchemaKey :  _this.model.getFormSchemaKey(),
 					model : routeModel
 				});
 				// show the search form
@@ -4073,12 +4101,7 @@ function(
 				throw "GenericFormView: a 'model' option is required";
 			}
 			// set schema key, from options or model
-			if (options.formSchemaKey) {
-				this.formSchemaKey = options.formSchemaKey;
-			}
-			else{
-				this.formSchemaKey = this.model.getFormSchemaKey();
-			}
+			this.formSchemaKey = this.model.getFormSchemaKey();
 			if (options.formTemplateKey) {
 				this.formTemplateKey = options.formTemplateKey;
 			}
@@ -4207,7 +4230,7 @@ function(
 
 			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering)
 			if (formSchema && _.size(formSchema) > 0) {
-				_self.renderForm();
+				_self.renderForm(formSchema);
 			} else {
 				var fetchScemaUrl = Calipso.getBaseUrl() + "/" + _self.model.getPathFragment() + '/' + (_self.model.isNew() ? "new" : _self.model.get("id"));
 
@@ -4224,9 +4247,15 @@ function(
 			}
 
 		},
-		renderForm : function() {
+		renderForm : function(formSchema) {
 			var _self = this;
-			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
+
+			console.log("GenericFormView#renderForm, _self.formSchemaKey: " + _self.formSchemaKey);
+			if(formSchema){
+				formSchema = _self.model.getFormSchema(_self.formSchemaKey);
+			}
+			//console.log("GenericFormView#renderForm, formSchema: ");
+			console.log(formSchema);
 			var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
 			if(!formSubmitButton){
 				if(_self.formSchemaKey.indexOf("search") == 0){
@@ -4247,7 +4276,7 @@ function(
 				_self.model.set(Calipso.session.searchData);
 				_self.searchResultsCollection.data = Calipso.session.searchData;
 			} else {
-				console.log("GenericFormView#onShow, No session.searchData to add");
+				console.log("GenericFormView#renderForm, No session.searchData to add");
 			}
 			var formOptions = {
 				model : _self.model,
@@ -4430,94 +4459,6 @@ function(
 		return "MainLayout";
 	};
 
-	/*
-	 * Default Login View implementation. Can be overriden with
-	 * Calipso.initializeApp({loginViewType: Foobar})
-	 */
-	Calipso.view.LoginView = Marionette.ItemView.extend({
-		template : Calipso.getTemplate('login'),
-		initialize : function(options) {
-			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			$(window).scrollTop(0);
-		},
-		/**
-		 * Get the name of this class
-		 * @returns the class name as a string
-		 */
-		getTypeName : function() {
-			return this.getTypeName();
-		},
-		events : {
-			"click .register" : "register",
-			"click a.btn-social-login" : "socialLogin",
-			"click button.form-login-submit" : "commit",
-			"submit .form-login" : "commit",
-		},
-		commit : function(e) {
-			console.log("Calipso.view.LoginView#commit");
-			Calipso.stopEvent(e);
-			var _this = this;
-			var userDetails = new Calipso.model.UserDetailsModel({
-				email : this.$('.input-email').val(),
-				password : this.$('.input-password').val(),
-				newPassword : this.$('.new-password').val(),
-				newPasswordConfirm : this.$('.new-password-confirm').val()
-			});
-				console.log(userDetails);
-			Calipso.session.save(userDetails);
-		},
-		socialLogin : function(e) {
-			Calipso.socialLogin(e);
-		},
-		/*
-		register : function(e) {
-			console.log("Calipso.view.LoginView#register");
-			Calipso.stopEvent(e);
-			var _this = this;
-
-			// pickup form data
-			var formData = {
-				password : this.$('.input-password').val()
-			};
-			var usernameOrEmail = this.$('.input-email').val();
-			if(usernameOrEmail){
-				if(usernameOrEmail.indexOf("@") > 0){
-					formData.email = usernameOrEmail;
-				}
-				else{
-					formData.username = usernameOrEmail;
-				}
-			}
-
-			var userModel = new Calipso.model.UserModel(formData);
-			var registrationForm = new Calipso.view.GenericFormView({
-				model : userModel
-			});
-			Calipso.vent.trigger('app:show', registrationForm, "register");
-
-		},
-		*/
-//		onShow : function() {
-//			// hide session info in nav bar
-//			console.log("LoginView.onShow, hiding session-info");
-//			$("#session-info").hide();
-//			$("#changePassToggle").bind("click", function() {
-//				$("#changePassSection").toggleClass("tmpl-hint");
-//				$("i").toggleClass("ion-ios7-arrow-thin-up");
-//			});
-//		},
-
-	}, {
-
-	});
-
-	/**
-	 * Get the name of this class
-	 * @returns the class name as a string
-	 */
-	Calipso.view.LoginView.getTypeName = function() {
-		return "LoginView";
-	};
 
 	Calipso.view.AppLayout = Calipso.view.MainLayout.extend({
 		tagName : "div",
@@ -5079,7 +5020,18 @@ function(
 			});
 			return false;
 		},
-
+		myProfile : function(){
+			if (Calipso.isAuthenticated()) {
+				Calipso.navigate("users/"+Calipso.session.userDetails.get("id"), {
+					trigger : false
+				});
+			}
+			else{
+				Calipso.navigate("login", {
+					trigger : true
+				});
+			}
+		},
 		login : function() {
 				if (Calipso.isAuthenticated()) {
 					window.alert("Please logout before attempting a new login");
@@ -5087,45 +5039,14 @@ function(
 				else{
 					this.showLayoutForModel(new Calipso.model.UserDetailsModel(), null, null);
 				}
-			/*
-			var loginModel = new Calipso.model.UserModel( {
-				email : Calipso.session.get('email'),
-				issuer: Calipso.session.get('issuer'),
-
-				getLayoutViewType : function() {
-					return Calipso.view.ModelDrivenBrowseLayout;
-				},
-			});
-
-			var view = new Calipso.config.loginViewType({
-				model : loginModel
-			});
-
-			view.on('app:login', this.authenticate);
-			//consolelog("AbstractController#login, showing login view");
-
-			Calipso.vent.trigger('app:show', view);
-			*/
-
 		},
-		loginRegistered : function() {
-			var loginModel = new Calipso.model.UserModel( {
-				email : Calipso.session.get('email'),
-				issuer: Calipso.session.get('issuer'),
-
-				getLayoutViewType : function() {
-					return Calipso.view.ModelDrivenBrowseLayout;
-				},
+		renderTokenPasswordChangeForm : function(username, token){
+			var model = new Calipso.model.UserDetailsModel({
+				username : username,
+				resetPasswordToken : token,
+				formSchemaKey : "create-withToken",
 			});
-
-			var view = new Calipso.config.loginViewType({
-				template : Calipso.getTemplate('loginRegistered'),
-				model : loginModel
-			});
-
-			view.on('app:login', this.authenticate);
-			//consolelog("AbstractController#login, showing login view");
-			Calipso.vent.trigger('app:show', view);
+			this.showLayoutForModel(model, null, null);
 		},
  		accountConfirm : function(confirmationToken) {
  			if(confirmationToken){
@@ -5448,17 +5369,48 @@ function(
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
 			// console.log("Calipso.view.UserRegistrationLayout#initialize");
 		},
+		regions : {
+			contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion",
+			forgotPasswordRegion : "#calipsoUserDetailsLayout-forgotPasswordRegion",
+		},
+		onShow : function(){
+				Calipso.view.ModelDrivenBrowseLayout.prototype.onShow.apply(this, arguments);
+				// add forgotten password form
+				var changePwUserDetails = new Calipso.model.UserDetailsModel({
+					formSchemaKey: "update-createToken",
+					isResetPasswordReguest : true,
+				});
+				var ViewType = changePwUserDetails.getItemViewType();
+				this.forgotPasswordRegion.show(
+					new ViewType({
+						model: changePwUserDetails,
+					})
+				);
+		},
 		onGenericFormSaved : function(model){
+			// model is not neccessarily the same as this.model
+			if(model.get("isResetPasswordReguest")){
+				Calipso.navigate("changePasswordWithToken/" + model.get("email"), {
+					trigger : true
+				});
+			}
+			else{
+				this.handleUserDetails(model);
+			}
+		},
+		handleUserDetails: function(model){
 			// if user details model is valid attach to session and FW to home
 			if(this.model.get("id")){
 				Calipso.vent.trigger('session:created', this.model);
 			}
 			// login failed, show error
-			else {
-				// todo: show marionette/form error, clear fields
-				console.log("Invalid credentials!");
+			else if(!this.model.get("email") && !this.model.get("username")){
+				window.alert("Invalid credentials!");
 			}
-		},
+			else {
+				console.log("handleUserDetails: doing nothing");
+			}
+		}
 	}, {
 		// static members
 		getTypeName : function() {
