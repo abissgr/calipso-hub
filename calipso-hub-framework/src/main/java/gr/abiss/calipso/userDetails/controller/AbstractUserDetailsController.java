@@ -166,9 +166,6 @@ HttpServletRequest request,
 		return this.create(request, response, resource);
 	}
 
-
-
-
 	@RequestMapping(value = "userDetails", method = RequestMethod.POST)
 	@ResponseBody
 	public ICalipsoUserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {

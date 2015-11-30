@@ -23,6 +23,7 @@ import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
 import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
+import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
@@ -42,6 +43,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -57,7 +59,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-//import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  */
@@ -119,6 +120,16 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	
 	@Column(nullable = true)
 	private String cellphone;
+
+	@Column(nullable = true)
+	private String address;
+	
+	@Column(nullable = true)
+	private String postCode;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "country_id", referencedColumnName = "id", nullable = true)
+	private Country country;
 
 	@Column(name = "birthday")
 	@FormSchemas({
@@ -479,16 +490,33 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	public void setChangedAttributes(List<String> changedAttributes) {
 		this.changedAttributes = changedAttributes;
 	}
-	
-	
 
-//	public LocalRegionMailingAddress getMailingAddress() {
-//		return mailingAddress;
-//	}
-//
-//	public void setMailingAddress(LocalRegionMailingAddress mailingAddress) {
-//		this.mailingAddress = mailingAddress;
-//	}
+	public String getAddress() {
+		return address;
+	}
 
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPostCode() {
+		return postCode;
+	}
+
+	public void setPostCode(String postCode) {
+		this.postCode = postCode;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
 
 }

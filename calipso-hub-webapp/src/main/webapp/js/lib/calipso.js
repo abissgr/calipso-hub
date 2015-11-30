@@ -297,7 +297,7 @@ function(
 					&& ModelType.getTypeName() != "Calipso.model.UserRegistrationModel"
 					&& ModelType.getTypeName() != "Calipso.model.GenericModel"){
 
-					Calipso.modelTypesMap[ModelType.getPathFragment()] = ModelType;
+					Calipso.modelTypesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
 
 				}
 			};
@@ -1000,10 +1000,10 @@ function(
 		getViewTitle : function(){
 			var schemaKey = this.getFormSchemaKey();
 			var title = "";
-			if(schemaKeyindexOf("create") == 0){
+			if(schemaKey.indexOf("create") == 0){
 				title += "New ";
 			}
-			if(schemaKeyindexOf("update") == 0){
+			if(schemaKey.indexOf("update") == 0){
 				title += "Edit ";
 			}
 
@@ -1357,9 +1357,9 @@ function(
 		 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
 		 */
 		getLayoutViewType : function(instance) {
-			console.log("GenericModel.getLayoutViewType, layoutViewType: " + this.layoutViewType);
-			console.log("GenericModel.getLayoutViewType, modelType: " + this.getTypeName());
-			return this.layoutViewType ? this.layoutViewType: Calipso.view.ModelDrivenSearchLayout;
+			var layoutViewType = this.layoutViewType ? this.layoutViewType: Calipso.view.ModelDrivenSearchLayout;
+			console.log("GenericModel.getLayoutViewType, layoutViewType: " + layoutViewType.getTypeName());
+			return layoutViewType;
 		},
 		/**
 		 * Get the default collection view like the
@@ -1384,7 +1384,9 @@ function(
 		 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
 		 */
 		getItemViewType : function(instance) {
-			return this.itemViewType ? this.itemViewType : Calipso.view.GenericFormView;
+			var itemViewType = this.itemViewType ? this.itemViewType : Calipso.view.GenericFormView;
+			console.log("GenericModel.getLayoutViewType, layoutViewType: " + itemViewType.getTypeName());
+			return itemViewType;
 		},
 
 		/**
@@ -3419,6 +3421,7 @@ function(
 		template : Calipso.getTemplate("templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
 		tagName : "li",
 		initialize : function(options) {
+			console.log("TemplateBasedItemView#initialize, options: " + this.options.toSource());
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			console.log("TemplateBasedItemView#initialize, item: " + this.model);
 		},
@@ -4711,7 +4714,7 @@ function(
 
 			/**
 			 * Calculate "from" now using the given date
-			 * @example {{#momentFromNow someDate}}
+			 * @example {{momentFromNow someDate}}
 			 */
 			Handlebars.registerHelper('momentFromNow', function(date) {
 				return window.moment ? moment(date).fromNow() : date;
@@ -5021,16 +5024,8 @@ function(
 			return false;
 		},
 		myProfile : function(){
-			if (Calipso.isAuthenticated()) {
-				Calipso.navigate("users/"+Calipso.session.userDetails.get("id"), {
-					trigger : false
-				});
-			}
-			else{
-				Calipso.navigate("login", {
-					trigger : true
-				});
-			}
+			console.log("myProfile");
+			this.mainNavigationCrudRoute("userProfile", Calipso.session.userDetails.get("id"))
 		},
 		login : function() {
 				if (Calipso.isAuthenticated()) {
@@ -5257,7 +5252,9 @@ function(
 		renderFetchable : function(model, ViewType, viewOptions){
 			var _self = this;
 			var fetchable = model.wrappedCollection ? model.wrappedCollection : model;
-			var skipDefaultSearch = model.skipDefaultSearch &&  model.wrappedCollection.hasCriteria();
+			var skipDefaultSearch = model.skipDefaultSearch
+				&&  model.wrappedCollection
+				&&  model.wrappedCollection.hasCriteria();
 			// promise to fetch then render
 			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
 			var renderFetchable = function() {
@@ -5268,11 +5265,13 @@ function(
 				// update page header tabs etc.
 				_self.syncMainNavigationState(model);
 			};
-			if (!skipDefaultSearch && fetchable.length == 0) {
+			if (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0)) {
+				console.log("renderFetchable: fetch");
 				fetchable.fetch({
 					data : fetchable.data
 				}).then(renderFetchable);
 			} else {
+				console.log("renderFetchable: dont fetch");
 				renderFetchable();
 			}
 		},
@@ -5451,6 +5450,44 @@ function(
 		getTypeName : function() {
 			return "UserRegistrationLayout";
 		}
+	});
+	Calipso.view.UserProfileView =  Calipso.view.TemplateBasedItemView.extend(
+		/** @lends Calipso.view.UserProfileView.prototype */
+		{
+			tagName : "div",
+			template : Calipso.getTemplate("userProfile"),
+		}, {
+			getTypeName : function() {
+				return "Calipso.view.UserProfileView";
+			}
+		}
+	);
+	Calipso.view.UserProfileLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
+		/** @lends Calipso.view.UserRegistrationLayout.prototype */
+		{
+			initialize : function(options) {
+				Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
+				// console.log("Calipso.view.UserRegistrationLayout#initialize");
+			},
+		}, {
+			// static members
+			getTypeName : function() {
+				return "UserProfileLayout";
+			}
+		}
+	);
+	Calipso.model.UserProfileModel = Calipso.model.UserModel.extend(
+	/** @lends Calipso.model.UserDetailsModel.prototype */
+	{
+		skipDefaultSearch : false
+	},
+	// static members
+	{
+		parent : Calipso.model.UserModel,
+		viewFragment : "userProfile",
+		typeName : "Calipso.model.UserProfileModel",
+		layoutViewType : Calipso.view.UserProfileLayout,
+		itemViewType : Calipso.view.UserProfileView,
 	});
 	// AMD define happens at the end for compatibility with AMD loaders
 	// that don't enforce next-turn semantics on modules.

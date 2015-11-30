@@ -54,7 +54,7 @@ public abstract class AbstractFormalRegion<P extends AbstractFormalRegion>
 	@Column(name = "path_level", nullable = false)
 	private Short pathLevel;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="parent")
 	private P parent;
 

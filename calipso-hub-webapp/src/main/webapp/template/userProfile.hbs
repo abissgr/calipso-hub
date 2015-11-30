@@ -1,0 +1,71 @@
+<div class="tmpl-hint">start userProfile.hbs</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="well">
+	        <h2>
+	            <img src="http://www.gravatar.com/avatar/{{ emailHash }}?s=50" class="img-circle"> 
+	            {{ name }} 
+	            <small>
+	                <a href="mailto://{{ email }}"> 
+	                    {{ email }}
+	                </a>
+	            </small>
+	        </h2>
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Contact Info</div>
+            <!--div class="panel-body">
+            </div-->
+            <div class="list-group">
+                {{#if email}}
+                <a class="list-group-item" href="mailto://{{ email }}"><span class="glyphicon glyphicon-envelope"></span> {{ email }}</a>
+                {{/if}}
+                {{#if cellphone}}
+                <a class="list-group-item" href="tel:{{ cellphone }}"><span class="glyphicon glyphicon-phone"></span> {{ cellphone }}</a>
+                {{/if}}
+                {{#if telephone}}
+                <a class="list-group-item" href="tel:{{ cellphone }}"><span class="glyphicon glyphicon-phone-alt"></span> {{ telephone }}</a>
+                {{/if}}
+                {{#if address}}
+                <address class="list-group-item">
+                    <span class="glyphicon glyphicon glyphicon-inbox"></span> {{address}}
+                    {{postCode}}
+                    {{country.name}}
+                </address>
+                {{/if}}
+            </div>
+         </div>
+     </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Status</div>
+            <!--div class="panel-body">
+            </div-->
+            <table class="table">
+              <tr><th>Active</th>
+	              <td>
+	                {{#if active}}
+	                <span class="text-success"><i class="fa fa-check"></i></span>
+	                {{else}}
+	                <span class="text-danger"><i class="fa fa-close"></i></span>
+	                {{/if}}
+	              </td>
+	          </tr>
+              <tr><th>Last Visit</th>
+              <td>{{momentFromNow lastVisit}}</td></tr>
+              <tr>
+                <th>Password</th>
+                <td>
+                    <a class="btn btn-danger" href="/changePassword">Change Password</a> 
+                    {{#if lastPassWordChangeDate}}Last updated {{momentFromNow lastPassWordChangeDate}}{{/if}}
+                </td>
+              </tr>
+			</table>
+         </div>
+     </div>
+</div>
+<div class="tmpl-hint">end userProfile.hbs</div>
