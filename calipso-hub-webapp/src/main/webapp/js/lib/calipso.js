@@ -1262,7 +1262,6 @@ function(
 				propertySchemaForAction = false;
 			}
 
-				console.log("GenericModel#getFormSchema formSchema: "+ formSchema.toSource());
 			return formSchema;
 		},
 		initialize : function() {
@@ -1873,7 +1872,6 @@ function(
 		   * @return {Form.Field}
 		   */
 		  createField: function(key, schema) {
-				//console.log("createField, key: " + key + ", schema: " + schema.toSource());
 				if(!schema.hidden){
 					if(!schema.titleHTML){
 						schema.titleHTML = schema.title;
@@ -1901,7 +1899,6 @@ function(
 					}
 				}
 
-				//console.log("createField, apply key: " + key + ", schema: " + schema.toSource());
 				return Backbone.Form.prototype.createField.apply(this, arguments);
 		  },
 
@@ -3421,7 +3418,6 @@ function(
 		template : Calipso.getTemplate("templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
 		tagName : "li",
 		initialize : function(options) {
-			console.log("TemplateBasedItemView#initialize, options: " + this.options.toSource());
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			console.log("TemplateBasedItemView#initialize, item: " + this.model);
 		},
