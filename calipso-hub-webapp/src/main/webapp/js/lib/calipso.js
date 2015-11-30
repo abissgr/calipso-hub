@@ -4714,7 +4714,7 @@ function(
 
 			/**
 			 * Calculate "from" now using the given date
-			 * @example {{momentFromNow someDate}}
+			 * @example {{-+momentFromNow someDate}}
 			 */
 			Handlebars.registerHelper('momentFromNow', function(date) {
 				return window.moment ? moment(date).fromNow() : date;
@@ -5340,7 +5340,8 @@ function(
 		*/
 		templatePage : function(templateName) {
  			var pageView = new Calipso.view.TemplateBasedItemView({
- 				template: Calipso.getTemplate(templateName)
+ 				template: Calipso.getTemplate(templateName),
+				tagName: "div"
  			});
  			Calipso.vent.trigger("app:show", pageView);
  		},
