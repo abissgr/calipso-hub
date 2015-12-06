@@ -51,7 +51,7 @@ public abstract class AbstractPersistable<ID extends Serializable> implements Fo
     public static interface CollectionView {}
 	
 	
-	//@JsonView(FormSchemaAwareView.class)
+	@JsonView(FormSchemaAwareView.class)
 	@Transient
 	private FormSchema formSchema;
 

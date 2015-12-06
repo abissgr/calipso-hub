@@ -2836,7 +2836,7 @@ function(
 			}
 		},
 		getTypeName : function() {
-			return this.getTypeName();
+			return this.constructor.getTypeName();
 		}
 	}, {
 		getTypeName : function() {
@@ -4101,7 +4101,11 @@ function(
 				throw "GenericFormView: a 'model' option is required";
 			}
 			// set schema key, from options or model
-			this.formSchemaKey = this.model.getFormSchemaKey();
+			this.formSchemaKey = options.formSchemaKey;
+			if (!this.formSchemaKey) {
+				this.formSchemaKey = this.model.getFormSchemaKey();
+			}
+			console.log("GenericFormView#initialize, formSchemaKey: " + this.formSchemaKey);
 			if (options.formTemplateKey) {
 				this.formTemplateKey = options.formTemplateKey;
 			}
@@ -4224,7 +4228,7 @@ function(
 		},
 		onShow : function() {
 			var _self = this;
-
+			console.log("_self.formSchemaKey: " + _self.formSchemaKey);
 			// get appropriate schema
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 
@@ -5094,16 +5098,17 @@ function(
 		 * @param  {Calipso.view.MainLayout]} the layout type to use. If absent the method will
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
-		showLayoutForModel : function(givenModel, ViewType, viewOptions){
-			viewOptions || (viewOptions = {});
-			viewOptions.model = givenModel;
+		showLayoutForModel : function(givenModel, LayoutType, layoutOptions){
+			//layoutOptions || (layoutOptions = {});
+			layoutOptions = $.extend(true, {}, givenModel.getLayoutOptions(), layoutOptions);
+			layoutOptions.model = givenModel;
 			// make sure to choose a layout type
-			if(!ViewType){
-				ViewType = givenModel.getLayoutViewType();
+			if(!LayoutType){
+				LayoutType = givenModel.getLayoutViewType();
 			}
-			console.log("showLayoutForModel, layout: " + ViewType.getTypeName());
+			console.log("showLayoutForModel, layout: " + LayoutType.getTypeName());
 			// instantiate and show the layout
-			var view = new ViewType(viewOptions);
+			var view = new LayoutType(layoutOptions);
 			Calipso.vent.trigger("app:show", view);
 		},
 		/**
@@ -5414,6 +5419,98 @@ function(
 			return "Calipso.view.UserDetailsLayout";
 		}
 	});
+
+
+		Calipso.view.WizardLayout = Calipso.view.ModelDrivenBrowseLayout.extend({
+			className : "container configurable-fluid",
+			template : Calipso.getTemplate('wizard-layout'),
+			/**
+			* Maintains the index of the latest step that has been rendered, if any
+			*/
+			currentStepIndex: null,
+			regions : {
+				stepRegion : ".wizard-step"
+			},
+			getRequiredOptionNames : function(){
+				return ["steps"];
+			},
+			onShow : function() {
+				// render title
+				if (this.title) {
+					this.$el.find(".wizard-title").empty().append(this.title);
+				}
+				// render child view
+				this.showNext();
+			},
+			getStepModel : function(step) {
+				var model = step.model;
+				if(!model && step.modelPath){
+					if(step.modelPath){
+						model = Calipso.getPathValue(this.model, step.modelPath);
+						if(_.isUndefined(model)){
+							throw ("Calipso.view.WizardLayout#getStepModel: no value found for modelPath: " + step.modelPath);
+						}
+					}
+				}
+				if(!model && step.modelType){
+					model = new step.modelType();
+					if(step.modelPath){
+						Calipso.setPathValue(this.model, step.modelPath, model);
+					}
+					if(step.parentModelPath){
+						Calipso.setPathValue(model, step.parentModelPath, this.model);
+					}
+				}
+				if(!model){
+					model = this.model;
+				}
+				if(!model){
+					throw "Could not resolve or create step view model";
+				}
+				step.model = model;
+				return model;
+			},
+			showNext : function() {
+				var stepIndex = 0;
+				if (this.currentStepIndex != null) {
+					stepIndex = this.currentStepIndex + 1;
+				}
+				this.showStep(stepIndex);
+			},
+			showPrevious : function() {
+				var stepIndex = 0;
+				if (this.currentStepIndex != null && this.currentStepIndex > 0) {
+					stepIndex = this.currentStepIndex - 1;
+				}
+				this.showStep(stepIndex);
+			},
+			updateProgress : function() {
+				this.$el.find(".wizard-progress").empty().append("Step " + (this.currentStepIndex + 1) + " of " + (this.config.steps.length + 1));
+			},
+			showStep : function(stepIndex) {
+				var step = this.config.steps[stepIndex];
+				console.log("showStep, step: ");
+				console.log(step);
+				var view = step.view;
+				if(!view){
+					var viewOptions = step.viewOptions ? step.viewOptions : {};
+					viewOptions.model = this.getStepModel(step);
+					var ViewType = step.viewType ? step.viewType : viewOptions.model.getItemViewType();
+					view = new ViewType(viewOptions);
+				}
+				// render child view
+				this.stepRegion.show(view);
+				this.currentStepIndex = stepIndex;
+			},
+
+			onGenericFormSaved : function(model){
+				this.showNext();
+			},
+		}, {
+			getTypeName : function() {
+				return "Calipso.view.WizardLayout";
+			}
+		});
 	//////////////////////////////////////////////////////
 	// user Registration: model, layout etc. Uses the
 	// userRegistrations path fragment/route.
