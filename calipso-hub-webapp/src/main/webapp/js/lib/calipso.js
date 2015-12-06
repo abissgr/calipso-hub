@@ -1872,6 +1872,7 @@ function(
 		   * @return {Form.Field}
 		   */
 		  createField: function(key, schema) {
+				console.log("createField: " + key);
 				if(!schema.hidden){
 					if(!schema.titleHTML){
 						schema.titleHTML = schema.title;
