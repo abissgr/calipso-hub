@@ -17,20 +17,20 @@
  */
 package gr.abiss.calipso.jpasearch.service.impl;
 
+import gr.abiss.calipso.model.acl.AclClass;
+import gr.abiss.calipso.model.acl.AclObject;
+import gr.abiss.calipso.model.acl.AclObjectIdentity;
+import gr.abiss.calipso.model.acl.AclSid;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
-import gr.abiss.calipso.acl.model.AclClass;
-import gr.abiss.calipso.acl.model.AclObject;
-import gr.abiss.calipso.acl.model.AclObjectIdentity;
-import gr.abiss.calipso.acl.model.AclSid;
-import gr.abiss.calipso.acl.repository.AclClassRepository;
-import gr.abiss.calipso.acl.repository.AclObjectIdentityRepository;
-import gr.abiss.calipso.acl.repository.AclSidRepository;
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.jpasearch.service.GenericService;
+import gr.abiss.calipso.repository.acl.AclClassRepository;
+import gr.abiss.calipso.repository.acl.AclObjectIdentityRepository;
+import gr.abiss.calipso.repository.acl.AclSidRepository;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 

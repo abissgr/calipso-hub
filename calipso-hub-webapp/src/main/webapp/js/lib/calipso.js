@@ -2275,7 +2275,103 @@ function(
 				headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
 			} ],
 		});
-
+		// Role model
+		// ---------------------------------------
+		Calipso.model.CountryModel = Calipso.model.GenericModel.extend(
+		/** @lends Calipso.model.RoleModel.prototype */
+		{
+			toString : function() {
+				return this.get("name");
+			}
+		//urlRoot : "/api/rest/users"
+		}, {
+			// static members
+			parent : Calipso.model.GenericModel,
+			label : "Role",
+			pathFragment : "countries",
+			typeName : "Calipso.model.RoleModel",
+			formSchemas : {//
+				name : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				nativeName : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				callingCode : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				capital : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				currency : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				languages : {
+					"search" : 'Text',
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+			},
+			gridSchema : [ {
+				name : "name",
+				label : "Name",
+				cell : Calipso.components.backgrid.ViewRowCell,
+				editable : false
+			}, {
+				name : "nativeName",
+				label : "Native name",
+				editable : false,
+				cell : "string"
+			}, {
+				name : "callingCode",
+				label : "Calling code",
+				editable : false,
+				cell : "string"
+			}, {
+				name : "capital",
+				label : "Capital",
+				editable : false,
+				cell : "string"
+			}, {
+				name : "currency",
+				label : "Currency",
+				editable : false,
+				cell : "string"
+			}, {
+				name : "languages",
+				label : "Languages",
+				editable : false,
+				cell : "string"
+			}, {
+				name : "edit",
+				label : "",
+				editable : false,
+				cell : Calipso.components.backgrid.EditRowInModalCell,
+				headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
+			} ],
+		});
 
 
 		// Notification Model
