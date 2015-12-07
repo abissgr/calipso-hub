@@ -1872,7 +1872,6 @@ function(
 		   * @return {Form.Field}
 		   */
 		  createField: function(key, schema) {
-				console.log("createField: " + key);
 				if(!schema.hidden){
 					if(!schema.titleHTML){
 						schema.titleHTML = schema.title;
@@ -1887,16 +1886,16 @@ function(
 						}
 					}
 					if(this.hintRequiredFields && this.isRequired(schema)){
-						var suffix = "";
 						var hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
 						schema.titleHTML.trim();
-						for(var i = schema.titleHTML.length; i < length; i++){
+						/*for(var i = schema.titleHTML.length; i < length; i++){
 							suffix += ' ';
 						}
 						if(schema.titleHTML.lastIndexOf(":") == schema.titleHTML.length - 1){
 							schema.titleHTML = title.substring(0, schema.titleHTML.length - 1);
 							suffix = ":" + suffix;
-						}
+						}*/
+						schema.titleHTML = schema.titleHTML + hint;
 					}
 				}
 
@@ -5435,12 +5434,13 @@ function(
 				return ["steps"];
 			},
 			onShow : function() {
+				// render child view
+				this.showNext();
+				/*
 				// render title
 				if (this.title) {
 					this.$el.find(".wizard-title").empty().append(this.title);
-				}
-				// render child view
-				this.showNext();
+				}*/
 			},
 			getStepModel : function(step) {
 				var model = step.model;
@@ -5489,7 +5489,7 @@ function(
 			},
 			showStep : function(stepIndex) {
 				var step = this.config.steps[stepIndex];
-				console.log("showStep, step: ");
+				console.log("showStep, index: " + stepIndex + "step: ");
 				console.log(step);
 				var view = step.view;
 				if(!view){
@@ -5499,6 +5499,9 @@ function(
 					view = new ViewType(viewOptions);
 				}
 				// render child view
+				var stepTitle = step.title ? step.title : ("Step " + (stepIndex + 1));
+				console.log("step title: " + stepTitle);
+				this.$el.find(".step-title").empty().append(stepTitle);
 				this.stepRegion.show(view);
 				this.currentStepIndex = stepIndex;
 			},
