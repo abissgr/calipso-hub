@@ -107,8 +107,9 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 				|| (!currentPrincipal.isAdmin() && !currentPrincipal.isSiteAdmin())){
 			LOGGER.info("create, forcing active: false");
 			resource.setActive(false);
-			LOGGER.info("create, creating confirmation key");
-			resource.setConfirmationToken(generator.generateKey());
+			String token = generator.generateKey();
+			LOGGER.info("creating user, confirmation token: " + token);
+			resource.setResetPasswordToken(token);
 		}
 		LOGGER.info("create, user: " + resource);
 		resource = super.create(resource);
@@ -150,8 +151,9 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
-		user.setConfirmationToken(null);
+		user.setResetPasswordToken(null);
 		user.setPassword(newPassword);
+		user.setActive(true);
 		user = this.update(user);
 
 		LOGGER.info("handlePasswordResetToken returning local user: " + user);
@@ -163,8 +165,8 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	public void handlePasswordResetRequest(String userNameOrEmail) {
 		Assert.notNull(userNameOrEmail);
 		User user = this.findByUserNameOrEmail(userNameOrEmail);
-		if (user == null) {
-			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
+		if (user == null || !user.getActive()) {
+			throw new UsernameNotFoundException("Could not match username to an active user: " + userNameOrEmail);
 		}
 		// keep any existing token
 		if(user.getResetPasswordToken() == null){
@@ -179,24 +181,23 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	}
 
 
-	@Override
-	@Transactional(readOnly = false)
-	public User confirmPrincipal(String confirmationToken) {
-		Assert.notNull(confirmationToken);
-		//LoggedInUserDetails loggedInUserDetails = new LoggedInUserDetails();
-		User original = this.userRepository.findByConfirmationToken(confirmationToken);
-		if (original != null) {
-			// enable and update user
-			original.setConfirmationToken(null);
-			original.setActive(true);
-			original = this.userRepository.save(original);
-		} else {
-			LOGGER.warn("Could not find any user matching confirmation token: " + confirmationToken);
-		}
-
-		LOGGER.info("create returning local user: " + original);
-		return original;
-	}
+//	@Override
+//	@Transactional(readOnly = false)
+//	public User confirmPrincipal(String confirmationToken) {
+//		Assert.notNull(confirmationToken);
+//		//LoggedInUserDetails loggedInUserDetails = new LoggedInUserDetails();
+//		User original = this.userRepository.findByConfirmationToken(confirmationToken);
+//		if (original != null) {
+//			// enable and update user
+//			original.setResetPasswordToken(null);
+//			original = this.userRepository.save(original);
+//		} else {
+//			LOGGER.warn("Could not find any user matching confirmation token: " + confirmationToken);
+//		}
+//
+//		LOGGER.info("create returning local user: " + original);
+//		return original;
+//	}
 
 
 	/**

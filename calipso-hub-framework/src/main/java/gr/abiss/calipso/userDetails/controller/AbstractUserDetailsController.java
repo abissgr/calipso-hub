@@ -63,39 +63,39 @@ public abstract class AbstractUserDetailsController<S extends UserDetailsService
 		this.userDetailsConfig = userDetailsConfig;
 	}
 
-	/**
-	 * Logins the given user after confirming his email address. Triggered by token HTML form (POST) or email confirmation link (GET)
-	 * @param request
-	 * @param response
-	 * @param token
-	 * @return
-	 */
-	@RequestMapping(value = "confirmation", method = {RequestMethod.POST })
-	@ResponseBody
-	public ICalipsoUserDetails confirmRegistrationAndLogin(HttpServletRequest request,
-			HttpServletResponse response, @RequestBody UserDetails resource) {
-		String key = resource.getConfirmationToken();
-		LOGGER.info("Confirmation key: " + key);
-		ICalipsoUserDetails userDetails = this.service.confirmPrincipal(key);
-		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
-		return userDetails;
-	}
+//	/**
+//	 * Logins the given user after confirming his email address. Triggered by token HTML form (POST) or email confirmation link (GET)
+//	 * @param request
+//	 * @param response
+//	 * @param token
+//	 * @return
+//	 */
+//	@RequestMapping(value = "confirmation", method = {RequestMethod.POST })
+//	@ResponseBody
+//	public ICalipsoUserDetails confirmRegistrationAndLogin(HttpServletRequest request,
+//			HttpServletResponse response, @RequestBody UserDetails resource) {
+//		String key = resource.getConfirmationToken();
+//		LOGGER.info("Confirmation key: " + key);
+//		ICalipsoUserDetails userDetails = this.service.confirmPrincipal(key);
+//		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
+//		return userDetails;
+//	}
 	
-	/**
-	 * Logins the given user after confirming his email address. Triggered by token HTML form (POST) or email confirmation link (GET)
-	 * @param request
-	 * @param response
-	 * @param token
-	 * @return
-	 */
-	@RequestMapping(value = "accountConfirmations/{token}", method = {RequestMethod.GET})
-	@ResponseBody
-	public ICalipsoUserDetails confirmRegistrationAndLoginFromEmailLink(HttpServletRequest request,
-			HttpServletResponse response, @PathVariable String token) {
-		ICalipsoUserDetails userDetails = this.service.confirmPrincipal(token);
-		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
-		return userDetails;
-	}
+//	/**
+//	 * Logins the given user after confirming his email address. Triggered by token HTML form (POST) or email confirmation link (GET)
+//	 * @param request
+//	 * @param response
+//	 * @param token
+//	 * @return
+//	 */
+//	@RequestMapping(value = "accountConfirmations/{token}", method = {RequestMethod.GET})
+//	@ResponseBody
+//	public ICalipsoUserDetails confirmRegistrationAndLoginFromEmailLink(HttpServletRequest request,
+//			HttpServletResponse response, @PathVariable String token) {
+//		ICalipsoUserDetails userDetails = this.service.confirmPrincipal(token);
+//		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
+//		return userDetails;
+//	}
 
 	/**
 	 * Logins the given user after reseting his password

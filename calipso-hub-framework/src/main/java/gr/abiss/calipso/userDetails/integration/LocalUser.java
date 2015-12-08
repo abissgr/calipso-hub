@@ -34,8 +34,6 @@ public interface LocalUser {
 	
 	void setActive(Boolean b);
 
-	void setConfirmationToken(String confirmationToken);
-
 	void setResetPasswordToken(String generateKey);
 
 	void setPassword(String newPassword);

@@ -72,7 +72,7 @@ public interface LocalUserService<ID extends Serializable, T extends LocalUser> 
 	public T findByCredentials(String userNameOrEmail, String userPassword,
 			Map<String, String> metadata);
 
-	public T confirmPrincipal(String confirmationToken);
+	//public T confirmPrincipal(String confirmationToken);
 
 	public void handlePasswordResetRequest(String userNameOrEmail);
 

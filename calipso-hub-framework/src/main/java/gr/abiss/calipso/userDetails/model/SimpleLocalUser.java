@@ -28,7 +28,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class SimpleLocalUser implements LocalUser {
 
 	private Boolean active;
-	private String confirmationToken;
+//	private String confirmationToken;
 	private String resetPasswordToken;
 	private String password;
 	private String username;
@@ -49,11 +49,11 @@ public class SimpleLocalUser implements LocalUser {
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
-
-	@Override
-	public void setConfirmationToken(String confirmationToken) {
-		this.confirmationToken = confirmationToken;
-	}
+//
+//	@Override
+//	public void setConfirmationToken(String confirmationToken) {
+//		this.confirmationToken = confirmationToken;
+//	}
 
 	@Override
 	public void setResetPasswordToken(String resetPasswordToken) {

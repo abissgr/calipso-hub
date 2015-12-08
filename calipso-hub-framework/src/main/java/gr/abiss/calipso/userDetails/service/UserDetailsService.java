@@ -31,7 +31,7 @@ public interface UserDetailsService extends CrudService<ICalipsoUserDetails, Str
 
 	void handlePasswordResetRequest(String userNameOrEmail);
 
-	ICalipsoUserDetails confirmPrincipal(String confirmationToken);
+//	ICalipsoUserDetails confirmPrincipal(String confirmationToken);
 
 	ICalipsoUserDetails createForImplicitSignup(LocalUser user)
 			throws DuplicateEmailException;

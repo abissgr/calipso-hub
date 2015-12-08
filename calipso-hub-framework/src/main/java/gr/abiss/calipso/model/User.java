@@ -91,10 +91,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	
 	@Transient
 	List<String> changedAttributes = null;
-	
-	@JsonIgnore
-	@Column(name = "confirmation_token")
-	private String confirmationToken;
 
 	@JsonIgnore
 	@Column(name = "reset_password_token")
@@ -246,6 +242,8 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@PrePersist
 	@PreUpdate
 	public void resetEmailHash() {
+		// create the email hash, 
+		// use email as username if latter is empty
 		if (this.getEmail() != null) {
 
 			// make sure it's trimmed
@@ -253,6 +251,9 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 			// update the hash
 			this.setEmailHash(MD5Utils.md5Hex(this.getEmail()));
 
+			if(this.getUsername() == null){
+				this.setUsername(this.getEmail());
+			}
 		}
 
 	}
@@ -334,15 +335,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@Override
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getConfirmationToken() {
-		return confirmationToken;
-	}
-
-	@Override
-	public void setConfirmationToken(String confirmationToken) {
-		this.confirmationToken = confirmationToken;
 	}
 
 	public String getResetPasswordToken() {

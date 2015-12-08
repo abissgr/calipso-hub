@@ -191,21 +191,21 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		return userDetails;
 	}
 
-	@Override
-	@Transactional(readOnly = false)
-	public ICalipsoUserDetails confirmPrincipal(String confirmationToken) {
-		LOGGER.debug("confirmPrincipal confirmationToken: " +  confirmationToken);
-		Assert.notNull(confirmationToken);
-		ICalipsoUserDetails userDetails = null;
-		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
-		// convert to UserDetals if not null
-		userDetails = UserDetails.fromUser(localUser);
-		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
-		}
-		return userDetails;
-	}
+//	@Override
+//	@Transactional(readOnly = false)
+//	public ICalipsoUserDetails confirmPrincipal(String confirmationToken) {
+//		LOGGER.debug("confirmPrincipal confirmationToken: " +  confirmationToken);
+//		Assert.notNull(confirmationToken);
+//		ICalipsoUserDetails userDetails = null;
+//		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
+//		// convert to UserDetals if not null
+//		userDetails = UserDetails.fromUser(localUser);
+//		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
+//		if(LOGGER.isDebugEnabled()){
+//			LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
+//		}
+//		return userDetails;
+//	}
 
 	@Override
 	@Transactional(readOnly = false)
@@ -223,7 +223,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		if (localUser == null) {
 			throw new UsernameNotFoundException("Could not match username: " + usernameOrEmail);
 		}
-		localUser.setConfirmationToken(null);
+		localUser.setResetPasswordToken(null);
 		localUser.setPassword(newPassword);
 		userDetails = UserDetails.fromUser(localUser);
 		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));

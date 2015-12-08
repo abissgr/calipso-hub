@@ -4,49 +4,66 @@
 	<div class="col-md-4"></div>
 	<div class="col-md-4">
 		<!--Panel Group -->
-		<div class="panel-group panel-group-lists" id="accordionFaq" role="tablist" aria-multiselectable="true">
+		<div class="panel-group panel-group-lists" id="accordionFaq"
+			role="tablist" aria-multiselectable="true">
 
-				<!-- Panel: Login/Change Password -->
-			  <div class="panel panel-default">
-			    <div class="panel-heading" role="tab" id="fheading1">
-			      <h4 class="panel-title">
-			        <a role="button" data-toggle="collapse" data-parent="#accordionFaq" href="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
-								<i class="fa fa-lock"></i>
-								<span class="view-title">Login</span>
-			        </a>
-			      </h4>
-			    </div>
-			    <div id="faqCollapse1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="faqHeading1">
-			      <div class="panel-body" id="calipsoModelDrivenBrowseLayout-contentRegion">
-								<!--Body content-->
-			      </div>
-			    </div>
-			  </div>
-
-				<!-- Panel: Forgot Password -->
-				<div class="panel panel-info">
-				    <div class="panel-heading" role="tab" id="faqHeading2">
-				      <h4 class="panel-title">
-				        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionFaq" href="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
-				          <i class="fa fa-unlock"></i>
-									Forgot password?
-				        </a>
-				      </h4>
-				    </div>
-				    <div id="faqCollapse2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqHeading2">
-				      <div class="panel-body">
-								<div class="panel-body" id="calipsoUserDetailsLayout-forgotPasswordRegion">
-										<!--Body content-->
-								</div>
-				    	</div>
+			<!-- Panel: Login/Change Password -->
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab" id="fheading1">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse"
+							data-parent="#accordionFaq" href="#faqCollapse1"
+							aria-expanded="true" aria-controls="faqCollapse1"> <i
+							class="fa fa-lock"></i> <span class="view-title">Login</span>
+						</a>
+					</h4>
+				</div>
+				<div id="faqCollapse1" class="panel-collapse collapse in"
+					role="tabpanel" aria-labelledby="faqHeading1">
+					<div class="panel-body">
+						{{#if username}}
+                        <p>A confirmation token has been emailed to you. Please check
+                            your inbox to find your token, then copy and paste it bellow.</p>
+						{{else}}
+                        <p>Enter your credentials bellow to login.</p>
+						{{/if}}
+						<div id="calipsoModelDrivenBrowseLayout-contentRegion">
+							<!--Body content-->
 						</div>
 					</div>
 				</div>
-
 			</div>
-			<!-- /Panel Group -->
-	</div><!--/col -->
-	<div class="col-md-4"></div>
-</div><!-- /row -->
+
+			<!-- Panel: Forgot Password -->
+			<div class="panel panel-info">
+				<div class="panel-heading" role="tab" id="faqHeading2">
+					<h4 class="panel-title">
+						<a class="collapsed" role="button" data-toggle="collapse"
+							data-parent="#accordionFaq" href="#faqCollapse2"
+							aria-expanded="false" aria-controls="faqCollapse2"> <i
+							class="fa fa-unlock"></i> Forgot password?
+						</a>
+					</h4>
+				</div>
+				<div id="faqCollapse2" class="panel-collapse collapse"
+					role="tabpanel" aria-labelledby="faqHeading2">
+					<div class="panel-body">
+					   <div class="panel-body">
+					       <p>Forgot your password? Enter your email bellow to receive a password reset link in your inbox.</p>
+	                        <div id="calipsoUserDetailsLayout-forgotPasswordRegion">
+	                            <!--Body content-->
+	                        </div>
+					   </div>
+					</div>
+				</div>
+			</div>
+		</div>
+        <!-- /Panel Group -->
+	</div>
+</div>
+<!--/col -->
+<div class="col-md-4"></div>
+</div>
+<!-- /row -->
 
 <div class="tmpl-hint">end userDetails-layout.hbs</div>

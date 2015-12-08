@@ -16,19 +16,15 @@
         	th:if="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
-        <p th:text="#{email.accountconfirmation.code(${user.getConfirmationToken()})} ">
-        Your confirmation code is:
+        <p th:text="#{email.token.is(${user.getResetPasswordToken()})} ">
+        Your confirmation token is:
         </p>
         <p th:text="#{email.accountconfirmation.clicklinktoconfirm}">
         Click the following link to confirm your email address and enable your account:
         </p>
         <p>
-        	<a th:if="${#strings.isEmpty(redir)}"
-	        	th:href="@{#{email.accountconfirmation.link(${baseUrl}, ${user.getConfirmationToken()})}}"
-	        	th:text="#{email.accountconfirmation.link(${baseUrl}, ${user.getConfirmationToken()})}"> </a>
-        	<a  th:unless="${#strings.isEmpty(redir)}"
-        		th:href="@{#{email.accountconfirmation.link.withredir(${baseUrl}, ${user.getConfirmationToken()}, ${redir})}}"
-        		th:text="#{email.accountconfirmation.link.withredir(${baseUrl}, ${user.getConfirmationToken()}, ${redir})}"> </a>
+            <a th:href="@{#{email.passwordreset.link(${baseUrl}, ${user.getUsername()}, ${user.getResetPasswordToken()})}}"
+             th:text="#{email.passwordreset.link(${baseUrl}, ${user.getUsername()}, ${user.getResetPasswordToken()})}"> </a>
         </p>
         <p class="greetings">
         	&emsp;Regards, <br />

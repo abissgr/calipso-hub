@@ -1384,7 +1384,7 @@ function(
 		 */
 		getItemViewType : function(instance) {
 			var itemViewType = this.itemViewType ? this.itemViewType : Calipso.view.GenericFormView;
-			console.log("GenericModel.getLayoutViewType, layoutViewType: " + itemViewType.getTypeName());
+			console.log("GenericModel.getItemViewType, layoutViewType: " + itemViewType.getTypeName());
 			return itemViewType;
 		},
 
@@ -2538,17 +2538,18 @@ function(
 			getFormSubmitButton : function(){
 				return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Register"
 			},
-			getFormTemplateKey : function(){
-				return "auth";
-			}
+			//getFormTemplateKey : function(){
+			//	return "auth";
+			//}
 		}, {
 			// static members
 			parent: Calipso.model.UserModel,
 			label: "Register",
 			pathFragment : "users",
 			typeName : "Calipso.model.UserRegistrationModel",
-			layoutViewType : Calipso.view.UserRegistrationLayout,
-			itemViewType : Calipso.view.GenericFormPanelView,
+			getLayoutViewType : function(instance) {
+				return Calipso.view.UserRegistrationLayout;
+			},
 			getFormSchemas : function(instance) {
 				console.log("UserRegistrationModel.getFormSchemas for " + instance.getTypeName());
 				var requiredText = {
@@ -2575,7 +2576,7 @@ function(
 						"update" : requiredText
 					},
 					username : {
-						"create" : requiredText,
+						//"create" : requiredText,
 						"update" : requiredText
 					},
 					email : {
@@ -2589,11 +2590,11 @@ function(
 						}
 					},
 					password : {
-						"create" : passwordText,
+						//"create" : passwordText,
 						"update" : passwordText
 					},
 					passwordConfirm : {
-						"create" : passwordConfirm,
+						//"create" : passwordConfirm,
 						"update" : passwordConfirm
 					},
 				};
@@ -4741,6 +4742,24 @@ function(
 		return Calipso._baseUrl;
 	}
 
+	Calipso.isUserInAnyRole = function(inputRoles){
+		var hasRole = false;
+		// only process if the user is authenticated
+		if (Calipso.session.userDetails) {
+			var ownedRoles = Calipso.session.userDetails.get("roles");
+			var inputRole;
+			for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
+				inputRole = inputRoles[j];
+				for (var k = 0; k < ownedRoles.length && hasRole == false; k++) {
+					var ownedRole = ownedRoles[k];
+					if (inputRole == ownedRole.name) {
+						hasRole = true;
+					}
+				}
+			}
+		}
+		return hasRole;
+	}
 
 	//
 	Calipso.util.Session = Backbone.Model.extend({
@@ -4775,36 +4794,30 @@ function(
 			// TODO: move these helpers to root scope
 			// and replace _this.userDetails with Calipso.session.userDetails
 			Handlebars.registerHelper("ifUserInRole", function() {
-				var hasRole = false;
-
-				// only process if the user is authenticated
-				if (_this.isAuthenticated()) {
-					//Last argument is the options object.
-					var options = arguments[arguments.length - 1];
-
-					// now get input roles, the ones to check for just a single match
-					var inputRoles = [];
-					for (var i = 0; i < arguments.length-1; i++) {
-						inputRoles.push(arguments[i]);
-					}
-					;
-					// now check if user has any of the given roles
-					if (inputRoles) {
-						var ownedRoles = _this.userDetails.get("roles");
-						var inputRole;
-						for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
-							inputRole = inputRoles[j];
-							for (var k = 0; k < ownedRoles.length && hasRole == false; k++) {
-								var ownedRole = ownedRoles[k];
-								if (inputRole == ownedRole.name) {
-									hasRole = true;
-								}
-							}
-						}
-					}
-					return hasRole ? options.fn(this) : options.inverse(this);
-
+				var options = arguments[arguments.length - 1];
+				// now get input roles, the ones to check for just a single match
+				var inputRoles = [];
+				for (var i = 0; i < arguments.length-1; i++) {
+					inputRoles.push(arguments[i]);
 				}
+				return Calipso.isUserInAnyRole(inputRoles) ? options.fn(this) : options.inverse(this);
+			});
+
+			/**
+			 * Check if the loggedin user has none of the given roles. Any numberof roles can be passed to the helper.
+			 * @example
+			 *  {{#ifUserInRole "ROLE_MANAGER" "ROLE_ADMIN"}}  <p>User is either a Manager or an Administrator! </p>{{/ifUserInRole}}
+			 */
+			// TODO: move these helpers to root scope
+			// and replace _this.userDetails with Calipso.session.userDetails
+			Handlebars.registerHelper("ifUserNotInRole", function() {
+				var options = arguments[arguments.length - 1];
+				// now get input roles, the ones to check for just a single match
+				var inputRoles = [];
+				for (var i = 0; i < arguments.length-1; i++) {
+					inputRoles.push(arguments[i]);
+				}
+				return !Calipso.isUserInAnyRole(inputRoles) ? options.fn(this) : options.inverse(this);
 			});
 
 
@@ -5121,7 +5134,14 @@ function(
 		},
 		myProfile : function(){
 			console.log("myProfile");
-			this.mainNavigationCrudRoute("userProfile", Calipso.session.userDetails.get("id"))
+			if (!Calipso.isAuthenticated()) {
+				Calipso.navigate("login", {
+					trigger : true
+				});
+			}
+			else{
+				this.mainNavigationCrudRoute("userProfile", Calipso.session.userDetails.get("id"))
+			}
 		},
 		login : function() {
 				if (Calipso.isAuthenticated()) {
@@ -5530,13 +5550,17 @@ function(
 				return ["steps"];
 			},
 			onShow : function() {
+
+				// resume wizard?
+				if(this.model.get("currentStepIndex")){
+						this.currentStepIndex = this.model.get("currentStepIndex");
+						console.log("Calipso.view.WizardLayout#onShow resuming at index: " + this.currentStepIndex);
+				}
+				else{
+					console.log("Calipso.view.WizardLayout#onShow skipping resume");
+				}
 				// render child view
 				this.showNext();
-				/*
-				// render title
-				if (this.title) {
-					this.$el.find(".wizard-title").empty().append(this.title);
-				}*/
 			},
 			getStepModel : function(step) {
 				var model = step.model;
@@ -5598,8 +5622,9 @@ function(
 				var stepTitle = step.title ? step.title : ("Step " + (stepIndex + 1));
 				console.log("step title: " + stepTitle);
 				this.$el.find(".step-title").empty().append(stepTitle);
-				this.stepRegion.show(view);
 				this.currentStepIndex = stepIndex;
+				this.model.set("currentStepIndex", stepIndex);
+				this.stepRegion.show(view);
 			},
 
 			onGenericFormSaved : function(model){
@@ -5618,9 +5643,11 @@ function(
 	Calipso.view.UserRegistrationLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
 	/** @lends Calipso.view.UserRegistrationLayout.prototype */
 	{
+
+		template : Calipso.getTemplate('userRegistration-layout'),
 		initialize : function(options) {
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-			// console.log("Calipso.view.UserRegistrationLayout#initialize");
+			console.log("Calipso.view.UserRegistrationLayout#initialize");
 		},
 
 		onGenericFormSaved : function(model){
@@ -5634,9 +5661,15 @@ function(
 				});
 			}
 			else{
-				// console.log("Calipso.view.UserRegistrationLayout#onGenericFormSaved, user is active, fwrding to confirmation form");
-				var confirmationModel = new Calipso.model.UserDetailsConfirmationModel();
-				this.showContent(confirmationModel);
+				var usernameOrEmail = model.get("email");
+				if(!usernameOrEmail){
+					usernameOrEmail = model.get("username");
+				}
+
+				Calipso.navigate("changePasswordWithToken/" + usernameOrEmail, {
+					trigger : true
+				});
+
 			}
 		},
 	}, {
@@ -5657,11 +5690,11 @@ function(
 		}
 	);
 	Calipso.view.UserProfileLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
-		/** @lends Calipso.view.UserRegistrationLayout.prototype */
+		/** @lends Calipso.view.UserProfileLayout.prototype */
 		{
 			initialize : function(options) {
 				Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-				// console.log("Calipso.view.UserRegistrationLayout#initialize");
+				// console.log("Calipso.view.UserProfileLayout#initialize");
 			},
 		}, {
 			// static members
