@@ -1339,7 +1339,7 @@ function(
 		 * @returns the class name as a string
 		 */
 		getPathFragment : function(instance) {
-			console.log("GenericModel.getPathFragment returns: " + this.pathFragment);
+			//console.log("GenericModel.getPathFragment returns: " + this.pathFragment);
 			return this.pathFragment;
 		},
 		/**
@@ -1357,7 +1357,7 @@ function(
 		 */
 		getLayoutViewType : function(instance) {
 			var layoutViewType = this.layoutViewType ? this.layoutViewType: Calipso.view.ModelDrivenSearchLayout;
-			console.log("GenericModel.getLayoutViewType, layoutViewType: " + layoutViewType.getTypeName());
+			//console.log("GenericModel.getLayoutViewType, layoutViewType: " + layoutViewType.getTypeName());
 			return layoutViewType;
 		},
 		/**
@@ -1384,7 +1384,7 @@ function(
 		 */
 		getItemViewType : function(instance) {
 			var itemViewType = this.itemViewType ? this.itemViewType : Calipso.view.GenericFormView;
-			console.log("GenericModel.getItemViewType, layoutViewType: " + itemViewType.getTypeName());
+			//console.log("GenericModel.getItemViewType, layoutViewType: " + itemViewType.getTypeName());
 			return itemViewType;
 		},
 
@@ -1864,6 +1864,27 @@ function(
 				return required;
 			},
 		  /**
+		   * Get all the field values as an object.
+		   * Use this method when passing data instead of objects.
+			 * Extends superclass to exclude fields with excludeFromCommit set to true
+		   *
+		   * @param {String} [key]    Specific field value to get
+		   */
+		  getValue: function(key) {
+		    //Return only given key if specified
+		    if (key) return this.fields[key].getValue();
+
+		    //Otherwise return entire form
+		    var values = {};
+		    _.each(this.fields, function(field) {
+					if(!field.excludeFromCommit){
+				      values[field.key] = field.getValue();
+					}
+		    });
+
+		    return values;
+		  },
+		  /**
 		   * Creates a Field instance
 		   *
 		   * @param {String} key
@@ -1999,6 +2020,59 @@ function(
 				}, {});
 			},
 	});
+	Calipso.components.backboneform.Form.Field = Backbone.Form.Field.extend({
+
+	  /**
+	   * Render the field and editor
+	   *
+	   * @return {Field} self
+	   */
+	  render: function() {
+	    var schema = this.schema,
+	        editor = this.editor,
+	        $ = Backbone.$;
+
+	    //Only render the editor if Hidden
+	    if (schema.type == Calipso.components.backboneform.Markup) {
+				console.log("MARKUP FIELD");
+	      return this.setElement(editor.render().el);
+	    }
+			else{
+				 return Backbone.Form.Field.prototype.render.apply(this, arguments);
+			}
+		}
+	});
+
+	Calipso.components.backboneform.Markup = Backbone.Form.editors.Hidden.extend(
+		{
+			tagName : "div",
+			excludeFromCommit : true,
+			initialize : function(options) {
+				Backbone.Form.editors.Hidden.prototype.initialize.call(this, options);
+				var markup = this.schema.html;
+				if(!markup){
+					markup = this.schema.template ? this.schema.template(this) : this.constructor.html;
+				}
+				this.$el.removeAttr("class type");
+				this.$el.html(markup);
+
+			},
+			getTemplate: function() {
+		    return this.schema.template || this.constructor.template;
+		  },
+			validate : function(){
+			},
+			setValue : function(){
+			},
+			getValue : function(){
+				return null;
+			},
+		},
+		{
+			// static
+			html : "<p>No html or template was provided in schema</p>"
+		}
+	);
 
 	Calipso.components.backboneform.Text = Backbone.Form.editors.Text.extend({
 		initialize : function(options) {
@@ -2156,7 +2230,7 @@ function(
 			$el.typeahead("destroy");
 		},
 		setValue : function(value, name) {
-			console.log("Calipso.components.backboneform.TypeaheadObject#setValue, value: '" + value + "', name: " + name);
+			//console.log("Calipso.components.backboneform.TypeaheadObject#setValue, value: '" + value + "', name: " + name);
 			var _this = this;
 			if(!value){
 				value = null;
@@ -2168,7 +2242,7 @@ function(
 			}
 		},
 		getValue : function() {
-			console.log("Calipso.components.backboneform.TypeaheadObject#getValue, value: '" + this.value + "'");
+			//console.log("Calipso.components.backboneform.TypeaheadObject#getValue, value: '" + this.value + "'");
 			var value = this.value;
 			var query = this.$el.find("#" + this.id + "Typeahead").typeahead('val');
 			// if empty value or input, return plain
@@ -2194,7 +2268,7 @@ function(
 			}
 		},
 		callDataFunction : function(functionName, param){
-			console.log("callDataFunction:  " + functionName + ", param: " + param);
+			//console.log("callDataFunction:  " + functionName + ", param: " + param);
 			this.$el.data("DateTimePicker")[functionName](param);
 		},
 		onFormAttach : function() {
@@ -2203,7 +2277,7 @@ function(
 			_this.$el.parent().addClass("input-group");
 			_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
 			_this.$el.parent().datetimepicker(_this.config);
-			console.log("Calipso.components.backboneform.Datetimepicker#render, _this.value: " + _this.value);
+			//console.log("Calipso.components.backboneform.Datetimepicker#render, _this.value: " + _this.value);
 			var value = _this.schema.fromProperty
 				? _this.model.get(_this.schema.fromProperty)
 				: _this.value;
@@ -2430,8 +2504,8 @@ function(
 			* like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
 			*/
 			getLayoutViewType : function(instance) {
-				console.log("UserDetailsModel.getLayoutViewType, layoutViewType: " + this.layoutViewType);
-				console.log("UserDetailsModel.getLayoutViewType, modelType: " + this.getTypeName());
+				//console.log("UserDetailsModel.getLayoutViewType, layoutViewType: " + this.layoutViewType);
+				//console.log("UserDetailsModel.getLayoutViewType, modelType: " + this.getTypeName());
 				return Calipso.view.UserDetailsLayout;
 			},
 			getFormSchemas : function(instance) {
@@ -2499,8 +2573,8 @@ function(
 			                type: 'password',
 			                message: 'Incorrect current password'
 			            };
-									console.log("checkPassword: ");
-									console.log(userDetails);
+									//console.log("checkPassword: ");
+									//console.log(userDetails);
 			            if (!userDetails.get("id")) return err;
 			        	}
 							],//validators
@@ -2551,7 +2625,7 @@ function(
 				return Calipso.view.UserRegistrationLayout;
 			},
 			getFormSchemas : function(instance) {
-				console.log("UserRegistrationModel.getFormSchemas for " + instance.getTypeName());
+				//console.log("UserRegistrationModel.getFormSchemas for " + instance.getTypeName());
 				var requiredText = {
 					type : 'Text',
 					validators : [ 'required' ]
@@ -2677,10 +2751,10 @@ function(
 				Calipso.model.GenericModel.prototype.initialize.apply(this, arguments);
 				//this.subjectModelType = options.subjectModelType;
 				var subjectModelType = this.get("subjectModelType");
-				console.log("Calipso.model.ReportDataSetModel#initialize, subjectModelType: ");
-				console.log(subjectModelType);
-				console.log("Calipso.model.ReportDataSetModel#initialize, attributes: ");
-				console.log(this.attributes);
+				//console.log("Calipso.model.ReportDataSetModel#initialize, subjectModelType: ");
+				//console.log(subjectModelType);
+				//console.log("Calipso.model.ReportDataSetModel#initialize, attributes: ");
+				//console.log(this.attributes);
 				if(!(_.isNull(subjectModelType) || _.isUndefined(subjectModelType))){
 					this.set("reportType", subjectModelType.getReportTypeOptions()[0]);
 					var now = new Date();
@@ -2725,7 +2799,7 @@ function(
 				return options;
 			},
 			getFormSchema : function(actionName){
-				console.log("Calipso.model.ReportDataSetModel#getFormSchema actionName: " + actionName);
+				//console.log("Calipso.model.ReportDataSetModel#getFormSchema actionName: " + actionName);
 				var formSchema = {};
 				var reportTypeOptions = this.getReportTypeOptions();
 				if(reportTypeOptions){
@@ -2773,16 +2847,16 @@ function(
 					},
 					validators : [ 'required' ]
 				};
-				console.log("Calipso.model.ReportDataSetModel#getFormSchema formSchema: ");
-				console.log(formSchema);
+				//console.log("Calipso.model.ReportDataSetModel#getFormSchema formSchema: ");
+				//console.log(formSchema);
 				return formSchema;
 			},
 			getGridSchema : function(kpi){
-			console.log("Calipso.model.ReportDataSetModel#getGridSchema kpi: " + kpi);
+			//console.log("Calipso.model.ReportDataSetModel#getGridSchema kpi: " + kpi);
 				// sum or count
 				if(!kpi){
 					kpi = this.get("kpi");
-					console.log("Calipso.model.ReportDataSetModel#getGridSchema this.kpi: " + kpi);
+					//console.log("Calipso.model.ReportDataSetModel#getGridSchema this.kpi: " + kpi);
 				}
 				var schema = [{
 					name : "label",
@@ -2790,7 +2864,7 @@ function(
 					editable : false,
 					cell : "text",
 				}];
-				console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
+				//console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
 				var entries = this.wrappedCollection.first().get("entries");
 				for(var i = 0 ; i < entries.length; i++){
 					schema.push({
@@ -2800,8 +2874,8 @@ function(
 						cell : Calipso.components.backgrid.ChildNumberAttributeCell,
 					});
 				}
-				console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
-				console.log(schema);
+				//console.log("Calipso.model.ReportDataSetModel#getGridSchema returns: ");
+				//console.log(schema);
 				return schema;
 			},
 			fieldTemplate : _.template('\
@@ -3516,7 +3590,7 @@ function(
 		tagName : "li",
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			console.log("TemplateBasedItemView#initialize, item: " + this.model);
+			//console.log("TemplateBasedItemView#initialize, item: " + this.model);
 		},
 	}, {
 		getTypeName : function() {
@@ -3538,9 +3612,9 @@ function(
 			options = options || {};
 			if (!this.collection && options.model && options.model.isSearchable()) {
 				this.collection = options.model.wrappedCollection;
-				console.log("TemplateBasedCollectionLayout#initialize, got options.model.wrappedCollection: " + this.collection + ", url: " + this.collection.url);
+				//console.log("TemplateBasedCollectionLayout#initialize, got options.model.wrappedCollection: " + this.collection + ", url: " + this.collection.url);
 			}
-			console.log("TemplateBasedCollectionView#initialize, collection: " + this.collection);
+			//console.log("TemplateBasedCollectionView#initialize, collection: " + this.collection);
 		},
 		onShow : function() {
 			var _self = this;
@@ -3559,7 +3633,7 @@ function(
 			}
 			// fetch collection?
 			else if (this.options.forceFetch) {
-				console.log("TemplateBasedCollectionView#onShow,  size: " + this.collection.length);
+				//console.log("TemplateBasedCollectionView#onShow,  size: " + this.collection.length);
 				_self.collection.fetch({
 					url : _self.collection.url,
 					success : function(collection, response, options) {
@@ -3581,7 +3655,7 @@ function(
 		onBeforeDestroy : function() {
 			if (!this.pollCollectionAfterDestroy) {
 				if (this.collection.getTypeName && this.collection.getTypeName() == "Calipso.collection.PollingCollection") {
-					console.log("TemplateBasedCollectionView#onBeforeDestroy, stop polling for collection URL: " + this.collection.url);
+					//console.log("TemplateBasedCollectionView#onBeforeDestroy, stop polling for collection URL: " + this.collection.url);
 					this.collection.stopFetching();
 					this.collection.reset();
 					this.collection = null;
@@ -3763,7 +3837,7 @@ function(
 			window.history.back();
 		},
 		initialize : function(options) {
-			console.log("ModelDrivenCollectionGridView.initialize, options: " + options);
+			//console.log("ModelDrivenCollectionGridView.initialize, options: " + options);
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			if (options.collection) {
 				this.collection = options.collection;
@@ -3777,8 +3851,8 @@ function(
 			if (options.callCollectionFetch) {
 				this.callCollectionFetch = options.callCollectionFetch;
 			}
-			console.log("ModelDrivenCollectionGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
-			console.log("ModelDrivenCollectionGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
+			//console.log("ModelDrivenCollectionGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
+			//console.log("ModelDrivenCollectionGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
 		},
 		onGridRendered : function() {
 
@@ -3795,15 +3869,15 @@ function(
 		onShow : function() {
 			var _self = this;
 			// in case of a report we need a grid schema key
-			console.log("ModelDrivenCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
+			//console.log("ModelDrivenCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
 			var gridSchema = _self.model.getGridSchema();
-			console.log("ModelDrivenCollectionGridView.onShow,  _self.model.getGridSchema: ");
-			console.log(_self.model.getGridSchema());
+			//console.log("ModelDrivenCollectionGridView.onShow,  _self.model.getGridSchema: ");
+			//console.log(_self.model.getGridSchema());
 
-			console.log("ModelDrivenCollectionGridView.onShow, collection: " + _self.collection);
+			//console.log("ModelDrivenCollectionGridView.onShow, collection: " + _self.collection);
 
-			console.log("ModelDrivenCollectionGridView.onShow, collection.data: " + _self.collection.data);
-			console.log(_self.collection.data);
+			//console.log("ModelDrivenCollectionGridView.onShow, collection.data: " + _self.collection.data);
+			//console.log(_self.collection.data);
 
 			this.backgrid = this.getGrid({
 				className : "backgrid responsive-table",
@@ -3887,9 +3961,9 @@ function(
 				});
 				origThead.hide();
 				table_clone.removeAttr('style');
-				console.log("ModelDrivenCollectionGridView showFixedHeader, added header");
+				//console.log("ModelDrivenCollectionGridView showFixedHeader, added header");
 			} else {
-				console.log("ModelDrivenCollectionGridView showFixedHeader, skipped adding header");
+				//console.log("ModelDrivenCollectionGridView showFixedHeader, skipped adding header");
 			}
 
 			//tableOrig.find('thead').first().hide();
@@ -3972,7 +4046,7 @@ function(
 			gridOptions.columnsToPin = 1;
 			gridOptions.minScreenSize = 5000;
 			gridOptions.className = "backgrid";
-			console.log("building responsive grid...");
+			//console.log("building responsive grid...");
 			return new Backgrid.Extension.ResponsiveGrid(gridOptions);
 		},
 		onGridRendered : function() {
@@ -4102,7 +4176,7 @@ function(
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 		},
 		onDomRefresh : function() {
-			console.log("MainContentTabsView onDomRefresh");
+			//console.log("MainContentTabsView onDomRefresh");
 		}
 
 	}, {
@@ -4201,7 +4275,7 @@ function(
 			if (!this.formSchemaKey) {
 				this.formSchemaKey = this.model.getFormSchemaKey();
 			}
-			console.log("GenericFormView#initialize, formSchemaKey: " + this.formSchemaKey);
+			//console.log("GenericFormView#initialize, formSchemaKey: " + this.formSchemaKey);
 			if (options.formTemplateKey) {
 				this.formTemplateKey = options.formTemplateKey;
 			}
@@ -4324,7 +4398,7 @@ function(
 		},
 		onShow : function() {
 			var _self = this;
-			console.log("_self.formSchemaKey: " + _self.formSchemaKey);
+			//console.log("_self.formSchemaKey: " + _self.formSchemaKey);
 			// get appropriate schema
 			var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 
@@ -4340,7 +4414,7 @@ function(
 						_self.renderForm();
 					},
 					error : function(model, response, options) {
-						console.log("Error fetching model from server");
+						//console.log("Error fetching model from server");
 						alert("Error fetching model from server");
 					}
 				});
@@ -4350,11 +4424,11 @@ function(
 		renderForm : function(formSchema) {
 			var _self = this;
 
-			console.log("GenericFormView#renderForm, _self.formSchemaKey: " + _self.formSchemaKey);
+			//console.log("GenericFormView#renderForm, _self.formSchemaKey: " + _self.formSchemaKey);
 			if(formSchema){
 				formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 			}
-			//console.log("GenericFormView#renderForm, formSchema: ");
+			////console.log("GenericFormView#renderForm, formSchema: ");
 			console.log(formSchema);
 			var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
 			if(!formSubmitButton){
@@ -4376,7 +4450,7 @@ function(
 				_self.model.set(Calipso.session.searchData);
 				_self.searchResultsCollection.data = Calipso.session.searchData;
 			} else {
-				console.log("GenericFormView#renderForm, No session.searchData to add");
+				//console.log("GenericFormView#renderForm, No session.searchData to add");
 			}
 			var formOptions = {
 				model : _self.model,
@@ -4606,7 +4680,7 @@ function(
 			tabContentsRegion : '#calipsoTabContentsRegion'
 		},
 		onShow : function() {
-			console.log("TabLayout#onShow");
+			//console.log("TabLayout#onShow");
 			var tabLabelsView = new TabLabelsCollectionView({
 				collection : this.collection
 			});
@@ -4887,8 +4961,8 @@ function(
 		},
 		// Saving will try to login the user
 		save : function(model) {
-			console.log("session.save called");
-			console.log(model);
+			//console.log("session.save called");
+			//console.log(model);
 			var _self = this;
 			var usernameOrEmail = model.get('email') ? model.get('email') : model.get('username');
 			model.save( null, {
@@ -5133,7 +5207,7 @@ function(
 			return false;
 		},
 		myProfile : function(){
-			console.log("myProfile");
+			//console.log("myProfile");
 			if (!Calipso.isAuthenticated()) {
 				Calipso.navigate("login", {
 					trigger : true
@@ -5176,7 +5250,7 @@ function(
 			if (!Calipso.isAuthenticated()) {
 				window.alert("Please login to change your password");
 			}
-			console.log("changePassword, current userDetails.id: "+Calipso.session.userDetails.get("id"));
+			//console.log("changePassword, current userDetails.id: "+Calipso.session.userDetails.get("id"));
 			this.showLayoutForModel(Calipso.session.userDetails, null, null);
 		},
 		/*
@@ -5221,7 +5295,7 @@ function(
 			if(!LayoutType){
 				LayoutType = givenModel.getLayoutViewType();
 			}
-			console.log("showLayoutForModel, layout: " + LayoutType.getTypeName());
+			//console.log("showLayoutForModel, layout: " + LayoutType.getTypeName());
 			// instantiate and show the layout
 			var view = new LayoutType(layoutOptions);
 			Calipso.vent.trigger("app:show", view);
@@ -5231,12 +5305,12 @@ function(
 		 * business key/URI componenent
 		 */
 		getModelType : function(modelTypeKey) {
-			console.log("AbstractController#getModelType, modelTypeKey: " + modelTypeKey);
+			//console.log("AbstractController#getModelType, modelTypeKey: " + modelTypeKey);
 			// load model Type
 			var ModelType;
 			if (Calipso.modelTypesMap[modelTypeKey]) {
 				ModelType = Calipso.modelTypesMap[modelTypeKey];
-			 console.log("AbstractController#getModelType, ModelType: " + ModelType.getTypeName());
+			 //console.log("AbstractController#getModelType, ModelType: " + ModelType.getTypeName());
 			} else {
 				var modelForRoute;
 				var modelModuleId = "model/" + _.singularize(modelTypeKey);
@@ -5383,12 +5457,12 @@ function(
 				_self.syncMainNavigationState(model);
 			};
 			if (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0)) {
-				console.log("renderFetchable: fetch");
+				//console.log("renderFetchable: fetch");
 				fetchable.fetch({
 					data : fetchable.data
 				}).then(renderFetchable);
 			} else {
-				console.log("renderFetchable: dont fetch");
+				//console.log("renderFetchable: dont fetch");
 				renderFetchable();
 			}
 		},
@@ -5473,7 +5547,7 @@ function(
 			this.layout.contentRegion.show(new Calipso.view.NotFoundView());
 		},
 		editItem : function(item) {
-			console.log("MainController#editItem, item: " + item);
+			//console.log("MainController#editItem, item: " + item);
 		}
 
 	});
@@ -5484,7 +5558,7 @@ function(
 		template : Calipso.getTemplate('userDetails-layout'),
 		initialize : function(options) {
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-			// console.log("Calipso.view.UserRegistrationLayout#initialize");
+			// //console.log("Calipso.view.UserRegistrationLayout#initialize");
 		},
 		regions : {
 			contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion",
