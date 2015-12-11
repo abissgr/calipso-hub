@@ -32,7 +32,7 @@ define([
 'hbs!template/MainContentNavView',
 'hbs!template/md-form-view',
 'hbs!template/md-formpanel-view',
-'hbs!template/generic-crud-layout',
+'hbs!template/tabbed-layout',
 'hbs!template/userDetails-layout',
 'hbs!template/userRegistration-layout',
 'hbs!template/userProfile',
@@ -43,7 +43,8 @@ define([
 'hbs!template/headerNotificationsItemView',
 'hbs!template/templateBasedItemView',
 'hbs!template/templateBasedCollectionView',
-'hbs!template/wizard-layout' ]
+'hbs!template/wizard-layout',
+'hbs!template/itemViewTemplate']
 ,
 
 function(
@@ -60,7 +61,7 @@ function(
 		MainContentNavView,
 		md_form_view,
 		md_formpanel_view,
-		generic_crud_layout,
+		tabbed_layout,
 		userDetails_layout,
 		userRegistration_layout,
 		userProfile,
@@ -71,7 +72,8 @@ function(
 		headerNotificationsItemView,
 		templateBasedItemView,
 		templateBasedCollectionView,
-		wizardLayout
+		wizardLayout,
+		itemViewTemplate
 ) {
 	return {
 
@@ -88,7 +90,7 @@ function(
 	"MainContentNavView":MainContentNavView,
 	"md-form-view":md_form_view,
 	"md-formpanel-view":md_formpanel_view,
-	"generic-crud-layout":generic_crud_layout,
+	"tabbed-layout":tabbed_layout,
 	"userDetails-layout":userDetails_layout,
 	"userRegistration-layout":userRegistration_layout,
 	"userProfile" : userProfile,
@@ -100,7 +102,7 @@ function(
 	"templateBasedItemView":templateBasedItemView,
 	"templateBasedCollectionView":templateBasedCollectionView,
 	"wizard-layout":wizardLayout,
-
+	"itemViewTemplate":itemViewTemplate
 	};
 
 });

@@ -144,16 +144,13 @@ function(
 	 */
 	Calipso.socialLogin = function(e) {
 
-			console.log("Calipso.socialLogin, clicked:");
 			Calipso.stopEvent(e);
 			var clicked = $(e.currentTarget);
 
-			console.log(clicked);
 			var providerNames = ["facebook", "linkedin", "twitter", "google"];
 			var providerName;
 
 			for(var i=0; i < providerNames.length; i++){
-				console.log("Calipso.socialLogin looking for className: " + "btn-social-login-" + providerNames[i]);
 				if(clicked.hasClass("btn-social-login-" + providerNames[i])){
 					providerName = providerNames[i];
 					break;
@@ -292,7 +289,6 @@ function(
 
 			Calipso.modelTypesMap = {};
 			var parseModel = function(ModelType) {
-				console.log("Calipso initializer, parsing model type: " + ModelType.getTypeName());
 				if(ModelType.getTypeName() != "Calipso.model.ReportDataSetModel"
 					&& ModelType.getTypeName() != "Calipso.model.UserRegistrationModel"
 					&& ModelType.getTypeName() != "Calipso.model.GenericModel"){
@@ -319,9 +315,7 @@ function(
 			for ( var modelKey in modelTypesMap) {
 				modelType = modelTypesMap[modelKey];
 				//TODO
-				// console.log("Add menu entrie for  model type: " + modelType.getTypeName() + " and key: " + modelType.getPathFragment() + ", showInMenu: " + modelType.prototype.showInMenu);
-				//				if(modelType.prototype.showInMenu){
-				if (true) {
+			if (true) {
 					menuEntries[modelType.getPathFragment()] = {
 						label : modelType.label,
 						modelKey : modelType.modelKey
@@ -1387,7 +1381,11 @@ function(
 			//console.log("GenericModel.getItemViewType, layoutViewType: " + itemViewType.getTypeName());
 			return itemViewType;
 		},
-
+		getItemViewTemplate: function(instance) {
+			var itemViewTemplate = this.itemViewTemplate ? this.itemViewTemplate : Calipso.getTemplate("itemViewTemplate");
+			//console.log("GenericModel.getItemViewType, layoutViewType: " + itemViewType.getTypeName());
+			return itemViewTemplate;
+		},
 		/**
 		 * Get the name of the model's business key property. The property name is used to
 		 * check whether a model instance has been loaded from the server. The default is "name".
@@ -2022,11 +2020,6 @@ function(
 	});
 	Calipso.components.backboneform.Form.Field = Backbone.Form.Field.extend({
 
-	  /**
-	   * Render the field and editor
-	   *
-	   * @return {Field} self
-	   */
 	  render: function() {
 	    var schema = this.schema,
 	        editor = this.editor,
@@ -2034,13 +2027,14 @@ function(
 
 	    //Only render the editor if Hidden
 	    if (schema.type == Calipso.components.backboneform.Markup) {
-				console.log("MARKUP FIELD");
 	      return this.setElement(editor.render().el);
 	    }
 			else{
 				 return Backbone.Form.Field.prototype.render.apply(this, arguments);
 			}
 		}
+	},{
+
 	});
 
 	Calipso.components.backboneform.Markup = Backbone.Form.editors.Hidden.extend(
@@ -3437,94 +3431,6 @@ function(
 			return "Calipso.view.ModelDrivenReportLayout";
 		}
 	});
-	/*
-		var ModelDrivenOverviewLayout = MainLayout.extend({
-			template : Calipso.getTemplate('md-overview-layout'),
-			onShow : function() {
-				console.log("ModelDrivenOverviewLayout#onShow");
-				var tabLabelsView = new TabLabelsCollectionView({
-					collection : this.collection
-				});
-				var tabContentsView = new TabContentsCollectionView({
-					collection : this.collection
-				});
-				this.tabLabelsRegion.show(tabLabelsView);
-				this.tabContentsRegion.show(tabContentsView);
-
-			},
-		},
-		// static members
-		{
-	 		getTypeName: function(){return "ModelDrivenCrudLayout"}
-		});
-
-		var TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
-			className : 'nav nav-pills',
-			tagName : 'ul',
-			childViewContainer : '.nav-tabs',
-			getItemView : function(item) {
-				return Backbone.Marionette.ItemView.extend({
-					tagName : 'li',
-					className : 'md-crud-layout-tab-label',
-					id : "md-crud-layout-tab-label-" + item.get("id"),
-					template : tmplTabLabel,
-
-					events : {
-						"click .show-tab": "viewTab",
-						"click .destroy-tab" : "destroyTab"
-					},
-					 viewTab: function(e) {
-						 console.log("TabPaneCollectionView.childView#viewTab");
-						 e.stopPropagation();
-						 e.preventDefault();
-						 vent.trigger("viewTab", this.model);
-					 },
-					destroyTab : function(e) {
-						console.log("TabPaneCollectionView.childView#destroyTab");
-						e.stopPropagation();
-						e.preventDefault();
-	//					this.model.collection.remove(this.model);
-						this.destroy();
-						vent.trigger("viewTab", {
-							id : "Search"
-						});
-					},
-				});
-			}
-		});
-
-		var TabContentsCollectionView = Backbone.Marionette.CollectionView.extend({
-			tagName : 'div',
-			getItemView : function(item) {
-				var ItemViewClass;
-				if(item){
-					if (item.get("childView")) {
-						ItemViewClass = item.get("childView");
-					} else {
-						ItemViewClass = GenericFormTabContentView;
-					}
-					console.log("TabContentsCollectionView#getItemView for item class " + item.constructor.getTypeName() + " returns: " + ItemViewClass.getTypeName());
-				}
-				return ItemViewClass;
-			},
-			buildItemView: function(item, ItemViewClass){
-				console.log("TabContentsCollectionView#buildItemView, ItemView: "+ItemViewClass.getTypeName()+", item: "+item.constructor.getTypeName() + ", wrapped collection: "+item.wrappedCollection);
-				if(item){
-					var options = {model: item};
-					if(item && item.wrappedCollection){
-						options.collection = item.wrappedCollection;
-					}
-				    // do custom stuff here
-
-				    var view = new ItemViewClass(options);
-
-				    // more custom code working off the view instance
-
-				    return view;
-				}
-			  },
-		});
-		*/
 	///////////////////////////////////////////////////////
 	// Views
 	///////////////////////////////////////////////////////
@@ -3588,6 +3494,12 @@ function(
 	{
 		template : Calipso.getTemplate("templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
 		tagName : "li",
+		attributes : function(){
+			return this.getOption("attributes");
+		},
+		getTemplate : function(){
+			return this.getOption("template");
+		},
 		initialize : function(options) {
 			Marionette.ItemView.prototype.initialize.apply(this, arguments);
 			//console.log("TemplateBasedItemView#initialize, item: " + this.model);
@@ -3597,15 +3509,22 @@ function(
 			return "Calipso.view.TemplateBasedItemView";
 		}
 	});
-	Calipso.view.TemplateBasedCollectionView = Marionette.CompositeView.extend(
+	Calipso.view.TemplateBasedCollectionView = Backbone.Marionette.CompositeView.extend(
 	/** @lends Calipso.view.TemplateBasedCollectionView.prototype */
 	{
-		template : Calipso.getTemplate("templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
+		//template : Calipso.getTemplate("templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
 		tagName : "ul",
+		attributes : {},
 		childView : Calipso.view.TemplateBasedItemView,
 		pollCollectionAfterDestroy : false,
 		childViewOptions : {
 			tagName : "li",
+		},
+		attributes : function(){
+			return this.getOption("attributes");
+		},
+		getTemplate : function(){
+			return this.getOption("template");
 		},
 		initialize : function(models, options) {
 			Marionette.CompositeView.prototype.initialize.apply(this, arguments);
@@ -3616,8 +3535,10 @@ function(
 			}
 			//console.log("TemplateBasedCollectionView#initialize, collection: " + this.collection);
 		},
+		/*
 		onShow : function() {
 			var _self = this;
+			var show = true;
 			// poll collection?
 			if (this.collection.getTypeName && this.collection.getTypeName() == "Calipso.collection.PollingCollection") {
 				if (this.options.pollOptions) {
@@ -3633,22 +3554,24 @@ function(
 			}
 			// fetch collection?
 			else if (this.options.forceFetch) {
+				show = false;
 				//console.log("TemplateBasedCollectionView#onShow,  size: " + this.collection.length);
 				_self.collection.fetch({
 					url : _self.collection.url,
 					success : function(collection, response, options) {
 						console.log("TemplateBasedCollectionView#onShow#renderCollectionItems,  size: " + collection.length);
-						//Marionette.CollectionView.prototype.onShow.apply(this);
+						//Backbone.Marionette.CompositeView.prototype.onShow.apply(_self);
 					},
 					error : function(collection, response, options) {
 						alert("failed fetching collection");
 					}
 				});
-			} else {
-				//Marionette.CollectionView.prototype.onShow.apply(this);
+			}
+			if(show) {
+				Backbone.Marionette.CompositeView.prototype.onShow.apply(this);
 			}
 
-		},
+		},*/
 		/**
 		 * Stop polling the collection if appropriate
 		 */
@@ -3666,7 +3589,7 @@ function(
 	buildChildView: function(child, ChildViewClass, childViewOptions){
 		  var options = _.extend({}, childViewOptions);
 		  options.model = child;
-		  console.log("buildChildView, childViewOptions.template: "+childViewOptions.template);
+		("buildChildView, childViewOptions.template: "+childViewOptions.template);
 		  if(child.childViewTemplate){
 			  options.template = child.childViewTemplate;
 		  }
@@ -3676,6 +3599,77 @@ function(
 		getTypeName : function() {
 			return "Calipso.view.TemplateBasedCollectionView";
 		}
+	});
+
+
+
+	Calipso.view.TabLayout = Calipso.view.MainLayout.extend({
+		template : Calipso.getTemplate('tabbed-layout'),
+		idProperty : "id",
+		buttonTextProperty : "name",
+		regions : {
+			tabLabelsRegion : '.region-nav-tabs',
+			tabContentsRegion : '.region-tab-content'
+		},
+		onShow : function() {
+			var _this = this;
+			if(this.collection.length > 0){
+				this.collection.at(0).set("tabActive", true);
+			}
+
+			//
+
+			var buttonTextProperty = this.getOption("buttonTextProperty");
+			var idProperty = this.getOption("idProperty");
+			var TabButtonItemView = Calipso.view.TemplateBasedItemView .extend({
+				template : _.template('<a href="#tab<%= '+idProperty+' %>" ' +
+					' <% if (tabActive){ %> class="active" <% } %>' +
+		  		'aria-controls="tab<%= '+idProperty+' %>" role="tab" data-toggle="tab"><%= '+buttonTextProperty+' %></a>'),
+				tagName : "li",
+
+				attributes : function () {
+					// Return model data
+					return {
+						role : "presentation",
+						class : this.model.get("tabActive") ? " active" : "",
+					};
+				}
+			});
+			var TabButtonsCollectionView = Calipso.view.TemplateBasedCollectionView .extend({
+				tagName : "ul",
+				template : _.template(''),
+				className : "nav nav-tabs",
+				attributes : {role : "tablist"},
+				childView : TabButtonItemView
+			});
+			this.tabLabelsRegion.show(new TabButtonsCollectionView({collection:this.collection}));
+
+			var ItemViewType = _this.collection.model.getItemViewType() || Calipso.view.TemplateBasedItemView;
+			var TabPanelsCollectionView = Calipso.view.TemplateBasedCollectionView .extend({
+				tagName : "div",
+				template : _.template(''),
+				className : "tab-content",
+				childView : ItemViewType.extend({
+					tagName : "div",
+					template : _this.collection.model.getItemViewTemplate(),
+					attributes : function () {
+				    // Return model data
+				    return {
+				      id : "tab" + this.model.get(idProperty),
+							role :"tabpanel",
+      				class : "tab-pane" + (this.model.get("tabActive") ? " active" : ""),
+
+				    };
+				  }
+				}),
+			});
+			this.tabContentsRegion.show(new TabPanelsCollectionView({collection:this.collection}));
+
+		},
+	},
+	// static members
+	{
+		typeName : "TabLayout",
 	});
 	Calipso.view.NotFoundView = Marionette.ItemView.extend(
 	/** @lends Calipso.view.NotFoundView.prototype */
@@ -3751,7 +3745,7 @@ function(
 			view.render();
 			view.$el.addClass(this.options.itemClass);
 			this.transitionViewIn(view);
-			//console.log(this.views);
+			//(this.views);
 		},
 
 		// Transition the new view in.
@@ -4424,12 +4418,9 @@ function(
 		renderForm : function(formSchema) {
 			var _self = this;
 
-			//console.log("GenericFormView#renderForm, _self.formSchemaKey: " + _self.formSchemaKey);
 			if(formSchema){
 				formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 			}
-			////console.log("GenericFormView#renderForm, formSchema: ");
-			console.log(formSchema);
 			var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
 			if(!formSubmitButton){
 				if(_self.formSchemaKey.indexOf("search") == 0){
@@ -4449,8 +4440,6 @@ function(
 			if (Calipso.session.searchData && (!_self.searchResultsCollection.data)) {
 				_self.model.set(Calipso.session.searchData);
 				_self.searchResultsCollection.data = Calipso.session.searchData;
-			} else {
-				//console.log("GenericFormView#renderForm, No session.searchData to add");
 			}
 			var formOptions = {
 				model : _self.model,
@@ -4671,31 +4660,7 @@ function(
 		return "TabModel";
 	};
 
-	Calipso.view.TabLayout = Backbone.Marionette.LayoutView.extend({
-		template : Calipso.getTemplate('generic-crud-layout'),
-		tagName : "div",
-		className : "col-sm-12",
-		regions : {
-			tabLabelsRegion : '#calipsoTabLabelsRegion',
-			tabContentsRegion : '#calipsoTabContentsRegion'
-		},
-		onShow : function() {
-			//console.log("TabLayout#onShow");
-			var tabLabelsView = new TabLabelsCollectionView({
-				collection : this.collection
-			});
-			var tabContentsView = new TabContentsCollectionView({
-				collection : this.collection
-			});
-			this.tabLabelsRegion.show(tabLabelsView);
-			this.tabContentsRegion.show(tabContentsView);
 
-		},
-	},
-	// static members
-	{
-		typeName : "TabLayout",
-	});
 
 	Calipso.view.TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
 		className : 'nav nav-pills',
@@ -4961,8 +4926,6 @@ function(
 		},
 		// Saving will try to login the user
 		save : function(model) {
-			//console.log("session.save called");
-			//console.log(model);
 			var _self = this;
 			var usernameOrEmail = model.get('email') ? model.get('email') : model.get('username');
 			model.save( null, {
@@ -5207,7 +5170,6 @@ function(
 			return false;
 		},
 		myProfile : function(){
-			//console.log("myProfile");
 			if (!Calipso.isAuthenticated()) {
 				Calipso.navigate("login", {
 					trigger : true
@@ -5250,28 +5212,8 @@ function(
 			if (!Calipso.isAuthenticated()) {
 				window.alert("Please login to change your password");
 			}
-			//console.log("changePassword, current userDetails.id: "+Calipso.session.userDetails.get("id"));
 			this.showLayoutForModel(Calipso.session.userDetails, null, null);
 		},
-		/*
-		authenticate : function(args) {
-			// console.log('MainController authenticate called');
-			var self = this;
-			var email = this.$('input[name="email"]').val();
-			var password = this.$('input[name="password"]').val();
-
-			$.when(this.model.authenticate(email, password)).then(function(model, response, options) {
-				Calipso.session.save(model);
-				Calipso.session.load();
-				// console.log('MainController authenticate navigating to home');
-				Calipso.navigate("home", {
-					trigger : true
-				});
-			}, function(model, xhr, options) {
-				self.$el.find('.alert').show();
-			});
-		},
-		*/
 		logout : function() {
 			Calipso.vent.trigger("session:destroy");
 			// this.login();
@@ -5288,14 +5230,12 @@ function(
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
 		showLayoutForModel : function(givenModel, LayoutType, layoutOptions){
-			//layoutOptions || (layoutOptions = {});
 			layoutOptions = $.extend(true, {}, givenModel.getLayoutOptions(), layoutOptions);
 			layoutOptions.model = givenModel;
 			// make sure to choose a layout type
 			if(!LayoutType){
 				LayoutType = givenModel.getLayoutViewType();
 			}
-			//console.log("showLayoutForModel, layout: " + LayoutType.getTypeName());
 			// instantiate and show the layout
 			var view = new LayoutType(layoutOptions);
 			Calipso.vent.trigger("app:show", view);
@@ -5305,12 +5245,10 @@ function(
 		 * business key/URI componenent
 		 */
 		getModelType : function(modelTypeKey) {
-			//console.log("AbstractController#getModelType, modelTypeKey: " + modelTypeKey);
 			// load model Type
 			var ModelType;
 			if (Calipso.modelTypesMap[modelTypeKey]) {
 				ModelType = Calipso.modelTypesMap[modelTypeKey];
-			 //console.log("AbstractController#getModelType, ModelType: " + ModelType.getTypeName());
 			} else {
 				var modelForRoute;
 				var modelModuleId = "model/" + _.singularize(modelTypeKey);
@@ -5326,7 +5264,6 @@ function(
 			if (!ModelType) {
 				throw "No matching model type was found for key: " + modelModuleId;
 			}
-			// console.log("getModelType, key: "+modelTypeKey+", type: "+ModelType.getPathFragment());
 			return ModelType;
 		},
 		/**
@@ -5356,25 +5293,21 @@ function(
 		 * @see Calipso.model.GenericModel.getBusinessKey
 		 */
 		getModelForRoute : function(ModelType, modelId, httpParams) {
-			//console.log("AbstractController#getModelForRoute, modelId: " + modelId + ", httpParams: " + httpParams + ", type: " + ModelType.getTypeName());
 
 			// Obtain a model for the view:
 			// if a model id is present, obtain a promise
 			// for the corresponding instance
 			var modelForRoute;
 			if (modelId) {
-				// console.log("AbstractController#getModelForRoute, looking for model id:" + modelId + ", type:" + ModelType.getTypeName());
-				//modelForRoute = ModelType.all().get(modelId);
+			//modelForRoute = ModelType.all().get(modelId);
 				if (modelForRoute) {
 					// console.log("getModelForRoute, cached model: " + modelForRoute);
 				} else {
 					// console.log("getModelForRoute, creating model: " + modelForRoute);
 					modelForRoute = ModelType.create({
 						id : modelId,
-					//url : Calipso.getBaseUrl() + "/api/rest/" + modelModuleId + "/" + id
 					});
 
-					// console.log("getModelForRoute, created model: " + modelForRoute);
 				}
 			}
 			else {
@@ -5384,7 +5317,6 @@ function(
 					httpParams = {};
 				}
 				modelForRoute = new ModelType(httpParams);
-//				modelForRoute.set("isSearchModel", true);
 				var collectionOptions = {
 					model : ModelType,
 					url : Calipso.getBaseUrl() + "/api/rest/" + ModelType.getPathFragment()
@@ -5398,11 +5330,9 @@ function(
 				modelForRoute.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
 
 			}
-			//console.log("AbstractController#getModelForRoute, model type: " + modelForRoute.getTypeName() + ", id: " + modelForRoute.get("id") + ", collection URL: " + Calipso.getBaseUrl() + "/api/rest/" + modelForRoute.getPathFragment());
 			return modelForRoute;
 		},
 		mainNavigationReportRoute : function(mainRoutePart, queryString) {
-			// console.log("AbstractController#mainNavigationReportRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
 
 			// TODO: temp fix
 			var isReport = window.location.href.indexOf("/reports") > -1 ;
