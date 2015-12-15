@@ -24,7 +24,7 @@ body, html {
 html, body, #full-height-wrapper { height: 100%; }
 body > #full-height-wrapper { height: auto; min-height: 100%; 
  position: relative;}
-
+body {margin-bottom: 100px;}
 .panel-title a[data-toggle="collapse"]{
 	display: block;
 }

@@ -3,6 +3,12 @@ require.config({
 	deps : [ 'main' ],
 	waitSeconds: 200,
 
+   config: {
+       i18n: {
+      	 locale: "en", //localStorage.getItem('locale') || 'en-us',
+       }
+   },
+
 	paths : {
 		'cookie' : 'lib/jquery.cookie',
 		'jquery' : 'lib/jquery',
@@ -155,7 +161,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ 'underscore', 'handlebars', 'calipso-hbs', 'moment',
+			deps : [ "i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment',
 			         'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',  
 			         'marionette', 
 			         'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator', 

@@ -18,19 +18,20 @@
  */
 
 define([
-	'underscore', 'handlebars', 'calipso-hbs', 'moment',
+	"i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment',
 	'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2',
   'marionette',
   'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
   /*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker','bootstrap-switch',
   'jquery-color', 'jquery-intlTelInput', 'q', 'chart'],
 function(
-	_, Handlebars, calipsoTemplates, moment,
+	labels, _, Handlebars, calipsoTemplates, moment,
 	Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2,
 	BackboneMarionette,
 	Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 	/*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch,
 	jqueryColor, intlTelInput, q, chartjs) {
+
 
 
 	/**
@@ -46,7 +47,8 @@ function(
 		customModel : {},
 		view : {},
 		controller : {},
-		hbs: {}
+		hbs: {},
+		labels : labels
 	};
 
 	// Get the DOM manipulator for later use
@@ -137,6 +139,30 @@ function(
 	Calipso.getConfigProperty = function(propertyName) {
 		return Calipso.config[propertyName];
 	};
+	Calipso._chartColors =  [
+		"91, 144, 191",
+		"163, 190, 140",
+		"171, 121, 103",
+		"208, 135, 112",
+		"180, 142, 173",
+		"235, 203, 139",
+		"39, 165, 218",
+		"250, 164, 58",
+		"96, 189, 104",
+		"241, 124, 176",
+		"178, 145, 47",
+		"178, 118, 178",
+		"222, 207, 63",
+		"241, 88, 84",
+		"77, 77, 77",
+		"0, 0, 0",
+	];
+Calipso.getThemeColor = function(index) {
+	if(index + 1  >  Calipso._chartColors.length){
+		throw "No more colours supported";
+	}
+	return Calipso._chartColors[index];
+};
 	/**
 	 * Get a conbfiguration property
 	 * @param  {[String]} the property name
@@ -3605,6 +3631,7 @@ function(
 
 	Calipso.view.TabLayout = Calipso.view.MainLayout.extend({
 		template : Calipso.getTemplate('tabbed-layout'),
+		tabClass : "nav nav-tabs",
 		idProperty : "id",
 		buttonTextProperty : "name",
 		regions : {
@@ -3638,7 +3665,7 @@ function(
 			var TabButtonsCollectionView = Calipso.view.TemplateBasedCollectionView .extend({
 				tagName : "ul",
 				template : _.template(''),
-				className : "nav nav-tabs",
+				className : _this.getOption("tabClass"),
 				attributes : {role : "tablist"},
 				childView : TabButtonItemView
 			});
@@ -4058,7 +4085,7 @@ function(
 			var ctx = canvas.getContext("2d");
 			var chartData = this.getDataForAttribute(this.model.get("kpi"));
 			var dataTotals = [];
-			_.each(chartData.datasets, function(dataset, index) {
+				_.each(chartData.datasets, function(dataset, index) {
 
 				//console.log("Calipso.view.ModelDrivenReportView#onShow each:chartData, dataset: ");
 				//console.log(dataset);

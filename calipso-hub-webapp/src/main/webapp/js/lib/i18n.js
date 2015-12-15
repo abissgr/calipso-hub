@@ -1,3 +1,8 @@
+/**
+ * @license RequireJS i18n 2.0.5 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+ * Available via the MIT or new BSD license.
+ * see: http://github.com/requirejs/i18n for details
+ */
 /*jslint regexp: true */
 /*global require: false, navigator: false, define: false */
 
@@ -72,6 +77,9 @@
             if (source.hasOwnProperty(prop) && (!target.hasOwnProperty(prop) || force)) {
                 target[prop] = source[prop];
             } else if (typeof source[prop] === 'object') {
+                if (!target[prop] && source[prop]) {
+                    target[prop] = {};
+                }
                 mixin(target[prop], source[prop], force);
             }
         }
@@ -81,7 +89,7 @@
         var masterConfig = module.config ? module.config() : {};
 
         return {
-            version: '2.0.1+',
+            version: '2.0.5',
             /**
              * Called when a dependency needs to be loaded.
              */
@@ -117,7 +125,8 @@
                     if (!locale) {
                         locale = masterConfig.locale =
                             typeof navigator === "undefined" ? "root" :
-                            (navigator.language ||
+                            ((navigator.languages && navigator.languages[0]) ||
+                             navigator.language ||
                              navigator.userLanguage || "root").toLowerCase();
                     }
                     parts = locale.split("-");
