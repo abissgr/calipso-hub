@@ -23,7 +23,7 @@ define([
   'marionette',
   'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
   /*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker','bootstrap-switch',
-  'jquery-color', 'jquery-intlTelInput', 'q', 'chart'],
+  'jquery-color', 'intlTelInput', 'q', 'chart'],
 function(
 	labels, _, Handlebars, calipsoTemplates, moment,
 	Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2,
@@ -32,7 +32,76 @@ function(
 	/*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch,
 	jqueryColor, intlTelInput, q, chartjs) {
 
+		// default locale is set in
+		var locale = localStorage.getItem('locale') || 'en';
+		moment.locale(locale);
 
+		// register calipso helpers for handlebars
+		Handlebars.registerHelper("getUserDetailsProperty", function(propName, options) {
+			var prop = "";
+			if (Calipso.session.isAuthenticated()) {
+				prop = Calipso.session.userDetails.get(propName);
+			}
+			return (prop);
+		});
+		Handlebars.registerHelper("getUserDetailsMetadatum", function(metaName, options) {
+			var metaValue = "";
+			if (Calipso.session.isAuthenticated() && Calipso.session.userDetails.get("metadata")) {
+				metaValue = Calipso.session.userDetails.get("metadata")[metaName];
+			}
+			return (metaValue);
+		});
+		/**
+		* Check if the loggedin user has any of the given roles. Any numberof roles can be passed to the helper.
+		* @example
+		*  {{#ifUserInRole "ROLE_MANAGER" "ROLE_ADMIN"}}  <p>User is either a Manager or an Administrator! </p>{{/ifUserInRole}}
+		*/
+		// TODO: move these helpers to root scope
+		// and replace _this.userDetails with Calipso.session.userDetails
+		Handlebars.registerHelper("ifUserInRole", function() {
+			var options = arguments[arguments.length - 1];
+			// now get input roles, the ones to check for just a single match
+			var inputRoles = [];
+			for (var i = 0; i < arguments.length-1; i++) {
+				inputRoles.push(arguments[i]);
+			}
+			return Calipso.isUserInAnyRole(inputRoles) ? options.fn(this) : options.inverse(this);
+		});
+
+		/**
+		* Check if the loggedin user has none of the given roles. Any numberof roles can be passed to the helper.
+		* @example
+		*  {{#ifUserInRole "ROLE_MANAGER" "ROLE_ADMIN"}}  <p>User is either a Manager or an Administrator! </p>{{/ifUserInRole}}
+		*/
+		// TODO: move these helpers to root scope
+		// and replace _this.userDetails with Calipso.session.userDetails
+		Handlebars.registerHelper("ifUserNotInRole", function() {
+			var options = arguments[arguments.length - 1];
+			// now get input roles, the ones to check for just a single match
+			var inputRoles = [];
+			for (var i = 0; i < arguments.length-1; i++) {
+				inputRoles.push(arguments[i]);
+			}
+			return !Calipso.isUserInAnyRole(inputRoles) ? options.fn(this) : options.inverse(this);
+		});
+
+
+		/**
+		* Calculate "from" now using the given date
+		* @example {{-+momentFromNow someDate}}
+		*/
+		Handlebars.registerHelper('momentFromNow', function(date) {
+			return moment(date).fromNow();
+		});
+
+
+		/**
+		* Calculate "from" now using the given date
+		* @example {{-+momentFromNow someDate}}
+		*/
+		Handlebars.registerHelper('momentDateTime', function(date) {
+			return moment(date).format("MMMM Do YYYY, h:mm:ss a");
+		});
 
 	/**
 	 * Calipso namespace
@@ -51,6 +120,9 @@ function(
 		labels : labels
 	};
 
+	Calipso.getLabels = function(){
+		return Calipso.labels;
+	}
 	// Get the DOM manipulator for later use
 	Calipso.$ = Backbone.$;
 	Calipso.decodeParamRegex = /\+/g;
@@ -493,46 +565,37 @@ Calipso.getThemeColor = function(index) {
 			return false;
 		});
 		Calipso.vent.on('session:created', function(userDetails) {
-
-			$("#page-wrapper").removeClass("anonymous");
-			$("#page-wrapper").addClass("loggedIn");
-
-
-			$("#container").removeClass("container");
-			$("#container").addClass("container-fluid");
-			// console.log("vent event session:created");
-			// update otification counters
-			var count = userDetails ? userDetails.get("notificationCount") : 0;
-
-			Calipso.updateBadges(".badge-notifications-count", userDetails ? userDetails.get("notificationCount") : 0);
-
-			Calipso.session.userDetails = userDetails;
-			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
-				model : Calipso.session.userDetails
-			}));
-
 			// send logged in user on their way
 			var fw = "home";
 			if (Calipso.app.fw) {
 				fw = Calipso.app.fw;
 				Calipso.app.fw = null;
 			}
-			// console.log("session:created, update model: " + userDetails.get("email") + ", navigating to: " + fw);
+			// reload the app if locale needs to be changed
+			var userLocale = userDetails.get("locale");
+			var oldLocale = localStorage.getItem("locale");
+			if(!oldLocale || oldLocale != userLocale){
+				localStorage.setItem("locale", userDetails.get("locale"));
 
-			Calipso.navigate(fw, {
-				trigger : true
-			});
-			//window.location = fw;
+				Calipso.navigate(fw, {
+					trigger : false
+				});
+				window.location.reload();
+			}
+			else{
+				// locale is the same, proceed normally
+				Calipso.session.userDetails = userDetails;
+				Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
+					model : Calipso.session.userDetails
+				}));
+
+				Calipso.navigate(fw, {
+					trigger : true
+				});
+			}
 		});
+
 		Calipso.vent.on('session:destroy', function(userDetails) {
-
-			$("#page-wrapper").removeClass("loggedIn");
-			$("#page-wrapper").addClass("anonymous");
-
-
-			$("#container").addClass("container");
-			$("#container").removeClass("container-fluid");
-
 			Calipso.session.destroy();
 			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 				model : userDetails
@@ -541,14 +604,16 @@ Calipso.getThemeColor = function(index) {
 				trigger : true
 			});
 		});
+
 		Calipso.vent.on('nav-menu:change', function(modelkey) {
 			// console.log("vent event nav-menu:change");
-
 		});
+
 		Calipso.vent.on('modal:show', function(view) {
 			console.log("vent event modal:show");
 			Calipso.app.modalRegion.show(view);
 		});
+
 		/**
 		 * @example Calipso.vent.trigger('modal:showInLayout', {view: someView, template: someTemplate, title: "My title"});
 		 */
@@ -2148,10 +2213,66 @@ Calipso.getThemeColor = function(index) {
 	});
 
 	Calipso.components.backboneform.Tel = Calipso.components.backboneform.Text.extend({
+		errorCodes : {
+			"-99" : "DEFAULT",
+			"1" : "INVALID_COUNTRY_CODE",
+			"2" : "TOO_SHORT",
+			"3" : "TOO_LONG",
+			"4" : "NOT_A_NUMBER"
+		},
+		intlValidate : function(){
+			this.form.fields[this.getName()].validate();
+		},
+		initialize : function(options) {
+			var _this = this;
+			this.labels = Calipso.getLabels();
+			if(!options.schema.validators ){
+				options.schema.validators = [];
+			}
+			if(options.value ){
+				this.value = options.value;
+			}
+			options.schema.validators.push(function ensure(value, formValues){
+				if(value  != null && value != "" && !_this.$el.intlTelInput("isValidNumber")){
+					var msgKey = _this.errorCodes[_this.$el.intlTelInput("getValidationError")+""] || "DEFAULT";
+					var err = {
+              type: _this.getName(),
+              message: _this.labels.intlTelInput[msgKey]
+          };
+					return err;
+				}
+			});
+			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
+		},
+		setValue : function(value) {
+			if(!value){
+				this.value = null;
+			}
+			else{
+				this.value = value;
+			}
+		},
+		getValue : function() {
+			return  this.$el.intlTelInput("getNumber");
+		},
 		onFormAttach : function() {
-			this.$el.intlTelInput();
+			var _this = this;
+			this.$el.intlTelInput({
+				nationalMode: true,
+				customPlaceholder : function(selectedCountryPlaceholder, selectedCountryData) {
+				  return _this.labels.intlTelInput.eg + ' ' + selectedCountryPlaceholder;
+				},
+			});
+			if(this.value){
+				this.$el.intlTelInput("setNumber", this.value);
+			}
+			this.$el.change(function () {
+				_this.setValue(_this.$el.intlTelInput("getNumber"));
+				_this.intlValidate();
+			});
 		},
 		onBeforeClose : function() {
+			this.$el.off("change");
 			this.$el.intlTelInput("destroy");
 		},
 	});
@@ -3461,12 +3582,14 @@ Calipso.getThemeColor = function(index) {
 	// Views
 	///////////////////////////////////////////////////////
 	// plumbing for handlebars template helpers
-	// Marionette.ItemView.prototype.mixinTemplateHelpers = function(target) {
+	// Also provides i18n labels
 	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
 		var self = this;
 		var templateHelpers = Marionette.getOption(self, "templateHelpers");
-		var result = {};
-
+		// add i18n labels from requirejs i18n
+		var result = {
+			labels: Calipso.getLabels()
+		};
 		target = target || {};
 
 		if (_.isFunction(templateHelpers)) {
@@ -4479,18 +4602,11 @@ Calipso.getThemeColor = function(index) {
 			}
 			this.form = new Calipso.components.backboneform.Form(formOptions);
 			this.form.setElement(this.$el.find(".generic-form-view").first()).render();
-			this.$el.find('input[type=text],textarea,select').filter(':visible:enabled:first').focus();
-			// generic-form-view
-			//					$(selector + ' textarea[data-provide="markdown"]').each(function() {
-			//						var $this = $(this);
-			//
-			//						if ($this.data('markdown')) {
-			//							$this.data('markdown').showEditor()
-			//						} else {
-			//							$this.markdown($this.data())
-			//						}
-			//
-			//					});
+			this.$el.find('label').filter(':visible:enabled:first').focus();
+			this.onFormRendered();
+		},
+		onFormRendered : function(){
+
 		},
 		getFormData : function getFormData($form) {
 			var unindexed_array = $form.serializeArray();
@@ -4830,71 +4946,6 @@ Calipso.getThemeColor = function(index) {
 	//
 	Calipso.util.Session = Backbone.Model.extend({
 		userDetails : false,
-		// Creating a new session instance will attempt to load
-		// the user using a "remember me" cookie token, if one exists.
-		initialize : function() {
-			var _this = this;
-			//	this.load();
-			// register handlebars helpers
-
-			// register session related handlebars helpers
-			Handlebars.registerHelper("getUserDetailsProperty", function(propName, options) {
-				var prop = "";
-				if (_this.isAuthenticated()) {
-					prop = _this.userDetails.get(propName);
-				}
-				return (prop);
-			});
-			Handlebars.registerHelper("getUserDetailsMetadatum", function(metaName, options) {
-				var metaValue = "";
-				if (_this.isAuthenticated() && _this.userDetails.get("metadata")) {
-					metaValue = _this.userDetails.get("metadata")[metaName];
-				}
-				return (metaValue);
-			});
-			/**
-			 * Check if the loggedin user has any of the given roles. Any numberof roles can be passed to the helper.
-			 * @example
-			 *  {{#ifUserInRole "ROLE_MANAGER" "ROLE_ADMIN"}}  <p>User is either a Manager or an Administrator! </p>{{/ifUserInRole}}
-			 */
-			// TODO: move these helpers to root scope
-			// and replace _this.userDetails with Calipso.session.userDetails
-			Handlebars.registerHelper("ifUserInRole", function() {
-				var options = arguments[arguments.length - 1];
-				// now get input roles, the ones to check for just a single match
-				var inputRoles = [];
-				for (var i = 0; i < arguments.length-1; i++) {
-					inputRoles.push(arguments[i]);
-				}
-				return Calipso.isUserInAnyRole(inputRoles) ? options.fn(this) : options.inverse(this);
-			});
-
-			/**
-			 * Check if the loggedin user has none of the given roles. Any numberof roles can be passed to the helper.
-			 * @example
-			 *  {{#ifUserInRole "ROLE_MANAGER" "ROLE_ADMIN"}}  <p>User is either a Manager or an Administrator! </p>{{/ifUserInRole}}
-			 */
-			// TODO: move these helpers to root scope
-			// and replace _this.userDetails with Calipso.session.userDetails
-			Handlebars.registerHelper("ifUserNotInRole", function() {
-				var options = arguments[arguments.length - 1];
-				// now get input roles, the ones to check for just a single match
-				var inputRoles = [];
-				for (var i = 0; i < arguments.length-1; i++) {
-					inputRoles.push(arguments[i]);
-				}
-				return !Calipso.isUserInAnyRole(inputRoles) ? options.fn(this) : options.inverse(this);
-			});
-
-
-			/**
-			 * Calculate "from" now using the given date
-			 * @example {{-+momentFromNow someDate}}
-			 */
-			Handlebars.registerHelper('momentFromNow', function(date) {
-				return window.moment ? moment(date).fromNow() : date;
-			});
-		},
 
 		// Returns true if the user is authenticated.
 		isAuthenticated : function() {

@@ -18,10 +18,13 @@
  */
 package gr.abiss.calipso.repository;
 
+import java.util.Date;
+
 import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.UserDTO;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends BaseRepository<User, String> {
@@ -35,8 +38,13 @@ public interface UserRepository extends BaseRepository<User, String> {
 	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	@Query("select u from User u where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public User findByUsernameOrEmail(String usernameOrEmail);
-	
+
 	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	@Query("select new gr.abiss.calipso.model.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public UserDTO findAsLink(String usernameOrEmailOrId);
+	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
+
+	@Modifying
+	@Query("UPDATE User AS u SET u.lastLogin = CURRENT_TIMESTAMP() WHERE u.id = ?1")
+	public void updateLastLogin(String userId);
 }

@@ -67,6 +67,12 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		super.setRepository(userRepository);
 	}
 
+	@Override
+	@Transactional(readOnly = false)
+	public void updateLastLogin(ICalipsoUserDetails u){
+		this.repository.updateLastLogin(u.getId());
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @see gr.abiss.calipso.userDetails.integration.LocalUserService#findByCredentials(java.lang.String, java.lang.String, java.util.Map)

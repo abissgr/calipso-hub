@@ -101,6 +101,12 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		this.baseNotificationService = baseNotificationService;
 	}
 
+	@Override
+	@Transactional(readOnly = false)
+	public void updateLastLogin(ICalipsoUserDetails u){
+		this.localUserService.updateLastLogin(u);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -459,7 +465,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			LOGGER.info("SignInAdapter#signIn userId: " + userId + ", connection: " + connection.getKey() + ", mached user: " + user);
 		//}
 		if(user != null){
-			SecurityUtil.login((HttpServletRequest) request.getNativeRequest(), (HttpServletResponse) request.getNativeResponse(), user, this.userDetailsConfig);
+			SecurityUtil.login((HttpServletRequest) request.getNativeRequest(), (HttpServletResponse) request.getNativeResponse(), user, this.userDetailsConfig, this);
 		}
 		return null;
 	}

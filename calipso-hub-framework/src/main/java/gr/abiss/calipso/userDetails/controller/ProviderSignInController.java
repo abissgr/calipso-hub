@@ -163,7 +163,7 @@ public class ProviderSignInController extends org.springframework.social.connect
 		}
 
 		//Logs the user in.
-		SecurityUtil.login(nativeRquest, response, registered, this.userDetailsConfig);
+		SecurityUtil.login(nativeRquest, response, registered, this.userDetailsConfig, this.userService);
 		//If the user is signing in by using a social provider, this method call stores
 		//the connection to the UserConnection table. Otherwise, this method does not
 		//do anything.

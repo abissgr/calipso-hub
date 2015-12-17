@@ -1,3 +1,27 @@
+// set console api if missing
+if(!window.console) {console={}; console.log = function(){};}
+// establish a locale
+function getLocale(){
+	// get "remembered" locale if exists
+	var locale = localStorage.getItem('locale');
+	// guess and set remembered otherwise
+	if(!locale){
+		if (navigator.languages != undefined && navigator.languages[0] != "*"){
+			locale = navigator.languages[0]; 
+		}
+		if(!locale && navigator.language != undefined && navigator.language != "*"){
+			locale = navigator.language; 
+		}
+		if(!locale && navigator.userLanguage != undefined && navigator.userLanguage != "*"){
+			locale = navigator.language; 
+		}
+		if(!locale){
+			locale = "en";
+		}
+		localStorage.setItem('locale', locale.toLowerCase());
+	}
+}
+
 require.config({
 	// main.js is the application entry point
 	deps : [ 'main' ],
@@ -5,7 +29,7 @@ require.config({
 
    config: {
        i18n: {
-      	 locale: "en", //localStorage.getItem('locale') || 'en-us',
+      	 locale: getLocale()
        }
    },
 
@@ -13,7 +37,7 @@ require.config({
 		'cookie' : 'lib/jquery.cookie',
 		'jquery' : 'lib/jquery',
 		'jquery-color' : 'lib/jquery.color.plus-names',
-		"jquery-intlTelInput" : 'lib/intlTelInput',
+		"intlTelInput" : 'lib/intlTelInput',
 		'q' : 'lib/q',
 		'underscore' : 'lib/underscore',
 		'underscore-string' : 'lib/underscore-string',
@@ -166,7 +190,7 @@ require.config({
 			         'marionette', 
 			         'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator', 
 			         'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 
-			         'jquery-color', 'jquery-intlTelInput', 'q', 'chart'],
+			         'jquery-color', 'intlTelInput', 'q', 'chart'],
 			exports : 'calipso',
 		},
 		
@@ -180,7 +204,13 @@ require.config({
          deps: ['jquery'],
          exports: 'jQuery.Color'
      },
-		
+
+     'intlTelInputUtil': {
+   	  deps:['jquery']
+     },
+     'intlTelInput': {
+   	  deps:['intlTelInputUtil']
+     },
 	}
 
 });

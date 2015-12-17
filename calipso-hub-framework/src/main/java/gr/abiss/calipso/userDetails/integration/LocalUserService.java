@@ -17,6 +17,8 @@
  */
 package gr.abiss.calipso.userDetails.integration;
 
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
 import java.io.Serializable;
@@ -79,5 +81,7 @@ public interface LocalUserService<ID extends Serializable, T extends LocalUser> 
 	public T handlePasswordResetToken(String userNameOrEmail, String token, String newPassword);
 
 	public T createActive(T resource);
+
+	public void updateLastLogin(ICalipsoUserDetails u);
 
 }

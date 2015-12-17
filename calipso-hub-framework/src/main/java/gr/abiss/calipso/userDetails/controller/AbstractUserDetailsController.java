@@ -115,7 +115,9 @@ HttpServletRequest request,
 		String userNameOrEmail = user.getEmailOrUsername();
 		ICalipsoUserDetails userDetails = service.resetPassword(
 				userNameOrEmail, token, user.getPassword());
-		SecurityUtil.login(request, response, userDetails, userDetailsConfig);
+		SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
+		
+		
 		return userDetails;
 	}
 
@@ -187,7 +189,7 @@ HttpServletRequest request,
 	@ResponseBody
 	public UserDetails update(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
 		resource = (UserDetails) this.service.update(resource);
-		SecurityUtil.login(request, response, resource, userDetailsConfig);	
+		SecurityUtil.login(request, response, resource, userDetailsConfig, this.service);	
 		return resource;
 	}
 
@@ -238,7 +240,7 @@ HttpServletRequest request,
 			LOGGER.info("create userDetails: " + userDetails);
 			if (userDetails != null && userDetails.getId() != null) {
 				if(apply){
-					SecurityUtil.login(request, response, userDetails, userDetailsConfig);
+					SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
 				}
 			} else {
 				if(apply){

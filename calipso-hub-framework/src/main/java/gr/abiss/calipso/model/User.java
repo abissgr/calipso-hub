@@ -97,9 +97,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	private String resetPasswordToken;
 
 	@Column(name = "password_changed")
-	@FormSchemas({
-			@FormSchemaEntry(json = FormSchemaEntry.TYPE_DATE)
-	})
 	private Date lastPassWordChangeDate;
 	
 	@Column(name = "email", unique = true, nullable = false)
@@ -136,8 +133,8 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@Column(name = "last_visit")
 	private Date lastVisit;
 
-	@Column(name = "last_post")
-	private Date lastPost;
+	@Column(name = "last_login")
+	private Date lastLogin;
 
 	@Column(name = "login_attempts")
 	private Short loginAttempts = 0;
@@ -153,9 +150,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	@Column(name = "locale", nullable = false)
 	private String locale = "en";
-
-	@Column(name = "date_format")
-	private String dateFormat;
 
 	@Transient
 	private String redirectUrl;
@@ -412,12 +406,12 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		this.lastVisit = lastVisit;
 	}
 
-	public Date getLastPost() {
-		return lastPost;
+	public Date getLastLogin() {
+		return lastLogin;
 	}
 
-	public void setLastPost(Date lastPost) {
-		this.lastPost = lastPost;
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 
 	public Short getLoginAttempts() {
@@ -460,14 +454,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	public void setLocale(String locale) {
 		this.locale = locale;
-	}
-
-	public String getDateFormat() {
-		return dateFormat;
-	}
-
-	public void setDateFormat(String dateFormat) {
-		this.dateFormat = dateFormat;
 	}
 
 	@Override

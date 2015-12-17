@@ -18,9 +18,11 @@
 package gr.abiss.calipso.userDetails.util;
 
 import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.userDetails.integration.LocalUserService;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.UserDetails;
+import gr.abiss.calipso.userDetails.service.UserDetailsService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -43,16 +45,17 @@ public class SecurityUtil {
 	// TODO: move to config
 	private static final String COOKIE_NAME_SESSION = "JSESSIONID";
 
-	public static void login(HttpServletRequest request, HttpServletResponse response, LocalUser user, UserDetailsConfig userDetailsConfig) {
+	public static void login(HttpServletRequest request, HttpServletResponse response, LocalUser user, 
+			UserDetailsConfig userDetailsConfig, UserDetailsService userDetailsService) {
 		ICalipsoUserDetails userDetails = UserDetails.fromUser(user);
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("login,  userDetails: "+userDetails);
 		}
-		login(request, response, userDetails, userDetailsConfig);
+		login(request, response, userDetails, userDetailsConfig, userDetailsService);
 	}
 
 	public static void login(HttpServletRequest request, HttpServletResponse response, ICalipsoUserDetails userDetails,
-			UserDetailsConfig userDetailsConfig) {
+			UserDetailsConfig userDetailsConfig, UserDetailsService userDetailsService) {
 		if(LOGGER.isDebugEnabled()){
 			if (userDetails != null){
 				LOGGER.debug("login, userDetails un: "+userDetails.getUsername()+", non-blank pw: "+StringUtils.isNotBlank(userDetails.getPassword()));
@@ -64,7 +67,10 @@ public class SecurityUtil {
 			String token = new String(Base64.encode((userDetails.getUsername()
 					+ ":" + userDetails.getPassword()).getBytes()));
 			addCookie(request, response, userDetailsConfig.getCookiesBasicAuthTokenName(), token, false, userDetailsConfig);
+			userDetailsService.updateLastLogin(userDetails);
 		} else{
+			LOGGER.warn("Login failed, force logout to clean any stale cookies");
+			SecurityUtil.logout(request, response, userDetailsConfig);
 			throw new BadCredentialsException("The provided user details are incomplete");
 		}
 		

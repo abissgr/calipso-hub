@@ -39,4 +39,6 @@ public interface UserDetailsService extends CrudService<ICalipsoUserDetails, Str
 	ICalipsoUserDetails getPrincipal();
 
 	LocalUser getPrincipalLocalUser();
+
+	void updateLastLogin(ICalipsoUserDetails u);
 }

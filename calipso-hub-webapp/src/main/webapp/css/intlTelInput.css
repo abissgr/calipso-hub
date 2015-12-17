@@ -1,8 +1,7 @@
 .intl-tel-input {
 	position: relative;
-	display: table-cell;
-	width: 100%;
 }
+
 .intl-tel-input * {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box
@@ -32,28 +31,28 @@
 	background-color: #FFC7C7
 }
 
-.intl-tel-input .flag-dropdown {
+.intl-tel-input .flag-container {
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	padding: 1px
 }
 
-.intl-tel-input .flag-dropdown:hover {
+.intl-tel-input .flag-container:hover {
 	cursor: pointer
 }
 
-.intl-tel-input .flag-dropdown:hover .selected-flag {
+.intl-tel-input .flag-container:hover .selected-flag {
 	background-color: rgba(0, 0, 0, 0.05)
 }
 
-.intl-tel-input input[disabled]+.flag-dropdown:hover, .intl-tel-input input[readonly]+.flag-dropdown:hover
+.intl-tel-input input[disabled]+.flag-container:hover, .intl-tel-input input[readonly]+.flag-container:hover
 	{
 	cursor: default
 }
 
-.intl-tel-input input[disabled]+.flag-dropdown:hover .selected-flag,
-	.intl-tel-input input[readonly]+.flag-dropdown:hover .selected-flag {
+.intl-tel-input input[disabled]+.flag-container:hover .selected-flag,
+	.intl-tel-input input[readonly]+.flag-container:hover .selected-flag {
 	background-color: transparent
 }
 
@@ -103,6 +102,11 @@
 	overflow-y: scroll
 }
 
+.intl-tel-input .country-list.dropup {
+	bottom: 100%;
+	margin-bottom: -1px
+}
+
 .intl-tel-input .country-list .flag {
 	display: inline-block;
 	width: 20px
@@ -150,6 +154,18 @@
 	width: 42px;
 	height: 100%;
 	opacity: 0
+}
+
+.intl-tel-input.iti-container {
+	position: absolute;
+	top: -1000px;
+	left: -1000px;
+	z-index: 1060;
+	padding: 1px
+}
+
+.intl-tel-input.iti-container:hover {
+	cursor: pointer
 }
 
 .iti-flag {
@@ -471,7 +487,7 @@
 }
 
 .iti-flag.cy {
-	height: 14px;
+	height: 13px;
 	background-position: -1225px 0px
 }
 

@@ -49,8 +49,12 @@
 					</td>
 				</tr>
                 <tr>
+                    <th>Account Created</th>
+                    <td>{{momentFromNow createdDate}}: {{momentDateTime createdDate}}</td>
+                </tr>
+                <tr>
                     <th>Last Visit</th>
-                    <td>{{momentFromNow lastVisit}}</td>
+                    <td>{{momentFromNow lastVisit}}: {{momentDateTime lastVisit}}</td>
                 </tr>
                 <tr>
                     <th>Locale</th>
@@ -58,7 +62,7 @@
                 </tr>
 				<tr>
 					<th>Password</th>
-					<td><a class="btn btn-danger" href="/changePassword">Change
+					<td><a class="btn btn-danger btn-xs" href="/changePassword">Change
 							Password</a> {{#if lastPassWordChangeDate}}Last updated
 						{{momentFromNow lastPassWordChangeDate}}{{/if}}</td>
 				</tr>
