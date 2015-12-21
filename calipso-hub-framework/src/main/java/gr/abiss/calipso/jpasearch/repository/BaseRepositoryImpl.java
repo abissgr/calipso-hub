@@ -18,6 +18,7 @@
 package gr.abiss.calipso.jpasearch.repository;
 
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
@@ -37,6 +38,12 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
+import javax.persistence.criteria.SetJoin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,4 +248,20 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		}
 	}
 
+	/** 
+	 * Get the entity's file uploads for this property
+	 * @param subjectId the entity id
+	 * @param propertyName the property holding the upload(s)
+	 * @return the uploads
+	 */
+	public List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName){
+		CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<BinaryFile> query = cb.createQuery(BinaryFile.class);
+		Root<T> root = query.from(this.domainClass);
+		query.where(cb.equal(root.get("id"), subjectId));
+		Selection<? extends BinaryFile> join = root.join(propertyName,JoinType.INNER);
+		query.select(join);
+		return this.entityManager.createQuery(query).getResultList();
+	}
 }

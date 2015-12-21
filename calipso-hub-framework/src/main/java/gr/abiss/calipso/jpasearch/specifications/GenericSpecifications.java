@@ -109,7 +109,7 @@ public class GenericSpecifications {
 		}
 	}
 
-	private static Field getField(Class<?> clazz, String fieldName) {
+	public static Field getField(Class<?> clazz, String fieldName) {
 		Field field = null;
 		if(!IGNORED_FIELD_NAMES.contains(fieldName)){
 

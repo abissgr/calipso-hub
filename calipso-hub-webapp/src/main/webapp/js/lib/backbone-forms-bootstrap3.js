@@ -53,7 +53,6 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Ba
   ');
 
   Form.editors.Base.prototype.className = 'form-control';
-  Form.editors.Checkbox.prototype.className = '';
   Form.Field.errorClassName = 'has-error';
 
 

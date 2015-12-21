@@ -31,15 +31,25 @@ This guide will only take a few minutes. After completion, you will have produce
 
 ## Service URLs and HTTP methods
 
-Calipso exposes CRUD, View and Search services for entity models in a regular way. Consider the RESTful URLs for an entity model representing a book. The <e>Entity URL Fragment</e> for that would be "books". Bellow are the service URLs for that EUF.
+RESTful conventions assign specific semantics to HTTP methods and what actions they are used for:
+
+HTTP GET    | Fetch / Query
+HTTP POST   | Create / New / Start
+HTTP PUT    | ‘Full’ Update / Alter / Modify
+HTTP PATCH  | ‘Partially’ Update / Alter / Modify
+HTTP [DELETE] Remove / Stop / Cancel
+
+Calipso follows the sam conventions to exposes SCRUD (search, create, update delete) services 
+for entity models in a regular way. Consider the RESTful URLs for an entity model representing a book. 
+The <e>Entity URL Fragment</e> for that would be "books". Bellow are the service URLs for that EUF.
 
 HTTP Method   | HTTP URL | Action
 ------------- | ---------|--------------
-POST          | localhost:8080/calipso/books | [Create](#create)
-GET           | localhost:8080/calipso/books/someId | [View](#view)
-PUT           | localhost:8080/calipso/books/someId | [Update](#update)
-GET           | localhost:8080/calipso/books?foo=bar&foo.subFoo=baz | [Search](#search)
-DELETE        | localhost:8080/calipso/books/someId | [Delete](#delete)
+POST          | localhost:8080/calipso/books | 
+GET           | localhost:8080/calipso/books/someId | 
+PUT           | localhost:8080/calipso/books/someId | 
+GET           | localhost:8080/calipso/books?foo=bar&foo.subFoo=baz |
+DELETE        | localhost:8080/calipso/books/someId | [
 
 
 ### Create

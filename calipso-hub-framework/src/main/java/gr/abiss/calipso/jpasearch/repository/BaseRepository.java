@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
+import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
@@ -56,4 +57,11 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
 	public void removeMetadatum(ID subjectId, String predicate);
 
 	public Metadatum findMetadatum(ID subjectId, String predicate);
+	/** 
+	 * Get the entity's file uploads for this property
+	 * @param subjectId the entity id
+	 * @param propertyName the property holding the upload(s)
+	 * @return the uploads
+	 */
+	public List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName);
 }

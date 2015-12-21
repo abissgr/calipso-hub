@@ -21,6 +21,7 @@ import gr.abiss.calipso.model.acl.AclClass;
 import gr.abiss.calipso.model.acl.AclObject;
 import gr.abiss.calipso.model.acl.AclObjectIdentity;
 import gr.abiss.calipso.model.acl.AclSid;
+import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
@@ -239,6 +240,15 @@ public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends S
 		
 		return new PageImpl<ReportDataSet>(new ArrayList<ReportDataSet>(0), pageable, 0);		
 		
+	}
+	/** 
+	 * Get the entity's file uploads for this propert
+	 * @param subjectId the entity id
+	 * @param propertyName the property holding the upload(s)
+	 * @return the uploads
+	 */
+	public List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName){
+		return this.repository.getUploadsForProperty(subjectId, propertyName);
 	}
 
 }

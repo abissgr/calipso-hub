@@ -1,18 +1,4 @@
-/**
-*  Your specific application stylesheet
-**/
 
-label, input {
-	display: inline
-}
-
-label {
-	font-weight:bold;
-}
-
-.form-block {
-	  display:block; 
-}
 
 /*
  * Visual styles for this demo
@@ -27,4 +13,31 @@ body > #full-height-wrapper { height: auto; min-height: 100%;
 #calipsoMainContentRegion {margin-bottom: 50px;}
 .panel-title a[data-toggle="collapse"]{
 	display: block;
+}
+.control-label{
+	margin-right: 10px;
+}
+.list-group-horizontal, 
+    .list-group-horizontal .list-group-item {
+    display: inline-block;
+    margin-bottom: 0px;
+}
+.list-group-horizontal .list-group-item {
+    margin-left:-4px;
+    margin-right: 0;
+}
+.list-group-horizontal .list-group-item:first-child {
+    border-top-right-radius:0;
+    border-bottom-left-radius:4px;
+}
+.list-group-horizontal .list-group-item:last-child {
+    border-top-right-radius:4px;
+    border-bottom-left-radius:0;
+}
+
+.panel-default hr{
+    background-color:rgb(204,​ 204,​ 204) !important;
+    border-color:rgb(204,​ 204,​ 204) !important;
+	color: rgb(204,​ 204,​ 204) !important;
+	height: 1px !important;
 }

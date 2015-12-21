@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.jpasearch.service;
 
+import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
@@ -25,6 +26,7 @@ import gr.abiss.calipso.model.types.TimeUnit;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.resthub.common.service.CrudService;
 import org.springframework.data.domain.Page;
@@ -58,4 +60,11 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 
 	public Page<ReportDataSet> getReportDatasets(Pageable pageable, TimeUnit timeUnit,
 			String dateField, Date dateFrom, Date dateTo, String reportName);
+	/** 
+	 * Get the entity's file uploads for this property
+	 * @param subjectId the entity id
+	 * @param propertyName the property holding the upload(s)
+	 * @return the uploads
+	 */
+	public List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName);
 }

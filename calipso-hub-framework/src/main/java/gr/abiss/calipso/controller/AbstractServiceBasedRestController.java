@@ -24,36 +24,56 @@ import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
+import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.base.PartiallyUpdateable;
+import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.service.cms.BinaryFileService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.lucene.index.Fields;
+import org.imgscalr.Scalr;
 import org.resthub.common.exception.NotFoundException;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
@@ -61,6 +81,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
@@ -76,6 +97,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -91,6 +114,16 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceBasedRestController.class);
  
+	private BinaryFileService binaryFileService;
+
+//	@Override
+	@Inject
+	@Qualifier("binaryFileService") // somehow required for CDI to work on 64bit JDK?
+	public void setService(BinaryFileService binaryFileService) {
+		this.binaryFileService = binaryFileService;
+	}
+	
+	
 	@Autowired
 	protected HttpServletRequest request;
 
@@ -468,7 +501,161 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
 		service.removeMetadatum(subjectId, predicate);
 	}
 	
+    @RequestMapping(value = "{subjectId}/uploads/{propertyName}", method = RequestMethod.GET)
+    public @ResponseBody List<BinaryFile> getUploadsByProperty(@PathVariable ID subjectId, @PathVariable String propertyName) {
+        LOGGER.info("uploadGet called");
+        List<BinaryFile> uploads = null;
+        // attach file
+        Field fileField = GenericSpecifications.getField(this.service.getDomainClass(), propertyName);
+        Class clazz = fileField.getType();
+        if(BinaryFile.class.isAssignableFrom(clazz)){
+        	uploads = this.service.getUploadsForProperty(subjectId, propertyName);
+        }
+        return uploads;
+    }
 
+    @RequestMapping(value = "{subjectId}/uploads/{propertyName}/thumbs/{id}", method = RequestMethod.GET)
+    public void thumbnail(HttpServletResponse response, @PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
+		Configuration config = ConfigurationFactory.getConfiguration();
+		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
+        BinaryFile file = binaryFileService.findById(id);
+        File fileFile = new File(fileUploadDirectory + file.getParentPath() + "/"+file.getThumbnailFilename());
+        response.setContentType(file.getContentType());
+        response.setContentLength(file.getThumbnailSize().intValue());
+        try {
+            InputStream is = new FileInputStream(fileFile);
+            IOUtils.copy(is, response.getOutputStream());
+        } catch(IOException e) {
+            LOGGER.error("Could not show thumbnail "+id, e);
+        }
+    }
+
+    @RequestMapping(value = "{subjectId}/uploads/{propertyName}/files/{id}", method = RequestMethod.GET)
+    public void getFile(HttpServletResponse response, @PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
+		Configuration config = ConfigurationFactory.getConfiguration();
+		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
+        BinaryFile file = binaryFileService.findById(id);
+        File fileFile = new File(fileUploadDirectory + file.getParentPath() + "/"+file.getNewFilename());
+        response.setContentType(file.getContentType());
+        response.setContentLength(file.getSize().intValue());
+        try {
+            InputStream is = new FileInputStream(fileFile);
+            IOUtils.copy(is, response.getOutputStream());
+        } catch(IOException e) {
+            LOGGER.error("Could not show picture "+id, e);
+        }
+    }
+    
+
+    
+    
+    @RequestMapping(value = "{subjectId}/uploads/{propertyName}/{id}", method = RequestMethod.DELETE)
+    public @ResponseBody List deleteById(@PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
+		Configuration config = ConfigurationFactory.getConfiguration();
+		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
+        BinaryFile file = binaryFileService.findById(id);
+        File fileFile = new File(fileUploadDirectory+"/"+file.getNewFilename());
+        fileFile.delete();
+        File thumbnailFile = new File(fileUploadDirectory+"/"+file.getThumbnailFilename());
+        thumbnailFile.delete();
+        binaryFileService.delete(file);
+        List<Map<String, Object>> results = new ArrayList();
+        Map<String, Object> success = new HashMap();
+        success.put("success", true);
+        results.add(success);
+        return results;
+    }
+    
+    @RequestMapping(value = "{subjectId}/uploads/{propertyName}", method = {RequestMethod.POST, RequestMethod.PUT}, 
+    		consumes = {}, produces = { "application/json", "application/xml" })
+    public @ResponseBody BinaryFile  addUploadsToProperty( @PathVariable ID subjectId, @PathVariable String propertyName, MultipartHttpServletRequest request, HttpServletResponse response) {
+        LOGGER.info("uploadPost called");
+
+		Configuration config = ConfigurationFactory.getConfiguration();
+		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
+		String baseUrl = config.getString("calipso.baseurl");
+		
+        Iterator<String> itr = request.getFileNames();
+        MultipartFile mpf;
+        BinaryFile bf = new BinaryFile();
+        try{
+        	 if (itr.hasNext()){
+	        
+	        
+	            mpf = request.getFile(itr.next());
+	            LOGGER.info("Uploading {}", mpf.getOriginalFilename());
+	            
+	
+	            bf.setName(mpf.getOriginalFilename());
+	            bf.setFileNameExtention(mpf.getOriginalFilename().substring(mpf.getOriginalFilename().lastIndexOf(".")+1));
+	            
+	            bf.setContentType(mpf.getContentType());
+	            bf.setSize(mpf.getSize());
+	            
+	            // request targets specific path?
+	            StringBuffer uploadsPath = new StringBuffer('/')
+	            	.append(this.service.getDomainClass().getDeclaredField("PATH_FRAGMENT").get(String.class))
+	            	.append('/')
+	            	.append(subjectId)
+	            	.append("/uploads/")
+	            	.append(propertyName);
+	            bf.setParentPath(uploadsPath.toString());
+	            LOGGER.info("Saving image entity with path: " + bf.getParentPath());
+	            bf = binaryFileService.create(bf);
+	
+	            LOGGER.info("file name: {}", bf.getNewFilename());
+	            bf = binaryFileService.findById(bf.getId());
+	            LOGGER.info("file name: {}", bf.getNewFilename());
+	
+	            File storageDirectory = new File(fileUploadDirectory + bf.getParentPath());
+	
+	            if(!storageDirectory.exists()){
+	            	storageDirectory.mkdirs();
+	            }
+	
+	            LOGGER.info("storageDirectory: {}", storageDirectory.getAbsolutePath());
+	            LOGGER.info("file name: {}", bf.getNewFilename());
+	            
+
+                File newFile = new File(storageDirectory, bf.getNewFilename());
+                newFile.createNewFile();
+                LOGGER.info("newFile path: {}", newFile.getAbsolutePath());
+                Files.copy(mpf.getInputStream(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                BufferedImage thumbnail = Scalr.resize(ImageIO.read(newFile), 290);
+                File thumbnailFile = new File(storageDirectory, bf.getThumbnailFilename());
+                ImageIO.write(thumbnail, "png", thumbnailFile);
+                bf.setThumbnailSize(thumbnailFile.length());
+                
+                bf = binaryFileService.update(bf);
+                
+                // attach file
+                // TODO: add/update to collection
+                Field fileField = GenericSpecifications.getField(this.service.getDomainClass(), propertyName);
+                Class clazz = fileField.getType();
+                if(BinaryFile.class.isAssignableFrom(clazz)){
+                	T target = this.service.findById(subjectId);
+                	BeanUtils.setProperty(target, propertyName, bf);
+                	this.service.update(target);
+                }
+                
+                bf.setUrl(baseUrl+"/api/rest/" + bf.getParentPath() + "/files/" + bf.getId());
+                bf.setThumbnailUrl(baseUrl+"/api/rest/" + bf.getParentPath() + "/thumbs/" + bf.getId());
+                bf.setDeleteUrl(baseUrl+"/api/rest/" + bf.getParentPath() + "/" + bf.getId());
+                bf.setDeleteType("DELETE");
+                bf.addInitialPreview("<img src=\"" + bf.getThumbnailUrl() + "\" class=\"file-preview-image\" />");
+                
+            } 
+
+        }catch(Exception e) {
+            LOGGER.error("Could not upload file(s) ", e);
+		}
+        
+//        Map<String, Object> files= new HashMap<String, Object>();
+        //files.put("files", list);
+        return bf;
+    }
+    
 	@RequestMapping(value = "reports", produces = { "application/json" }, method = RequestMethod.GET)
 	@ResponseBody
 	//@ApiOperation(value = "reports", httpMethod = "GET")
