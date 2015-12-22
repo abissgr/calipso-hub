@@ -403,7 +403,7 @@ Calipso.getThemeColor = function(index) {
 		Calipso.getLabelSkeleton = function(){
 
 			var modelKeys = {};
-	/*
+
 			// iterate models
 			$.each(Calipso.modelTypesMap, function(modelKey, ModelType) {
 				if(ModelType && ModelType.getFormSchemas && ModelType.getFormSchemas()){
@@ -438,7 +438,15 @@ Calipso.getThemeColor = function(index) {
 											if(""+oKey != ""+oVal && isNaN(oVal)){
 												if(!_.isUndefined(oVal.val) && !_.isUndefined(oVal.label)){
 														options[""+oVal.val] = ""+oVal.label;
-												}else{
+												}
+												else if(oVal.heading){
+													// bootstrap list group
+													options[""+oKey] = {
+														heading: ""+oVal.heading,
+														text : ""+oVal.text
+													};
+												}
+												else{
 														options[""+oKey] = ""+oVal;
 												}
 											}
@@ -465,7 +473,7 @@ Calipso.getThemeColor = function(index) {
 				}
 			});
 			console.log("labels JSON:\n"+ modelKeys.toSource());
-			*/
+
 			return modelKeys;
 		};
 
@@ -2249,6 +2257,32 @@ Calipso.getThemeColor = function(index) {
 		});
 		Calipso.components.backboneform.H5 = Calipso.components.backboneform.P.extend({
 				tagName : "h5",
+		});
+		Calipso.components.backboneform.ListGroup = Calipso.components.backboneform.Markup.extend({
+				tagName : "div",
+				className : "list-group",
+				initialize : function(options) {
+					Backbone.Form.editors.Hidden.prototype.initialize.call(this, options);
+					var html = "";
+					// TODO: OR labels options
+					console.log("OPTIONS: ");
+					console.log(this.schema.options);
+					if(this.schema.options){
+						for(var i=0; i < options.schema.options.length; i++){
+							html += '<div class="list-group-item">' +
+							'<h5 class"list-group-item-heading"><strong>' +
+							this.schema.options[i].heading +
+							'</strong></h5>' +
+							'<p class="list-group-item-tex">' +
+							this.schema.options[i].text +
+							'</p></div>';
+						}
+					}
+					this.$el.removeAttr("type class");
+					this.$el.addClass("list-grou");
+					this.$el.html(html);
+
+				},
 		});
 
 	Calipso.components.backboneform.Text = Backbone.Form.editors.Text.extend({
