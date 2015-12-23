@@ -37,7 +37,9 @@ function(
 	 * @namespace
 	 */
 	var Calipso = {
-		config : {},
+		config : {
+			locale: localStorage.getItem('locale')
+		},
 		util : {},
 		components : {},
 		collection : {},
@@ -48,6 +50,7 @@ function(
 		hbs: {},
 		labels : labels
 	};
+	console.log("LOCALE: " + Calipso.config.locale);
 		// default locale is set in
 		moment.locale(Calipso.config.locale);
 
@@ -416,9 +419,10 @@ Calipso.getThemeColor = function(index) {
 							modelKeys[modelKey][fieldName] = {};
 							var getActionLabels = function(actionName, actionSchema){
 								var actionLabels = {};
-								if(!actionSchema.titleKey){
+								if(!actionSchema.titleKey ){
 									var title = actionSchema.titleHTML || actionSchema.title;
-									if(!title && actionName == "default"){
+									// if not explicitly empty
+									if(_.isUndefined(title)){
 											title = fieldName.replace(/([A-Z])/g, ' $1')
 												// uppercase the first character
 												.replace(/^./, function(str){ return str.toUpperCase(); });
@@ -426,10 +430,13 @@ Calipso.getThemeColor = function(index) {
 									if(title){
 										actionLabels.title = title;
 									}
-									if(actionSchema.text){
-										actionLabels.text = actionSchema.text;
-									}
 
+								}
+								if(actionSchema && actionSchema.text){
+									actionLabels.text = actionSchema.text;
+								}
+								if(actionSchema && actionSchema.help){
+									actionLabels.help = actionSchema.help;
 								}
 								if(actionSchema && actionSchema.options
 									&& _.isArray(actionSchema.options)) {
@@ -455,14 +462,14 @@ Calipso.getThemeColor = function(index) {
 											actionLabels.options = options;
 										}
 								}
-								if(actionLabels && (actionLabels.options || actionLabels.title) ){
+								if(actionLabels ){
 									modelKeys[modelKey][fieldName][actionName] = actionLabels;
 								}
 							}
 							$.each(fieldSchema, getActionLabels);
-							if(!modelKeys[modelKey][fieldName]["default"]){
+							/*if(!modelKeys[modelKey][fieldName]["default"]){
 								getActionLabels("default", {});
-							}
+							}*/
 
 						}
 					});
@@ -1782,7 +1789,21 @@ Calipso.getThemeColor = function(index) {
 			}
     },
 	};
+	/*
 	Calipso.components.backboneformTemplates = {
+			horizontal : _.template('\
+				<div class="form-group field-<%= key %>">\
+				<label class="col-sm-2 control-label" for="<%= editorId %>">\
+				  <% if (titleHTML){ %><%= titleHTML %>\
+				  <% } else { %><%- title %><% } %>\
+				</label>\
+				<div class="col-sm-10">\
+				  <span data-editor></span>\
+				  <p class="help-block" data-error></p>\
+				  <p class="help-block"><%= help %></p>\
+				</div>\
+				</div>\
+			'),
 			vertical :  _.template('\
 		    <div class="form-group field-<%= key %>">\
 		      <label class="control-label" for="<%= editorId %>">\
@@ -1810,6 +1831,7 @@ Calipso.getThemeColor = function(index) {
 		    </div>\
 		  ')
 	};
+	*/
 	Calipso.components.backgrid.SmartHighlightRow = Backgrid.Row.extend({
   	initialize: function() {
 			Backgrid.Row.prototype.initialize.apply(this, arguments);
@@ -2065,16 +2087,17 @@ Calipso.getThemeColor = function(index) {
 		   */
 		  createField: function(key, schema) {
 				if(!schema.hidden){
-					if(!schema.titleHTML){
-						schema.titleHTML = schema.title;
-					}
-					schema.title = undefined;
-					if(!schema.titleHTML){
-						if(this.capitalizeKeys){
-							// insert a space before all caps
-							schema.titleHTML = key.replace(/([A-Z])/g, ' $1')
-							// uppercase the first character
-							.replace(/^./, function(str){ return str.toUpperCase(); });
+					if(!schema.titleKey ){
+						var title = schema.titleHTML || schema.title;
+						if(_.isUndefined(title)){
+							// TODO: 	if(this.capitalizeKeys){
+								title = key.replace(/([A-Z])/g, ' $1')
+									// uppercase the first character
+									.replace(/^./, function(str){ return str.toUpperCase(); });
+						}
+						if(title){
+							schema.titleHTML = title;
+							schema.title = undefined;
 						}
 					}
 					if(this.hintRequiredFields && this.isRequired(schema)){
@@ -2249,6 +2272,9 @@ Calipso.getThemeColor = function(index) {
 			title : "No html or template was provided in schema"
 		});
 
+		Calipso.components.backboneform.PDanger = Calipso.components.backboneform.P.extend({
+				className : "text-danger",
+		});
 		Calipso.components.backboneform.H3 = Calipso.components.backboneform.P.extend({
 				tagName : "h3",
 		});
@@ -2359,6 +2385,54 @@ Calipso.getThemeColor = function(index) {
 	});
 
 
+	Calipso.components.backboneform.Checkboxes = Backbone.Form.editors.Checkboxes.extend({
+		tagName: 'div',
+		className : "list-group",
+		/**
+	   * Create the checkbox list HTML
+	   * @param {Array}   Options as a simple array e.g. ['option1', 'option2']
+	   *                      or as an array of objects e.g. [{val: 543, label: 'Title for object 543'}]
+	   * @return {String} HTML
+	   */
+	  _arrayToHtml: function (array) {
+	    var html = $();
+	    var self = this;
+
+	    _.each(array, function(option, index) {
+				var itemHtml = $('<label class="list-group-item" for="'+self.id+'-'+index+'">');
+				if (_.isObject(option)) {
+	        if (option.group) {
+						itemHtml = null;
+			      html = html.add(self._arrayToHtmloption.options());
+	        }else{
+	          var val = (option.val || option.val === 0) ? option.val : '';
+	          itemHtml.append( $('<input type="checkbox" name="'+self.getName()+'" id="'+self.id+'-'+index+'" />').val(val) );
+	          if (option.labelHTML){
+	            itemHtml.append("&nbsp;"+option.labelHTML);
+	          }
+	          else {
+	            itemHtml.append("&nbsp;"+option.label);
+	          }
+	        }
+	      }
+	      else {
+	        itemHtml.append( $('<input type="checkbox" name="'+self.getName()+'" id="'+self.id+'-'+index+'" />').val(option) );
+	      }
+
+				if(itemHtml){
+	      	html = html.add(itemHtml);
+				}
+	    });
+
+	    return html;
+	  }
+	}, {
+	  //STATICS
+	});
+
+	Calipso.components.backboneform.CheckboxesInline = Calipso.components.backboneform.Checkboxes.extend({
+		className : "list-group list-group-horizontal",
+	});
 
 
 	Calipso.components.backboneform.Tel = Calipso.components.backboneform.Text.extend({
@@ -4785,13 +4859,13 @@ Calipso.getThemeColor = function(index) {
 		},
 		formTemplates : {
 			horizontal : _.template('\
-					<form autocomplete=\"off\" class="form-horizontal" role="form">\
-					<div data-fieldsets></div>\
-					<% if (submitButton) { %>\
-					<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
-					<% } %>\
-					</form>\
-			'),
+		    <form class="form-horizontal" role="form">\
+		      <div data-fieldsets></div>\
+		      <% if (submitButton) { %>\
+		        <button type="submit" class="btn"><%= submitButton %></button>\
+		      <% } %>\
+		    </form>\
+		  '),
 			nav : _.template('\
 					<nav class="navbar navbar-default">\
 					<form autocomplete=\"off\" class="navbar-form navbar-left" role="form">\
@@ -5847,6 +5921,8 @@ Calipso.getThemeColor = function(index) {
 				this.currentStepIndex = stepIndex;
 				this.model.set("currentStepIndex", stepIndex);
 				this.stepRegion.show(view);
+				$('html, body').animate({scrollTop:0},500);
+
 			},
 
 			onGenericFormSaved : function(model){

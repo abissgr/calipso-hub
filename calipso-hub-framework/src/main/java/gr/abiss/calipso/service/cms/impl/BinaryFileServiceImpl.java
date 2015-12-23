@@ -29,6 +29,7 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 @Named("binaryFileService")
 public class BinaryFileServiceImpl extends GenericEntityServiceImpl<BinaryFile, String, BinaryFileRepository> 
@@ -41,5 +42,14 @@ public class BinaryFileServiceImpl extends GenericEntityServiceImpl<BinaryFile, 
 	public void setRepository(BinaryFileRepository binaryFileRepository) {
 		super.setRepository(binaryFileRepository);
 	}
+
+	@Transactional(readOnly = false)
+	@Override
+	public void delete(BinaryFile resource) {
+		// TODO Auto-generated method stub
+		this.repository.delete(resource);
+	}
+	
+	
 
 }

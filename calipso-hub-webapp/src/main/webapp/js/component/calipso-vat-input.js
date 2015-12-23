@@ -1528,7 +1528,10 @@ define([ 'calipso' ], function(Calipso) {
 						msg += _this.labels.calipso.vatInput.invalidVat;
 					}
 					if (country && !checkVATObject.valid_country){
-						msg += _this.labels.calipso.vatInput.countryMissmatch;
+						msg += (" " + _this.labels.calipso.vatInput.countryMissmatch);
+						if(country){
+							msg += (' (' + country + ')')
+						}
 					}
 					if(msg){
 						return  {

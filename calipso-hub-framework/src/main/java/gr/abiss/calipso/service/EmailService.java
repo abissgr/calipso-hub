@@ -28,6 +28,8 @@ import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -41,7 +43,9 @@ import org.thymeleaf.context.Context;
 
 @Service
 public class EmailService {
-
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmailService.class);
+			
 	@Value("${mail.server.from}")
 	private String defaultMailFrom;
 
@@ -60,7 +64,6 @@ public class EmailService {
 	 * @param user
 	 * @throws MessagingException
 	 */
-	@Async
 	public void sendAccountConfirmation(final User user) throws MessagingException {
 		final String subject = "Account Confirmation";
 		final String templateName = "email-account-confirmation.html";
@@ -79,7 +82,7 @@ public class EmailService {
 	 * @param user
 	 * @throws MessagingException
 	 */
-	@Async
+
 	public void sendPasswordResetLink(final User user) throws MessagingException {
 		final String subject = "Password Reset Request";
 		final String templateName = "email-password-reset.html";
@@ -93,21 +96,25 @@ public class EmailService {
 		sendEmail(subject, templateName, emailTo, emailFrom, ctx);
 	}
 
-	private void sendEmail(final String subject, final String templateName, String emailTo, String emailFrom, final Context ctx)
-			throws MessagingException {
-		// Prepare message using a Spring helper
-		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
-		final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, "UTF-8");
-		message.setSubject(subject);
-		message.setFrom(emailFrom);
-		message.setTo(emailTo);
-		ctx.setVariable("baseUrl", this.baseUrl);
-		// Create the HTML body using Thymeleaf
-		final String htmlContent = this.templateEngine.process(templateName, ctx);
-		message.setText(htmlContent, true /* isHtml */);
-
-		// Send email
-		this.mailSender.send(mimeMessage);
+	@Async
+	public void sendEmail(final String subject, final String templateName, String emailTo, String emailFrom, final Context ctx){
+		try {
+			// Prepare message using a Spring helper
+			final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+			final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, "UTF-8");
+			message.setSubject(subject);
+				message.setFrom(emailFrom);
+			message.setTo(emailTo);
+			ctx.setVariable("baseUrl", this.baseUrl);
+			// Create the HTML body using Thymeleaf
+			final String htmlContent = this.templateEngine.process(templateName, ctx);
+			message.setText(htmlContent, true /* isHtml */);
+	
+			// Send email
+			this.mailSender.send(mimeMessage);
+		} catch (Exception e) {
+			LOGGER.error("Failed to send email: ", e);
+		}
 	}
 
     
@@ -116,6 +123,7 @@ public class EmailService {
     /* 
      * Send HTML mail with attachment. 
      */
+	@Async
     public void sendMailWithAttachment(
             final String recipientName, final String recipientEmail, final String attachmentFileName, 
             final byte[] attachmentBytes, final String attachmentContentType, final Locale locale) 
@@ -154,6 +162,7 @@ public class EmailService {
     /* 
      * Send HTML mail with inline image
      */
+	@Async
     public void sendMailWithInline(
             final String recipientName, final String recipientEmail, final String imageResourceName, 
             final byte[] imageBytes, final String imageContentType, final Locale locale)

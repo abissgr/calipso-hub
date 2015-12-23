@@ -35,9 +35,9 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms'], function($, _, Ba
         <% if (titleHTML){ %><%= titleHTML %>\
         <% } else { %><%- title %><% } %>\
       </label>\
+        <p class="help-block"><%= help %></p>\
         <span data-editor></span>\
         <p class="help-block" data-error></p>\
-        <p class="help-block"><%= help %></p>\
     </div>\
   ');
 
