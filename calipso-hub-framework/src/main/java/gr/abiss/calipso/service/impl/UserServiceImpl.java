@@ -123,13 +123,9 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		LOGGER.info("create, created user: " + resource);
 
 		if (resource != null && !resource.getActive()) {
-			try {
-				LOGGER.info("Sending account confirmation email...");
-				emailService.sendAccountConfirmation(resource);
-				LOGGER.info("Account confirmation email sent");
-			} catch (MessagingException e) {
-				LOGGER.error("Could not create account confirmation email", e);
-			}
+			LOGGER.info("Sending account confirmation email...");
+			emailService.sendAccountConfirmation(resource);
+			LOGGER.info("Account confirmation email sent");
 		}
 		LOGGER.info("created user: " + resource);
 		return resource;
@@ -179,11 +175,8 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 			user.setResetPasswordToken(this.generator.generateKey());
 			user = this.userRepository.save(user);
 		}
-		try {
-			emailService.sendPasswordResetLink(user);
-		} catch (MessagingException e) {
-			throw new RuntimeException("Could not create password reset email", e);
-		}
+		emailService.sendPasswordResetLink(user);
+		
 	}
 
 

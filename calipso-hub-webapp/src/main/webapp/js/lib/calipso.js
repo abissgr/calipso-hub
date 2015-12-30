@@ -374,12 +374,12 @@ define(
 		// console.log("Calipso.app has been configured");
 
 		Calipso.getLabelSkeleton = function() {
-
+			var viewSections = {};
 			var modelKeys = {};
-			/*
+
 						// iterate models
 						$.each(Calipso.modelTypesMap, function(modelKey, ModelType) {
-							if(ModelType && ModelType.getFormSchemas && ModelType.getFormSchemas()){
+							if(ModelType && ModelType.getPathFragment() == "accountApplications" && ModelType.getFormSchemas && ModelType.getFormSchemas()){
 								var formSchemas = ModelType.getFormSchemas();
 								// iterate fields
 								modelKeys[modelKey] = {};
@@ -388,6 +388,9 @@ define(
 									if(fieldSchema){
 										modelKeys[modelKey][fieldName] = {};
 										var getActionLabels = function(actionName, actionSchema){
+											if(_.isUndefined(viewSections[actionName])){
+												viewSections[actionName] = [];
+											}
 											var actionLabels = {};
 											if(!actionSchema.titleKey ){
 												var title = actionSchema.titleHTML || actionSchema.title;
@@ -399,6 +402,9 @@ define(
 												}
 												if(title){
 													actionLabels.title = title;
+													viewSections[actionName].push({
+														name : fieldName,
+													});
 												}
 
 											}
@@ -447,7 +453,7 @@ define(
 							}
 						});
 						console.log("labels JSON:\n"+ modelKeys.toSource());
-			*/
+
 			return modelKeys;
 		};
 
@@ -1305,6 +1311,90 @@ define(
 		getFormSchemas : function() {
 			return this.constructor.getFormSchemas(this);
 		},
+		getFormActions : function() {
+			var formSchemas = this.constructor.getFormSchemas(this);
+			var actions = {};
+			$.each(formSchemas, function(fieldName, fieldSchema) {
+				$.each(fieldSchema, function(actionName, actionSchema){
+					// add action if missing
+					if(_.isUndefined(actions[actionName])){
+						actions[actionName] = {};
+					}
+					actions[actionName][fieldName] = this.getFinalSchema(fieldName, actionSchema, actionName);
+				});
+			});
+			return actions;
+		},
+		isRequired : function(schema) {
+			var required = schema.required;
+			if (!required && schema.validators) {
+				required = $.inArray('required', schema.validators) > -1;
+			}
+			return required;
+		},
+		getFinalSchema : function(fieldName, fieldSchema, actionName) {
+			console.log("getFinalSchema fieldName: " + fieldName + ", actionName: " + actionName);
+			// get i18n labels configuration as defaults,
+			// then overwrite those using local settings
+			var labelsConfig = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.' + actionName);
+
+			//
+			// final title
+			//
+			var title = fieldSchema.titleHTML || fieldSchema.title;
+			if (_.isUndefined(title)) {
+				// build title from field name
+				title = fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) {
+					return str.toUpperCase();
+				});
+			}
+			if (title) {
+				// hint required?
+				var hint = "";
+				if(this.isRequired(fieldSchema)){
+					hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
+					title.trim();
+					if(title.lastIndexOf(":") == title.length - 1){
+						title = title.substring(0, title.length - 1);
+						hint += ":";
+					}
+				}
+				fieldSchema.titleHTML = title + hint;
+				fieldSchema.title = undefined;
+			}
+			//
+			// final options
+			//
+			if (labelsConfig.options) {
+				var optionListLabels = labelsConfig.options;
+				var newOptions = [];
+
+				// listgroup format
+				if (optionListLabels["0"] && (optionListLabels["0"].heading || optionListLabels["0"].text)) {
+					var i = 0;
+					while (optionListLabels[i + ""]) {
+						var optionLabels = optionListLabels[i + ""];
+						newOptions.push({
+							heading : optionLabels.heading,
+							text : optionLabels.text
+						});
+						i++;
+					}
+				}
+				// normal var/label options
+				else {
+					_.each(optionListLabels, function(value, key, obj) {
+						newOptions.push({
+							val : key,
+							label : value
+						});
+					});
+				}
+				labelsConfig.options = newOptions;
+			}
+			var schema = $.extend({}, labelsConfig, fieldSchema);
+			return schema;
+		},
 		/**
 		 * Get the form schema for a specific action like "create", "update", "search" or "report".
 		 *
@@ -1368,7 +1458,7 @@ define(
 						}
 						// add final schema for field
 						if (propertySchemaForAction) {
-							formSchema[propertyName] = propertySchemaForAction;
+							formSchema[propertyName] = this.getFinalSchema(propertyName, propertySchemaForAction, actionName);
 						}
 					} else {
 						console.log("WARNING GenericModel#getFormSchema, no " + actionName + "schema found for property: " + propertyName);
@@ -2014,13 +2104,7 @@ define(
 			this.formSchemaKey = options.formSchemaKey;
 			Backbone.Form.prototype.initialize.apply(this, arguments);
 		},
-		isRequired : function(schema) {
-			var required = schema.required;
-			if (!required && schema.validators) {
-				required = $.inArray('required', schema.validators) > -1;
-			}
-			return required;
-		},
+
 		/**
 		 * Get all the field values as an object.
 		 * Use this method when passing data instead of objects.
@@ -2043,85 +2127,6 @@ define(
 
 			return values;
 		},
-		getFinalSchema : function(key, fieldSchema) {
-			// get i18n labels configuration as defaults,
-			// then overwrite those using local settings
-			var labelsConfig = Calipso.getLabels("models." + this.model.getPathFragment() + '.' + key + '.' + this.formSchemaKey);
-			// normalize options
-			if (labelsConfig.options) {
-				var optionListLabels = labelsConfig.options;
-				var newOptions = [];
-
-				// listgroup format
-				if (optionListLabels["0"] && (optionListLabels["0"].heading || optionListLabels["0"].text)) {
-					var i = 0;
-					while (optionListLabels[i + ""]) {
-						var optionLabels = optionListLabels[i + ""];
-						newOptions.push({
-							heading : optionLabels.heading,
-							text : optionLabels.text
-						});
-						i++;
-					}
-				}
-				// normal var/label options
-				else {
-					_.each(optionListLabels, function(value, key, obj) {
-						newOptions.push({
-							val : key,
-							label : value
-						});
-					});
-				}
-				labelsConfig.options = newOptions;
-			}
-			var schema = $.extend({}, labelsConfig, fieldSchema);
-			return schema;
-		},
-		/**
-		 * Creates a Field instance
-		 *
-		 * @param {String} key
-		 * @param {Object} schema       Field schema
-		 *
-		 * @return {Form.Field}
-		 */
-		createField : function(key, fieldSchema) {
-
-			var schema = this.getFinalSchema(key, fieldSchema);
-			if (!schema.hidden) {
-				if (!schema.titleKey) {
-					var title = schema.titleHTML || schema.title;
-					if (_.isUndefined(title)) {
-						// TODO: 	if(this.capitalizeKeys){
-						title = key.replace(/([A-Z])/g, ' $1')
-						// uppercase the first character
-						.replace(/^./, function(str) {
-							return str.toUpperCase();
-						});
-					}
-					if (title) {
-						schema.titleHTML = title;
-						schema.title = undefined;
-					}
-				}
-				if (this.hintRequiredFields && this.isRequired(schema)) {
-					var hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
-					schema.titleHTML.trim();
-					/*for(var i = schema.titleHTML.length; i < length; i++){
-						suffix += ' ';
-					}
-					if(schema.titleHTML.lastIndexOf(":") == schema.titleHTML.length - 1){
-						schema.titleHTML = title.substring(0, schema.titleHTML.length - 1);
-						suffix = ":" + suffix;
-					}*/
-					schema.titleHTML = schema.titleHTML + hint;
-				}
-			}
-
-			return Backbone.Form.prototype.createField.call(this, key, schema);
-		},
-
 		render : function() {
 			var self = this, fields = this.fields, $ = Backbone.$;
 
@@ -2661,14 +2666,18 @@ define(
 		showInMenu : true,
 		formSchemas : {//
 			name : {
-				"search" : 'Text',
+				"search" : {
+					type : 'Text',
+				},
 				"default" : {
 					type : 'Text',
 					validators : [ 'required' ]
 				}
 			},
 			description : {
-				"search" : 'Text',
+				"search" : {
+					type : 'Text',
+				},
 				"default" : {
 					type : 'Text',
 					validators : [ 'required' ]

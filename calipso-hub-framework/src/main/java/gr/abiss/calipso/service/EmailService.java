@@ -64,7 +64,7 @@ public class EmailService {
 	 * @param user
 	 * @throws MessagingException
 	 */
-	public void sendAccountConfirmation(final User user) throws MessagingException {
+	public void sendAccountConfirmation(final User user){
 		final String subject = "Account Confirmation";
 		final String templateName = "email-account-confirmation.html";
 		String emailTo = user.getEmail();
@@ -76,14 +76,32 @@ public class EmailService {
 
 		sendEmail(subject, templateName, emailTo, emailFrom, ctx);
     }
+	
+	/**
+	 * Send an test email to verify outgoing email settings
+	 * @param user the user to send the email to
+	 * @throws MessagingException
+	 */
+	public void sendTest(final User user) {
+		final String subject = "[ignore] Email Server Test";
+		final String templateName = "email-test.html";
+		String emailTo = user.getEmail();
+		String emailFrom = defaultMailFrom;
+		
+		// Prepare the evaluation context
+		final Context ctx = new Context(new Locale(user.getLocale()));
+		ctx.setVariable("user", user);
 
+		sendEmail(subject, templateName, emailTo, emailFrom, ctx);
+    }
+	
 	/**
 	 * Send a password reset email to the given user
 	 * @param user
 	 * @throws MessagingException
 	 */
 
-	public void sendPasswordResetLink(final User user) throws MessagingException {
+	public void sendPasswordResetLink(final User user)  {
 		final String subject = "Password Reset Request";
 		final String templateName = "email-password-reset.html";
 		String emailTo = user.getEmail();
