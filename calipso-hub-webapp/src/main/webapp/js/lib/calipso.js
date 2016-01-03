@@ -5837,7 +5837,7 @@ define(
 		},
 		showStep : function(stepIndex) {
 			var step = this.config.steps[stepIndex];
-			var view = step.viewType;
+			var view = step.view;
 			if (!view) {
 				var viewOptions = step.viewOptions ? step.viewOptions : {};
 				viewOptions.model = this.getStepModel(step);
