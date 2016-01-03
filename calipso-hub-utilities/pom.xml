@@ -171,7 +171,6 @@
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
 		</dependency>
-		
 		<!-- elastisearch -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -229,8 +228,8 @@
 
 		<!-- JavaMail -->
 		<dependency>
-           <groupId>javax.mail</groupId>
-           <artifactId>javax.mail-api</artifactId>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>

@@ -374,12 +374,11 @@ define(
 		// console.log("Calipso.app has been configured");
 
 		Calipso.getLabelSkeleton = function() {
-			var viewSections = {};
 			var modelKeys = {};
-
+/*
 						// iterate models
 						$.each(Calipso.modelTypesMap, function(modelKey, ModelType) {
-							if(ModelType && ModelType.getPathFragment() == "accountApplications" && ModelType.getFormSchemas && ModelType.getFormSchemas()){
+							if(ModelType && ModelType.getFormSchemas && ModelType.getFormSchemas()){
 								var formSchemas = ModelType.getFormSchemas();
 								// iterate fields
 								modelKeys[modelKey] = {};
@@ -388,9 +387,6 @@ define(
 									if(fieldSchema){
 										modelKeys[modelKey][fieldName] = {};
 										var getActionLabels = function(actionName, actionSchema){
-											if(_.isUndefined(viewSections[actionName])){
-												viewSections[actionName] = [];
-											}
 											var actionLabels = {};
 											if(!actionSchema.titleKey ){
 												var title = actionSchema.titleHTML || actionSchema.title;
@@ -402,9 +398,6 @@ define(
 												}
 												if(title){
 													actionLabels.title = title;
-													viewSections[actionName].push({
-														name : fieldName,
-													});
 												}
 
 											}
@@ -453,7 +446,7 @@ define(
 							}
 						});
 						console.log("labels JSON:\n"+ modelKeys.toSource());
-
+			*/
 			return modelKeys;
 		};
 
@@ -1312,18 +1305,7 @@ define(
 			return this.constructor.getFormSchemas(this);
 		},
 		getFormActions : function() {
-			var formSchemas = this.constructor.getFormSchemas(this);
-			var actions = {};
-			$.each(formSchemas, function(fieldName, fieldSchema) {
-				$.each(fieldSchema, function(actionName, actionSchema){
-					// add action if missing
-					if(_.isUndefined(actions[actionName])){
-						actions[actionName] = {};
-					}
-					actions[actionName][fieldName] = this.getFinalSchema(fieldName, actionSchema, actionName);
-				});
-			});
-			return actions;
+			return this.constructor.getFormActions(this);
 		},
 		isRequired : function(schema) {
 			var required = schema.required;
@@ -1332,26 +1314,26 @@ define(
 			}
 			return required;
 		},
-		getFinalSchema : function(fieldName, fieldSchema, actionName) {
-			console.log("getFinalSchema fieldName: " + fieldName + ", actionName: " + actionName);
+		getFinalSchema : function(fieldName, fieldSchema, actionName, dontHintRequired) {
 			// get i18n labels configuration as defaults,
 			// then overwrite those using local settings
 			var labelsConfig = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.' + actionName);
 
+			var schema = $.extend({}, labelsConfig, fieldSchema);
 			//
 			// final title
 			//
 			var title = fieldSchema.titleHTML || fieldSchema.title;
 			if (_.isUndefined(title)) {
 				// build title from field name
-				title = fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) {
+				title = labelsConfig.title || fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) {
 					return str.toUpperCase();
 				});
 			}
 			if (title) {
 				// hint required?
 				var hint = "";
-				if(this.isRequired(fieldSchema)){
+				if(!dontHintRequired && this.isRequired(fieldSchema)){
 					hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
 					title.trim();
 					if(title.lastIndexOf(":") == title.length - 1){
@@ -1390,9 +1372,11 @@ define(
 						});
 					});
 				}
-				labelsConfig.options = newOptions;
+				fieldSchema.options = newOptions;
 			}
 			var schema = $.extend({}, labelsConfig, fieldSchema);
+			schema.fieldName = fieldName;
+			schema.actionName = actionName;
 			return schema;
 		},
 		/**
@@ -1610,6 +1594,27 @@ define(
 		 */
 		getBusinessKey : function(instance) {
 			this.businessKey;
+		},
+		formActions : null,
+		getFormActions : function(instance) {
+			if(!this.formActions){
+
+					var formSchemas = instance.getFormSchemas();
+					var actions = {};
+					var actionsArray = [];
+					$.each(formSchemas, function(fieldName, fieldSchema) {
+						$.each(fieldSchema, function(actionName, actionSchema){
+							// add action if missing
+							if(_.isUndefined(actions[actionName])){
+								actions[actionName] = [];
+								actionsArray.push(actions[actionName]);
+							}
+							actions[actionName].push(instance.getFinalSchema(fieldName, actionSchema, actionName));
+						});
+					});
+					this.formActions = actionsArray;
+			}
+			return this.formActions;
 		},
 		getTypeaheadSource : function(options) {
 			var _this = this;
@@ -3823,6 +3828,9 @@ define(
 	{
 		template : Calipso.getTemplate("templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
 		tagName : "li",
+		initialize : function(models, options) {
+			Marionette.ItemView.prototype.initialize.apply(this, arguments);
+		},
 		attributes : function() {
 			return this.getOption("attributes");
 		},
@@ -5829,7 +5837,7 @@ define(
 		},
 		showStep : function(stepIndex) {
 			var step = this.config.steps[stepIndex];
-			var view = step.view;
+			var view = step.viewType;
 			if (!view) {
 				var viewOptions = step.viewOptions ? step.viewOptions : {};
 				viewOptions.model = this.getStepModel(step);
