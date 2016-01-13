@@ -56,6 +56,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -170,6 +171,19 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		this.email = email;
 	}
 
+	public boolean hasRole(String roleName){
+		Assert.notNull(roleName, "Role name cannot be null");
+		boolean hasIt = false;
+		if(CollectionUtils.isNotEmpty(this.roles)){
+			for(Role role : roles){
+				if(roleName.equalsIgnoreCase(role.getName())){
+					hasIt = true;
+					break;
+				}
+			}
+		}
+		return hasIt;
+	}
 	/**
 	 * {@inheritDoc}}
 	 * @see gr.abiss.calipso.model.interfaces.ReportDataSetSubject#getLabel()

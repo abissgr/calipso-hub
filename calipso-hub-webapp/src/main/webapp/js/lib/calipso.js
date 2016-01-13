@@ -4019,6 +4019,9 @@ define(
 			var _this = this;
 			if (this.collection.length > 0) {
 				this.collection.at(0).set("tabActive", true);
+				for(var i=1; i < this.collection.length; i++){
+					this.collection.at(i).set("tabActive", false);
+				}
 			}
 
 			//
@@ -4026,7 +4029,7 @@ define(
 			var buttonTextProperty = this.getOption("buttonTextProperty");
 			var idProperty = this.getOption("idProperty");
 			var TabButtonItemView = Calipso.view.TemplateBasedItemView.extend({
-				template : _.template('<a href="#tab<%= ' + idProperty + ' %>" ' + ' <% if (tabActive){ %> class="active" <% } %>' + 'aria-controls="tab<%= ' + idProperty + ' %>" role="tab" data-toggle="tab"><%= ' + buttonTextProperty + ' %></a>'),
+				template : _.template('<a href="#tab<%= ' + idProperty + ' %>" ' + ' <% if (tabActive != undefined && tabActive){ %> class="active" <% } %>' + 'aria-controls="tab<%= ' + idProperty + ' %>" role="tab" data-toggle="tab"><%= ' + buttonTextProperty + ' %></a>'),
 				tagName : "li",
 
 				attributes : function() {
