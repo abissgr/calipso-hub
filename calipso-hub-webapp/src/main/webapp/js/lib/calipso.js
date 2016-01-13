@@ -23,6 +23,42 @@ define(
 		function(labels, _, Handlebars, calipsoTemplates, moment, Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 /*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, jqueryColor, intlTelInput, q, chartjs) {
 
+	// deepExtend mixinTemplateHelpers
+
+	_.mixin({ 'deepExtend': function (obj) {
+	  var parentRE = /#{\s*?_\s*?}/,
+	  slice = Array.prototype.slice;
+
+	  _.each(slice.call(arguments, 1), function(source) {
+	    for (var prop in source) {
+	      if (_.isUndefined(obj[prop]) || _.isFunction(obj[prop]) || _.isNull(source[prop]) || _.isDate(source[prop])) {
+	        obj[prop] = source[prop];
+	      }
+	      else if (_.isString(source[prop]) && parentRE.test(source[prop])) {
+	        if (_.isString(obj[prop])) {
+	          obj[prop] = source[prop].replace(parentRE, obj[prop]);
+	        }
+	      }
+	      else if (_.isArray(obj[prop]) || _.isArray(source[prop])){
+	        if (!_.isArray(obj[prop]) || !_.isArray(source[prop])){
+	          throw new Error('Trying to combine an array with a non-array (' + prop + ')');
+	        } else {
+	          obj[prop] = _.reject(_.deepExtend(_.clone(obj[prop]), source[prop]), function (item) { return _.isNull(item);});
+	        }
+	      }
+	      else if (_.isObject(obj[prop]) || _.isObject(source[prop])){
+	        if (!_.isObject(obj[prop]) || !_.isObject(source[prop])){
+	          throw new Error('Trying to combine an object with a non-object (' + prop + ')');
+	        } else {
+	          obj[prop] = _.deepExtend(_.clone(obj[prop]), source[prop]);
+	        }
+	      } else {
+	        obj[prop] = source[prop];
+	      }
+	    }
+	  });
+	  return obj;
+	}});
 	/**
 	 * Calipso namespace
 	 * @namespace
@@ -39,7 +75,8 @@ define(
 		view : {},
 		controller : {},
 		hbs : {},
-		labels : labels
+		labels : labels,
+		datatypes : {},
 	};
 
 	// default locale is set in
@@ -1702,6 +1739,12 @@ define(
 						dataType : "email",
 						validators : [ 'email' ]
 					},
+					"create" : {
+						type : 'Text',
+						title : "Email",
+						dataType : "email",
+						validators : [ 'required', 'email', Calipso.components.backboneform.validators.newUserEmail ]
+					},
 					"default" : {
 						type : 'Text',
 						title : "Email",
@@ -1834,6 +1877,25 @@ define(
 				}
 			}
 		},
+		newUserEmail : function(value, formValues){
+			var usersCollection = new Calipso.collection.GenericCollection([], {
+				model : Calipso.model.UserModel,
+				data : {
+					email : value
+				}
+			});
+			usersCollection.fetch({
+				async:false,
+				url : usersCollection.url,
+				data : usersCollection.data
+			});
+			if(usersCollection.length > 0){
+				return {
+					type : "email",
+					message : "A user with that email already exists"
+				};
+			}
+		}
 	};
 	/*
 	Calipso.components.backboneformTemplates = {
@@ -2350,7 +2412,9 @@ define(
 			this.unbind();
 		},
 	});
-
+	Calipso.components.backboneform.Textarea = Calipso.components.backboneform.Text.extend({
+		tagName : "textarea"
+	});
 	Calipso.components.backboneform.NumberText = Calipso.components.backboneform.Text.extend({
 		getValue : function() {
 			var value = Backbone.Form.editors.Text.prototype.getValue.apply(this, arguments);
@@ -3011,6 +3075,10 @@ define(
 					"search" : {
 						title : "Username or email",
 						type : 'Text',
+					},
+					"create" : {
+						type : 'Text',
+						validators : [ 'required', 'email',  Calipso.components.backboneform.validators.newUserEmail]
 					},
 					"default" : {
 						type : 'Text',
@@ -5941,9 +6009,87 @@ define(
 		layoutViewType : Calipso.view.UserProfileLayout,
 		itemViewType : Calipso.view.UserProfileView,
 	});
-	// AMD define happens at the end for compatibility with AMD loaders
-	// that don't enforce next-turn semantics on modules.
 
+	// Base attribute dataType
+	Calipso.datatypes.Base = Marionette.Object.extend({
+		defaults : {
+			"viewTypes" : {
+				// TODO: "view"
+				"default" : null
+			},
+		},
+		constructor : function(options) {
+			options = options || {};
+      this.options = _.deepExtend({}, this._getDefaults(), options);
+	    if (!this.getOption("model") || !this.getOption("name")) {
+	      throw "Mandatory option missing, one of model, name";
+	    }
+		},
+		_getDefaults : function(){
+			return _.result(this, "defaults", {});
+		},
+		getFoo : function(useCase, what){
+			var value = undefined;
+			var option = this.options[what];
+			if(option){
+
+				value = option[useCase];
+				while(_.isUndefined(value)){
+					// fallback to more generic use case ? (e.g. from "create-custom" to "create")
+					if(useCase.indexOf("-") > 0){
+						useCase = useCace.substring(0, useCase.indexOf("-"));
+						value = option[useCase];
+					}
+					else if(useCase != "default"){
+						useCase = "default"
+						value = option[useCase];
+					}
+					else{
+						value = null;
+					}
+				}
+			}
+			return value;
+		},
+	},{
+	});
+	/*
+	Calipso.datatypes.Base.extend = function (protoProps, staticProps) {
+        // Call default extend method
+        var extended = Backbone.Marionette.extend.call(this, protoProps, staticProps);
+        // Add a usable super method for better inheritance
+        extended.prototype._super = this.prototype;
+        // Apply new or different defaults on top of the original
+        if (protoProps.defaults && this.prototype.defaults) {
+					extended.prototype.defaults = _.deepExtend({}, this.prototype.defaults, extended.prototype.defaults);
+        }
+        return extended;
+    };
+
+	Calipso.datatypes.String = Calipso.datatypes.Base.extend({
+
+		defaults : {
+			"viewTypes" : {
+				// TODO: "view"
+				"default" : Calipso.components.backboneform.Text
+			},
+		},
+	},{
+	});
+	var baseField = new Calipso.datatypes.Base({model:new Calipso.model.GenericModel(), name : "name"});
+	console.log("baseField: ");
+	console.log(baseField.getOption("viewTypes"));
+	console.log(baseField.getOption("validators"));
+
+	var stringField = new Calipso.datatypes.String({model:new Calipso.model.GenericModel(), name : "name"});
+	console.log("stringField: ");
+	console.log(stringField.getOption("viewTypes"));
+	console.log(stringField.getOption("validators"));
+	var stringFieldR = new Calipso.datatypes.String.Required({model:new Calipso.model.GenericModel(), name : "name"});
+	console.log("stringFieldR: ");
+	console.log(stringFieldR.getOption("viewTypes"));
+	console.log(stringFieldR.getOption("validators"));
+	*/
 	return Calipso;
 
 });
