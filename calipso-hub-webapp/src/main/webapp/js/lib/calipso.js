@@ -2926,7 +2926,6 @@ define(
 			return Calipso.view.UserDetailsLayout;
 		},
 		getFormSchemas : function(instance) {
-
 			var passwordText = {
 				type : 'Password',
 				validators : [ 'required' ]
@@ -2955,7 +2954,7 @@ define(
 				},
 				email : {
 					"create" : {
-						type : 'Text',
+						type : (instance && instance.get("resetPasswordToken")) ? "Hidden" : 'Text',
 						label : "Username or Email",
 						validators : [ 'required' ],
 					},
@@ -3430,7 +3429,9 @@ define(
 
 	Calipso.view.MainLayout = Calipso.view.AbstractLayout.extend({
 		className : "container configurable-fluid",
-
+		initialize : function(options) {
+			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
+		}
 	});
 
 	Calipso.view.ModalLayout = Calipso.view.AbstractLayout.extend({
@@ -4006,30 +4007,52 @@ define(
 		}
 	});
 
-	Calipso.view.TabLayout = Calipso.view.MainLayout.extend({
+	Calipso.view.TabLayout = Calipso.view.AbstractLayout.extend({
 		template : Calipso.getTemplate('tabbed-layout'),
 		tabClass : "nav nav-tabs",
 		idProperty : "id",
+		showOnselect : false,
 		buttonTextProperty : "name",
+		events : {
+			"click a[data-toggle=\"tab\"]" : "showTabContent"
+		},
 		regions : {
 			tabLabelsRegion : '.region-nav-tabs',
 			tabContentsRegion : '.region-tab-content'
 		},
+		initialize : function(options) {
+			Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
+			this.mergeOptions(options);
+		},
+		/**
+		 * Redraws the selected tab content when
+		 * options.showOnselect is true
+		 */
+		showTabContent : function(e){
+			if(this.options.showOnselect){
+				var $link = $(e.currentTarget);
+				this.tabContentsRegion.show(new this.itemViewType({
+					model : this.options.collection.at($link.data("collectionIndex"))
+				}));
+			}
+		},
 		onShow : function() {
 			var _this = this;
 			if (this.collection.length > 0) {
-				this.collection.at(0).set("tabActive", true);
-				for(var i=1; i < this.collection.length; i++){
-					this.collection.at(i).set("tabActive", false);
+				for(var i=0; i < this.collection.length; i++){
+					var modelItem = this.collection.at(i);
+					modelItem.set("tabActive", i==0?true:false);
+					modelItem.set("collectionIndex", i);
 				}
 			}
-
-			//
 
 			var buttonTextProperty = this.getOption("buttonTextProperty");
 			var idProperty = this.getOption("idProperty");
 			var TabButtonItemView = Calipso.view.TemplateBasedItemView.extend({
-				template : _.template('<a href="#tab<%= ' + idProperty + ' %>" ' + ' <% if (tabActive != undefined && tabActive){ %> class="active" <% } %>' + 'aria-controls="tab<%= ' + idProperty + ' %>" role="tab" data-toggle="tab"><%= ' + buttonTextProperty + ' %></a>'),
+				template : _.template('<a href="#tab<%= ' + idProperty + ' %>" ' +
+				' <% if (tabActive != undefined && tabActive){ %> class="active" <% } %>' +
+				'aria-controls="tab<%= ' + idProperty + ' %>" role="tab" ' +
+				'data-toggle="tab" data-collection-index="<%=collectionIndex%>"><%= ' + buttonTextProperty + ' %></a>'),
 				tagName : "li",
 
 				attributes : function() {
@@ -4053,28 +4076,39 @@ define(
 				collection : this.collection
 			}));
 
-			var ItemViewType = _this.collection.model.getItemViewType() || Calipso.view.TemplateBasedItemView;
-			var TabPanelsCollectionView = Calipso.view.TemplateBasedCollectionView.extend({
+			var BaseItemViewType = _this.collection.model.getItemViewType() || Calipso.view.TemplateBasedItemView;
+			_this.itemViewType = BaseItemViewType.extend({
 				tagName : "div",
-				template : _.template(''),
-				className : "tab-content",
-				childView : ItemViewType.extend({
-					tagName : "div",
-					template : _this.collection.model.getItemViewTemplate(),
-					attributes : function() {
-						// Return model data
-						return {
-							id : "tab" + this.model.get(idProperty),
-							role : "tabpanel",
-							class : "tab-pane" + (this.model.get("tabActive") ? " active" : ""),
+				template : _this.collection.model.getItemViewTemplate(),
+				attributes : function() {
+					// Return model data
+					return {
+						id : "tab" + this.model.get(idProperty),
+						role : "tabpanel",
+						class : "tab-pane" + (this.model.get("tabActive") ? " active" : ""),
 
-						};
-					}
-				}),
+					};
+				}
 			});
-			this.tabContentsRegion.show(new TabPanelsCollectionView({
-				collection : this.collection
-			}));
+
+			var tabPanelsView;
+			if(_this.options.showOnselect){
+				tabPanelsView = new _this.itemViewType({
+					model : _this.options.collection.at(0)
+				});
+			}
+			else{
+				var TabPanelsCollectionView = Calipso.view.TemplateBasedCollectionView.extend({
+					tagName : "div",
+					template : _.template(''),
+					className : "tab-content",
+					childView : ItemViewType,
+				});
+				tabPanelsView = new TabPanelsCollectionView({
+					collection : this.collection
+				});
+			}
+			this.tabContentsRegion.show(tabPanelsView);
 
 		},
 	},
@@ -5170,6 +5204,9 @@ define(
 
 	Calipso.isUserInAnyRole = function(inputRoles) {
 		var hasRole = false;
+		if(!_.isArray(inputRoles)){
+			inputRoles = [inputRoles];
+		}
 		// only process if the user is authenticated
 		if (Calipso.session.userDetails) {
 			var ownedRoles = Calipso.session.userDetails.get("roles");
