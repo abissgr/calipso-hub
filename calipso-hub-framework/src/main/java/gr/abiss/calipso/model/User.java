@@ -96,6 +96,10 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@JsonIgnore
 	@Column(name = "reset_password_token")
 	private String resetPasswordToken;
+	
+	@JsonIgnore
+	@Column(name = "reset_password_token_date")
+	private Date resetPasswordTokenCreated;
 
 	@Column(name = "password_changed")
 	private Date lastPassWordChangeDate;
@@ -263,6 +267,14 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 				this.setUsername(this.getEmail());
 			}
 		}
+		
+		// clear or set the token creation date  if needed
+		if(this.getResetPasswordToken() == null){
+			this.setResetPasswordTokenCreated(null);
+		}
+		else if(this.getResetPasswordTokenCreated() == null){
+			this.setResetPasswordTokenCreated(new Date());
+		}
 
 	}
 	
@@ -352,6 +364,14 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@Override
 	public void setResetPasswordToken(String resetPasswordToken) {
 		this.resetPasswordToken = resetPasswordToken;
+	}
+
+	public Date getResetPasswordTokenCreated() {
+		return resetPasswordTokenCreated;
+	}
+
+	public void setResetPasswordTokenCreated(Date resetPasswordTokenCreated) {
+		this.resetPasswordTokenCreated = resetPasswordTokenCreated;
 	}
 
 	public Date getLastPassWordChangeDate() {

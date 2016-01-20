@@ -47,4 +47,9 @@ public interface UserRepository extends BaseRepository<User, String> {
 	@Modifying
 	@Query("UPDATE User AS u SET u.lastLogin = CURRENT_TIMESTAMP() WHERE u.id = ?1")
 	public void updateLastLogin(String userId);
+	
+	@Modifying
+	@Query("UPDATE User AS u SET u.resetPasswordTokenCreated = NULL, u.resetPasswordToken = NULL "
+			+ "WHERE u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < :yesterday")
+	public void expireResetPasswordTokens(Date yesterday);
 }

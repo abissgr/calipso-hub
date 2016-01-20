@@ -38,7 +38,14 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.MessagingException;
+import javax.persistence.Query;
 
+import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.LockMode;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
+import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -114,6 +121,33 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 
 	@Override
 	@Transactional(readOnly = false)
+	public void expireResetPasswordTokens() {
+		// get a hibernate session suitable for read-only access to large datasets
+		StatelessSession session = ((Session) this.repository.getEntityManager().getDelegate()).getSessionFactory().openStatelessSession();
+		Date yesterday = DateUtils.addDays(new Date(), -1);
+		
+		// send email notifications for account confirmation tokens that expired
+        org.hibernate.Query query = session.createQuery("SELECT u FROM User u "
+        		+ "WHERE u.password IS NULL and u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < :yesterday");
+        query.setParameter("yesterday", yesterday);
+        query.setFetchSize(Integer.valueOf(1000));
+        query.setReadOnly(true);
+        query.setLockMode("a", LockMode.NONE);
+        ScrollableResults results = query.scroll(ScrollMode.FORWARD_ONLY);
+        while (results.next()) {
+            User user = (User) results.get(0);
+            // TODO: send expiration email
+            this.emailService.sendAccountConfirmationExpired(user);
+        }
+        results.close();
+        session.close();
+        
+        // expire tokens, including password reset requests
+        this.repository.expireResetPasswordTokens(yesterday);
+	}
+	
+	@Override
+	@Transactional(readOnly = false)
 	public User createActive(User resource) {
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
@@ -132,7 +166,6 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		}
 		user.setResetPasswordToken(null);
 		user.setPassword(newPassword);
-		user.setActive(true);
 		user = this.update(user);
 
 		LOGGER.info("handlePasswordResetToken returning local user: " + user);

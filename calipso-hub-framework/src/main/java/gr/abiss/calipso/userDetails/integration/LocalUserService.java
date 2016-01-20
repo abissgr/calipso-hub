@@ -84,4 +84,6 @@ public interface LocalUserService<ID extends Serializable, T extends LocalUser> 
 
 	public void updateLastLogin(ICalipsoUserDetails u);
 
+	public void expireResetPasswordTokens();
+
 }

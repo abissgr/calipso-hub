@@ -5609,10 +5609,17 @@ define(
 			}
 		},
 		changePassword : function() {
+			var userDetails = Calipso.session.userDetails;
 			if (!Calipso.isAuthenticated()) {
-				window.alert("Please login to change your password");
+				userDetails = new Calipso.model.UserDetailsModel({
+					showResetPasswordForm : true
+				});
+				var httpParams = Calipso.getHttpUrlParams();
+				if(httpParams.email){
+					userDetails.set("email", httpParams.email);
+				}
 			}
-			this.showLayoutForModel(Calipso.session.userDetails, null, null);
+			this.showLayoutForModel(userDetails, null, null);
 		},
 		logout : function() {
 			Calipso.vent.trigger("session:destroy");
@@ -5899,11 +5906,16 @@ define(
 			var changePwUserDetails = new Calipso.model.UserDetailsModel({
 				formSchemaKey : "update-createToken",
 				isResetPasswordReguest : true,
+				email : this.model.get("email")
 			});
 			var ViewType = changePwUserDetails.getItemViewType();
 			this.forgotPasswordRegion.show(new ViewType({
 				model : changePwUserDetails,
 			}));
+			if(this.model.get("showResetPasswordForm")){
+				$("#loginCollapse1").collapse('hide');
+				$("#loginCollapse2").collapse('show');
+			}
 		},
 		onGenericFormSaved : function(model) {
 			// model is not neccessarily the same as this.model

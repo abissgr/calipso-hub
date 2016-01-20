@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:remove="all">Account Confirmation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style>
+        .greetings{color:#333333;}
+        </style>
+    </head>
+    <body>
+        <p class="greetings" th:text="#{email.greeting(${user.getFirstName()})}"
+        	th:unless="${#strings.isEmpty(user.getFirstName())}">
+            Hello, Peter Static!
+        </p>
+        <p class="greetings" th:text="#{email.greeting(${user.getUserName()})}"
+        	th:if="${#strings.isEmpty(user.getFirstName())}">
+            Hello, Peter Static!
+        </p>
+        <p th:text="#{email.accountconfirmation.expired.clicklinktoconfirm}">
+        The previous email verification link sent to you has expired. You can request a new one at any time by clicking on the link bellow.
+        </p>
+        <p>
+            <a th:href="@{#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()} }}"
+             th:text="#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()} )}"> </a>
+        </p>
+        <p class="greetings">
+        	Regards, <br />
+            <em>The Team</em>
+        </p>
+    </body>
+</html>

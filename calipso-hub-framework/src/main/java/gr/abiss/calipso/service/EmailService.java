@@ -67,14 +67,18 @@ public class EmailService {
 	public void sendAccountConfirmation(final User user){
 		final String subject = "Account Confirmation";
 		final String templateName = "email-account-confirmation.html";
-		String emailTo = user.getEmail();
-		String emailFrom = defaultMailFrom;
-		
-		// Prepare the evaluation context
-		final Context ctx = new Context(new Locale(user.getLocale()));
-		ctx.setVariable("user", user);
-
-		sendEmail(subject, templateName, emailTo, emailFrom, ctx);
+		sendEmailToUser(user, subject, templateName);
+    }
+	
+	/**
+	 * Send an email to the given user, notifying him the account confirmation time window expired
+	 * @param user
+	 * @throws MessagingException
+	 */
+	public void sendAccountConfirmationExpired(final User user){
+		final String subject = "Account Confirmation Expired";
+		final String templateName = "email-account-confirmation-expired.html";
+		sendEmailToUser(user, subject, templateName);
     }
 	
 	/**
@@ -85,14 +89,7 @@ public class EmailService {
 	public void sendTest(final User user) {
 		final String subject = "[ignore] Email Server Test";
 		final String templateName = "email-test.html";
-		String emailTo = user.getEmail();
-		String emailFrom = defaultMailFrom;
-		
-		// Prepare the evaluation context
-		final Context ctx = new Context(new Locale(user.getLocale()));
-		ctx.setVariable("user", user);
-
-		sendEmail(subject, templateName, emailTo, emailFrom, ctx);
+		sendEmailToUser(user, subject, templateName);
     }
 	
 	/**
@@ -104,6 +101,12 @@ public class EmailService {
 	public void sendPasswordResetLink(final User user)  {
 		final String subject = "Password Reset Request";
 		final String templateName = "email-password-reset.html";
+		
+		sendEmailToUser(user, subject, templateName);
+	}
+
+	public void sendEmailToUser(final User user, final String subject,
+			final String templateName) {
 		String emailTo = user.getEmail();
 		String emailFrom = defaultMailFrom;
 
