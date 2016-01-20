@@ -126,6 +126,7 @@ public class EmailService {
 			ctx.setVariable("baseUrl", this.baseUrl);
 			// Create the HTML body using Thymeleaf
 			final String htmlContent = this.templateEngine.process(templateName, ctx);
+			LOGGER.info("Sending email body: " + htmlContent);
 			message.setText(htmlContent, true /* isHtml */);
 	
 			// Send email
@@ -163,6 +164,7 @@ public class EmailService {
 
         // Create the HTML body using Thymeleaf
         final String htmlContent = this.templateEngine.process("email-withattachment.html", ctx);
+		LOGGER.info("Sending email body: " + htmlContent);
         message.setText(htmlContent, true /* isHtml */);
         
         // Add the attachment
@@ -203,6 +205,7 @@ public class EmailService {
 
         // Create the HTML body using Thymeleaf
         final String htmlContent = this.templateEngine.process("email-inlineimage.html", ctx);
+		LOGGER.info("Sending email body: " + htmlContent);
         message.setText(htmlContent, true /* isHtml */);
         
         // Add the inline image, referenced from the HTML code as "cid:${imageResourceName}"

@@ -103,31 +103,11 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User create(User resource) {
-
-		LOGGER.info("create user: " + resource);
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
-		ICalipsoUserDetails currentPrincipal = this.getPrincipal();
-		if(!resource.getActive() 
-				|| currentPrincipal == null 
-				|| (!currentPrincipal.isAdmin() && !currentPrincipal.isSiteAdmin())){
-			LOGGER.info("create, forcing active: false");
-			resource.setActive(false);
-			String token = generator.generateKey();
-			LOGGER.info("creating user, confirmation token: " + token);
-			resource.setResetPasswordToken(token);
-		}
-		LOGGER.info("create, user: " + resource);
+		resource.setResetPasswordToken(generator.generateKey());
 		resource = super.create(resource);
-		//roleRepository.save(userRole);
-		LOGGER.info("create, created user: " + resource);
-
-		if (resource != null && !resource.getActive()) {
-			LOGGER.info("Sending account confirmation email...");
-			emailService.sendAccountConfirmation(resource);
-			LOGGER.info("Account confirmation email sent");
-		}
-		LOGGER.info("created user: " + resource);
+		emailService.sendAccountConfirmation(resource);
 		return resource;
 	}
 
@@ -135,14 +115,11 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User createActive(User resource) {
-		LOGGER.info("createActive, user: " + resource);
-		resource.setActive(true);
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
-
-		User user = repository.save(resource);
-		roleRepository.save(userRole);
-		return user;
+		resource.setResetPasswordToken(generator.generateKey());
+		resource = super.create(resource);
+		return resource;
 	}
 
 	@Override

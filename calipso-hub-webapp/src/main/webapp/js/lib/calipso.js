@@ -287,6 +287,42 @@ define(
 		return false;
 	};
 	/**
+	 * Change the user locale and reload
+	 * @param  {[String]} the desired locale
+	 */
+	Calipso.changeLocale = function(newLocale) {
+		console.log("Calipso.changeLocale: " + newLocale);
+		if(newLocale){
+			var currentLocale = localStorage.getItem('locale');
+				console.log("Calipso.changeLocale, currentLocale: " + currentLocale);
+			if(!currentLocale || currentLocale != newLocale){
+				var applyLocale = function(){
+					localStorage.setItem('locale', newLocale);
+					window.location.reload();
+				}
+					// if logged in user, persist locale settings
+				if(Calipso.isAuthenticated()){
+					var userModel = new Calipso.model.UserModel({
+						id : Calipso.session.userDetails.get("id")
+					});
+					userModel.save({locale : newLocale}, {
+						success : function(model, response) {
+							applyLocale();
+						},
+						error : function() {
+							alert("Failed updating locale preferences");
+							applyLocale();
+						}
+					});
+				}
+				// if anonymous user, just apply and reload
+				else{
+					applyLocale();
+				}
+			}
+		}
+	};
+	/**
 	 * Use the MainRouter to navigate to the given route
 	 * @param  {[String]} the route URL
 	 * @param  {[Object]} the options hash
@@ -1736,20 +1772,18 @@ define(
 					"search" : {
 						type : 'Text',
 						title : "Email",
-						dataType : "email",
-						validators : [ 'email' ]
-					},
-					"create" : {
-						type : 'Text',
-						title : "Email",
-						dataType : "email",
-						validators : [ 'required', 'email', Calipso.components.backboneform.validators.newUserEmail ]
 					},
 					"default" : {
 						type : 'Text',
 						title : "Email",
 						dataType : "email",
-						validators : [ 'required', 'email' ]
+						validators : [ 'required', 'email', Calipso.components.backboneform.validators.getUserEmailValidator(instance) ]
+					},
+					"search" : {
+						type : 'Text',
+						title : "Email",
+						dataType : "email",
+						validators : ['email' ]
 					}
 				},
 				telephone : {
@@ -1877,26 +1911,37 @@ define(
 				}
 			}
 		},
-		newUserEmail : function(value, formValues){
-			var usersCollection = new Calipso.collection.GenericCollection([], {
-				model : Calipso.model.UserModel,
-				data : {
-					email : value
+		getUserEmailValidator : function(instance){
+			return function(value, formValues){
+				// is there a value to validate?
+				if(value){
+					var usersCollection = new Calipso.collection.GenericCollection([], {
+						model : Calipso.model.UserModel,
+						data : {
+							email : value
+						}
+					});
+					// find users wit hthe given email
+					usersCollection.fetch({
+						async:false,
+						url : usersCollection.url,
+						data : usersCollection.data
+					});
+					if(usersCollection.length > 0){
+						// if not the same user
+						var formModelId = Calipso.getObjectProperty(instance, "id");
+						console.log("Validating EMAIL, current ID: " + formModelId + ", found ID: " + usersCollection.at(0).get("id"));
+						if(!formModelId || formModelId != usersCollection.at(0).get("id")){
+							return {
+								type : "email",
+								message : "A user with that email already exists"
+							}
+						}
+					}
 				}
-			});
-			usersCollection.fetch({
-				async:false,
-				url : usersCollection.url,
-				data : usersCollection.data
-			});
-			if(usersCollection.length > 0){
-				return {
-					type : "email",
-					message : "A user with that email already exists"
-				};
 			}
 		}
-	};
+	}
 	/*
 	Calipso.components.backboneformTemplates = {
 			horizontal : _.template('\
@@ -2370,8 +2415,13 @@ define(
 	});
 
 	Calipso.components.backboneform.Text = Backbone.Form.editors.Text.extend({
+		config : {},
 		initialize : function(options) {
 			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
+			options = options || {};
+			if(options.schema && options.schema.config){
+				this.config = $.extend({}, this.config, options.schema.config);
+			}
 			if (this.form) {
 				var _this = this;
 				this.listenToOnce(this.form, "attach", function() {
@@ -2501,6 +2551,9 @@ define(
 			"3" : "TOO_LONG",
 			"4" : "NOT_A_NUMBER"
 		},
+		config : {
+			nationalMode : true,
+		},
 		intlValidate : function() {
 			this.form.fields[this.getName()].validate();
 		},
@@ -2524,6 +2577,10 @@ define(
 				}
 			});
 			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
+
+			this.config.customPlaceholder = function(selectedCountryPlaceholder, selectedCountryData) {
+				return _this.labels.intlTelInput.eg + ' ' + selectedCountryPlaceholder;
+			};
 		},
 		setValue : function(value) {
 			if (!value) {
@@ -2537,12 +2594,7 @@ define(
 		},
 		onFormAttach : function() {
 			var _this = this;
-			this.$el.intlTelInput({
-				nationalMode : true,
-				customPlaceholder : function(selectedCountryPlaceholder, selectedCountryData) {
-					return _this.labels.intlTelInput.eg + ' ' + selectedCountryPlaceholder;
-				},
-			});
+			this.$el.intlTelInput(this.config);
 			if (this.value) {
 				this.$el.intlTelInput("setNumber", this.value);
 			}
@@ -2954,7 +3006,7 @@ define(
 				},
 				email : {
 					"create" : {
-						type : (instance && instance.get("resetPasswordToken")) ? "Hidden" : 'Text',
+						type : 'Text',
 						label : "Username or Email",
 						validators : [ 'required' ],
 					},
@@ -2965,10 +3017,10 @@ define(
 				},
 				resetPasswordToken : {
 					"create-withToken" : {
-						type : 'Text',
+						type : (instance && instance.get("resetPasswordToken")) ? "Hidden" : 'Text',
 						validators : [ 'required' ]
 					},
-					help : "A reset token has been been sent. Please check your email."
+					help : "A verification message has been been sent to your email address. Please check your inbox."
 				},
 				currentPassword : {
 					"update" : {
@@ -3074,15 +3126,12 @@ define(
 					"search" : {
 						title : "Username or email",
 						type : 'Text',
-					},
-					"create" : {
-						type : 'Text',
-						validators : [ 'required', 'email',  Calipso.components.backboneform.validators.newUserEmail]
+						validators : [ 'email' ]
 					},
 					"default" : {
 						type : 'Text',
-						validators : [ 'required', 'email' ]
-					}
+						validators : [ 'required', 'email',  Calipso.components.backboneform.validators.getUserEmailValidator(instance)]
+					},
 				},
 				password : {
 					//"create" : passwordText,
@@ -3098,8 +3147,8 @@ define(
 
 	});
 
+/*
 	Calipso.model.UserDetailsConfirmationModel = Calipso.model.UserDetailsModel.extend(
-	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
 		getFormSubmitButton : function() {
 			return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Confirm"
@@ -3138,7 +3187,7 @@ define(
 		},
 
 	});
-
+*/
 	// Report Dataset Model
 	// This model is used by the router controller when a
 	// subjectModelTypeFragment/reports
@@ -5859,7 +5908,7 @@ define(
 		onGenericFormSaved : function(model) {
 			// model is not neccessarily the same as this.model
 			if (model.get("isResetPasswordReguest")) {
-				Calipso.navigate("changePasswordWithToken/" + model.get("email"), {
+				Calipso.navigate("/page/userRegistrationSubmitted", {
 					trigger : true
 				});
 			} else {
@@ -5985,7 +6034,13 @@ define(
 		initialize : function(options) {
 			Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
 		},
+		onGenericFormSaved : function(model) {
 
+				Calipso.navigate("/page/userRegistrationSubmitted", {
+					trigger : true
+				});
+		},
+		/*
 		onGenericFormSaved : function(model) {
 			// if the user is active just navigate to login
 			// TODO: add message
@@ -6007,6 +6062,7 @@ define(
 
 			}
 		},
+		*/
 	}, {
 		// static members
 		getTypeName : function() {
