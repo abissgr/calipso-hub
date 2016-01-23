@@ -3,14 +3,8 @@
 /*
  * Visual styles for this demo
  */
-body, html {
-  height: 100%;
-  
-}
-html, body, #full-height-wrapper { height: 100%; }
-body > #full-height-wrapper { height: auto; min-height: 100%; 
- position: relative;}
-#calipsoMainContentRegion {margin-bottom: 50px;}
+
+
 .panel-title a[data-toggle="collapse"]{
 	display: block;
 }

@@ -18,11 +18,11 @@
 	    <div class="social-form-container">
 	    </div>
 	    
-	    <div id="calipsoFooterRegion">
-	        <!-- -->
-	    </div>
     </div>
     
+    <div id="calipsoFooterRegion">
+        <!-- -->
+    </div>
     <!-- Placed at the end of the document so the pages load faster -->
     <script data-main="${basePath}/js/@scriptmain@" id="calipso-script-main" src="${basePath}/js/lib/require.js">
     </script>

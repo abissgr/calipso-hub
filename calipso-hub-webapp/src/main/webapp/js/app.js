@@ -61,12 +61,28 @@ function(
 	// intercept links
 	//////////////////////////////////
 	$(document).on("click", "a", function(event) {
-		var href = $(this).attr("href");
-		console.log("Cought link: " + href);
-		if (href && href.match(/^\/.*/) 
-				&& !$(this).attr("target")) {
+
+		var $a = $(this);
+		var href = $a.attr("href");
+
+		if (href && href.match(/^\/.*/) && !$(this).attr("target")) {
 			Calipso.stopEvent(event);
-			console.log("stopped link: " + href);
+			
+			// Close dropdown menus (desktop) or nav collapse (mobile)
+			// get up to 5th level parent
+			var ancestorScope = $a;
+			for(i=0; i < 5 && ancestorScope.parentNode; i++){
+				ancestorScope = ancestorScope.parentNode;
+			}
+			// mobile, collapse hide
+			if ($(window).width() < 768) {
+				$a.parentsUntil(ancestorScope, ".navbar-collapse:first").collapse('hide');
+			}
+			// desktop-ish, close dropdown
+			else{
+				$a.parentsUntil(ancestorScope, ".dropdown:first").removeClass('open');
+			}
+
 			Backbone.history.navigate(href, true);
 		}
 	});

@@ -4180,7 +4180,6 @@ define(
 	{
 		className : "container",
 		template : Calipso.getTemplate('footer'),
-		id : "navbar-menu",
 		className : "col-sm-12"
 	}, {
 		getTypeName : function() {

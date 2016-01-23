@@ -3,8 +3,10 @@
 **/
 
 
-/* Sticky footer styles calipsoMainContentRegion
+
+/* Misk
 -------------------------------------------------- */
+
 .tmpl-hint{display:none;}
 .hidden{display:none}
 
@@ -67,11 +69,6 @@ div#sidebar-collapse-accordion div.panel div.panel-heading h4.panel-title a.side
 	display:block;
 	text-decoration: none;
 	font-size:smaller;;
-}
-div#sidebar-collapse-accordion,
-
-#calipsoMainContentRegion {
-    padding-top: 70px;
 }
 div#sidebar-collapse-accordion div.panel-body{
     padding-top:0px;
