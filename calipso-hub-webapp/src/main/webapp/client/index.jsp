@@ -4,25 +4,26 @@
 <head>
 <%@ include file="../includes/head.jsp" %>
 </head>
-<body class="page-sidebar-fixed page-footer-fixed">
+<body class="full-height-column">
     <nav id="calipsoHeaderRegion" role="navigation" class="navbar navbar-inverse navbar-fixed-top">
         <!-- -->
     </nav>
-    <div id="full-height-wrapper">
-	    <div id="calipsoMainContentRegion">
-	        <!-- -->
-	    </div>
-	    <div id="calipsoModalRegion" class="modal fade" tabindex='-1'></div>
-	    <div id="hiddenWrapper" style="display: none"></div>
-	    
-	    <div class="social-form-container">
-	    </div>
-	    
+    
+    <main class="full-height-row-expanded">
+        <div id="calipsoMainContentRegion"></div>
+    </main>
+    
+    <div class="full-height-row">
+        <div id="calipsoModalRegion" class="modal fade" tabindex='-1'></div>
+        <div id="hiddenWrapper" style="display: none"></div>
+        <div class="social-form-container">
+        </div>
     </div>
     
-    <div id="calipsoFooterRegion">
+    <footer id="calipsoFooterRegion" class="full-height-row">
         <!-- -->
-    </div>
+    </footer>
+    
     <!-- Placed at the end of the document so the pages load faster -->
     <script data-main="${basePath}/js/@scriptmain@" id="calipso-script-main" src="${basePath}/js/lib/require.js">
     </script>
