@@ -170,6 +170,15 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	public User() {
 	}
+
+	public User(UserDTO dto) {
+		this.setId(dto.getId());
+		this.setFirstName(dto.getFirstName());
+		this.setLastName(dto.getLastName());
+		this.username = dto.getUsername();
+		this.email = dto.getEmail();
+		this.emailHash = dto.getEmailHash();
+	}
 	
 	public User(String email) {
 		this.email = email;

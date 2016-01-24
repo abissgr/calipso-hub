@@ -50,6 +50,6 @@ public interface UserRepository extends BaseRepository<User, String> {
 	
 	@Modifying
 	@Query("UPDATE User AS u SET u.resetPasswordTokenCreated = NULL, u.resetPasswordToken = NULL "
-			+ "WHERE u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < :yesterday")
+			+ "WHERE u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < ?1")
 	public void expireResetPasswordTokens(Date yesterday);
 }

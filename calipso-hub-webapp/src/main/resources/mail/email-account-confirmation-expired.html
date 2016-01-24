@@ -20,8 +20,8 @@
         The previous email verification link sent to you has expired. You can request a new one at any time by clicking on the link bellow.
         </p>
         <p>
-            <a th:href="@{#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()} }}"
-             th:text="#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()} )}"> </a>
+            <a th:href="@{#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()})}}"
+             th:text="#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()})}"> </a>
         </p>
         <p class="greetings">
         	Regards, <br />
