@@ -14,7 +14,14 @@
 						<a role="button" data-toggle="collapse"
 							data-parent="#accordionFaq" href="#loginCollapse1"
 							aria-expanded="true" aria-controls="loginCollapse1"> <i
-							class="fa fa-lock"></i> <span class="view-title">Login</span>
+							class="fa fa-lock"></i> <span class="view-title">
+                                
+                        {{#if username}}
+                        {{labels.tmpl.userRegistration.titleNewPassword}}
+                        {{else}}
+                        {{labels.tmpl.userRegistration.titleLogin}}
+                        {{/if}}
+                            </span>
 						</a>
 					</h4>
 				</div>
@@ -22,10 +29,9 @@
 					role="tabpanel" aria-labelledby="faqHeading1">
 					<div class="panel-body">
 						{{#if username}}
-                        <p>A confirmation token has been emailed to you. Please check
-                            your inbox to find your token, then copy and paste it bellow.</p>
+                        <p>{{labels.tmpl.userRegistration.formHelpNewPassword}}</p>
 						{{else}}
-                        <p>Enter your credentials bellow to login.</p>
+                        <p>{{labels.tmpl.userRegistration.formHelpLogin}}</p>
 						{{/if}}
 						<div id="calipsoModelDrivenBrowseLayout-contentRegion">
 							<!--Body content-->
@@ -41,7 +47,12 @@
 						<a class="collapsed" role="button" data-toggle="collapse"
 							data-parent="#accordionFaq" href="#loginCollapse2"
 							aria-expanded="false" aria-controls="loginCollapse2"> <i
-							class="fa fa-unlock"></i> Forgot password?
+							class="fa fa-unlock"></i>
+						{{#if username}}
+                        {{labels.tmpl.userRegistration.titleExpiredLink}}
+                        {{else}}
+                        {{labels.tmpl.userRegistration.titleForgotPassword}}
+                        {{/if}}
 						</a>
 					</h4>
 				</div>
@@ -49,7 +60,7 @@
 					role="tabpanel" aria-labelledby="faqHeading2">
 					<div class="panel-body">
 					   <div class="panel-body">
-					       <p>Forgot your password? Enter your email bellow to receive a password reset link in your inbox.</p>
+					       <p>{{labels.tmpl.userRegistration.formHelpForgotPassword}}</p>
 	                        <div id="calipsoUserDetailsLayout-forgotPasswordRegion">
 	                            <!--Body content-->
 	                        </div>

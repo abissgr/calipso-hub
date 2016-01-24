@@ -2990,6 +2990,8 @@ define(
 					message : 'Passwords must match!'
 				} ],
 			};
+			// is a password reset token already present?
+			var pwResetTokenPresent = instance && instance.get("resetPasswordToken");
 
 			return {
 				id : {
@@ -3017,10 +3019,10 @@ define(
 				},
 				resetPasswordToken : {
 					"create-withToken" : {
-						type : (instance && instance.get("resetPasswordToken")) ? "Hidden" : 'Text',
+						type : pwResetTokenPresent ? "Hidden" : 'Text',
 						validators : [ 'required' ]
 					},
-					help : "A verification message has been been sent to your email address. Please check your inbox."
+
 				},
 				currentPassword : {
 					"update" : {
@@ -4817,6 +4819,8 @@ define(
 						},
 						commit : function(e) {
 							var _this = this;
+							console.log("_this.formSchemaKey: "+_this.formSchemaKey);
+							console.log(this.model);
 							Calipso.stopEvent(e);
 							if (!this.isFormValid()) {
 								return false;
