@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 public class SimpleLocalUser implements LocalUser {
@@ -40,6 +41,22 @@ public class SimpleLocalUser implements LocalUser {
 	private List<? extends GrantedAuthority> roles;
 	private Map<String, ? extends Metadatum> metadata;
 
+	@Override
+	public String getFullName() {
+		StringBuffer s = new StringBuffer("");
+		if(StringUtils.isNotBlank(this.getFirstName())){
+			s.append(this.getFirstName());
+			if(StringUtils.isNotBlank(this.getLastName())){
+				s.append(' ');
+			}
+		}
+		if(StringUtils.isNotBlank(this.getLastName())){
+			s.append(this.getLastName());
+		}
+		return s.toString();
+
+	}
+	
 	@Override
 	public Boolean getActive() {
 		return this.active;

@@ -25,7 +25,7 @@ function getLocale(){
 require.config({
 	// main.js is the application entry point
 	deps : [ 'main' ],
-	waitSeconds: 200,
+	waitSeconds: 0,
 
    config: {
        i18n: {

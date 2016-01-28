@@ -49,6 +49,8 @@ public interface LocalUser {
 	void setLastName(String socialLastName);
 
 	String getLastName();
+	
+	String getFullName();
 
 	String getEmail();
 

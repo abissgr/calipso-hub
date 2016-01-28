@@ -52,6 +52,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
@@ -272,7 +273,9 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 			// update the hash
 			this.setEmailHash(MD5Utils.md5Hex(this.getEmail()));
 
-			if(this.getUsername() == null){
+			// if usernames are not exposed the email has been used to set its value
+			// in that case it must follow the email value change
+			if(this.getUsername() == null || this.getUsername().contains("@")){
 				this.setUsername(this.getEmail());
 			}
 		}
@@ -329,6 +332,22 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@Override
 	public String getFirstName() {
 		return firstName;
+	}
+
+	@Override
+	public String getFullName() {
+		StringBuffer s = new StringBuffer("");
+		if(StringUtils.isNotBlank(this.getFirstName())){
+			s.append(this.getFirstName());
+			if(StringUtils.isNotBlank(this.getLastName())){
+				s.append(' ');
+			}
+		}
+		if(StringUtils.isNotBlank(this.getLastName())){
+			s.append(this.getLastName());
+		}
+		return s.toString();
+
 	}
 
 	@Override
