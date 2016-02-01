@@ -298,6 +298,7 @@ define(
 			if(!currentLocale || currentLocale != newLocale){
 				var applyLocale = function(){
 					localStorage.setItem('locale', newLocale);
+					Calipso.config.locale = newLocale;
 					window.location.reload();
 				}
 					// if logged in user, persist locale settings
@@ -3081,6 +3082,10 @@ define(
 		getFormSubmitButton : function() {
 			return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Register"
 		},
+		initialize : function() {
+			Calipso.model.GenericModel.prototype.initialize.apply(this, arguments);
+			this.set("locale", Calipso.config.locale);
+		},
 	//getFormTemplateKey : function(){
 	//	return "auth";
 	//}
@@ -3308,7 +3313,7 @@ define(
 				type : Calipso.components.backboneform.Datetimepicker,
 				template : this.fieldTemplate,
 				config : {
-					locale : 'en',
+					locale : Calipso.config.locale,
 					format : 'MM/YYYY',
 					viewMode : 'months',
 					widgetPositioning : {
