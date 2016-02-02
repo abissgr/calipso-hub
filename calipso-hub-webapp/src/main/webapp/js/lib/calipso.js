@@ -2837,8 +2837,12 @@ define(
 	Calipso.model.CountryModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.RoleModel.prototype */
 	{
+		initialize : function() {
+			Calipso.model.GenericModel.prototype.initialize.apply(this, arguments);
+			this.set("translatedName", Calipso.getLabels("countries."+this.get("id")));
+		},
 		toString : function() {
-			return this.get("name");
+			return this.get("translatedName") || this.get("name");
 		}
 	//urlRoot : "/api/rest/users"
 	}, {
