@@ -64,8 +64,12 @@ define(
 	 * @namespace
 	 */
 	var Calipso = {
+		getLocale : function(){
+			var locale = localStorage.getItem('locale');
+			console.log("Calipso.getLocale: " + locale);
+			return locale;
+		},
 		config : {
-			locale : localStorage.getItem('locale')
 		},
 		util : {},
 		components : {},
@@ -80,9 +84,12 @@ define(
 	};
 
 	// default locale is set in
-	moment.locale(Calipso.config.locale);
+	moment.locale(Calipso.getLocale());
 
 	// register calipso helpers for handlebars
+	Handlebars.registerHelper("getLocale", function(propName, options) {
+		return Calipso.getLocale();
+	});
 	Handlebars.registerHelper("getUserDetailsProperty", function(propName, options) {
 		var prop = "";
 		if (Calipso.session.isAuthenticated()) {
@@ -298,7 +305,6 @@ define(
 			if(!currentLocale || currentLocale != newLocale){
 				var applyLocale = function(){
 					localStorage.setItem('locale', newLocale);
-					Calipso.config.locale = newLocale;
 					window.location.reload();
 				}
 					// if logged in user, persist locale settings
@@ -2721,13 +2727,15 @@ define(
 
 	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
 	Calipso.components.backboneform.Datetimepicker = Calipso.components.backboneform.Text.extend({
-		config : {
-			locale : Calipso.config.locale,
-			allowInputToggle : true,
+		getConfig : function(){
+			return {
+				locale : Calipso.getLocale(),
+				allowInputToggle : true,
+			};
 		},
 		initialize : function(options) {
 			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
-			this.schema.config = _.defaults({}, this.schema.config, this.config);
+			this.schema.config = _.defaults({}, this.schema.config, this.getConfig());
 			// set position if empty
 			if (!this.schema.config.widgetPositioning) {
 				this.schema.config.widgetPositioning = {
@@ -3084,7 +3092,7 @@ define(
 		},
 		initialize : function() {
 			Calipso.model.GenericModel.prototype.initialize.apply(this, arguments);
-			this.set("locale", Calipso.config.locale);
+			this.set("locale", Calipso.getLocale());
 		},
 	//getFormTemplateKey : function(){
 	//	return "auth";
@@ -3116,7 +3124,10 @@ define(
 					message : 'Passwords must match!'
 				} ]
 			};
-			return {//
+			return {
+				locale : {
+					"default" : {type : 'Hidden'},
+				},
 				firstName : {
 					"create" : requiredText,
 					"update" : requiredText
@@ -3313,7 +3324,7 @@ define(
 				type : Calipso.components.backboneform.Datetimepicker,
 				template : this.fieldTemplate,
 				config : {
-					locale : Calipso.config.locale,
+					locale : Calipso.getLocale(),
 					format : 'MM/YYYY',
 					viewMode : 'months',
 					widgetPositioning : {
