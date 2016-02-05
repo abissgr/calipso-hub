@@ -2576,13 +2576,13 @@ define(
 				this.value = options.value;
 			}
 			options.schema.validators.push(function ensure(value, formValues) {
-				if (value != null && value != "" && !_this.$el.intlTelInput("isValidNumber")) {
+				/*if (value != null && value != "" && !_this.$el.intlTelInput("isValidNumber")) {
 					var msgKey = _this.errorCodes[_this.$el.intlTelInput("getValidationError") + ""] || "DEFAULT";
 					var err = {
 						type : _this.getName(),
 						message : _this.labels.intlTelInput[msgKey]
 					};
-					return err;
+					return err;*/
 				}
 			});
 			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
@@ -6065,7 +6065,7 @@ define(
 				model : Calipso.model.GenericModel
 			});
 			// render child view
-			this.showStep(this.model.get("currentStepIndex") + 1);
+			this.showStep(parseInt(this.model.get("currentStepIndex")+"") + 1);
 		},
 		getStepModel : function(step) {
 			var model = step.model;
