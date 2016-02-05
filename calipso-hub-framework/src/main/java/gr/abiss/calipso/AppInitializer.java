@@ -122,7 +122,8 @@ public class AppInitializer {
 			t3.setSourceContentType(Text.MIME_MARKDOWN);
 			textService.create(t3);
 			
-			User u0 = new User("info@abiss.gr");
+			User u0 = new User();
+			u0.setEmail("info@abiss.gr");
 			u0.setFirstName("Admin");
 			u0.setLastName("User");
 			u0.setUsername("admin");
@@ -132,7 +133,8 @@ public class AppInitializer {
 			u0 = userService.createActive(u0);
 
 			for(int i = 0; i < 10; i++){
-				User u = new User("user"+i+"@abiss.gr");
+				User u = new User();
+				u.setEmail("user"+i+"@abiss.gr");
 				u.setFirstName("First"+i);
 				u.setLastName("Last"+i);
 				u.setUsername("user"+i);

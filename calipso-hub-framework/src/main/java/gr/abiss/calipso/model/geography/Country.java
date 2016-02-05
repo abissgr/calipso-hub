@@ -62,6 +62,10 @@ public class Country extends AbstractFormalRegion<Continent> {
 		super();
 	}
 	
+	public Country(String id) {
+		this.setId(id);
+	}
+	
 	public Country(String id, String name, String nativeName, String callingCode, Continent continent, 
 			String capital, String currency, String languages) {
 		super(id, name, continent);

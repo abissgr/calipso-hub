@@ -181,8 +181,8 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		this.emailHash = dto.getEmailHash();
 	}
 	
-	public User(String email) {
-		this.email = email;
+	public User(String id) {
+		this.setId(id);
 	}
 
 	public boolean hasRole(String roleName){
