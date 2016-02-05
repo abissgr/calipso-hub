@@ -1780,17 +1780,14 @@ define(
 				email : {
 					"search" : {
 						type : 'Text',
-						title : "Email",
 					},
 					"default" : {
 						type : 'Text',
-						title : "Email",
 						dataType : "email",
 						validators : [ 'required', 'email', Calipso.components.backboneform.validators.getUserEmailValidator(instance) ]
 					},
 					"search" : {
 						type : 'Text',
-						title : "Email",
 						dataType : "email",
 						validators : ['email' ]
 					}
@@ -1812,7 +1809,6 @@ define(
 				active : {
 					"base" : {
 						type : 'Checkbox',
-						title : "Active",
 					},
 					"create" : {
 						extend : "base",
@@ -1824,26 +1820,22 @@ define(
 				},
 				roles : {
 					"base" : {
-						title : "Roles",
 						type : Backbone.Form.editors.ModelSelect2,
 						options : rolesCollection,
 						multiple : true,
 					},
 					"search" : {
-						title : "Roles",
 						type : Backbone.Form.editors.ModelSelect2,
 						options : rolesCollection,
 						multiple : true,
 					},
 					"create" : {
-						title : "Roles",
 						type : Backbone.Form.editors.ModelSelect2,
 						options : rolesCollection,
 						multiple : true,
 						validators : [ 'required' ],
 					},
 					"update" : {
-						title : "Roles",
 						type : Backbone.Form.editors.ModelSelect2,
 						options : rolesCollection,
 						multiple : true,
@@ -3085,7 +3077,6 @@ define(
 					"update" : {
 						type : 'Password',
 						validators : [ 'required' ],
-						title : "New Password"
 					},
 					"create-withToken" : {
 						extend : "update",
@@ -3165,7 +3156,6 @@ define(
 				},
 				email : {
 					"search" : {
-						title : "Username or email",
 						type : 'Text',
 						validators : [ 'email' ]
 					},
