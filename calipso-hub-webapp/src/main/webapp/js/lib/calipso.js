@@ -2248,6 +2248,23 @@ define(
 
 			return values;
 		},
+		getDraft : function(){
+			var values = {};
+			_.each(this.fields, function(field) {
+				if (!field.excludeFromCommit) {
+					var value = field.getValue();
+					if(value && value.id){
+						value = {id : Calipso.getObjectProperty(value, "id")};
+					}
+					values[field.key] = value;
+				}
+			});
+			delete values.currentStepIndex;
+			delete values.highestStepIndex;
+			console.log("getDraft: ");
+			console.log(values);
+			return values;
+		},
 		render : function() {
 			var self = this, fields = this.fields, $ = Backbone.$;
 
@@ -2563,9 +2580,9 @@ define(
 		config : {
 			nationalMode : true,
 		},
-		intlValidate : function() {
+		/*intlValidate : function() {
 			this.form.fields[this.getName()].validate();
-		},
+		},*/
 		initialize : function(options) {
 			var _this = this;
 			this.labels = Calipso.getLabels();
@@ -2575,14 +2592,14 @@ define(
 			if (options.value) {
 				this.value = options.value;
 			}
-			options.schema.validators.push(function ensure(value, formValues) {
-				/*if (value != null && value != "" && !_this.$el.intlTelInput("isValidNumber")) {
+			options.schema.validators.push(function(value, formValues) {
+				if (value != null && value != "" && !_this.$el.intlTelInput("isValidNumber")) {
 					var msgKey = _this.errorCodes[_this.$el.intlTelInput("getValidationError") + ""] || "DEFAULT";
 					var err = {
 						type : _this.getName(),
 						message : _this.labels.intlTelInput[msgKey]
 					};
-					return err;*/
+					return err;
 				}
 			});
 			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
@@ -2609,7 +2626,7 @@ define(
 			}
 			this.$el.change(function() {
 				_this.setValue(_this.$el.intlTelInput("getNumber"));
-				_this.intlValidate();
+				//_this.intlValidate();
 			});
 		},
 		onBeforeClose : function() {
@@ -4992,7 +5009,7 @@ define(
 						onBeforeDestroy : function(e) {
 							if(this.hasDraft){
 								// keep a session draft of changes
-								var draft = this.form.toJson();
+								var draft = this.form.getDraft();
 								delete draft.currentStepIndex;
 
 								sessionStorage.setItem(
