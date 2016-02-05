@@ -6101,6 +6101,9 @@ define(
 		},
 		showStep : function(stepIndex) {
 			var step = this.config.steps[stepIndex];
+			if(!step){
+				throw "No wizard step defined for key: "+stepIndex;
+			}
 			var view = step.view;
 			if (!view) {
 				var viewOptions = step.viewOptions ? step.viewOptions : {};
@@ -6124,7 +6127,7 @@ define(
 		},
 
 		onGenericFormSaved : function(model) {
-			this.showStep(this.model.get("currentStepIndex") + 1);
+			this.showStep(parseInt(this.model.get("currentStepIndex")+"") + 1);
 		},
 	}, {
 		getTypeName : function() {
