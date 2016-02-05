@@ -46,6 +46,7 @@ define([
 'hbs!template/templateBasedItemView',
 'hbs!template/templateBasedCollectionView',
 'hbs!template/wizard-layout',
+'hbs!template/wizardTabItem',
 'hbs!template/itemViewTemplate']
 ,
 
@@ -76,6 +77,7 @@ function(
 		templateBasedItemView,
 		templateBasedCollectionView,
 		wizardLayout,
+		wizardTabItem,
 		itemViewTemplate
 ) {
 	return {
@@ -106,6 +108,7 @@ function(
 	"templateBasedItemView":templateBasedItemView,
 	"templateBasedCollectionView":templateBasedCollectionView,
 	"wizard-layout":wizardLayout,
+	"wizardTabItem":wizardTabItem,
 	"itemViewTemplate":itemViewTemplate
 	};
 

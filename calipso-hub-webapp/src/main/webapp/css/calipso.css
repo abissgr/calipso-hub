@@ -77,6 +77,20 @@ div#sidebar-collapse-accordion div.panel-body{
     padding-left:0px;
 }
 
+/**
+Bootstrap 3 - Disabled dropdown links
+
+Mimic cursor style from native .dropdown-menu > .disabled > a{} styles,
+since `pointer-events: none` kills the cursor state, too. 
+*/
+.dropdown-menu > .disabled{
+ cursor: not-allowed; 
+}
+
+/* The real magic ;) */
+.dropdown-menu > .disabled > a{
+ pointer-events: none;
+}
 /*
   custom backgrid styles
 --------------------------------------------------

@@ -18,9 +18,11 @@
  */
 
 define(
-		[ "i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
+		[ "i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms',
+		'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
 		/*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
-		function(labels, _, Handlebars, calipsoTemplates, moment, Backbone, PageableCollection, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
+		function(labels, _, Handlebars, calipsoTemplates, moment, Backbone, PageableCollection,
+			BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 /*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, jqueryColor, intlTelInput, q, chartjs) {
 
 	// deepExtend mixinTemplateHelpers
@@ -3977,10 +3979,6 @@ define(
 		getTemplate : function() {
 			return this.getOption("template");
 		},
-		initialize : function(options) {
-			Marionette.ItemView.prototype.initialize.apply(this, arguments);
-			//console.log("TemplateBasedItemView#initialize, item: " + this.model);
-		},
 	}, {
 		getTypeName : function() {
 			return "Calipso.view.TemplateBasedItemView";
@@ -3992,6 +3990,7 @@ define(
 		//template : Calipso.getTemplate("templateBasedCollectionView"),//_.template('<div id="calipsoTemplateBasedCollectionLayout-collectionViewRegion"></div>'),
 		tagName : "ul",
 		attributes : {},
+		template : _.template(''),
 		childView : Calipso.view.TemplateBasedItemView,
 		pollCollectionAfterDestroy : false,
 		childViewOptions : {
@@ -4136,7 +4135,6 @@ define(
 			});
 			var TabButtonsCollectionView = Calipso.view.TemplateBasedCollectionView.extend({
 				tagName : "ul",
-				template : _.template(''),
 				className : _this.getOption("tabClass"),
 				attributes : {
 					role : "tablist"
@@ -4741,6 +4739,7 @@ define(
 						},
 						formTemplateKey : "horizontal",
 						modal : false,
+						hasDraft : false,
 						addToCollection : null,
 						// Define view template
 						formSchemaKey : null,
@@ -4839,8 +4838,6 @@ define(
 						},
 						commit : function(e) {
 							var _this = this;
-							console.log("_this.formSchemaKey: "+_this.formSchemaKey);
-							console.log(this.model);
 							Calipso.stopEvent(e);
 							if (!this.isFormValid()) {
 								return false;
@@ -4853,8 +4850,9 @@ define(
 
 									_this.model.save(null, {
 										success : function(model, response) {
+											sessionStorage.removeItem(_this.getDraftKey());
+											_this.hasDraft = false;
 											if (_this.addToCollection) {
-
 												_this.addToCollection.add(_this.model);
 												_this.model.trigger("added");
 											}
@@ -4943,6 +4941,15 @@ define(
 								_self.model.set(Calipso.session.searchData);
 								_self.searchResultsCollection.data = Calipso.session.searchData;
 							}
+							else {
+								var draft = sessionStorage.getItem(_self.getDraftKey());
+								if(draft){
+									draft = JSON.parse(draft);
+									_self.model.set(draft);
+								}
+							}
+
+
 							var formOptions = {
 								model : _self.model,
 								schema : formSchema,
@@ -4957,6 +4964,11 @@ define(
 							this.form.setElement(this.$el.find(".generic-form-view").first()).render();
 							this.$el.find('label').filter(':visible:enabled:first').focus();
 							this.onFormRendered();
+
+							// flag changed
+							this.listenTo(this.form, 'change', function(){
+								_self.hasDraft = true;
+							});
 						},
 						onFormRendered : function() {
 
@@ -4974,7 +4986,20 @@ define(
 						socialLogin : function(e) {
 							Calipso.socialLogin(e);
 						},
+						getDraftKey : function(){
+							 return this.model.getPathFragment() + '/'+this.model.get("id")+'/'+this.formSchemaKey;
+						},
 						onBeforeDestroy : function(e) {
+							if(this.hasDraft){
+								// keep a session draft of changes
+								var draft = this.form.toJson();
+								delete draft.currentStepIndex;
+
+								sessionStorage.setItem(
+									this.getDraftKey(),
+									JSON.stringify(draft)
+								);
+							}
 							this.form.close();
 						},
 					},
@@ -5972,24 +5997,75 @@ define(
 	Calipso.view.WizardLayout = Calipso.view.ModelDrivenBrowseLayout.extend({
 		className : "container configurable-fluid",
 		template : Calipso.getTemplate('wizard-layout'),
-		/**
-		* Maintains the index of the latest step that has been rendered, if any
-		*/
-		currentStepIndex : null,
+		events : {
+			"click a.wizard-step" : "browseToStep"
+		},
 		regions : {
-			stepRegion : ".wizard-step"
+			stepRegion : ".wizard-step",
+			navRegion : ".wizard-title"
 		},
 		getRequiredOptionNames : function() {
 			return [ "steps" ];
 		},
+		showNav : function() {
+			var _layout = this;
+			// render navigation
+			var NavCollectionView = Calipso.view.TemplateBasedCollectionView.extend({
+				tagName : "ul",
+				className : "dropdown-menu",
+				childView : Calipso.view.TemplateBasedItemView.extend({
+					initialize : function(options) {
+						Calipso.view.TemplateBasedItemView.prototype.initialize.apply(this, arguments);
+						var model = this.model;
+						model.set("colIndex", _layout.stepsCollection.indexOf(model));
+						model.set("shownIndex", model.get("colIndex") + 1);
+						model.set("completed", model.get("colIndex") <= _layout.model.get("highestStepIndex"));
+						model.set("accessible", model.get("colIndex") <= _layout.model.get("highestStepIndex") + 1);
+						model.set("active", model.get("colIndex") == _layout.model.get("currentStepIndex"));
+
+						// add bootstrap classes
+						if(!this.model.get("accessible")){
+							this.$el.addClass("disabled");
+						}
+						else if(this.model.get("active")){
+							this.$el.addClass("active");
+						}
+					},
+					onShow : function(options) {
+						/*this.$el.find('a[title]').tooltip({
+					    trigger: 'hover',
+					    placement: 'bottom',
+					    animate: true,
+					    delay: 500,
+					    container: 'body'
+						});*/
+					},
+					onBeforeDestroy : function() {
+						//this.$el.find('a[title]').tooltip('destroy');
+					}
+				}),
+				childViewOptions: {
+					tagName : "li",
+			    template : Calipso.getTemplate("wizardTabItem")
+			  }
+			});
+			this.navRegion.show(new NavCollectionView({collection : this.stepsCollection}));
+
+			this.$el.find(".wizard-title").prepend(
+				'<button type="button" class="btn btn-default dropdown-toggle" ' +
+				' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + Calipso.getLabels("calipso.words.step") +
+				" <strong>" + (this.model.get("currentStepIndex") + 1) + "</strong> / " + this.stepsCollection.length +
+				' <span class="caret"></span></button>'
+			);
+
+		},
 		onShow : function() {
-			// set persisted index if missing
-			var currentStepIndex = this.model.get("currentStepIndex");
-			if (this.model.isNew() || _.isUndefined(currentStepIndex) || _.isNull(currentStepIndex)) {
-				this.model.set("currentStepIndex", -1);
-			}
+			var _layout = this;
+			this.stepsCollection = new Calipso.collection.GenericCollection(_layout.config.steps, {
+				model : Calipso.model.GenericModel
+			});
 			// render child view
-			this.showNext();
+			this.showStep(this.model.get("currentStepIndex") + 1);
 		},
 		getStepModel : function(step) {
 			var model = step.model;
@@ -6019,13 +6095,9 @@ define(
 			step.model = model;
 			return model;
 		},
-		showNext : function() {
-			var currentStepIndex = this.model.get("currentStepIndex") + 1;
-			this.model.set("currentStepIndex", currentStepIndex);
-			this.showStep(currentStepIndex);
-		},
-		updateProgress : function() {
-			this.$el.find(".wizard-progress").empty().append("Step " + (this.currentStepIndex + 1) + " of " + (this.config.steps.length + 1));
+		browseToStep : function(e){
+			var $link = $(e.currentTarget)
+			this.showStep(parseInt($link.data("step")));
 		},
 		showStep : function(stepIndex) {
 			var step = this.config.steps[stepIndex];
@@ -6046,10 +6118,13 @@ define(
 				scrollTop : 0
 			}, 500);
 
+
+			// render nav/progress view
+			this.showNav();
 		},
 
 		onGenericFormSaved : function(model) {
-			this.showNext();
+			this.showStep(this.model.get("currentStepIndex") + 1);
 		},
 	}, {
 		getTypeName : function() {
