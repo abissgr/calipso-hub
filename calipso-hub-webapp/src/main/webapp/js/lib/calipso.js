@@ -1399,8 +1399,10 @@ define(
 		getFinalSchema : function(fieldName, fieldSchema, actionName, dontHintRequired) {
 			// get i18n labels configuration as defaults,
 			// then overwrite those using local settings
-			var labelsConfig = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.' + actionName);
-
+			var modelLabels = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName) || {};
+			var labelsConfig = modelLabels.actionName || {};
+			var labelsDefaultConfig = modelLabels["default"] || {};
+			console.log("getFinalSchema, labelsConfig: " + labelsConfig);
 			var schema = $.extend({}, labelsConfig, fieldSchema);
 			//
 			// final title
@@ -1408,7 +1410,7 @@ define(
 			var title = fieldSchema.titleHTML || fieldSchema.title;
 			if (_.isUndefined(title)) {
 				// build title from field name
-				title = labelsConfig.title || fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) {
+				title = labelsConfig.title || labelsDefaultConfig.title || fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) {
 					return str.toUpperCase();
 				});
 			}
@@ -3074,13 +3076,8 @@ define(
 				},
 				password : {
 					"create" : passwordText,
-					"update" : {
-						type : 'Password',
-						validators : [ 'required' ],
-					},
-					"create-withToken" : {
-						extend : "update",
-					},
+					"update" : passwordText,
+					"create-withToke" : passwordText,
 				},
 				passwordConfirmation : {
 					"update" : passwordConfirm,
