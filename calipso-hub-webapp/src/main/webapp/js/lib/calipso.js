@@ -1399,10 +1399,10 @@ define(
 		getFinalSchema : function(fieldName, fieldSchema, actionName, dontHintRequired) {
 			// get i18n labels configuration as defaults,
 			// then overwrite those using local settings
-			var modelLabels = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName) || {};
-			var labelsConfig = modelLabels.actionName || {};
-			var labelsDefaultConfig = modelLabels["default"] || {};
-			console.log("getFinalSchema, labelsConfig: " + labelsConfig);
+			
+			var labelsConfig = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.' + actionName);
+			var labelsDefaultConfig = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.default');
+			
 			var schema = $.extend({}, labelsConfig, fieldSchema);
 			//
 			// final title
@@ -3076,8 +3076,13 @@ define(
 				},
 				password : {
 					"create" : passwordText,
-					"update" : passwordText,
-					"create-withToke" : passwordText,
+					"update" : {
+						type : 'Password',
+						validators : [ 'required' ],
+					},
+					"create-withToken" : {
+						extend : "update",
+					},
 				},
 				passwordConfirmation : {
 					"update" : passwordConfirm,
