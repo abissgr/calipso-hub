@@ -1399,10 +1399,10 @@ define(
 		getFinalSchema : function(fieldName, fieldSchema, actionName, dontHintRequired) {
 			// get i18n labels configuration as defaults,
 			// then overwrite those using local settings
-			
+
 			var labelsConfig = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.' + actionName);
 			var labelsDefaultConfig = Calipso.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.default');
-			
+
 			var schema = $.extend({}, labelsConfig, fieldSchema);
 			//
 			// final title
@@ -4809,12 +4809,22 @@ define(
 						},
 						events : {
 							"click a.btn-social-login" : "socialLogin",
+							"click a.open-modal-page" : "openModalPage",
 							"click button.submit" : "commit",
 							"submit form" : "commit",
 							"click button.cancel" : "cancel",
 							"submit" : "commitOnEnter",
 							"keypress input[type=password]" : "commitOnEnter",
 							"keypress input[type=text]" : "commitOnEnter"
+						},
+						openModalPage : function(e){
+							Calipso.stopEvent(e);
+							var $a = $(e.currentTarget);
+							var pageView = new Calipso.view.TemplateBasedItemView({
+								template : Calipso.getTemplate($a.data("page")),
+								tagName : "div"
+							});
+							Calipso.vent.trigger('modal:show', pageView);
 						},
 						commitOnEnter : function(e) {
 							if (e.keyCode != 13) {
