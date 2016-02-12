@@ -3519,7 +3519,8 @@ define(
 	Calipso.view.ModalLayout = Calipso.view.AbstractLayout.extend({
 		template : Calipso.getTemplate('modal-layout'),
 		events : {
-			"click a.modal-close" : "closeModal"
+			"click a.modal-close" : "closeModal",
+			"click button.modal-close" : "closeModal"
 		},
 		regions : {
 			modalBodyRegion : ".modal-body"
@@ -4824,7 +4825,7 @@ define(
 								template : Calipso.getTemplate($a.data("page")),
 								tagName : "div"
 							});
-							Calipso.vent.trigger('modal:show', pageView);
+							Calipso.vent.trigger('modal:showInLayout', {view: pageView});
 						},
 						commitOnEnter : function(e) {
 							if (e.keyCode != 13) {
