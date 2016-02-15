@@ -4825,7 +4825,7 @@ define(
 								template : Calipso.getTemplate($a.data("page")),
 								tagName : "div"
 							});
-							Calipso.vent.trigger('modal:showInLayout', {view: pageView});
+							Calipso.vent.trigger('modal:showInLayout', {view: pageView, title: $a.data("title")});
 						},
 						commitOnEnter : function(e) {
 							if (e.keyCode != 13) {

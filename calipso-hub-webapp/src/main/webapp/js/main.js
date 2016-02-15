@@ -4,17 +4,28 @@ if(!window.console) {console={}; console.log = function(){};}
 function getLocale(){
 	// get "remembered" locale if exists
 	var locale = localStorage.getItem('locale');
+	
 	// guess and set remembered otherwise
 	if(!locale){
-		if (navigator.languages != undefined && navigator.languages[0] != "*"){
-			locale = navigator.languages[0]; 
+		var browserLanguagePropertyKeys = ['languages', 'language', 'browserLanguage', 'userLanguage', 'systemLanguage'];
+		var prop;
+		for (var i = 0; !locale && i < browserLanguagePropertyKeys.length; i++) {
+		    prop = browserLanguagePropertyKeys[i];
+		    // pick first if array
+		    if(prop && prop.constructor === Array){
+		   	 prop = prop[0];
+		    }
+		    // no wildcards
+		    if(prop && prop != "*"){
+		   	 // no sub-locale
+		   	 if(prop.length > 2){
+		   		 prop = prop.substring(0,2);
+		   	 }
+		   	  // set it
+		   	 locale = prop;
+		    }
 		}
-		if(!locale && navigator.language != undefined && navigator.language != "*"){
-			locale = navigator.language; 
-		}
-		if(!locale && navigator.userLanguage != undefined && navigator.userLanguage != "*"){
-			locale = navigator.language; 
-		}
+
 		if(!locale){
 			locale = "en";
 		}
