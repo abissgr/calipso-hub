@@ -13,18 +13,38 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 	 * schema: {title: {type:'Select2', options:['Mr','Mrs',Ms], config: {}, multiple: false}
 	 */
 	Backbone.Form.editors.SimpleTypeSelect2 = Backbone.Form.editors.Select.extend({
-		render : function() {
+		config : {},
+		initialize : function(options) {
+			Backbone.Form.editors.Select.prototype.initialize.call(this, options);
+			options = options || {};
+			if(options.schema && options.schema.config){
+				this.config = $.extend({}, this.config, options.schema.config);
+			}
+			if (this.form) {
+				var _this = this;
+				this.listenToOnce(this.form, "attach", function() {
+					_this.onFormAttach();
+				});
+				this.listenToOnce(this.form, "close", function() {
+					_this.onFormClose();
+				});
+			}
+		},
+		onFormAttach : function() {
 			Backbone.Form.editors.Select.prototype.render.apply(this, arguments);
-			var config = this.schema.config || {};
-			var _this = this;
-			setTimeout(function() {
-				if (_this.schema.multiple) {
-					_this.$el.prop('multiple', true);
-				}
-				_this.$el.select2(config);
-			}, 0);
-			return this;
-		}
+			if (this.schema.multiple) {
+				this.$el.prop('multiple', true);
+			}
+			this.$el.select2(this.config);
+		},
+		onFormClose : function() {
+			this.$el.select2('destroy'); 
+			if (this.onBeforeClose) {
+				this.onBeforeClose();
+			}
+			this.remove();
+			this.unbind();
+		},
 	});
 
 	/**
