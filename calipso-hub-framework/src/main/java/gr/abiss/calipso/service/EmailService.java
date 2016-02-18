@@ -25,13 +25,16 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -54,18 +57,22 @@ public class EmailService {
 
     @Autowired 
     private JavaMailSender mailSender;
-    
+
     @Autowired 
     private TemplateEngine templateEngine;
+    
+    @Inject
+	@Qualifier("messageSource") 
+    private MessageSource messageSource;
 
-
+    
 	/**
 	 * Send an Account Confirmation email to the given user
 	 * @param user
 	 * @throws MessagingException
 	 */
 	public void sendAccountConfirmation(final User user){
-		final String subject = "Account Confirmation";
+		final String subject = messageSource.getMessage("email.accountconfirmation.subject", null, user.getLocaleObject());
 		final String templateName = "email-account-confirmation.html";
 		sendEmailToUser(user, subject, templateName);
     }
@@ -76,7 +83,7 @@ public class EmailService {
 	 * @throws MessagingException
 	 */
 	public void sendAccountConfirmationExpired(final User user){
-		final String subject = "Account Confirmation Expired";
+		final String subject = messageSource.getMessage("email.accountconfirmation.expired.subject", null, user.getLocaleObject());
 		final String templateName = "email-account-confirmation-expired.html";
 		sendEmailToUser(user, subject, templateName);
     }
@@ -99,7 +106,7 @@ public class EmailService {
 	 */
 
 	public void sendPasswordResetLink(final User user)  {
-		final String subject = "Password Reset Request";
+		final String subject = messageSource.getMessage("email.passwordreset.subject", null, user.getLocaleObject());
 		final String templateName = "email-password-reset.html";
 		
 		sendEmailToUser(user, subject, templateName);
@@ -108,13 +115,25 @@ public class EmailService {
 	public void sendEmailToUser(final User user, final String subject,
 			final String templateName) {
 		String emailTo = user.getEmail();
-		String emailFrom = defaultMailFrom;
-
+		String emailFrom = getDefaultSender(user);
 		// Prepare the evaluation context
 		final Context ctx = new Context(new Locale(user.getLocale()));
 		ctx.setVariable("user", user);
 
 		sendEmail(subject, templateName, emailTo, emailFrom, ctx);
+	}
+
+	protected String getDefaultSender(final User user) {
+		String emailFrom = new StringBuffer("\"")
+				.append(messageSource.getMessage("email.from", null, user.getLocaleObject()))
+				.append("\" <")
+				.append(defaultMailFrom)
+				.append('>')
+				.toString();
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("getDefaultSender: " + emailFrom);
+		}
+		return emailFrom;
 	}
 
 	@Async
@@ -124,12 +143,15 @@ public class EmailService {
 			final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
 			final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, "UTF-8");
 			message.setSubject(subject);
-				message.setFrom(emailFrom);
+			message.setFrom(emailFrom);
 			message.setTo(emailTo);
 			ctx.setVariable("baseUrl", this.baseUrl);
 			// Create the HTML body using Thymeleaf
 			final String htmlContent = this.templateEngine.process(templateName, ctx);
-			LOGGER.info("Sending email body: " + htmlContent);
+
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("Sending email body: " + htmlContent);
+			}
 			message.setText(htmlContent, true /* isHtml */);
 	
 			// Send email

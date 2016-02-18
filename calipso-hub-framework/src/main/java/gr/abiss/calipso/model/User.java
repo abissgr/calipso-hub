@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -90,9 +91,13 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	@Column(name = "user_password")
 	private String password;
-	
+
 	@Transient
 	List<String> changedAttributes = null;
+	
+	@Transient
+	@JsonIgnore
+	Locale localeObject = null;
 
 	@JsonIgnore
 	@Column(name = "reset_password_token")
@@ -183,6 +188,13 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	
 	public User(String id) {
 		this.setId(id);
+	}
+	
+	public Locale getLocaleObject() {
+		if(this.localeObject == null){
+			this.localeObject = new Locale(this.getLocale() != null ? this.getLocale() : "en");
+		}
+		return localeObject;
 	}
 
 	public boolean hasRole(String roleName){
