@@ -2428,7 +2428,7 @@ define(
 				}
 			}
 			this.$el.removeAttr("type class");
-			this.$el.addClass("list-grou");
+			this.$el.addClass("list-group");
 			this.$el.html(html);
 
 		},
@@ -6109,7 +6109,7 @@ define(
 			this.$el.find(".wizard-title").prepend(
 				'<button type="button" class="btn btn-default dropdown-toggle" ' +
 				' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + Calipso.getLabels("calipso.words.step") +
-				" <strong>" + (this.model.get("currentStepIndex") + 1) + "</strong> / " + this.stepsCollection.length +
+				" " + (this.model.get("currentStepIndex") + 1) + " / " + this.stepsCollection.length +
 				' <span class="caret"></span></button>'
 			);
 
