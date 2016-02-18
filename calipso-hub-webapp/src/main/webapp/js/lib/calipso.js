@@ -5508,6 +5508,41 @@ define(
 		//consolelog("Helper ifLoggedOut returns "+loggedOut);
 		return loggedOut ? options.fn(this) : options.inverse(this);
 	});
+
+	/**
+	 * Translates the given value or value.id by looking for a match
+	 * in the labels or labels.options for that path
+	 * @example
+	 * {{getValueLabel contextAttribute 'labels.path'}}
+	 */
+	Handlebars.registerHelper('getValueLabel', function(value, labelsPath) {
+	// if value exists
+	if (!_.isNull(value) && !_.isUndefined(value)) {
+		//normalize if necessary
+		value = value instanceof Object && value.id ? value.id + "" : value + "";
+
+		// get labels
+		var labels = Calipso.getLabels(labelsPath);
+		//normalize if necessary
+		labels = labels && labels.options ? labels.options : labels;
+
+		console.log("getValueLabel, value: " + value + ", labelsPath: " + labelsPath + ", labels: ");
+		console.log(labels);
+
+		// if labels exist
+		if (labels) {
+
+			// try direct match, then search, then fallback
+			value = labels[value]
+			|| _.findWhere(labels, {
+				val : value
+			})
+			|| value;
+
+		}
+	}
+	return value;
+});
 	// //////////////////////////////////////
 	// Search cache
 	// //////////////////////////////////////
