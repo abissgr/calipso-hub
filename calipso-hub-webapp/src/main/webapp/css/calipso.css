@@ -485,9 +485,6 @@ width: 100%;
 /*//////////////////////////////////////////////
 // Forms
 //////////////////////////////////////////////*/
-.generic-form-view label{
-    font-size:80%;
-}
 .generic-form-view label small{
     font-size:80%;
     text-transform:none;
