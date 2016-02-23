@@ -1933,7 +1933,7 @@ define(
 					if(usersCollection.length > 0){
 						// if not the same user
 						var formModelId = Calipso.getObjectProperty(instance, "id");
-						console.log("Validating EMAIL, current ID: " + formModelId + ", found ID: " + usersCollection.at(0).get("id"));
+						//console.log("Validating EMAIL, current ID: " + formModelId + ", found ID: " + usersCollection.at(0).get("id"));
 						if(!formModelId || formModelId != usersCollection.at(0).get("id")){
 							return {
 								type : "email",
@@ -2255,8 +2255,6 @@ define(
 			});
 			delete values.currentStepIndex;
 			delete values.highestStepIndex;
-			console.log("getDraft: ");
-			console.log(values);
 			return values;
 		},
 		render : function() {
@@ -2282,7 +2280,6 @@ define(
 			//Render standalone editors
 			$form.find('[data-editors]').add($form).each(function(i, el) {
 				var $container = $(el), selection = $container.attr('data-editors');
-
 				if (_.isUndefined(selection))
 					return;
 
@@ -4805,7 +4802,12 @@ define(
 								this.searchResultsCollection = this.model.wrappedCollection;
 							}
 							//
-							this.formTemplate = this.getFormTemplate(options.formTemplateKey ? options.formTemplateKey : this.formTemplateKey);
+							if (options.formTemplate) {
+								this.formTemplate = options.formTemplate;
+							}
+							else{
+								this.formTemplate = this.getFormTemplate(options.formTemplateKey ? options.formTemplateKey : this.formTemplateKey);
+							}
 
 						},
 						events : {

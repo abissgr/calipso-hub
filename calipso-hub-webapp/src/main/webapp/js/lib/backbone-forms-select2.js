@@ -13,7 +13,7 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 	 * schema: {title: {type:'Select2', options:['Mr','Mrs',Ms], config: {}, multiple: false}
 	 */
 	Backbone.Form.editors.SimpleTypeSelect2 = Backbone.Form.editors.Select.extend({
-		config : {},
+		config : {width: "100%"},
 		initialize : function(options) {
 			Backbone.Form.editors.Select.prototype.initialize.call(this, options);
 			options = options || {};
