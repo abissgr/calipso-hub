@@ -30,12 +30,44 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 				});
 			}
 		},
+		setValue : function(value) {
+//			console.log("setValue, value: ");
+//			console.log(value);
+
+			console.log("setValue, value: " + (value?value.id:value));
+			this.$el.find('option[selected]').removeAttr('selected');
+
+			// add new selection
+			var newValue, id;
+			// multiple selection
+			if (this.schema.multiple) {
+				newValue = [];
+				for(var i = 0; i < value.length; i++) {
+					id = value[i] && value[i].id ? value[i].id : value[i];
+					newValue.push(id);
+					this.$el.find('option[value="' + id + '"]').prop('selected', true);
+				}
+			}
+			// single selection
+			else{
+				id = value && value.id ? value.id : value;
+				newValue = id;
+				this.$el.find('option[value="' + id + '"]').prop('selected', true);
+			}
+			this.$el.val(newValue);
+			this.$el.trigger("change");
+		},
 		onFormAttach : function() {
 			Backbone.Form.editors.Select.prototype.render.apply(this, arguments);
+			var _this = this;
 			if (this.schema.multiple) {
 				this.$el.prop('multiple', true);
 			}
-			this.$el.select2(this.config);
+
+			this.$el.select2(this.config).on("change", function() {
+				_this.trigger('change', _this);
+			});
+			
 		},
 		onFormClose : function() {
 			this.$el.select2('destroy'); 
@@ -62,6 +94,7 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 	 */
 	Backbone.Form.editors.ModelSelect2 = Backbone.Form.editors.SimpleTypeSelect2.extend({
 		//  select a model VS a string value.
+
 		getValue : function() {
 			var simpleValue = this.$el.val();
 //			console.log("Backbone.Form.editors.ModelSelect2#getValue, value: ");
@@ -85,29 +118,6 @@ define([ 'jquery', 'underscore', 'backbone', 'select2', 'backbone-forms' ], func
 //			console.log("getValue, simpleValue: " + simpleValue + ", model value: ");
 //			console.log(value);
 			return value;
-		},
-		// https://github.com/powmedia/backbone-forms/issues/291
-		setValue : function(value) {
-			//console.log("setValue, value: ");
-			var newValue;
-
-			// multiple?
-			if (this.schema.multiple) {
-				// just force an array 
-				value = [].concat(value);
-				newValue = [];
-				var valueEntry;
-				for (var i = 0; i < value.length; i++) {
-					valueEntry = value[i];
-					newValue.push(valueEntry && valueEntry.id ? valueEntry.id : valueEntry);
-				}
-			}
-			// single value
-			else {
-				newValue = value && value.id ? value.id : value;
-			}
-			this.$el.val(newValue);
-			this.$el.select2("val", newValue);
 		},
 	});
 

@@ -142,7 +142,7 @@ define(
 
 	/**
 	* Calculate "from" now using the given date
-	* @example {{-+momentFromNow someDate}}
+	* @example {{momentFromNow someDate}}
 	*/
 	Handlebars.registerHelper('momentFromNow', function(date) {
 		return moment(date).fromNow();
@@ -150,10 +150,19 @@ define(
 
 	/**
 	* Calculate "from" now using the given date
-	* @example {{-+momentFromNow someDate}}
+	* @example {{momentFromNow someDate}}
 	*/
 	Handlebars.registerHelper('momentDateTime', function(date) {
 		return moment(date).format("MMMM Do YYYY, h:mm:ss a");
+	});
+
+	/**
+	* Calculate "from" now using the given date
+	* @example {{-+momentFromNow someDate}}
+	*/
+	Handlebars.registerHelper('moment', function(date, format) {
+		// "MMMM Do YYYY"
+		return moment(date).format(format);
 	});
 
 	Calipso.getLabels = function(path) {
@@ -2852,6 +2861,9 @@ define(
 			this.set("translatedName", Calipso.getLabels("countries."+this.get("id")));
 		},
 		toString : function() {
+			return this.get("translatedName") || this.get("name");
+		},
+		text : function() {
 			return this.get("translatedName") || this.get("name");
 		}
 	//urlRoot : "/api/rest/users"
