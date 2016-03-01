@@ -3,3 +3,5 @@
 /.settings
 /calipso-hub.sublime-project
 /calipso-hub.sublime-workspace
+*.iml
+.idea/
