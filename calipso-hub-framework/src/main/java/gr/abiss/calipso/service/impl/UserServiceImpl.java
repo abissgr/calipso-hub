@@ -41,6 +41,7 @@ import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.persistence.Query;
 
+import gr.abiss.calipso.util.PasswordHasher;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
@@ -91,7 +92,9 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		if(LOGGER.isDebugEnabled()) LOGGER.debug("findByCredentials, userNameOrEmail: " + userNameOrEmail + ", password: " + password + ", metadata: " + metadata);
 		User user = null;
 		try {
-			user = this.repository.findByCredentials(userNameOrEmail, password);
+			final String hashedPassword = PasswordHasher.hashPassword(password);
+			user = this.repository.findByCredentials(userNameOrEmail, hashedPassword);
+
 			LOGGER.error("findByCredentials: matched user: "+user);
 			if (user != null) {
 				if (!CollectionUtils.isEmpty(metadata)) {
@@ -166,7 +169,10 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
 		user.setResetPasswordToken(null);
-		user.setPassword(newPassword);
+
+		final String hashedPassword = PasswordHasher.hashPassword(newPassword);
+		user.setPassword(hashedPassword);
+
 		user = this.update(user);
 
 		LOGGER.info("handlePasswordResetToken returning local user: " + user);
@@ -268,10 +274,12 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		// make sure a user matching the credentials is found
 		User u = this.findByCredentials(userNameOrEmail, oldPassword, null);
 		Assert.notNull(u, "Failed updating user pass: A user could not be found with the given credentials");
-		
+
 		// update password and return user
-		u.setPassword(newPassword);
+		final String hashedPassword = PasswordHasher.hashPassword(newPassword);
+		u.setPassword(hashedPassword);
 		u.setLastPassWordChangeDate(new Date());
+
 		u = this.update(u);
 		return u;
 	}
