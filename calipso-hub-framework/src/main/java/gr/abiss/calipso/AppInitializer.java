@@ -33,6 +33,7 @@ import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.service.cms.TextService;
+import gr.abiss.calipso.util.PasswordHasher;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 
 import java.util.Date;
@@ -127,7 +128,8 @@ public class AppInitializer {
 			u0.setFirstName("Admin");
 			u0.setLastName("User");
 			u0.setUsername("admin");
-			u0.setPassword("admin");
+
+			u0.setPassword(PasswordHasher.hashPassword("admin"));
 			u0.setLastVisit(now);
 			u0.addRole(adminRole);
 			u0 = userService.createActive(u0);
@@ -138,7 +140,7 @@ public class AppInitializer {
 				u.setFirstName("First"+i);
 				u.setLastName("Last"+i);
 				u.setUsername("user"+i);
-				u.setPassword("user"+i);
+				u.setPassword(PasswordHasher.hashPassword("user"+i));
 				u.setLastVisit(now);
 				u = userService.createActive(u);
 
