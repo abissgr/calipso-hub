@@ -56,6 +56,7 @@ import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import sun.security.util.Password;
 
 //@Named("userService")
 public class UserServiceImpl extends GenericEntityServiceImpl<User, String, UserRepository> 
@@ -93,7 +94,11 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		User user = null;
 		try {
 			final String hashedPassword = PasswordHasher.hashPassword(password);
-			user = this.repository.findByCredentials(userNameOrEmail, hashedPassword);
+			final User found = this.repository.findByUsernameOrEmail(userNameOrEmail);
+
+            if (PasswordHasher.checkPassword(password, hashedPassword)) {
+                user = found;
+            }
 
 			LOGGER.error("findByCredentials: matched user: "+user);
 			if (user != null) {
@@ -114,7 +119,7 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User create(User resource) {
-		Role userRole = roleRepository.findByName(Role.ROLE_USER);
+		final Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
 		resource.setResetPasswordToken(generator.generateKey());
 		resource = super.create(resource);
@@ -237,7 +242,10 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		user.setUsername(userAccountData.getUsername());
 		user.setFirstName(userAccountData.getFirstName());
 		user.setLastName(userAccountData.getLastName());
-		user.setPassword(userAccountData.getPassword());
+
+		final String hashedPassword = PasswordHasher.hashPassword(userAccountData.getPassword());
+		user.setPassword(hashedPassword);
+
 		User existing = this.repository.findByUsernameOrEmail(user.getEmail());
 		if(existing == null){
 			existing = this.repository.findByUsernameOrEmail(user.getUsername());
