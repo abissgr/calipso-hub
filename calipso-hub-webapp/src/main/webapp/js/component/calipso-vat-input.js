@@ -1507,7 +1507,7 @@ define([ 'calipso' ], function(Calipso) {
 		initialize : function(options) {
 			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
 			var _this = this;
-			this.labels = Calipso.getLabels();
+			this.labels = Calipso.util.getLabels();
 			if (!options.schema.validators) {
 				options.schema.validators = [];
 			}
