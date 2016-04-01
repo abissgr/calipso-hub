@@ -16,22 +16,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define(['calipso', 'underscore', 'backbone', 'marionette'],
+define([ 'calipso', 'underscore', 'backbone', 'marionette', 'view/HomeLayout' ],
 
-function(Calipso, _, Backbone, Marionette) {
-//this.layout.contentRegion.show(new HomeLayout());
+function(Calipso, _, Backbone, Marionette, HomeLayout, howItWorks, AccountApplicationModel, BrokerAccountModel) {
+	var labels = Calipso.util.getLabels();
 
- 	var MainController = Calipso.controller.AbstractController.extend({
+	var MainController = Calipso.controller.AbstractController.extend({
 
 		home : function() {
-			console.log("MainController#home");
-			if (!Calipso.session.isAuthenticated()) {
-				this._redir("login");
-				return false;
+			// if anonymous or admin, just show default home
+			if(!Calipso.util.isAuthenticated() || Calipso.isUserInAnyRole("ROLE_ADMIN")){
+				var homeLayout = new HomeLayout({});
+				Calipso.vent.trigger("app:show", homeLayout);
 			}
-			
-			Calipso.navigate('users', {trigger:true});
-		}
+			// else if cient, show trading accounts
+			else{
+				Calipso.navigate("myAccounts", {trigger : true});
+			}
+		},
+		
 
 	});
 	return MainController;

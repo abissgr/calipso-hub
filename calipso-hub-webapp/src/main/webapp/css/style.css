@@ -1,3 +1,25 @@
+/* Sticky footer styles 
+-------------------------------------------------- */
+body, html {
+  height: 100%;
+  
+}
+.full-height-column{
+    display: table;
+    height: 100%;
+    width: 100%;
+}
+.full-height-row{
+    display: table-row;
+    height: 1px;
+}
+.full-height-row-expanded{
+    display: table-row;
+}
+#calipsoMainContentRegion{
+    /* padding according to nav/header height;*/
+    padding-top: 70px;
+}
 
 
 /*

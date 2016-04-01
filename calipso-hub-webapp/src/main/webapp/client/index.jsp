@@ -20,8 +20,17 @@
         </div>
     </div>
     
-    <footer id="calipsoFooterRegion" class="full-height-row">
-        <!-- -->
+    <footer class="full-height-row">
+        <div  id="calipsoFooterRegion"></div>
+        <div class="container configurable-fluid">
+            <div class="row">
+                <div class="col-xs-12 copyright">
+                    <p class="credit text-muted text-center">
+                        Last updated: ${dev.build.timestamp}
+                    </p>
+                </div>
+            </div>
+        </div>
     </footer>
     
     <!-- Placed at the end of the document so the pages load faster -->

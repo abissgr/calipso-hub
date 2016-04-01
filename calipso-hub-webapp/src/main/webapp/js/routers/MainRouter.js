@@ -47,7 +47,9 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			':mainRoutePart/' : 'mainNavigationSearchRoute',
 			':mainRoutePart/?*queryString' : 'mainNavigationSearchRoute',
 			':mainRoutePart?*queryString' : 'mainNavigationSearchRoute',
+			
 			':mainRoutePart/:modelId' : 'mainNavigationCrudRoute',
+			
 			'*path':  'notFoundRoute'
 		}
 

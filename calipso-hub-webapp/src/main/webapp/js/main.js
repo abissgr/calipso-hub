@@ -1,26 +1,22 @@
 // set console api if missing
 if(!window.console) {console={}; console.log = function(){};}
-// establish a locale
-function getLocale(){
+//establish a locale
+function initLocale(){
 	// get "remembered" locale if exists
 	var locale = localStorage.getItem('locale');
 	
 	// guess and set remembered otherwise
-	if(!locale){
+	if(!locale && navigator){
 		var browserLanguagePropertyKeys = ['languages', 'language', 'browserLanguage', 'userLanguage', 'systemLanguage'];
 		var prop;
 		for (var i = 0; !locale && i < browserLanguagePropertyKeys.length; i++) {
-		    prop = browserLanguagePropertyKeys[i];
+		    prop = navigator[browserLanguagePropertyKeys[i]];
 		    // pick first if array
 		    if(prop && prop.constructor === Array){
 		   	 prop = prop[0];
 		    }
 		    // no wildcards
 		    if(prop && prop != "*"){
-		   	 // no sub-locale
-		   	 if(prop.length > 2){
-		   		 prop = prop.substring(0,2);
-		   	 }
 		   	  // set it
 		   	 locale = prop;
 		    }
@@ -29,26 +25,27 @@ function getLocale(){
 		if(!locale){
 			locale = "en";
 		}
+	  	 // no sub-locale
+		else if(locale.length > 2){
+			locale = locale.substring(0,2);
+	  	}
 		localStorage.setItem('locale', locale.toLowerCase());
 	}
 }
+initLocale();
+
 
 require.config({
 	// main.js is the application entry point
 	deps : [ 'main' ],
 	waitSeconds: 0,
 
-   config: {
-       i18n: {
-      	 locale: getLocale()
-       }
-   },
-
 	paths : {
 		'cookie' : 'lib/jquery.cookie',
 		'jquery' : 'lib/jquery',
 		'jquery-color' : 'lib/jquery.color.plus-names',
 		"intlTelInput" : 'lib/intlTelInput',
+		"intlTelInputUtil" : 'lib/intlTelInputUtil',
 		'q' : 'lib/q',
 		'underscore' : 'lib/underscore',
 		'underscore-string' : 'lib/underscore-string',
@@ -76,7 +73,6 @@ require.config({
 		'async' : 'lib/async',
 		'keymaster' : 'lib/keymaster',
 		'moment' : 'lib/moment',
-		'template' : '../template',
 		'json2' : 'lib/json2',
 		'console' : 'lib/resthub/console', 
 		'backgrid' : 'lib/backgrid/backgrid',
@@ -101,6 +97,7 @@ require.config({
       'google-maps-loader' : 'lib/google-maps-loader',
       'humanize' : 'lib/humanize-duration',
       'chart': 'lib/Chart',
+		'template' : '../template',
 
 	},
 	wrapShim: true,
@@ -226,5 +223,15 @@ require.config({
 
 });
 
+// r.js does only reads the above config. this one is 
+// merged with the first while on the browser by requirejs. 
+require.config({
+	waitSeconds: 0,
+   config: {
+       i18n: {
+      	 locale: localStorage.getItem('locale') || "de"
+       }
+   },
+});
 //Load our app module and pass it to our definition function
 require(['app']);

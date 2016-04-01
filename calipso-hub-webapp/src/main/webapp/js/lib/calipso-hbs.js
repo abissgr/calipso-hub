@@ -36,13 +36,12 @@ define([
 'hbs!template/userDetails-layout',
 'hbs!template/userRegistration-layout',
 'hbs!template/userRegistrationSubmitted',
-
 'hbs!template/userProfile',
 'hbs!template/applayout',
-'hbs!template/tab-label',
 'hbs!template/loginRegistered',
 'hbs!template/headerNotificationsCollectionView',
 'hbs!template/headerNotificationsItemView',
+'hbs!template/support',
 'hbs!template/templateBasedItemView',
 'hbs!template/templateBasedCollectionView',
 'hbs!template/wizard-layout',
@@ -70,10 +69,10 @@ function(
 		userRegistrationSubmitted,
 		userProfile,
 		applayout,
-		tab_label,
 		loginRegistered,
 		headerNotificationsCollectionView,
 		headerNotificationsItemView,
+		support,
 		templateBasedItemView,
 		templateBasedCollectionView,
 		wizardLayout,
@@ -81,7 +80,6 @@ function(
 		itemViewTemplate
 ) {
 	return {
-
 	"modal-layout":modal_layout,
 	"header":header,
 	"header-menuitem":header_menuitem,
@@ -101,10 +99,10 @@ function(
 	"userRegistrationSubmitted":userRegistrationSubmitted,
 	"userProfile" : userProfile,
 	"applayout":applayout,
-	"tab-label":tab_label,
 	"loginRegistered":loginRegistered,
 	"headerNotificationsCollectionView":headerNotificationsCollectionView,
 	"headerNotificationsItemView":headerNotificationsItemView,
+	'support' : support,
 	"templateBasedItemView":templateBasedItemView,
 	"templateBasedCollectionView":templateBasedCollectionView,
 	"wizard-layout":wizardLayout,

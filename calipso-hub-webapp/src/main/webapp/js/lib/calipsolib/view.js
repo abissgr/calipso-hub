@@ -162,7 +162,8 @@ define(
 					return "Calipso.view.ModalLayout";
 				}
 			});
-			Calipso.view.HeaderNotificationsRegion = Backbone.Marionette.Region.extend({
+			
+			/*Calipso.view.HeaderNotificationsRegion = Backbone.Marionette.Region.extend({
 				el : "#calipsoHeaderView-notificationsRegion",
 				attachHtml : function(view) {
 					this.$el.clear().append('<a href="#" data-toggle="dropdown" class="dropdown-toggle">' + '<i class="fa fa-bell fa-fw"></i>' + '<sup class="badge badge-primary badge-notifications-count hidden"></sup>' + '<i class="fa fa-caret-down"></i>', view.el);
@@ -170,7 +171,7 @@ define(
 			});
 			Calipso.view.HeaderNotificationsRegion.prototype.attachHtml = function(view) {
 				this.$el.clear().append('<a href="#" data-toggle="dropdown" class="dropdown-toggle">' + '<i class="fa fa-bell fa-fw"></i>' + '<sup class="badge badge-primary badge-notifications-count hidden"></sup>' + '<i class="fa fa-caret-down"></i>', view.el);
-			};
+			};*/
 
 			Calipso.view.HeaderView = Calipso.view.MainLayout.extend(
 			/** @lends Calipso.view.HeaderView.prototype */
@@ -183,14 +184,23 @@ define(
 					"click a.login" : "login",
 					"click a.register" : "register",
 					"click a.logout" : "logout",
+					"click a.locale" : "changeLocale",
 				},
 				regions : {
-					//menuRegion : "#calipsoHeaderView-menuRegion",
-					notificationsRegion : {
-						// appends the notifications without clearing the link,
-						// fixes HTML structure issue
-						regionClass : Calipso.view.HeaderNotificationsRegion
-					}
+
+					menuRegion : "#calipsoHeaderView-menuRegion",
+					notificationsRegion : "#calipsoHeaderView-notificationsRegion"
+//					notificationsRegion : {
+//						// appends the notifications without clearing the link,
+//						// fixes HTML structure issue
+//						regionClass : Calipso.view.HeaderNotificationsRegion
+//					}
+				},
+				changeLocale : function(e) {
+					console.log("changeLocale: ");
+					console.log($(e.currentTarget).data("locale"));
+					Calipso.stopEvent(e);
+					Calipso.changeLocale($(e.currentTarget).data("locale"));
 				},
 				// TODO: investigate
 				//		serializeData: function(){

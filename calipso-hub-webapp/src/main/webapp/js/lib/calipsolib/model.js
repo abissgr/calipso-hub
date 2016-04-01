@@ -371,69 +371,69 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 		 * @todo implement optional merging of superclass schemas by using the supermodel.parent property
 		 */
 		getFormSchema : function(actionName) {
-			// decide based on model persistence state if no action was given
-			if (!actionName) {
-				actionName = this.getFormSchemaKey();
-				//console.log("GenericModel#getFormSchema actionName: "+ actionName);
-			}
-			// the schema to build for the selected action
-			var formSchema = {};
-			// get the complete schema to filter out from
-			// console.log("GenericModel#getFormSchema calling : this.getFormSchemas()");
-			var formSchemas = this.getFormSchemas();
+			var formSchema = this.constructor.getSchema("form") || {};
+			if(!formSchema){
+				// decide based on model persistence state if no action was given
+				if (!actionName) {
+					actionName = this.getFormSchemaKey();
+					//console.log("GenericModel#getFormSchema actionName: "+ actionName);
+				}
+				// get the complete schema to filter out from
+				// console.log("GenericModel#getFormSchema calling : this.getFormSchemas()");
+				var formSchemas = this.getFormSchemas();
 
-			// for each property, select the appropriate schema entry for the given
-			// action
-			var propertySchema;
-			var propertySchemaForAction;
-			for ( var propertyName in formSchemas) {
-				if (formSchemas.hasOwnProperty(propertyName)) {
-					propertySchema = formSchemas[propertyName];
+				// for each property, select the appropriate schema entry for the given
+				// action
+				var propertySchema;
+				var propertySchemaForAction;
+				for ( var propertyName in formSchemas) {
+					if (formSchemas.hasOwnProperty(propertyName)) {
+						propertySchema = formSchemas[propertyName];
 
-					// if a schema exists for the property
-					if (propertySchema) {
-						// try obtaining a schema for the specific action
-						var partialSchema = propertySchema[actionName];
-						// support default fallback
-						if (!partialSchema) {
-							partialSchema = propertySchema["default"];
-						}
-						if (partialSchema) {
-							propertySchemaForAction = {};
-							// extend on top of "extend" if avalable
-							if (partialSchema.extend) {
-								var extendArr = partialSchema.extend;
-								if (!$.isArray(extendArr)) {
-									extendArr = [ extendArr ];
-								}
-								for (var i = 0; i < extendArr.length; i++) {
-									var toAdd = extendArr[i];
-									// if ref to another action key, resolve it
-									if (toAdd instanceof String || typeof toAdd === "string") {
-										toAdd = propertySchema[toAdd + ''];
-									}
-									$.extend(true, propertySchemaForAction, toAdd);
-								}
+						// if a schema exists for the property
+						if (propertySchema) {
+							// try obtaining a schema for the specific action
+							var partialSchema = propertySchema[actionName];
+							// support default fallback
+							if (!partialSchema) {
+								partialSchema = propertySchema["default"];
 							}
-							// add explicit schema for action key
-							$.extend(true, propertySchemaForAction, partialSchema);
-						}
-						// add final schema for field
-						if (propertySchemaForAction) {
-							formSchema[propertyName] = this.getFinalSchema(propertyName, propertySchemaForAction, actionName);
+							if (partialSchema) {
+								propertySchemaForAction = {};
+								// extend on top of "extend" if avalable
+								if (partialSchema.extend) {
+									var extendArr = partialSchema.extend;
+									if (!$.isArray(extendArr)) {
+										extendArr = [ extendArr ];
+									}
+									for (var i = 0; i < extendArr.length; i++) {
+										var toAdd = extendArr[i];
+										// if ref to another action key, resolve it
+										if (toAdd instanceof String || typeof toAdd === "string") {
+											toAdd = propertySchema[toAdd + ''];
+										}
+										$.extend(true, propertySchemaForAction, toAdd);
+									}
+								}
+								// add explicit schema for action key
+								$.extend(true, propertySchemaForAction, partialSchema);
+							}
+							// add final schema for field
+							if (propertySchemaForAction) {
+								formSchema[propertyName] = this.getFinalSchema(propertyName, propertySchemaForAction, actionName);
+							}
+						} else {
+							console.log("WARNING GenericModel#getFormSchema, no " + actionName + "schema found for property: " + propertyName);
 						}
 					} else {
-						console.log("WARNING GenericModel#getFormSchema, no " + actionName + "schema found for property: " + propertyName);
+						console.log("WARNING GenericModel#getFormSchema, no schema found for property: " + actionName);
 					}
-				} else {
-					console.log("WARNING GenericModel#getFormSchema, no schema found for property: " + actionName);
+
+					// reset
+					propertySchema = false;
+					propertySchemaForAction = false;
 				}
-
-				// reset
-				propertySchema = false;
-				propertySchemaForAction = false;
 			}
-
 			return formSchema;
 		},
 		initialize : function() {
@@ -515,10 +515,42 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			return this.pathFragment;
 		},
 		/**
+		 * Construct the schema type as an object or, if arrayItemProperty is present, an array
+		 */
+		getSchema : function(schemaType, arrayItemProperty) {
+			var _this = this;
+			console.log(_this.getPathFragment() + ".constructor#getSchema, schemaType: " + schemaType + ", arrayItemProperty: " + arrayItemProperty);
+			var schema;
+			if(this.fields){
+				if(arrayItemProperty){
+					schema = _.map(this.fields, function(field, key){
+						console.log("field["+schemaType+"]:");
+						console.log(field[schemaType]);
+						var fieldSchema = $.extend({}, Calipso.datatypes[field.datatype][schemaType], field[schemaType]);
+						fieldSchema[arrayItemProperty] = key;
+						return fieldSchema;
+					});
+				}
+				else{
+					schema = _.mapObject(this.fields, function(field, key){
+						console.log("field["+schemaType+"]:");
+						console.log(field[schemaType]);
+						var fieldSchema = $.extend({}, Calipso.datatypes[field.datatype][schemaType], field[schemaType]);
+						//fieldSchema[key] =
+						return fieldSchema;
+					});
+				}
+
+			}
+			console.log(_this.getPathFragment() + ".constructor#getSchema(" + schemaType + "), schema: ");
+			console.log(schema);
+			return schema;
+		},
+		/**
 		 * Get the default grid schema fro this type.
 		 */
 		getGridSchema : function(instance) {
-			return this.gridSchema;
+			return this.getSchema("backgrid", "name") || this.gridSchema;
 		},
 		getFormSchemas : function(instance) {
 			return this.formSchemas;
@@ -646,7 +678,7 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 		showInMenu : true,
 		pathFragment : "users",
 		typeName : "Calipso.model.UserModel",
-		getFormSchemas : function(instance) {
+		getFormSchemasOLD : function(instance) {
 			var rolesCollection = new Calipso.collection.AllCollection([], {
 				url : function() {
 					return Calipso.getBaseUrl() + "/api/rest/" + Calipso.model.RoleModel.getPathFragment();
@@ -739,7 +771,42 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 				}
 			};
 		},
-		getGridSchema : function(instance) {
+		fields : {
+			username : {
+				"datatype" : "String",
+				backgrid : {
+					cell : Calipso.components.backgrid.ViewRowCell,
+				}
+			},
+			firstName : {
+				"datatype" : "String",
+			},
+			lastName : {
+				"datatype" : "String",
+			},
+			email : {
+				"datatype" : "Email",
+			},
+			telephone : {
+				"datatype" : "Tel",
+			},
+			cellphone : {
+				"datatype" : "Tel",
+			},
+			active : {
+				"datatype" : "Boolean",
+			},
+			roles : {
+				"datatype" : "List",
+			}
+		},
+		usecases : {
+			"search" : {
+				includes : ["username", "firstName", "lastName", "email" ],
+
+			},
+		},
+		getGridSchemaOLD : function(instance) {
 			return [ {
 				name : "username",
 				label : "Username",
@@ -791,10 +858,6 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 
 
 	Calipso.model.HostModel = Calipso.model.GenericModel.extend({
-		getFormSchema: function(){
-			console.log("HostModel#getFormSchema");
-			return this.constructor.getFormSchema();
-		}
 	},
 	// static members
 	{
@@ -803,23 +866,13 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 		typeName : "Calipso.model.HostModel",
 		fields : {
 			"domain" : {
-				"datatype" : "Text"
+				"datatype" : "String"
 			}
 		},
 		getPathFragment : function(){
 			return  "hosts";
 		},
 
-		getFormSchema : function(){
-			console.log("HostModel.constructor#getFormSchema:");
-			var formSchema = _.map(this.fields, function(field, key){
-				console.log("field: ");
-					console.log(field);
-				return {key : Calipso.datatypes[field.datatype].formSchema };
-			});
-			console.log(formSchema);
-			return formSchema;
-		}
 	});
 	Calipso.model.UserProfileModel = Calipso.model.UserModel.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */

@@ -29,28 +29,11 @@ function(
 	// Global backbone error handling
 	//////////////////////////////////
 	Backbone.ajax = function() {
-      // Invoke $.ajaxSetup in the context of Backbone.$
-      Backbone.$.ajaxSetup.call(Backbone.$, {
-      	// use traditional HTTP params
-      	traditional: true,
-      	// handle status codes 
-         statusCode: {
-              401: function(){
-        			console.log("Backbone.$.ajaxSetup 401");
-                  // Redirect the to the login page.
-                 Backbone.history.navigate(Calipso.getConfigProperty("contextPath") + "client/login", true);
-              },
-              403: function() {
-          			console.log("Backbone.$.ajaxSetup 403");
-                  // 403 -- Access denied
-                 Backbone.history.navigate(Calipso.getConfigProperty("contextPath") + "client/login", true);
-              }
-	      
-        }
-      });
-      return Backbone.$.ajax.apply(Backbone.$, arguments);
+		// Invoke $.ajaxSetup in the context of Backbone.$
+		Backbone.$.ajaxSetup.call(Backbone.$, Calipso.getDefaultFetchOptions());
+		return Backbone.$.ajax.apply(Backbone.$, arguments);
 	};
-	
+
 	// initialize/configure application 
 	Calipso.initializeApp({
 		contextPath: "calipso/",
@@ -67,20 +50,16 @@ function(
 
 		if (href && href.match(/^\/.*/) && !$(this).attr("target")) {
 			Calipso.stopEvent(event);
-			
-			// Close dropdown menus (desktop) or nav collapse (mobile)
-			// get up to 5th level parent
-			var ancestorScope = $a;
-			for(i=0; i < 5 && ancestorScope.parentNode; i++){
-				ancestorScope = ancestorScope.parentNode;
-			}
-			// mobile, collapse hide
-			if ($(window).width() < 768) {
-				$a.parentsUntil(ancestorScope, ".navbar-collapse:first").collapse('hide');
-			}
-			// desktop-ish, close dropdown
-			else{
-				$a.parentsUntil(ancestorScope, ".dropdown:first").removeClass('open');
+
+			if ($a.hasClass("triggerCollapseMenu")) {
+				// mobile, collapse hide
+				if ($(window).width() < 768) {
+					$a.closest(".navbar-collapse").collapse('hide');
+				}
+				// desktop-ish, close dropdown
+				else{
+					$a.closest(".dropdown").removeClass('open');
+				}
 			}
 
 			Backbone.history.navigate(href, true);

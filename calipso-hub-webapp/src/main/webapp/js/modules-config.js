@@ -16,10 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'calipso', 'model/host', 'model/page', 'model/text'],
-function( Calipso, HostModel, PageModel, TextModel) {
-
-	Calipso.customModel[HostModel.prototype.getPathFragment()] = HostModel;
-	//Calipso.customModel[PageModel.prototype.getPathFragment()] = PageModel;
-	Calipso.customModel[TextModel.prototype.getPathFragment()] = TextModel;
+define([ 'calipso'],
+function( Calipso) {
+//	Calipso.customModel[HostModel.prototype.getPathFragment()] = HostModel;`
 });

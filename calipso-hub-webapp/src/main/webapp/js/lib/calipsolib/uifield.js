@@ -17,33 +17,29 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette',
+define([ "lib/calipsolib/form", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette',
 
-'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'intlTelInput' ], function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, intlTelInput) {
+'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'intlTelInput' ],
+function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, intlTelInput) {
 
 	Calipso.uifield = {};
 
 	// Base attribute dataType
-	Calipso.datatypes.Base = Marionette.Object.extend({
-		// grid
-		gridSchema : {
+	Calipso.datatypes.Base = Marionette.Object.extend({}, {
+		"backgrid" : {
 			name : null,
 			label : null,
 			editable : false,
-		   sortable: false,
-		   cell : "string", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
-		   headerCell: Backgrid.HeaderCell, //"select-all"
+			sortable : false,
+			cell : "string", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+			headerCell : Backgrid.HeaderCell, //"select-all"
 		},
-		formSchema : {
+		"form" : {
 			type : "Text",
-			validators : [ /*'required'*/ ],
+			validators : [ /*'required'*/],
 		}
-
-	}, {});
-
-
-
-
+	});
+/*
 	Calipso.datatypes.Base.extend = function(protoProps, staticProps) {
 		// Call default extend method
 		var extended = Backbone.Marionette.extend.call(this, protoProps, staticProps);
@@ -55,74 +51,138 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 		}
 		return extended;
 	};
-
-
-
-	Calipso.datatypes.String = Calipso.datatypes.Base.extend({
+*/
+	Calipso.datatypes.String = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "string",
-	}, {});
-	Calipso.datatypes.Text = Calipso.datatypes.Base.extend({
+	});
+	Calipso.datatypes.Text = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "text",
-	}, {});
-	Calipso.datatypes.Boolean = Calipso.datatypes.Base.extend({
+		"form" : {
+			type : "TextArea",
+			validators : [ /*'required'*/],
+		}
+	});
+	Calipso.datatypes.Boolean = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "boolean",
-	}, {});
-	Calipso.datatypes.Integer = Calipso.datatypes.Base.extend({
+		"form" : {
+			type : "Checkbox",
+			validators : [ /*'required'*/],
+		}
+	});
+	Calipso.datatypes.Integer = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "integer",
-	}, {});
-	Calipso.datatypes.Decimal = Calipso.datatypes.Base.extend({
+		"form" : {
+			type : "Number",
+			validators : [ /*'required'*/],
+		}
+	});
+	Calipso.datatypes.Decimal = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "decimal",
-	}, {});
-	Calipso.datatypes.Money = Calipso.datatypes.Decimal.extend({
+		"form" : {
+			type : "Number",
+			validators : [ /*'required'*/],
+		}
+	});
+	Calipso.datatypes.Money = Calipso.datatypes.Decimal.extend({}, {
 		dataTypeKey : "money",
-	}, {});
-	Calipso.datatypes.Datetime = Calipso.datatypes.Integer.extend({
+		"form" : {
+			type : "Number",
+			validators : [ /*'required'*/],
+		}
+	});
+	Calipso.datatypes.Datetime = Calipso.datatypes.Integer.extend({}, {
 		dataTypeKey : "datetime",
-	}, {});
-	Calipso.datatypes.Date = Calipso.datatypes.Datetime.extend({
+		"form" : {
+			type : Calipso.components.backboneform.Datetimepicker,
+			validators : [ /*'required'*/],
+			config : {
+				locale : Calipso.util.getLocale(),
+				format : 'YYYY-MM-DD HH:mm',
+				viewMode : 'months',
+				widgetPositioning : {
+					//horizontal : "right"
+				}
+			},
+		}
+	});
+	Calipso.datatypes.Date = Calipso.datatypes.Datetime.extend({}, {
 		dataTypeKey : "date",
-	}, {});
-	Calipso.datatypes.Time = Calipso.datatypes.Datetime.extend({
+		"form" : {
+			type : Calipso.components.backboneform.Datetimepicker,
+			validators : [ /*'required'*/],
+			config : {
+				locale : Calipso.util.getLocale(),
+				format : 'YYYY-MM-DD',
+				viewMode : 'months',
+				widgetPositioning : {
+					//horizontal : "right"
+				}
+			},
+		}
+	});
+	Calipso.datatypes.Time = Calipso.datatypes.Datetime.extend({}, {
 		dataTypeKey : "time",
-	}, {});
-	Calipso.datatypes.Lov = Calipso.datatypes.Base.extend({
+		"form" : {
+			type : Calipso.components.backboneform.Datetimepicker,
+			validators : [ /*'required'*/],
+			config : {
+				locale : Calipso.util.getLocale(),
+				format : 'HH:mm',
+				//viewMode : 'months',
+				widgetPositioning : {
+					//horizontal : "right"
+				}
+			}
+		}
+	});
+	Calipso.datatypes.Lov = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "lov",
-	}, {});
-	Calipso.datatypes.List = Calipso.datatypes.Base.extend({
+	});
+	Calipso.datatypes.List = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "list",
-	}, {});
-	Calipso.datatypes.Email = Calipso.datatypes.String.extend({
+	});
+	Calipso.datatypes.Email = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "email",
-	}, {});
-	Calipso.datatypes.Tel = Calipso.datatypes.String.extend({
+		"form" : {
+			type : "Text",
+			validators : [ 'email' ],
+		},
+		"backgrid" : {
+			cell : "email"
+		}
+	});
+	Calipso.datatypes.Tel = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "tel",
-	}, {});
-	Calipso.datatypes.Link = Calipso.datatypes.String.extend({
+		"form" : {
+			type : Calipso.components.backboneform.Tel,
+			validators : [ Calipso.components.backboneform.validators.digitsOnly ]
+		}
+	});
+	Calipso.datatypes.Link = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "link",
-	}, {});
-	Calipso.datatypes.File = Calipso.datatypes.Base.extend({
+	});
+	Calipso.datatypes.File = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "file",
-	}, {});
-	Calipso.datatypes.Image = Calipso.datatypes.File.extend({
+	});
+	Calipso.datatypes.Image = Calipso.datatypes.File.extend({}, {
 		dataTypeKey : "image",
-	}, {});
-	Calipso.datatypes.Color = Calipso.datatypes.String.extend({
+	});
+	Calipso.datatypes.Color = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "color",
-	}, {});
-	Calipso.datatypes.Json = Calipso.datatypes.Text.extend({
+	});
+	Calipso.datatypes.Json = Calipso.datatypes.Text.extend({}, {
 		dataTypeKey : "json",
-	}, {});
-	Calipso.datatypes.Markdown = Calipso.datatypes.Text.extend({
+	});
+	Calipso.datatypes.Markdown = Calipso.datatypes.Text.extend({}, {
 		dataTypeKey : "markdown",
-	}, {});
-	Calipso.datatypes.Html = Calipso.datatypes.Text.extend({
+	});
+	Calipso.datatypes.Html = Calipso.datatypes.Text.extend({}, {
 		dataTypeKey : "html",
-	}, {});
-	Calipso.datatypes.Csv = Calipso.datatypes.Text.extend({
+	});
+	Calipso.datatypes.Csv = Calipso.datatypes.Text.extend({}, {
 		dataTypeKey : "csv",
-	}, {});
+	});
 
-	
 	return Calipso;
 
 });
