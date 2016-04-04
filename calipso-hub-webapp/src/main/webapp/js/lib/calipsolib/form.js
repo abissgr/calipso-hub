@@ -19,11 +19,11 @@
 
 define(
 		[ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone-forms',
-		'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette', 
-		
+		'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette',
+
 		'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'intlTelInput'],
 		function( Calipso, _, Handlebars, moment, Backbone,
-			BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette, 
+			BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette,
 			Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, intlTelInput) {
 
 
@@ -708,44 +708,146 @@ define(
 	});
 
 
-	
-	/*
-	Calipso.datatypes.Base.extend = function (protoProps, staticProps) {
-        // Call default extend method
-        var extended = Backbone.Marionette.extend.call(this, protoProps, staticProps);
-        // Add a usable super method for better inheritance
-        extended.prototype._super = this.prototype;
-        // Apply new or different defaults on top of the original
-        if (protoProps.defaults && this.prototype.defaults) {
-					extended.prototype.defaults = _.deepExtend({}, this.prototype.defaults, extended.prototype.defaults);
-        }
-        return extended;
-    };
-
-	Calipso.datatypes.String = Calipso.datatypes.Base.extend({
-
-		defaults : {
-			"viewTypes" : {
-				// TODO: "view"
-				"default" : Calipso.components.backboneform.Text
+		/**
+		 * Select2
+		 *
+		 * A simple Select2 - jQuery based replacement for the Select editor.
+		 *
+		 * Usage: Works the same as Select editor, with the following extensions for Select2:
+		 * schema.config: configuration object passed to Select2
+		 * schema.multiple: sets 'multiple' property on the HTML <select>
+		 *
+		 * Example:
+		 * schema: {title: {type:'Select2', options:['Mr','Mrs',Ms], config: {}, multiple: false}
+		 */
+		Backbone.Form.editors.SimpleTypeSelect2 = Backbone.Form.editors.Select.extend({
+			config : {width: "100%"},
+			initialize : function(options) {
+				// add model collection options if needed
+				if(options.schema && !options.schema.options && options.schema.listModel){
+					options.schema.options = new Calipso.collection.AllCollection([], {
+						url : function() {
+							return Calipso.getBaseUrl() + "/api/rest/" + options.schema.listModel.getPathFragment();
+						},
+						model : options.schema.listModel,
+					});
+				}
+				console.log("SimpleTypeSelect2#initialize, options: ");
+				console.log(options);
+				Backbone.Form.editors.Select.prototype.initialize.call(this, options);
+				options = options || {};
+				if(options.schema && options.schema.config){
+					if(options.schema.config){
+						this.config = $.extend({}, this.config, options.schema.config);
+					}
+				}
+				if (this.form) {
+					var _this = this;
+					this.listenToOnce(this.form, "attach", function() {
+						_this.onFormAttach();
+					});
+					this.listenToOnce(this.form, "close", function() {
+						_this.onFormClose();
+					});
+				}
 			},
-		},
-	},{
-	});
-	var baseField = new Calipso.datatypes.Base({model:new Calipso.model.GenericModel(), name : "name"});
-	console.log("baseField: ");
-	console.log(baseField.getOption("viewTypes"));
-	console.log(baseField.getOption("validators"));
+			setValue : function(value) {
+	//			console.log("setValue, value: ");
+	//			console.log(value);
 
-	var stringField = new Calipso.datatypes.String({model:new Calipso.model.GenericModel(), name : "name"});
-	console.log("stringField: ");
-	console.log(stringField.getOption("viewTypes"));
-	console.log(stringField.getOption("validators"));
-	var stringFieldR = new Calipso.datatypes.String.Required({model:new Calipso.model.GenericModel(), name : "name"});
-	console.log("stringFieldR: ");
-	console.log(stringFieldR.getOption("viewTypes"));
-	console.log(stringFieldR.getOption("validators"));
-	*/
+				console.log("setValue, value: " + (value?value.id:value));
+				this.$el.find('option[selected]').removeAttr('selected');
+
+				// add new selection
+				var newValue, id;
+				// multiple selection
+				if (this.schema.multiple) {
+					newValue = [];
+					for(var i = 0; i < value.length; i++) {
+						id = value[i] && value[i].id ? value[i].id : value[i];
+						newValue.push(id);
+						this.$el.find('option[value="' + id + '"]').prop('selected', true);
+					}
+				}
+				// single selection
+				else{
+					id = value && value.id ? value.id : value;
+					newValue = id;
+					this.$el.find('option[value="' + id + '"]').prop('selected', true);
+				}
+				this.$el.val(newValue);
+				this.$el.trigger("change");
+			},
+			onFormAttach : function() {
+				Backbone.Form.editors.Select.prototype.render.apply(this, arguments);
+				var _this = this;
+				if (this.schema.multiple) {
+					this.$el.prop('multiple', true);
+				}
+
+				this.$el.select2(this.config).on("change", function() {
+					_this.trigger('change', _this);
+				});
+
+			},
+			onFormClose : function() {
+				this.$el.select2('destroy');
+				if (this.onBeforeClose) {
+					this.onBeforeClose();
+				}
+				this.remove();
+				this.unbind();
+			},
+		});
+
+		/**
+		 * ModelSelect2
+		 *
+		 * A simple Select2 - jQuery based replacement for the Select editor
+		 * that selects a model VS a string value.
+		 *
+		 * Usage: Works the same as Select editor, with the following extensions for Select2:
+		 * schema.config: configuration object passed to Select2
+		 * schema.multiple: sets 'multiple' property on the HTML <select>
+		 *
+		 * Example:
+		 * schema: {title: {type:'Select2', options:myCollection, config: {}, multiple: false}
+		 */
+		Backbone.Form.editors.ModelSelect2 = Backbone.Form.editors.SimpleTypeSelect2.extend({
+			//  select a model VS a string value.
+
+			getValue : function() {
+				var simpleValue = this.$el.val();
+	//			console.log("Backbone.Form.editors.ModelSelect2#getValue, value: ");
+	//			console.log(simpleValue);
+				var value;
+				if(simpleValue){
+
+					if (this.schema.multiple) {
+						value = [];
+						for (var i = 0; i < simpleValue.length; i++) {
+							value.push(this.schema.options.findWhere({
+								id : simpleValue[i]
+							}));
+						}
+					} else {
+						value = this.schema.options.findWhere({
+							id : simpleValue
+						});
+					}
+				}
+	//			console.log("getValue, simpleValue: " + simpleValue + ", model value: ");
+	//			console.log(value);
+				return value;
+			},
+		});
+
+		/*
+		 * Use the Select2 v4 Theme for Bootstrap, see
+		 * https://github.com/fk/select2-bootstrap-theme
+		 */
+		$.fn.select2.defaults.set("theme", "bootstrap");
+
 	return Calipso;
 
 });

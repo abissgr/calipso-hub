@@ -38,17 +38,18 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			'myProfile' : 'myProfile',
 
 			'page/:templateName' : 'templatePage',
-			':mainRoutePart/reports' : 'mainNavigationReportRoute',
+			/*':mainRoutePart/reports' : 'mainNavigationReportRoute',
 			':mainRoutePart/reports/' : 'mainNavigationReportRoute',
 			':mainRoutePart/reports/?*queryString' : 'mainNavigationReportRoute',
 			':mainRoutePartreports?*queryString' : 'mainNavigationReportRoute',
+*/
+			':mainRoutePart' : 'showEntitySearch',
+			':mainRoutePart/' : 'showEntitySearch',
+			':mainRoutePart/?*queryString' : 'showEntitySearch',
+			':mainRoutePart?*queryString' : 'showEntitySearch',
 
-			':mainRoutePart' : 'mainNavigationSearchRoute',
-			':mainRoutePart/' : 'mainNavigationSearchRoute',
-			':mainRoutePart/?*queryString' : 'mainNavigationSearchRoute',
-			':mainRoutePart?*queryString' : 'mainNavigationSearchRoute',
-			
-			':mainRoutePart/:modelId' : 'mainNavigationCrudRoute',
+			':mainRoutePart/:modelId' : 'showEntityView',
+			':mainRoutePart/:modelId/:usecase' : 'showUseCase',
 			
 			'*path':  'notFoundRoute'
 		}

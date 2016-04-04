@@ -377,9 +377,6 @@ define(
 
 			Calipso.modelTypesMap = {};
 			var parseModel = function(ModelType) {
-				console.log("parseModel, ModelType.getTypeName(): " + ModelType.getTypeName());
-				console.log("parseModel, ModelType.viewFragment: " + ModelType.viewFragment);
-				console.log("parseModel, ModelType.getPathFragment(): " + ModelType.getPathFragment());
 				if (ModelType.getTypeName() != "Calipso.model.ReportDataSetModel" && ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" && ModelType.getTypeName() != "Calipso.model.GenericModel") {
 
 					Calipso.modelTypesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
@@ -1145,6 +1142,34 @@ define(
 		return Calipso.session && Calipso.session.isAuthenticated();
 	}
 
+	/**
+	* Get the model type corresponding to the given
+	* business key/URI componenent
+	*/
+	Calipso.util.getModelType = function(modelTypeKey) {
+		console.log("getModelType, modelTypeKey: " + modelTypeKey);
+		// load model Type
+		var ModelType;
+		if (Calipso.modelTypesMap[modelTypeKey]) {
+			ModelType = Calipso.modelTypesMap[modelTypeKey];
+		} else {
+			var modelForRoute;
+			var modelModuleId = "model/" + _.singularize(modelTypeKey);
+			if (!require.defined(modelModuleId)) {
+				require([ modelModuleId ], function(module) {
+					ModelType = module;
+				});
+			} else {
+				ModelType = require(modelModuleId);
+			}
+
+		}
+		if (!ModelType) {
+			throw "No matching model type was found for key: " + modelModuleId;
+		}
+		return ModelType;
+	};
+
 	// //////////////////////////////////////
 	// Search cache
 	// //////////////////////////////////////
@@ -1243,6 +1268,24 @@ define(
 		}
 	};
 
+	Calipso.datatypes.UseCaseContext = Marionette.Object.extend(
+		{
+			key : null,
+			//schemaType : null, specfied by view instead
+			roleIncludes : null,
+			roleExcludes : null,
+			fieldIncludes : null,
+			fieldExcludes : null,
+			fieldMasks : null,
+			view : null,
+			initialize : function(options){
+				console.log("UseCaseContext#initialize, options:")
+		    console.log(options);
+				Marionette.Object.prototype.initialize.apply(this, arguments);
+		  }
+		},
+		{}
+	);
 	// //////////////////////////////////////
 	// Controller
 	// //////////////////////////////////////
@@ -1353,33 +1396,6 @@ define(
 			Calipso.vent.trigger("app:show", view);
 		},
 		/**
-		 * Get the model type corresponding to the given
-		 * business key/URI componenent
-		 */
-		getModelType : function(modelTypeKey) {
-			console.log("getModelType, modelTypeKey: " + modelTypeKey);
-			// load model Type
-			var ModelType;
-			if (Calipso.modelTypesMap[modelTypeKey]) {
-				ModelType = Calipso.modelTypesMap[modelTypeKey];
-			} else {
-				var modelForRoute;
-				var modelModuleId = "model/" + _.singularize(modelTypeKey);
-				if (!require.defined(modelModuleId)) {
-					require([ modelModuleId ], function(module) {
-						ModelType = module;
-					});
-				} else {
-					ModelType = require(modelModuleId);
-				}
-
-			}
-			if (!ModelType) {
-				throw "No matching model type was found for key: " + modelModuleId;
-			}
-			return ModelType;
-		},
-		/**
 		 * Get a model representing the current request.
 		 *
 		 * For an example, consider the URL [api-root]/users/[some-id]. First,
@@ -1456,7 +1472,7 @@ define(
 				var httpParams = Calipso.getHttpUrlParams();
 
 				// get the model the report focuses on
-				var ModelType = this.getModelType(mainRoutePart);
+				var ModelType = Calipso.util.getModelType(mainRoutePart);
 				if (!Calipso.util.isAuthenticated() && !ModelType.isPublic()) {
 					return this._redir("login");
 				}
@@ -1512,16 +1528,22 @@ define(
 		/**
 		 *
 		 */
-		mainNavigationSearchRoute : function(mainRoutePart, queryString) {
-			// console.log("AbstractController#mainNavigationSearchRoute, mainRoutePart: " + mainRoutePart + ", queryString: " + queryString);
-			//			for (var i = 0, j = arguments.length; i < j; i++) {
-			//				console.log("AbstractController#mainNavigationSearchRoute, argument: " + (arguments[i] + ' '));
-			//			}
+		showEntitySearch : function(mainRoutePart, queryString) {
 			var httpParams = Calipso.getHttpUrlParams();
-			this.mainNavigationCrudRoute(mainRoutePart, null, httpParams);
+			console.log("showEntitySearch, mainRoutePart: " + mainRoutePart +
+					", queryString: " + queryString);
+			this.showUseCase(mainRoutePart, null, "search", httpParams);
 
 		},
-		mainNavigationCrudRoute : function(mainRoutePart, modelId, httpParams) {
+		showEntityView : function(mainRoutePart, modelId) {
+			console.log("showEntityView, mainRoutePart: " + mainRoutePart +
+				", modelId: " + modelId);
+			this.showUseCase(mainRoutePart, modelId, "view", null);
+
+		},
+		showUseCase : function(mainRoutePart, modelId, useCaseKey, httpParams) {
+			console.log("showUseCase, mainRoutePart: " + mainRoutePart +
+				", modelId: " + modelId + ", useCaseKey: " + useCaseKey + ", httpParams: " + httpParams);
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if (qIndex > -1) {
@@ -1529,7 +1551,16 @@ define(
 			}
 			// build the model instance representing the current request
 
-			var ModelType = this.getModelType(mainRoutePart);
+			var ModelType = Calipso.util.getModelType(mainRoutePart);
+
+			// TODO: load non-implicit useCaseKey if model does not provide it
+
+			var useCase = new Calipso.datatypes.UseCaseContext(
+				$.extend({}, ModelType.useCases[useCaseKey], {key : useCaseKey})
+			);
+			console.log("USECASE: ");
+			console.log(useCase);
+
 			if (!Calipso.util.isAuthenticated() && !ModelType.isPublic()) {
 				return this._redir("login");
 			}
@@ -1594,86 +1625,6 @@ define(
 
 	});
 
-	// Base attribute dataType
-	Calipso.datatypes.Base = Marionette.Object.extend({
-		defaults : {
-			"viewTypes" : {
-				// TODO: "view"
-				"default" : null
-			},
-		},
-		constructor : function(options) {
-			options = options || {};
-      this.options = _.deepExtend({}, this._getDefaults(), options);
-	    if (!this.getOption("model") || !this.getOption("name")) {
-	      throw "Mandatory option missing, one of model, name";
-	    }
-		},
-		_getDefaults : function(){
-			return _.result(this, "defaults", {});
-		},
-		getFoo : function(useCase, what){
-			var value = undefined;
-			var option = this.options[what];
-			if(option){
-
-				value = option[useCase];
-				while(_.isUndefined(value)){
-					// fallback to more generic use case ? (e.g. from "create-custom" to "create")
-					if(useCase.indexOf("-") > 0){
-						useCase = useCace.substring(0, useCase.indexOf("-"));
-						value = option[useCase];
-					}
-					else if(useCase != "default"){
-						useCase = "default"
-						value = option[useCase];
-					}
-					else{
-						value = null;
-					}
-				}
-			}
-			return value;
-		},
-	},{
-	});
-	/*
-	Calipso.datatypes.Base.extend = function (protoProps, staticProps) {
-        // Call default extend method
-        var extended = Backbone.Marionette.extend.call(this, protoProps, staticProps);
-        // Add a usable super method for better inheritance
-        extended.prototype._super = this.prototype;
-        // Apply new or different defaults on top of the original
-        if (protoProps.defaults && this.prototype.defaults) {
-					extended.prototype.defaults = _.deepExtend({}, this.prototype.defaults, extended.prototype.defaults);
-        }
-        return extended;
-    };
-
-	Calipso.datatypes.String = Calipso.datatypes.Base.extend({
-
-		defaults : {
-			"viewTypes" : {
-				// TODO: "view"
-				"default" : Calipso.components.backboneform.Text
-			},
-		},
-	},{
-	});
-	var baseField = new Calipso.datatypes.Base({model:new Calipso.model.GenericModel(), name : "name"});
-	console.log("baseField: ");
-	console.log(baseField.getOption("viewTypes"));
-	console.log(baseField.getOption("validators"));
-
-	var stringField = new Calipso.datatypes.String({model:new Calipso.model.GenericModel(), name : "name"});
-	console.log("stringField: ");
-	console.log(stringField.getOption("viewTypes"));
-	console.log(stringField.getOption("validators"));
-	var stringFieldR = new Calipso.datatypes.String.Required({model:new Calipso.model.GenericModel(), name : "name"});
-	console.log("stringFieldR: ");
-	console.log(stringFieldR.getOption("viewTypes"));
-	console.log(stringFieldR.getOption("validators"));
-	*/
 	return Calipso;
 
 });

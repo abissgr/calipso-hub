@@ -26,18 +26,6 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 
 	// Base attribute dataType
 	Calipso.datatypes.Base = Marionette.Object.extend({}, {
-		"backgrid" : {
-			name : null,
-			label : null,
-			editable : false,
-			sortable : false,
-			cell : "string", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
-			headerCell : Backgrid.HeaderCell, //"select-all"
-		},
-		"form" : {
-			type : "Text",
-			validators : [ /*'required'*/],
-		}
 	});
 /*
 	Calipso.datatypes.Base.extend = function(protoProps, staticProps) {
@@ -54,8 +42,20 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 */
 	Calipso.datatypes.String = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "string",
+		"backgrid" : {
+			name : null,
+			label : null,
+			editable : false,
+			sortable : false,
+			cell : "string", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+			headerCell : Backgrid.HeaderCell, //"select-all"
+		},
+		"form" : {
+			type : "Text",
+			validators : [ /*'required'*/],
+		}
 	});
-	Calipso.datatypes.Text = Calipso.datatypes.Base.extend({}, {
+	Calipso.datatypes.Text = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "text",
 		"form" : {
 			type : "TextArea",
@@ -140,6 +140,9 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 	});
 	Calipso.datatypes.List = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "list",
+		"form" : {
+			type : Backbone.Form.editors.ModelSelect2,
+		}
 	});
 	Calipso.datatypes.Email = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "email",
@@ -151,6 +154,8 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 			cell : "email"
 		}
 	});
+
+
 	Calipso.datatypes.Tel = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "tel",
 		"form" : {
@@ -183,6 +188,13 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 		dataTypeKey : "csv",
 	});
 
+	Calipso.datatypes.Edit = Calipso.datatypes.Base.extend({}, {
+		dataTypeKey : "edit",
+		"backgrid" : {
+			cell : Calipso.components.backgrid.EditRowInModalCell,
+			headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
+		}
+	});
 	return Calipso;
 
 });

@@ -371,8 +371,12 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 		 * @todo implement optional merging of superclass schemas by using the supermodel.parent property
 		 */
 		getFormSchema : function(actionName) {
-			var formSchema = this.constructor.getSchema("form") || {};
+			// TODO:only experimenting on usecase-drive for UserModel
+			var formSchema = this.getTypeName() == "Calipso.model.UserModel"
+				?  this.constructor.getSchema("form")
+				: null;
 			if(!formSchema){
+				formSchema = {};
 				// decide based on model persistence state if no action was given
 				if (!actionName) {
 					actionName = this.getFormSchemaKey();
@@ -514,34 +518,61 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			//console.log("GenericModel.getPathFragment returns: " + this.pathFragment);
 			return this.pathFragment;
 		},
+		// TODO: refactor view to region names to
+		// allow multiple views config peer layout
+		useCases : {
+			create : {
+				layout : Calipso.view.ModelDrivenBrowseLayout,
+				view : Calipso.view.GenericFormView,
+			},
+			update : {
+				layout : Calipso.view.ModelDrivenBrowseLayout,
+				view : Calipso.view.GenericFormView,
+			},
+			search : {
+				layout : Calipso.view.ModelDrivenSearchLayout,
+				view : Calipso.view.GenericFormView,
+			},
+
+		},
 		/**
 		 * Construct the schema type as an object or, if arrayItemProperty is present, an array
 		 */
 		getSchema : function(schemaType, arrayItemProperty) {
 			var _this = this;
 			console.log(_this.getPathFragment() + ".constructor#getSchema, schemaType: " + schemaType + ", arrayItemProperty: " + arrayItemProperty);
-			var schema;
 			if(this.fields){
-				if(arrayItemProperty){
-					schema = _.map(this.fields, function(field, key){
-						console.log("field["+schemaType+"]:");
-						console.log(field[schemaType]);
-						var fieldSchema = $.extend({}, Calipso.datatypes[field.datatype][schemaType], field[schemaType]);
-						fieldSchema[arrayItemProperty] = key;
-						return fieldSchema;
-					});
-				}
-				else{
-					schema = _.mapObject(this.fields, function(field, key){
-						console.log("field["+schemaType+"]:");
-						console.log(field[schemaType]);
-						var fieldSchema = $.extend({}, Calipso.datatypes[field.datatype][schemaType], field[schemaType]);
-						//fieldSchema[key] =
-						return fieldSchema;
-					});
-				}
+				var schema;
+				var schemaEntry;
+				var baseSchemaEntry;
+				var overrideSchemaEntry;
 
+				schema = arrayItemProperty ? [] : {};
+				_.each(this.fields, function(field, key){
+					console.log("FIELD  "+key);
+					console.log(field[schemaType]);
+					console.log("DATATYPE: ");
+					console.log(Calipso.datatypes[field.datatype][schemaType]);
+					baseSchemaEntry = Calipso.datatypes[field.datatype][schemaType];
+					overrideSchemaEntry = field[schemaType];
+					// if a schema entry exists, add it
+					if(baseSchemaEntry || overrideSchemaEntry){
+						// merge to new object
+						schemaEntry = $.extend({}, baseSchemaEntry, overrideSchemaEntry);
+
+						// if expected schema is of type array, push
+						if(arrayItemProperty){
+							schemaEntry[arrayItemProperty] = key;
+							schema.push(schemaEntry);
+						}// if expected schema is of type objet, add
+						else{
+							schema[key] = schemaEntry;
+						}
+					}
+
+				});
 			}
+
 			console.log(_this.getPathFragment() + ".constructor#getSchema(" + schemaType + "), schema: ");
 			console.log(schema);
 			return schema;
@@ -663,6 +694,62 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			return _this.typeaheadSources[sourceKey];
 		},
 	});
+
+		// Role model
+		// ---------------------------------------
+		Calipso.model.RoleModel = Calipso.model.GenericModel.extend(
+		/** @lends Calipso.model.RoleModel.prototype */
+		{
+			toString : function() {
+				return this.get("name");
+			}
+		//urlRoot : "/api/rest/users"
+		}, {
+			// static members
+			parent : Calipso.model.GenericModel,
+			label : "Role",
+			pathFragment : "roles",
+			typeName : "Calipso.model.RoleModel",
+			formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
+			showInMenu : true,
+			formSchemas : {//
+				name : {
+					"search" : {
+						type : 'Text',
+					},
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+				description : {
+					"search" : {
+						type : 'Text',
+					},
+					"default" : {
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				}
+			},
+			gridSchema : [ {
+				name : "name",
+				label : "Name",
+				cell : Calipso.components.backgrid.ViewRowCell,
+				editable : false
+			}, {
+				name : "description",
+				label : "Description",
+				editable : false,
+				cell : "string"
+			}, {
+				name : "edit",
+				label : "",
+				editable : false,
+				cell : Calipso.components.backgrid.EditRowInModalCell,
+				headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
+			} ],
+		});
 
 	Calipso.model.UserModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.UserModel.prototype */
@@ -798,11 +885,17 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			},
 			roles : {
 				"datatype" : "List",
-			}
+				"form" : {
+					"listModel" : Calipso.model.RoleModel
+				}
+			},
+			edit : {
+				"datatype" : "Edit",
+			},
 		},
-		usecases : {
+		useCases : {
 			"search" : {
-				includes : ["username", "firstName", "lastName", "email" ],
+				fieldIncludes : ["username", "firstName", "lastName", "email" ],
 
 			},
 		},
@@ -892,62 +985,7 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 	// More models
 	//////////////////////////////////////////////////
 
-	// Role model
-	// ---------------------------------------
-	Calipso.model.RoleModel = Calipso.model.GenericModel.extend(
-	/** @lends Calipso.model.RoleModel.prototype */
-	{
-		toString : function() {
-			return this.get("name");
-		}
-	//urlRoot : "/api/rest/users"
-	}, {
-		// static members
-		parent : Calipso.model.GenericModel,
-		label : "Role",
-		pathFragment : "roles",
-		typeName : "Calipso.model.RoleModel",
-		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
-		showInMenu : true,
-		formSchemas : {//
-			name : {
-				"search" : {
-					type : 'Text',
-				},
-				"default" : {
-					type : 'Text',
-					validators : [ 'required' ]
-				}
-			},
-			description : {
-				"search" : {
-					type : 'Text',
-				},
-				"default" : {
-					type : 'Text',
-					validators : [ 'required' ]
-				}
-			}
-		},
-		gridSchema : [ {
-			name : "name",
-			label : "Name",
-			cell : Calipso.components.backgrid.ViewRowCell,
-			editable : false
-		}, {
-			name : "description",
-			label : "Description",
-			editable : false,
-			cell : "string"
-		}, {
-			name : "edit",
-			label : "",
-			editable : false,
-			cell : Calipso.components.backgrid.EditRowInModalCell,
-			headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
-		} ],
-	});
-	// Role model
+	// Country model
 	// ---------------------------------------
 	Calipso.model.CountryModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.RoleModel.prototype */

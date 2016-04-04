@@ -162,7 +162,7 @@ define(
 					return "Calipso.view.ModalLayout";
 				}
 			});
-			
+
 			/*Calipso.view.HeaderNotificationsRegion = Backbone.Marionette.Region.extend({
 				el : "#calipsoHeaderView-notificationsRegion",
 				attachHtml : function(view) {
@@ -1541,7 +1541,7 @@ define(
 									var formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 
 									// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering)
-									if (formSchema && _.size(formSchema) > 0) {
+									if (formSchema) {
 										_self.renderForm(formSchema);
 									} else {
 										var fetchScemaUrl = Calipso.getBaseUrl() + "/" + _self.model.getPathFragment() + '/' + (_self.model.isNew() ? "new" : _self.model.get("id"));
@@ -1562,7 +1562,7 @@ define(
 								renderForm : function(formSchema) {
 									var _self = this;
 
-									if (formSchema) {
+									if (!formSchema) {
 										formSchema = _self.model.getFormSchema(_self.formSchemaKey);
 									}
 									var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
