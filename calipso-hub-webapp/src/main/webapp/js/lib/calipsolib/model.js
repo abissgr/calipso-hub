@@ -529,11 +529,20 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 				layout : Calipso.view.ModelDrivenBrowseLayout,
 				view : Calipso.view.GenericFormView,
 			},
-			search : {
-				layout : Calipso.view.ModelDrivenSearchLayout,
-				view : Calipso.view.GenericFormView,
+			"search" : {
+				view : Calipso.view.SearchLayout,
 			},
 
+		},
+		fieldNames : [],
+		getFieldNames : function(){
+			var _this = this;
+			if(!this.fieldNames){
+				_.each(this.fields, function(field, key){
+					_this.fieldNames.push(key);
+				});
+			}
+			return this.fieldNames;
 		},
 		/**
 		 * Construct the schema type as an object or, if arrayItemProperty is present, an array
@@ -694,6 +703,27 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			return _this.typeaheadSources[sourceKey];
 		},
 	});
+
+	/**
+	 * Encance the extend function to properly merge the
+	 * static "fields" and "useCases" hashes
+	 */
+
+Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
+	var _this = this;
+	_.each(["fields", "useCases"], function(mergableStaticProp){
+
+		staticProps[mergableStaticProp] || (staticProps[mergableStaticProp] = {});
+		_.each(_.keys(_this[mergableStaticProp]), function(key){
+				staticProps[mergableStaticProp][key] || (staticProps[mergableStaticProp][key] = {});
+			_.defaults(staticProps[mergableStaticProp][key], _this[mergableStaticProp][key]);
+		});
+	});
+	var ModelType = Backbone.Model.extend.apply(this, arguments);
+	console.log("MERGED USECASES " + ModelType.getTypeName());
+	console.log(ModelType.useCases);
+	return ModelType;
+};
 
 		// Role model
 		// ---------------------------------------

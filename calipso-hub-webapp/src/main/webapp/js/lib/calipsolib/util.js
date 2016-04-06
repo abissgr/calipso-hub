@@ -1278,11 +1278,33 @@ define(
 			fieldExcludes : null,
 			fieldMasks : null,
 			view : null,
+			mergableOptions: ['key', 'roleIncludes', 'roleExcludes',
+				'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'view', 'model'],
 			initialize : function(options){
 				console.log("UseCaseContext#initialize, options:")
 		    console.log(options);
 				Marionette.Object.prototype.initialize.apply(this, arguments);
-		  }
+				this.mergeOptions(options, this.mergableOptions);
+		  },
+			getViewOptions(regionName, viewName){
+				var _this = this, options = _.extend({}, this.options);
+				_.each(["regions", "views"], function(mergableProp){
+					if(options[mergableProp]){
+						_.extend(options, options[mergableProp]);
+						delete options[mergableProp];
+					}
+				});
+				// add fields
+				options.fields = {};
+				_.each(this.model.constructor.fields, function(value, key, list){
+					if((!_this.fieldIncludes || $.inArray(key, _this.fieldIncludes))
+						&& (!_this.fieldExcludes || !$.inArray(key, _this.fieldExcludes))){
+						options.fields[key] = value;
+					}
+				})
+				return options;
+			}
+
 		},
 		{}
 	);
@@ -1379,20 +1401,21 @@ define(
 
 		},
 		/**
+		 * Instantiate and show a layout for the given use case
+		 */
+		showUseCaseView : function(useCaseContext) {
+			var view = new useCaseContext.view({model: useCaseContext.model, useCaseContext: useCaseContext});
+			Calipso.vent.trigger("app:show", view);
+		},
+		/**
 		 * Instantiate and show a layout for the given model
 		 * @param  {Calipso.model.GenericModel} givenModel the model for which the layout will be shown
 		 * @param  {Calipso.view.MainLayout]} the layout type to use. If absent the method will
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
-		showLayoutForModel : function(givenModel, LayoutType, layoutOptions) {
-			layoutOptions = $.extend(true, {}, givenModel.getLayoutOptions(), layoutOptions);
-			layoutOptions.model = givenModel;
-			// make sure to choose a layout type
-			if (!LayoutType) {
-				LayoutType = givenModel.getLayoutViewType();
-			}
+		showLayoutForModel : function(givenModel, useCaseContext, layoutOptions) {
 			// instantiate and show the layout
-			var view = new LayoutType(layoutOptions);
+			var view = new useCaseContext.view({model: givenModel, useCaseContext: useCaseContext});
 			Calipso.vent.trigger("app:show", view);
 		},
 		/**
@@ -1460,6 +1483,7 @@ define(
 			}
 			return modelForRoute;
 		},
+		// TODO: remove
 		mainNavigationReportRoute : function(mainRoutePart, queryString) {
 
 			// TODO: temp fix
@@ -1500,29 +1524,9 @@ define(
 			}
 
 		},
-		renderFetchable : function(model, ViewType, viewOptions) {
+		renderFetchable : function(model, useCaseContext) {
 			var _self = this;
-			var fetchable = model.wrappedCollection ? model.wrappedCollection : model;
-			var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
-			// promise to fetch then render
-			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
-			var renderFetchable = function() {
 
-				// show the layout type corresponding to the requested model
-				_self.showLayoutForModel(model, ViewType, viewOptions);
-
-				// update page header tabs etc.
-				_self.syncMainNavigationState(model);
-			};
-			if (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0)) {
-				//console.log("renderFetchable: fetch");
-				fetchable.fetch({
-					data : fetchable.data
-				}).then(renderFetchable);
-			} else {
-				//console.log("renderFetchable: dont fetch");
-				renderFetchable();
-			}
 		},
 
 		/**
@@ -1553,19 +1557,45 @@ define(
 
 			var ModelType = Calipso.util.getModelType(mainRoutePart);
 
-			// TODO: load non-implicit useCaseKey if model does not provide it
-
-			var useCase = new Calipso.datatypes.UseCaseContext(
-				$.extend({}, ModelType.useCases[useCaseKey], {key : useCaseKey})
-			);
-			console.log("USECASE: ");
-			console.log(useCase);
-
 			if (!Calipso.util.isAuthenticated() && !ModelType.isPublic()) {
 				return this._redir("login");
 			}
-			var modelForRoute = this.getModelForRoute(ModelType, modelId, httpParams);
-			this.renderFetchable(modelForRoute);
+			var model = this.getModelForRoute(ModelType, modelId, httpParams);
+
+			// TODO: support loading of usecase modules?
+			var useCaseContext = new Calipso.datatypes.UseCaseContext(
+				$.extend({}, ModelType.useCases[useCaseKey], {key : useCaseKey}, {model : model})
+			);
+
+			// fetch model(s) and show view
+			var fetchable = model.wrappedCollection ? model.wrappedCollection : model;
+
+			// TODO: move to usecases
+			// oif true, occupy the main region with the search form instead of
+			// showing the form and grid side-by-side
+			var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
+			// promise to fetch then render
+			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
+			var renderFetchable = function() {
+
+				// show the layout type corresponding to the requested model
+				_self.showUseCaseView(useCaseContext);
+
+				// TODO: remove/move to header view events;
+				// update page header tabs etc.
+				// this has been left over from when the associated markup was
+				// not part of some view
+				_self.syncMainNavigationState(model);
+			};
+			if (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0)) {
+				//console.log("renderFetchable: fetch");
+				fetchable.fetch({
+					data : fetchable.data
+				}).then(renderFetchable);
+			} else {
+				//console.log("renderFetchable: dont fetch");
+				renderFetchable();
+			}
 		},
 		notFoundRoute : function() {
 			// build the model instancde representing the current request
