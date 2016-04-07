@@ -96,6 +96,13 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 	Calipso.model.GenericModel = Backbone.Model.extend(
 	/** @lends Calipso.model.GenericModel.prototype */
 	{
+		getUseCase : function(key) {
+				return this.constructor.getUseCase(key);
+		},
+
+		getFields : function() {
+				return this.constructor.getFields();
+		},
 		getFormSubmitButton : function() {
 			return null;
 		},
@@ -139,9 +146,6 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 		},
 		getBaseFragment : function() {
 			return this.constructor.getBaseFragment(this);
-		},
-		getGridSchema : function() {
-			return this.constructor.getGridSchema(this);
 		},
 		/*
 		 * Will return <code>search</code> if the model is a search model,
@@ -191,75 +195,6 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			return this.constructor.isCollectionCacheable && this.constructor.isCollectionCacheable();
 		},
 		/**
-		 * Get the layout view for this model. To specify a layout for your model under a static
-		 * or instance context, override {@link Calipso.model.GenericModel.getLayoutViewType}
-		 * or {@link getLayoutViewType} respectively in your subclass.
-		 *
-		 * Layout views defined this way are picked up by controllers.
-		 *
-		 * @see {@link Calipso.model.GenericModel.getLayoutViewType}
-		 */
-		getLayoutViewType : function() {
-			return this.constructor.getLayoutViewType(this);
-		},
-		getLayoutOptions : function() {
-			return this.constructor.getLayoutOptions(this);
-		},
-		/**
-		 * Get the collection view type for collections of this model. To specify a collection
-		 * view for your model under a static or instance context, override
-		 * {@link Calipso.model.GenericModel.getCollectionViewType} or
-		 * {@link getCollectionViewType} respectively in your subclass.
-		 *
-		 * Collection views defined this way are picked up by layout views..
-		 *
-		 * @see {@link Calipso.model.GenericModel.getCollectionViewType}
-		 */
-		getCollectionViewType : function() {
-			return this.constructor.getCollectionViewType(this);
-		},
-		/**
-		 * Get the collection view type for collections of this model. To specify a collection
-		 * view for your model under a static or instance context, override
-		 * {@link Calipso.model.GenericModel.getCollectionViewType} or
-		 * {@link getCollectionViewType} respectively in your subclass.
-		 *
-		 * Collection views defined this way are picked up by layout views..
-		 *
-		 * @see {@link Calipso.model.GenericModel.getCollectionViewType}
-		 */
-		getReportCollectionViewType : function() {
-			return this.constructor.getReportCollectionViewType(this);
-		},
-		/**
-		 * Get the item view type for this model. To specify an item view for your model under a static
-		 * or instance context, override {@link Calipso.model.GenericModel.getItemViewType}
-		 * or {@link getItemViewType} respectively in your subclass.
-		 *
-		 * Layout views defined this way are picked up by controllers.
-		 *
-		 * @see {@link Calipso.model.GenericModel.getItemViewType}
-		 */
-		getItemViewType : function() {
-			// console.log("GenericModel.getItemViewType() called, will return GenericFormView");
-			return this.constructor.getItemViewType(this);
-		},
-		/**
-		 * Get the item view template for this model. the template is picked up and
-		 * used by item views like GenericView.  To specify an item view template for
-		 * your model under a static or instance context,
-		 * override {@link Calipso.model.GenericModel.getItemViewTemplate}
-		 * or {@link getItemViewTemplate} respectively in your subclass.
-		 *
-		 * Layout views defined this way are picked up by controllers.
-		 *
-		 * @see {@link Calipso.model.GenericModel.getItemViewType}
-		 */
-		getItemViewTemplate : function() {
-			// console.log("GenericModel.getItemViewTemplate() called");
-			return this.constructor.getItemViewTemplate(this);
-		},
-		/**
 		 * Get the complete set of form schemas. You can also obtain the form schema for
 		 * a specific action like "create", "update" or "search" using
 		 * {@linkcode getFormSchema} instead.
@@ -290,7 +225,7 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			}
 			return required;
 		},
-		getFinalSchema : function(fieldName, fieldSchema, actionName, dontHintRequired) {
+		getFinalSchemaOLD : function(fieldName, fieldSchema, actionName, dontHintRequired) {
 			// get i18n labels configuration as defaults,
 			// then overwrite those using local settings
 
@@ -357,89 +292,6 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			schema.actionName = actionName;
 			return schema;
 		},
-		/**
-		 * Get the form schema for a specific action like "create", "update", "search" or "report".
-		 *
-		 * To define form schemas for your subclass under a static or instance context, override
-		 * {@link Calipso.model.GenericModel.getFormSchemas} or {@link getFormSchemas} respectively.
-		 *
-		 * Form schemas are used by form views like {@linkcode GenericFormView} or layout views
-		 * that use such form views in their regions.
-		 *
-		 * @param {string} actionName for example "create", "update" or "search"
-		 * @see {@link getFormSchemas}
-		 * @todo implement optional merging of superclass schemas by using the supermodel.parent property
-		 */
-		getFormSchema : function(actionName) {
-			// TODO:only experimenting on usecase-drive for UserModel
-			var formSchema = this.getTypeName() == "Calipso.model.UserModel"
-				?  this.constructor.getSchema("form")
-				: null;
-			if(!formSchema){
-				formSchema = {};
-				// decide based on model persistence state if no action was given
-				if (!actionName) {
-					actionName = this.getFormSchemaKey();
-					//console.log("GenericModel#getFormSchema actionName: "+ actionName);
-				}
-				// get the complete schema to filter out from
-				// console.log("GenericModel#getFormSchema calling : this.getFormSchemas()");
-				var formSchemas = this.getFormSchemas();
-
-				// for each property, select the appropriate schema entry for the given
-				// action
-				var propertySchema;
-				var propertySchemaForAction;
-				for ( var propertyName in formSchemas) {
-					if (formSchemas.hasOwnProperty(propertyName)) {
-						propertySchema = formSchemas[propertyName];
-
-						// if a schema exists for the property
-						if (propertySchema) {
-							// try obtaining a schema for the specific action
-							var partialSchema = propertySchema[actionName];
-							// support default fallback
-							if (!partialSchema) {
-								partialSchema = propertySchema["default"];
-							}
-							if (partialSchema) {
-								propertySchemaForAction = {};
-								// extend on top of "extend" if avalable
-								if (partialSchema.extend) {
-									var extendArr = partialSchema.extend;
-									if (!$.isArray(extendArr)) {
-										extendArr = [ extendArr ];
-									}
-									for (var i = 0; i < extendArr.length; i++) {
-										var toAdd = extendArr[i];
-										// if ref to another action key, resolve it
-										if (toAdd instanceof String || typeof toAdd === "string") {
-											toAdd = propertySchema[toAdd + ''];
-										}
-										$.extend(true, propertySchemaForAction, toAdd);
-									}
-								}
-								// add explicit schema for action key
-								$.extend(true, propertySchemaForAction, partialSchema);
-							}
-							// add final schema for field
-							if (propertySchemaForAction) {
-								formSchema[propertyName] = this.getFinalSchema(propertyName, propertySchemaForAction, actionName);
-							}
-						} else {
-							console.log("WARNING GenericModel#getFormSchema, no " + actionName + "schema found for property: " + propertyName);
-						}
-					} else {
-						console.log("WARNING GenericModel#getFormSchema, no schema found for property: " + actionName);
-					}
-
-					// reset
-					propertySchema = false;
-					propertySchemaForAction = false;
-				}
-			}
-			return formSchema;
-		},
 		initialize : function() {
 			Backbone.Model.prototype.initialize.apply(this, arguments);
 			var thisModel = this;
@@ -448,6 +300,7 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 				this.set("calipsoFormSubmitButton", this.getFormSubmitButton());
 			}
 			this.on("change", function(model, options) {
+				console.log("Model on change, saving self");
 				if (options && options.save === false) {
 					return;
 				}
@@ -483,16 +336,8 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 		businessKey : "name",
 		baseFragment : '/api/rest/',
 		typeaheadSources : {},
-		layoutOptions : null,
-		layoutViewType : false,
-		collectionViewType : false,
-		itemViewType : false,
-		reportViewType : false,
 		create : function(attrs, options) {
 			return new this(attrs, options);
-		},
-		getLayoutOptions : function() {
-			return this.layoutOptions;
 		},
 		isPublic : function() {
 			return this.public;
@@ -522,17 +367,39 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 		// allow multiple views config peer layout
 		useCases : {
 			create : {
-				layout : Calipso.view.ModelDrivenBrowseLayout,
-				view : Calipso.view.GenericFormView,
+				view : Calipso.view.BrowseLayout,
+				viewOptions : {
+					childViewOptions : {
+						formOptions : {
+							submitButton : "WOW"
+						}
+					}
+				},
 			},
 			update : {
-				layout : Calipso.view.ModelDrivenBrowseLayout,
-				view : Calipso.view.GenericFormView,
+				view : Calipso.view.BrowseLayout,
+				viewOptions : {
+					childViewOptions : {
+						formOptions : {
+							submitButton : "WOW"
+						}
+					}
+				}
 			},
-			"search" : {
+			search : {
 				view : Calipso.view.SearchLayout,
 			},
 
+		},
+
+		getUseCase : function(key) {
+			return $.extend({}, this.useCases[key]);
+		},
+
+		getFields : function() {
+			//console.log("GenericModel.getPathFragment returns: " + this.pathFragment);
+			var fields = $.extend({}, this.fields);
+			return fields;
 		},
 		fieldNames : [],
 		getFieldNames : function(){
@@ -543,128 +410,6 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 				});
 			}
 			return this.fieldNames;
-		},
-		/**
-		 * Construct the schema type as an object or, if arrayItemProperty is present, an array
-		 */
-		getSchema : function(schemaType, arrayItemProperty) {
-			var _this = this;
-			console.log(_this.getPathFragment() + ".constructor#getSchema, schemaType: " + schemaType + ", arrayItemProperty: " + arrayItemProperty);
-			if(this.fields){
-				var schema;
-				var schemaEntry;
-				var baseSchemaEntry;
-				var overrideSchemaEntry;
-
-				schema = arrayItemProperty ? [] : {};
-				_.each(this.fields, function(field, key){
-					console.log("FIELD  "+key);
-					console.log(field[schemaType]);
-					console.log("DATATYPE: ");
-					console.log(Calipso.datatypes[field.datatype][schemaType]);
-					baseSchemaEntry = Calipso.datatypes[field.datatype][schemaType];
-					overrideSchemaEntry = field[schemaType];
-					// if a schema entry exists, add it
-					if(baseSchemaEntry || overrideSchemaEntry){
-						// merge to new object
-						schemaEntry = $.extend({}, baseSchemaEntry, overrideSchemaEntry);
-
-						// if expected schema is of type array, push
-						if(arrayItemProperty){
-							schemaEntry[arrayItemProperty] = key;
-							schema.push(schemaEntry);
-						}// if expected schema is of type objet, add
-						else{
-							schema[key] = schemaEntry;
-						}
-					}
-
-				});
-			}
-
-			console.log(_this.getPathFragment() + ".constructor#getSchema(" + schemaType + "), schema: ");
-			console.log(schema);
-			return schema;
-		},
-		/**
-		 * Get the default grid schema fro this type.
-		 */
-		getGridSchema : function(instance) {
-			return this.getSchema("backgrid", "name") || this.gridSchema;
-		},
-		getFormSchemas : function(instance) {
-			return this.formSchemas;
-		},
-		/**
-		 * Get the default layout view at a static context for your subclass,
-		 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
-		 */
-		getLayoutViewType : function(instance) {
-			var layoutViewType = this.layoutViewType ? this.layoutViewType : Calipso.view.ModelDrivenSearchLayout;
-			//console.log("GenericModel.getLayoutViewType, layoutViewType: " + layoutViewType.getTypeName());
-			return layoutViewType;
-		},
-		/**
-		 * Get the default collection view like the
-		 * default {@link ModelDrivenCollectionGridView}
-		 * at a static context for your subclass,
-		 *@returns {@link ModelDrivenCollectionGridView}
-		 */
-		getCollectionViewType : function(instance) {
-			return this.collectionViewType ? this.collectionViewType : Calipso.view.ModelDrivenCollectionGridView;
-		},
-		/**
-		 * Override this to define a default report view like the
-		 * default {@link ModelDrivenCollectionGridView}
-		 * at a static context for your subclass,
-		 *@returns {@link Calipso.view.ModelDrivenReportView}
-		 */
-		getReportCollectionViewType : function(instance) {
-			return this.reportViewType ? this.reportViewType : Calipso.view.ModelDrivenReportView;
-		},
-		/**
-		 * Get the default itwem view at a static context for your subclass,
-		 * like {@link ModelDrivenCrudLayout} or {@link ModelDrivenSearchLayout}
-		 */
-		getItemViewType : function(instance) {
-			var itemViewType = this.itemViewType ? this.itemViewType : Calipso.view.GenericFormView;
-			//console.log("GenericModel.getItemViewType, layoutViewType: " + itemViewType.getTypeName());
-			return itemViewType;
-		},
-		getItemViewTemplate : function(instance) {
-			var itemViewTemplate = this.itemViewTemplate ? this.itemViewTemplate : Calipso.getTemplate("itemViewTemplate");
-			//console.log("GenericModel.getItemViewType, layoutViewType: " + itemViewType.getTypeName());
-			return itemViewTemplate;
-		},
-		/**
-		 * Get the name of the model's business key property. The property name is used to
-		 * check whether a model instance has been loaded from the server. The default is "name".
-		 *
-		 * @returns the business key if one is defined by the model class, "name" otherwise
-		 */
-		getBusinessKey : function(instance) {
-			this.businessKey;
-		},
-		formActions : null,
-		getFormActions : function(instance) {
-			if(!this.formActions){
-
-					var formSchemas = instance.getFormSchemas();
-					var actions = {};
-					var actionsArray = [];
-					$.each(formSchemas, function(fieldName, fieldSchema) {
-						$.each(fieldSchema, function(actionName, actionSchema){
-							// add action if missing
-							if(_.isUndefined(actions[actionName])){
-								actions[actionName] = [];
-								actionsArray.push(actions[actionName]);
-							}
-							actions[actionName].push(instance.getFinalSchema(fieldName, actionSchema, actionName));
-						});
-					});
-					this.formActions = actionsArray;
-			}
-			return this.formActions;
 		},
 		getTypeaheadSource : function(options) {
 			var _this = this;
@@ -713,16 +458,16 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 	var _this = this;
 	_.each(["fields", "useCases"], function(mergableStaticProp){
 
-		staticProps[mergableStaticProp] || (staticProps[mergableStaticProp] = {});
-		_.each(_.keys(_this[mergableStaticProp]), function(key){
-				staticProps[mergableStaticProp][key] || (staticProps[mergableStaticProp][key] = {});
-			_.defaults(staticProps[mergableStaticProp][key], _this[mergableStaticProp][key]);
-		});
+		if(!_.isUndefined(staticProps[mergableStaticProp]) && !_.isUndefined(_this[mergableStaticProp])){
+			_.each(_.keys(_this[mergableStaticProp]), function(key){
+				staticProps[mergableStaticProp][key] = $.extend({},
+					(_this[mergableStaticProp][key] || {}),
+					(staticProps[mergableStaticProp][key] || {})
+				);
+			});
+		}
 	});
-	var ModelType = Backbone.Model.extend.apply(this, arguments);
-	console.log("MERGED USECASES " + ModelType.getTypeName());
-	console.log(ModelType.useCases);
-	return ModelType;
+	return Backbone.Model.extend.apply(this, arguments);;
 };
 
 		// Role model
@@ -741,44 +486,22 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 			pathFragment : "roles",
 			typeName : "Calipso.model.RoleModel",
 			formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
-			showInMenu : true,
-			formSchemas : {//
+
+
+			fields : {
 				name : {
-					"search" : {
-						type : 'Text',
-					},
-					"default" : {
-						type : 'Text',
-						validators : [ 'required' ]
+					"datatype" : "String",
+					backgrid : {
+						cell : Calipso.components.backgrid.ViewRowCell,
 					}
 				},
 				description : {
-					"search" : {
-						type : 'Text',
-					},
-					"default" : {
-						type : 'Text',
-						validators : [ 'required' ]
-					}
-				}
+					"datatype" : "String",
+				},
+				//edit : {
+				//	"datatype" : "Edit",
+				//},
 			},
-			gridSchema : [ {
-				name : "name",
-				label : "Name",
-				cell : Calipso.components.backgrid.ViewRowCell,
-				editable : false
-			}, {
-				name : "description",
-				label : "Description",
-				editable : false,
-				cell : "string"
-			}, {
-				name : "edit",
-				label : "",
-				editable : false,
-				cell : Calipso.components.backgrid.EditRowInModalCell,
-				headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
-			} ],
 		});
 
 	Calipso.model.UserModel = Calipso.model.GenericModel.extend(
@@ -795,99 +518,6 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 		showInMenu : true,
 		pathFragment : "users",
 		typeName : "Calipso.model.UserModel",
-		getFormSchemasOLD : function(instance) {
-			var rolesCollection = new Calipso.collection.AllCollection([], {
-				url : function() {
-					return Calipso.getBaseUrl() + "/api/rest/" + Calipso.model.RoleModel.getPathFragment();
-				},
-				model : Calipso.model.RoleModel,
-			});
-			var text = {
-				type : 'Text'
-			};
-			var textRequired = {
-				type : 'Text',
-				validators : [ 'required' ]
-			};
-			return {//
-				firstName : {
-					"search" : text,
-					"default" : textRequired,
-				},
-				lastName : {
-					"search" : text,
-					"default" : textRequired,
-				},
-				username : {
-					"search" : text,
-					"default" : textRequired,
-				},
-				email : {
-					"search" : {
-						type : 'Text',
-					},
-					"default" : {
-						type : 'Text',
-						dataType : "email",
-						validators : [ 'required', 'email', Calipso.components.backboneform.validators.getUserEmailValidator(instance) ]
-					},
-					"search" : {
-						type : 'Text',
-						dataType : "email",
-						validators : ['email' ]
-					}
-				},
-				telephone : {
-					"default" : {
-						type : Calipso.components.backboneform.Tel,
-						dataType : "tel",
-						validators : [ Calipso.components.backboneform.validators.digitsOnly ]
-					}
-				},
-				cellphone : {
-					"default" : {
-						type : Calipso.components.backboneform.Tel,
-						dataType : "tel",
-						validators : [ Calipso.components.backboneform.validators.digitsOnly ]
-					},
-				},
-				active : {
-					"base" : {
-						type : 'Checkbox',
-					},
-					"create" : {
-						extend : "base",
-						help : "Select to skip email confirmation"
-					},
-					"update" : {
-						extend : "base",
-					},
-				},
-				roles : {
-					"base" : {
-						type : Backbone.Form.editors.ModelSelect2,
-						options : rolesCollection,
-						multiple : true,
-					},
-					"search" : {
-						type : Backbone.Form.editors.ModelSelect2,
-						options : rolesCollection,
-						multiple : true,
-					},
-					"create" : {
-						type : Backbone.Form.editors.ModelSelect2,
-						options : rolesCollection,
-						multiple : true,
-						validators : [ 'required' ],
-					},
-					"update" : {
-						type : Backbone.Form.editors.ModelSelect2,
-						options : rolesCollection,
-						multiple : true,
-					},
-				}
-			};
-		},
 		fields : {
 			username : {
 				"datatype" : "String",
@@ -895,6 +525,7 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 					cell : Calipso.components.backgrid.ViewRowCell,
 				}
 			},
+
 			firstName : {
 				"datatype" : "String",
 			},
@@ -913,69 +544,17 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 			active : {
 				"datatype" : "Boolean",
 			},
-			roles : {
+			/*roles : {
 				"datatype" : "List",
 				"form" : {
 					"listModel" : Calipso.model.RoleModel
 				}
-			},
+			},*/
+
 			edit : {
 				"datatype" : "Edit",
 			},
 		},
-		useCases : {
-			"search" : {
-				fieldIncludes : ["username", "firstName", "lastName", "email" ],
-
-			},
-		},
-		getGridSchemaOLD : function(instance) {
-			return [ {
-				name : "username",
-				label : "Username",
-				cell : Calipso.components.backgrid.ViewRowCell,
-				editable : false
-			}, {
-				name : "firstName",
-				label : "First Name",
-				editable : false,
-				cell : "string"
-			}, {
-				name : "lastName",
-				label : "Last Name",
-				editable : false,
-				cell : "string"
-			}, {
-				name : "email",
-				label : "Email",
-				cell : "email",
-				editable : false
-			}, {
-				name : "createdDate",
-				label : "Created",
-				cell : "date",
-				editable : false
-			}, {
-				name : "edit",
-				label : "",
-				editable : false,
-				cell : Calipso.components.backgrid.EditRowInModalCell,
-				headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
-			} ];
-		},
-		getOverviewSchema : function(instance) {
-			return [ {
-				member : "username",
-				label : "username"
-			}, {
-				fetchUrl : "/api/rest/users",
-				// merge in this model if missing:
-				// modelType: Foobar,
-				member : "mergedAttribute",
-				label : "merged attribute",
-				viewType : Calipso.view.CollectionMemberGridView
-			} ];
-		}
 
 	});
 

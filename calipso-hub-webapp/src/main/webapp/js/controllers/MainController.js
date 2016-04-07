@@ -23,20 +23,7 @@ function(Calipso, _, Backbone, Marionette, HomeLayout, howItWorks, AccountApplic
 
 	var MainController = Calipso.controller.AbstractController.extend({
 
-		home : function() {
-			// if anonymous or admin, just show default home
-			if(!Calipso.util.isAuthenticated() || Calipso.isUserInAnyRole("ROLE_ADMIN")){
-				var homeLayout = new HomeLayout({});
-				Calipso.vent.trigger("app:show", homeLayout);
-			}
-			// else if cient, show trading accounts
-			else{
-				Calipso.navigate("myAccounts", {trigger : true});
-			}
-		},
-		
 
 	});
 	return MainController;
 });
-	

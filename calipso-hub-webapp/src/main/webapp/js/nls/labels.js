@@ -29,14 +29,16 @@ define({
 				"formHelpForgotPassword" : "Enter your email bellow to receive a password reset link in your inbox. The link will be valid for 24 hours.",
 				"submitted" : "A verification email has been sent. Please check your inbox and click on the link to complete your registration. The link will be valid for 24 hours."
 			},
-			
+
 		},// tmpl
 		"calipso" : {
 			"words" : {
 				"close" : "Close",
 				"step" : "Step",
 				"yes" : "Yes",
-				"no" : "No"
+				"no" : "No",
+				"create" : "Create",
+				"update" : "Update",
 			},
 			"select2" : {
 				"placeholder": "Type to select",

@@ -49,8 +49,8 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			':mainRoutePart?*queryString' : 'showEntitySearch',
 
 			':mainRoutePart/:modelId' : 'showEntityView',
-			':mainRoutePart/:modelId/:usecase' : 'showUseCase',
-			
+			':mainRoutePart/:modelId/:usecase' : 'showUseCaseView',
+
 			'*path':  'notFoundRoute'
 		}
 

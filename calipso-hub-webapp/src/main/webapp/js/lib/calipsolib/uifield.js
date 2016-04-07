@@ -41,14 +41,11 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 	};
 */
 	Calipso.datatypes.String = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "string",
+		dataTypeKey : "String",
 		"backgrid" : {
-			name : null,
-			label : null,
 			editable : false,
 			sortable : false,
-			cell : "string", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
-			headerCell : Backgrid.HeaderCell, //"select-all"
+			cell : "Text", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
 		},
 		"form" : {
 			type : "Text",
@@ -57,41 +54,71 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 	});
 	Calipso.datatypes.Text = Calipso.datatypes.String.extend({}, {
 		dataTypeKey : "text",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Text", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 		"form" : {
-			type : "TextArea",
+			type : "Text",
 			validators : [ /*'required'*/],
 		}
 	});
 	Calipso.datatypes.Boolean = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "boolean",
+		dataTypeKey : "Boolean",
 		"form" : {
 			type : "Checkbox",
 			validators : [ /*'required'*/],
-		}
+		},
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Boolean", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 	});
 	Calipso.datatypes.Integer = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "integer",
+		dataTypeKey : "Integer",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Integer", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 		"form" : {
-			type : "Number",
+			type : "Integer",
 			validators : [ /*'required'*/],
 		}
 	});
 	Calipso.datatypes.Decimal = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "decimal",
+		dataTypeKey : "Decimal",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Number", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 		"form" : {
 			type : "Number",
 			validators : [ /*'required'*/],
 		}
 	});
 	Calipso.datatypes.Money = Calipso.datatypes.Decimal.extend({}, {
-		dataTypeKey : "money",
+		dataTypeKey : "Money",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Number", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 		"form" : {
 			type : "Number",
 			validators : [ /*'required'*/],
 		}
 	});
 	Calipso.datatypes.Datetime = Calipso.datatypes.Integer.extend({}, {
-		dataTypeKey : "datetime",
+		dataTypeKey : "Datetime",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Datetime", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 		"form" : {
 			type : Calipso.components.backboneform.Datetimepicker,
 			validators : [ /*'required'*/],
@@ -106,7 +133,12 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 		}
 	});
 	Calipso.datatypes.Date = Calipso.datatypes.Datetime.extend({}, {
-		dataTypeKey : "date",
+		dataTypeKey : "Date",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Date", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 		"form" : {
 			type : Calipso.components.backboneform.Datetimepicker,
 			validators : [ /*'required'*/],
@@ -121,7 +153,12 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 		}
 	});
 	Calipso.datatypes.Time = Calipso.datatypes.Datetime.extend({}, {
-		dataTypeKey : "time",
+		dataTypeKey : "Time",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Time", //integer,number, date, uri, select-row, Calipso.components.backgrid.ChildStringAttributeCell
+		},
 		"form" : {
 			type : Calipso.components.backboneform.Datetimepicker,
 			validators : [ /*'required'*/],
@@ -136,60 +173,67 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 		}
 	});
 	Calipso.datatypes.Lov = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "lov",
+		dataTypeKey : "Lov",
 	});
 	Calipso.datatypes.List = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "list",
+		dataTypeKey : "List",
 		"form" : {
 			type : Backbone.Form.editors.ModelSelect2,
 		}
 	});
 	Calipso.datatypes.Email = Calipso.datatypes.String.extend({}, {
-		dataTypeKey : "email",
+		dataTypeKey : "Email",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Email"
+		},
 		"form" : {
 			type : "Text",
 			validators : [ 'email' ],
 		},
-		"backgrid" : {
-			cell : "email"
-		}
 	});
 
 
 	Calipso.datatypes.Tel = Calipso.datatypes.String.extend({}, {
-		dataTypeKey : "tel",
+		dataTypeKey : "Tel",
+		"backgrid" : {
+			editable : false,
+			sortable : false,
+			cell : "Text"
+		},
 		"form" : {
 			type : Calipso.components.backboneform.Tel,
 			validators : [ Calipso.components.backboneform.validators.digitsOnly ]
 		}
 	});
 	Calipso.datatypes.Link = Calipso.datatypes.String.extend({}, {
-		dataTypeKey : "link",
+		dataTypeKey : "Link",
 	});
 	Calipso.datatypes.File = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "file",
 	});
 	Calipso.datatypes.Image = Calipso.datatypes.File.extend({}, {
-		dataTypeKey : "image",
+		dataTypeKey : "Image",
 	});
 	Calipso.datatypes.Color = Calipso.datatypes.String.extend({}, {
-		dataTypeKey : "color",
+		dataTypeKey : "Color",
 	});
 	Calipso.datatypes.Json = Calipso.datatypes.Text.extend({}, {
-		dataTypeKey : "json",
+		dataTypeKey : "Json",
 	});
 	Calipso.datatypes.Markdown = Calipso.datatypes.Text.extend({}, {
-		dataTypeKey : "markdown",
+		dataTypeKey : "Markdown",
 	});
 	Calipso.datatypes.Html = Calipso.datatypes.Text.extend({}, {
-		dataTypeKey : "html",
+		dataTypeKey : "Html",
 	});
 	Calipso.datatypes.Csv = Calipso.datatypes.Text.extend({}, {
-		dataTypeKey : "csv",
+		dataTypeKey : "Csv",
 	});
 
 	Calipso.datatypes.Edit = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "edit",
+		dataTypeKey : "Edit",
 		"backgrid" : {
 			cell : Calipso.components.backgrid.EditRowInModalCell,
 			headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell

@@ -19,11 +19,11 @@
 
 define(
 		[ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone.paginator',
-		 'marionette', 
+		 'marionette',
 		 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
 		 'bootstrap-switch'],
 		function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
-			BackboneMarionette, 
+			BackboneMarionette,
 			Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 			BootstrapSwitch) {
 
@@ -33,7 +33,7 @@ define(
 				BackgridCellInitialize.apply(this, arguments);
 				this.$el.attr("data-title", this.column.get("label"));
 			}
-			
+
 			Calipso.components.backgrid = {};
 			Calipso.components.backgrid.SmartHighlightRow = Backgrid.Row.extend({
 				initialize : function() {
@@ -152,15 +152,9 @@ define(
 			{
 				editEntry : function(e) {
 					Calipso.stopEvent(e);
-					var rowModel = this.model;
-					var ContentViewType = rowModel.getItemViewType();
-					var contentView = new ContentViewType({
-						model : rowModel,
-						modal : true
-					});
-					Calipso.vent.trigger("modal:showInLayout", {
-						view : contentView,
-						model : rowModel,
+					Calipso.vent.trigger("modal:showUseCaseContext", {
+						useCaseKey : "update",
+						model : this.model,
 					});
 				}
 			});
@@ -223,21 +217,19 @@ define(
 			Calipso.components.backgrid.CreateNewInModalHeaderCell = Calipso.components.backgrid.CreateNewHeaderCell.extend({
 
 				createNewForManualEdit : function(e) {
+					//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
 					Calipso.stopEvent(e);
-					var rowModel = this.collection.model.create();
-					var ContentViewType = rowModel.getItemViewType();
-					var contentView = new ContentViewType({
-						model : rowModel,
-						modal : true,
-						addToCollection : this.collection
+
+					Calipso.vent.trigger("modal:showUseCaseContext", {
+						useCaseKey : "create",
+						modelType : this.collection.model,
+						childViewOptions : {
+							addToCollection : this.collection
+						}
 					});
 
-					Calipso.vent.trigger("modal:showInLayout", {
-						view : contentView,
-						model : rowModel,
-					});
 				},
 			});
 
-		
+
 });

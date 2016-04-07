@@ -34,7 +34,9 @@ define({
 			"close" : "Schließen",
 			"step" : "Schritt",
 			"yes" : "Ja",
-			"no" : "Nein"
+			"no" : "Nein",
+			"create" : "Create",
+			"update" : "Update",
 		},
 		"select2" : {
 			"placeholder": "Bitte auswählen",

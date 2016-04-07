@@ -17,14 +17,13 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define([ "lib/calipsolib/util", 
-         'lib/calipsolib/handlebars', 
-         'lib/calipsolib/form', 
-         'lib/calipsolib/backgrid', 
-         'lib/calipsolib/view', 
-         'lib/calipsolib/model', 
+define([ "lib/calipsolib/util",
+         'lib/calipsolib/handlebars',
+         'lib/calipsolib/form',
+         'lib/calipsolib/backgrid',
+         'lib/calipsolib/view',
+         'lib/calipsolib/model',
          'lib/calipsolib/session'],
 function(Calipso) {
-	console.log("calipso-util: "+ Calipso);
 	return Calipso;
 });

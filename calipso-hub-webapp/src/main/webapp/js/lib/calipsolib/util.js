@@ -71,7 +71,7 @@ define(
 		util : {
 			getLocale : function(){
 				var locale = localStorage.getItem('locale');
-				console.log("Calipso.util.getLocale: " + locale);
+			//console.logseCase("Calipso.util.getLocale: " + locale);
 				return locale;
 			},
 		},
@@ -130,12 +130,12 @@ define(
 			// handle status codes
 			statusCode : {
 				401 : function() {
-					console.log("Backbone.$.ajaxSetup 401");
+				//console.logseCase("Backbone.$.ajaxSetup 401");
 					window.alert("Your session has expired");
 					Calipso.navigate("login");
 				},
 				403 : function() {
-					console.log("Backbone.$.ajaxSetup 403");
+				//console.logseCase("Backbone.$.ajaxSetup 403");
 					window.alert("Your session has expired");
 					Calipso.navigate("login");
 				}
@@ -234,10 +234,10 @@ define(
 	 * @param  {[String]} the desired locale
 	 */
 	Calipso.changeLocale = function(newLocale) {
-		console.log("Calipso.changeLocale: " + newLocale);
+	//console.logseCase("Calipso.changeLocale: " + newLocale);
 		if(newLocale){
 			var currentLocale = localStorage.getItem('locale');
-				console.log("Calipso.changeLocale, currentLocale: " + currentLocale);
+			//console.logseCase("Calipso.changeLocale, currentLocale: " + currentLocale);
 			if(!currentLocale || currentLocale != newLocale){
 				var applyLocale = function(){
 					localStorage.setItem('locale', newLocale);
@@ -383,8 +383,8 @@ define(
 
 				}
 			};
-			console.log("Calipso.model:");
-			console.log(Calipso.model);
+		//console.logseCase("Calipso.model:");
+		//console.logseCase(Calipso.model);
 			_(Calipso.model).each(parseModel);
 			_(Calipso.customModel).each(parseModel);
 
@@ -460,10 +460,10 @@ define(
 
 							}
 							else{
-								console.log("No form schemas found for modelKey: " + modelKey);
+							//console.logseCase("No form schemas found for modelKey: " + modelKey);
 							}
 						});
-						console.log("labels JSON:\n"+ modelKeys.toSource());
+					//console.logseCase("labels JSON:\n"+ modelKeys.toSource());
 			*/
 			return modelKeys;
 		};
@@ -574,14 +574,16 @@ define(
 
 		});
 
-		Calipso.vent.on('app:show', function(appView, navigaeToUrl) {
+		Calipso.vent.on('app:show', function(appView, navigateToUrl) {
+		//console.logseCase("Calipso.vent.on 'app:show', view: " + appView.getTypeName() + ", navigateToUrl: " + navigateToUrl);
+
 			var $wrapper = $("#container");
 			if (appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")) {
 				$wrapper.attr("class", appView.containerClass);
 			}
 			Calipso.app.mainContentRegion.show(appView);
-			if (navigaeToUrl) {
-				Calipso.navigate(navigaeToUrl, {
+			if (navigateToUrl) {
+				Calipso.navigate(navigateToUrl, {
 					trigger : false
 				});
 			}
@@ -700,6 +702,35 @@ define(
 			var modalLayoutView = new Calipso.view.ModalLayout(layoutProperties);
 			Calipso.app.modalRegion.show(modalLayoutView);
 		});
+
+		Calipso.vent.on('modal:showUseCaseContext', function(options) {
+			var useCaseContext = options.useCaseContext ||
+				 Calipso.datatypes.UseCaseContext.create({
+					key : options.useCaseKey,
+					model : options.model || options.modelType.create()
+				});
+			if (!useCaseContext) {
+				throw "A 'view' property is required on vent trigger 'modal:showInLayout'.";
+			}
+
+			var layoutProperties = {
+				useCaseContext : useCaseContext,
+				childView : useCaseContext.createView({
+					viewOptions : {
+						childViewOptions : _.extend({modal : true}, options.childViewOptions || {})
+					}
+				}),
+				model : options.model,
+
+			};
+			/*if (!properties.template) {
+				layoutProperties.template = properties.template;
+			}*/
+			// show
+			Calipso.app.modalRegion.show(new Calipso.view.DefaulfModalLayout(layoutProperties));
+		});
+
+
 		Calipso.vent.on('modal:destroy', function() {
 			// console.log("vent event modal:destroy");
 			Calipso.app.modalRegion.closeModal();
@@ -1147,7 +1178,7 @@ define(
 	* business key/URI componenent
 	*/
 	Calipso.util.getModelType = function(modelTypeKey) {
-		console.log("getModelType, modelTypeKey: " + modelTypeKey);
+	//console.logseCase("getModelType, modelTypeKey: " + modelTypeKey);
 		// load model Type
 		var ModelType;
 		if (Calipso.modelTypesMap[modelTypeKey]) {
@@ -1278,35 +1309,82 @@ define(
 			fieldExcludes : null,
 			fieldMasks : null,
 			view : null,
+			viewOptions : {},
 			mergableOptions: ['key', 'roleIncludes', 'roleExcludes',
-				'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'view', 'model'],
+				'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'view', 'views', 'regions', 'viewOptions', 'model'],
 			initialize : function(options){
-				console.log("UseCaseContext#initialize, options:")
+			//console.logseCase("UseCaseContext#initialize, options:")
 		    console.log(options);
 				Marionette.Object.prototype.initialize.apply(this, arguments);
 				this.mergeOptions(options, this.mergableOptions);
+				this.initFields();
 		  },
-			getViewOptions(regionName, viewName){
-				var _this = this, options = _.extend({}, this.options);
-				_.each(["regions", "views"], function(mergableProp){
-					if(options[mergableProp]){
-						_.extend(options, options[mergableProp]);
-						delete options[mergableProp];
-					}
-				});
+			createView : function(options){
+				options || (options = {});
+				var viewOptions = 	_.extend({},
+					this.viewOptions || {}, options.viewOptions || {},
+					{useCaseContext : this, model : this.model});
+				return new this.view(viewOptions);
+
+			},
+			initFields : function(){
+				var _this = this;
 				// add fields
-				options.fields = {};
-				_.each(this.model.constructor.fields, function(value, key, list){
-					if((!_this.fieldIncludes || $.inArray(key, _this.fieldIncludes))
-						&& (!_this.fieldExcludes || !$.inArray(key, _this.fieldExcludes))){
-						options.fields[key] = value;
+			//console.logseCase("UseCaseContext.initFields, fieldIncludes: ");
+			//console.logseCase(_this.fieldIncludes);
+			//console.logseCase("UseCaseContext.initFields, fieldExcludes: ");
+			//console.logseCase(_this.fieldExcludes);
+				this.fields = {};
+				_.each(_this.model.constructor.getFields(), function(value, key, list){
+					var included = !_this.fieldIncludes || $.inArray(key, _this.fieldIncludes) > -1;
+					var excluded = _this.fieldExcludes && $.inArray(key, _this.fieldExcludes) > -1;
+					var excludedTypes = _this.fieldTypeExcludes && $.inArray(key, _this.fieldTypeExcludes) > -1;
+				//console.logseCase("UseCaseContext.initFields, included: " + included + ", excluded: " + excluded);
+					if(included	&& !excluded	&& !excludedTypes){
+						_this.fields[key] = value;
+					//console.logseCase("getUseCase included field: " + key);
+					}
+					else{
+				//console.logseCase("getUseCase excluded field: " + key);
 					}
 				})
-				return options;
+
+			},
+			getUseCase(regionName, viewName){
+				var _this = this;
+				var useCaseOptions = {};
+				_.each(this.mergableOptions, function(mergableProp){
+					useCaseOptions[mergableProp] = _this[mergableProp];
+				});
+				_.each(useCaseOptions.regions, function(value, key, list){
+					if(key == regionName){
+						_.extend(useCaseOptions, value);
+					}
+				});
+				_.each(useCaseOptions.views, function(value, key, list){
+					if(key == viewName){
+						_.extend(useCaseOptions, value);
+					}
+				});
+
+				return new Calipso.datatypes.UseCaseContext(useCaseOptions);
 			}
 
 		},
-		{}
+		{
+			create : function(options){
+		//console.logseCase("UseCaseContext#create options: ");
+		//console.logseCase(options);
+				var modelUseCase = options.model.getUseCase(options.key);
+			//console.logseCase("UseCaseContext#create modelUseCase: ");
+			//console.logseCase(modelUseCase);
+
+				var foptions = _.extend(modelUseCase, options);
+			//console.logseCase("UseCaseContext#create final options: ");
+			//console.logseCase(foptions);
+				return new Calipso.datatypes.UseCaseContext(foptions);
+			}
+		}
 	);
 	// //////////////////////////////////////
 	// Controller
@@ -1399,13 +1477,6 @@ define(
 		register : function() {
 			this.showLayoutForModel(new Calipso.model.UserRegistrationModel());
 
-		},
-		/**
-		 * Instantiate and show a layout for the given use case
-		 */
-		showUseCaseView : function(useCaseContext) {
-			var view = new useCaseContext.view({model: useCaseContext.model, useCaseContext: useCaseContext});
-			Calipso.vent.trigger("app:show", view);
 		},
 		/**
 		 * Instantiate and show a layout for the given model
@@ -1524,30 +1595,19 @@ define(
 			}
 
 		},
-		renderFetchable : function(model, useCaseContext) {
-			var _self = this;
-
-		},
-
 		/**
 		 *
 		 */
 		showEntitySearch : function(mainRoutePart, queryString) {
 			var httpParams = Calipso.getHttpUrlParams();
-			console.log("showEntitySearch, mainRoutePart: " + mainRoutePart +
-					", queryString: " + queryString);
-			this.showUseCase(mainRoutePart, null, "search", httpParams);
+			this.showUseCaseView(mainRoutePart, null, "search", httpParams);
 
 		},
 		showEntityView : function(mainRoutePart, modelId) {
-			console.log("showEntityView, mainRoutePart: " + mainRoutePart +
-				", modelId: " + modelId);
-			this.showUseCase(mainRoutePart, modelId, "view", null);
+			this.showUseCaseView(mainRoutePart, modelId, "view", null);
 
 		},
-		showUseCase : function(mainRoutePart, modelId, useCaseKey, httpParams) {
-			console.log("showUseCase, mainRoutePart: " + mainRoutePart +
-				", modelId: " + modelId + ", useCaseKey: " + useCaseKey + ", httpParams: " + httpParams);
+		showUseCaseView : function(mainRoutePart, modelId, useCaseKey, httpParams) {
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if (qIndex > -1) {
@@ -1578,8 +1638,7 @@ define(
 			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
 			var renderFetchable = function() {
 
-				// show the layout type corresponding to the requested model
-				_self.showUseCaseView(useCaseContext);
+				Calipso.vent.trigger("app:show", useCaseContext.createView());
 
 				// TODO: remove/move to header view events;
 				// update page header tabs etc.

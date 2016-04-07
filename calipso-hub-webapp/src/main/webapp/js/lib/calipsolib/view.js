@@ -73,13 +73,9 @@ define(
 			    return new RegionManager();
 			  },
 				showChildView : function(regionName, view) {
-					console.log(this.getTypeName()+"#showChildView, regionName: " + regionName);
 					view.useCaseContext || (view.useCaseContext = this.useCaseContext);
 					view.regionName = regionName;
 					view.regionPath = this.regionPath + "." + regionName;
-					console.log("AbstractLayout#showChildView, view useCase: " + view.useCaseContext +
-						", regionName: " + view.regionName + ", regionPath: " + view.regionPath);
-					console.log(view.useCaseContext);
 					// render child view
 					Backbone.Marionette.LayoutView.prototype.showChildView.apply(this, arguments);
 				},
@@ -168,21 +164,20 @@ define(
 					}
 				},
 				initialize : function(options) {
-					console.log(this.getTypeName()+"#initialize");
 					Backbone.Marionette.LayoutView.prototype.initialize.apply(this, arguments);
 					if (!this.skipSrollToTop) {
 						$(window).scrollTop(0);
 					}
 					this.useCaseContext = options.useCaseContext;
+					this.childViewOptions = options.childViewOptions || {};
 				},
 				onShow : function(){
-					console.log(this.getTypeName()+"#onShow");
 					var _this = this;
 					_.each(this.regionViewTypes, function(ViewType, regionName, list){
-						_this.showChildView(regionName, new ViewType({
+						_this.showChildView(regionName, new ViewType(_.extend({
 							model : _this.useCaseContext.model,
 							useCaseContext : _this.useCaseContext
-						}));
+						}, _this.childViewOptions)));
 					});
 				},
 				getTypeName : function() {
@@ -195,15 +190,6 @@ define(
 				}
 			});
 
-			Calipso.view.SearchLayout = Backbone.Marionette.LayoutView.extend({
-				template : Calipso.getTemplate('md-search-layout'),
-				regionViewTypes : {
-					sidebarRegion : Calipso.view.GenericFormView,
-					contentRegion : Calipso.view.ModelDrivenCollectionGridView
-				}
-			}, {
-				typeName : "Calipso.view.SearchLayout"
-			});
 
 			Calipso.view.MainLayout = Calipso.view.AbstractLayout.extend({
 				className : "container configurable-fluid",
@@ -278,8 +264,6 @@ define(
 //					}
 				},
 				changeLocale : function(e) {
-					console.log("changeLocale: ");
-					console.log($(e.currentTarget).data("locale"));
 					Calipso.stopEvent(e);
 					Calipso.changeLocale($(e.currentTarget).data("locale"));
 				},
@@ -1012,24 +996,74 @@ define(
 
 			});
 
-			Calipso.view.ModelDrivenCollectionView = Marionette.ItemView.extend(
-			/**
-			 * @param options object members:
-			 *  - collection/wrappedCollection
-			 *  - callCollectionFetch: whether to fetch the collection from the server
-			 * @lends Calipso.view.ModelDrivenCollectionView.prototype
-			 */
-			{
 
-			},
-			// static members
-			{
-				getTypeName : function() {
-					return "ModelDrivenCollectionView";
-				}
-			});
+						Calipso.view.UseCaseItemView = Marionette.ItemView.extend({
+							schemaType : null,
+							mergableOptions: ['useCaseContext', 'formOptions'],
+							initialize : function(options) {
+								Marionette.ItemView.prototype.initialize.apply(this, arguments);
+			    			this.mergeOptions(options, this.mergableOptions);
+							},
+							onBeforeShow : function(){
+								//TODO: roles, masks, nested usecases
+								this.useCase = this.useCaseContext.getUseCase(this.regionName, this.schemaType);
+								this.schema = this.buildSchema();
+							},
+							buildSchema : function(fields) {
+								var _this = this,
+									schemaType = this.schemaType,
+									isArray = this.schemaType == "backgrid",
+									schema = null;
 
-			Calipso.view.ModelDrivenCollectionGridView = Marionette.ItemView.extend(
+								fields || (fields = this.useCase.fields);
+								if(fields){
+									var schemaEntry;
+									var baseSchemaEntry;
+									var overrideSchemaEntry;
+
+
+									schema = isArray ? [] : {};
+									_.each(fields, function(field, key){
+										baseSchemaEntry = Calipso.datatypes[field.datatype][schemaType];
+										overrideSchemaEntry = field[schemaType];
+										// if a schema entry exists, add it
+										if(baseSchemaEntry || overrideSchemaEntry){
+											// merge to new object
+											schemaEntry = _.extend({}, baseSchemaEntry || {}, overrideSchemaEntry || {});
+
+												//TODO: also labelPropertyCopy
+											if(_this.keyPropertyCopy){
+												schemaEntry[_this.keyPropertyCopy] = key;
+											}
+										if(_this.labelPropertyCopy){
+											schemaEntry[_this.labelPropertyCopy] = key;
+										}
+
+											// if expected schema is of type array, push
+											if(isArray){
+												schema.push(schemaEntry);
+											}// if expected schema is of type objet, add
+											else{
+												schema[key] = schemaEntry;
+											}
+										}
+
+									});
+								}
+
+								console.log("UseCaseItemView#buildSchema schema: ");
+								console.log(schema);
+								return schema;
+							},
+						},
+						{
+
+									typeName : "Calipso.view.UseCaseItemView",
+								getTypeName : function() {
+									return this.typeName;;
+								}
+						});
+			Calipso.view.ModelDrivenCollectionGridView = Calipso.view.UseCaseItemView.extend(
 			/**
 			 * @param options object members:
 			 *  - collection/wrappedCollection
@@ -1038,6 +1072,9 @@ define(
 			 * */
 			{
 				schemaType : "backgrid",
+				keyPropertyCopy : "name",
+				labelPropertyCopy : "label",
+
 				// Define view template
 				template : Calipso.getTemplate('md-collection-grid-view'),
 				events : {
@@ -1051,12 +1088,9 @@ define(
 				},
 				initialize : function(options) {
 					//console.log("ModelDrivenCollectionGridView.initialize, options: " + options);
-					Marionette.ItemView.prototype.initialize.apply(this, arguments);
-					if (options.collection) {
-						this.collection = options.collection;
-					} else if (options.model && options.model.wrappedCollection) {
-						this.collection = options.model.wrappedCollection;
-					}
+					Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
+
+					this.collection = options.collection || options.model.wrappedCollection;
 					if (!this.collection) {
 						throw "no collection or collection wrapper model was provided";
 					}
@@ -1076,25 +1110,13 @@ define(
 				onCollectionFetchFailed : function() {
 
 				},
-				getGrid : function(gridOptions) {
-					return new Backgrid.Grid(gridOptions);
-				},
 				onShow : function() {
 					var _self = this;
-					// in case of a report we need a grid schema key
-					//console.log("ModelDrivenCollectionGridView.onShow,  _self.collection.url: " + _self.collection.url);
-					var gridSchema = _self.model.getGridSchema();
-					//console.log("ModelDrivenCollectionGridView.onShow,  _self.model.getGridSchema: ");
-					//console.log(_self.model.getGridSchema());
-
-					//console.log("ModelDrivenCollectionGridView.onShow, collection: " + _self.collection);
-
-					//console.log("ModelDrivenCollectionGridView.onShow, collection.data: " + _self.collection.data);
-					//console.log(_self.collection.data);
-
-					this.backgrid = this.getGrid({
+					console.log("GRID onshow schema: " );;
+					console.log( this.schema );
+					this.backgrid = new Backgrid.Grid({
 						className : "backgrid responsive-table",
-						columns : gridSchema,
+						columns : _self.schema,
 						row : Calipso.components.backgrid.SmartHighlightRow,
 						collection : _self.collection,
 						emptyText : "No records found"
@@ -1158,6 +1180,7 @@ define(
 					// console.log("ModelDrivenCollectionGridView showed");
 
 				},
+				// REMOVE
 				showFixedHeader : function() {
 					var fixedHeaderContainer = this.$el.find(".backgrid-fixed-header");
 					if (fixedHeaderContainer.length > 0) {
@@ -1190,306 +1213,8 @@ define(
 				}
 			});
 
-			Calipso.view.ModelDrivenReportView = Calipso.view.ModelDrivenCollectionGridView.extend({
-				tagName : "div",
-				// Define view template
-				template : Calipso.getTemplate('md-report-view'),
-				chartOptions : {
-					responsive : true,
-					maintainAspectRatio : false,
-					//		    bezierCurveTension : 0.7,
-					//bezierCurve: false
-					///Boolean - Whether grid lines are shown across the chart
-					scaleShowGridLines : true,
 
-					//String - Colour of the grid lines
-					scaleGridLineColor : "rgba(0,0,0,.05)",
 
-					//Number - Width of the grid lines
-					scaleGridLineWidth : 1,
-
-					//Boolean - Whether to show horizontal lines (except X axis)
-					scaleShowHorizontalLines : true,
-
-					//Boolean - Whether to show vertical lines (except Y axis)
-					scaleShowVerticalLines : true,
-
-					// Boolean - Whether to show labels on the scale
-					scaleShowLabels : true,
-
-					pointDotRadius : 3,
-					//Number - Pixel width of point dot stroke
-					pointDotStrokeWidth : 2,
-					datasetStrokeWidth : 2,
-					// Interpolated JS string - can access value
-					scaleLabel : "<%=value%>",
-					multiTooltipTemplate : "<%= datasetLabel %> - <%= value %>",
-					//String - A legend template
-					legendTemplate : "<ul class=\"list-inline\"><% for (var i=0; i<segments.length; i++){%><li class=\"list-group-item\"><span style=\"color:<%=segments[i].fillColor%> \"><i class=\"fa fa-bookmark\"></i>&nbsp;</span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
-
-				},
-				colors : [ "91, 144, 191", "163, 190, 140", "171, 121, 103", "208, 135, 112", "180, 142, 173", "235, 203, 139", "39, 165, 218", //"#5DA5DA" , // blue
-				"250, 164, 58", //"#FAA43A" , // orange
-				"96, 189, 104", //"#60BD68" , // green
-				"241, 124, 176", //"#F17CB0" , // pink
-				"178, 145, 47", //"#B2912F" , // brown
-				"178, 118, 178", //"#B276B2" , // purple
-				"222, 207, 63", //"#DECF3F" , // yellow
-				"241, 88, 84", //"#F15854" , // red
-				"77, 77, 77", //"#4D4D4D" , // gray
-				"0, 0, 0", //"#000000" , // black
-				],
-				initialize : function(options) {
-					//console.log("ReportView.initialize, options: " + options);
-					Calipso.view.ModelDrivenCollectionGridView.prototype.initialize.apply(this, arguments);
-					var self = this;
-					if (options && options.chartOptions) {
-						_.extend(this.chartOptions, options.chartOptions);
-					}
-					//this.bindTo(this.model, "change", this.modelChanged);
-				},
-				getGrid : function(gridOptions) {
-					gridOptions.columnsToPin = 1;
-					gridOptions.minScreenSize = 5000;
-					gridOptions.className = "backgrid";
-					//console.log("building responsive grid...");
-					return new Backgrid.Extension.ResponsiveGrid(gridOptions);
-				},
-				onGridRendered : function() {
-					this.backgrid.setSwitchable({});
-				},
-				onShow : function() {
-					Calipso.view.ModelDrivenCollectionGridView.prototype.onShow.apply(this);
-
-					var model = this.model, _this = this;
-					// Get the context of the canvas element we want to select
-					var canvas = this.$(".chart")[0];
-					var $canvas = $(canvas);
-					//			$canvas.attr("width", $canvas.parent().attr("width"));
-					//			$canvas.attr("height", $canvas.parent().attr("height"));
-					var ctx = canvas.getContext("2d");
-					var chartData = this.getDataForAttribute(this.model.get("kpi"));
-					var dataTotals = [];
-					_.each(chartData.datasets, function(dataset, index) {
-
-						//console.log("Calipso.view.ModelDrivenReportView#onShow each:chartData, dataset: ");
-						//console.log(dataset);
-						var color = _this.colors[index];
-						dataset.fillColor = "rgba(" + color + ",0.02)";
-						dataset.strokeColor = "rgba(" + color + ",0.8)";
-						dataset.pointColor = "rgba(" + color + ",0.8)";
-						dataset.pointStrokeColor = "rgba(" + color + ",0)";
-						dataset.pointHighlightFill = "#fff";
-						dataset.pointHighlightStroke = "rgba(" + color + ",04)";
-
-						// add totals dataset
-						var sum = 0;
-						for (var i = 0; i < dataset.data.length; i++) {
-							sum += parseFloat(dataset.data[i]);
-						}
-						dataTotals.push({
-							label : dataset.label,
-							value : sum % 1 === 0 ? sum : parseFloat(sum.toFixed(2)),
-							color : "rgba(" + color + ",0.8)",
-							highlight : "rgba(" + color + ",0.4)",
-						});
-					});
-
-					this.chart = new Chart(ctx).Line(chartData, this.chartOptions);
-
-					var canvasTotals = this.$(".chart-totals")[0];
-					var $canvasTotals = $(canvasTotals);
-					//			$canvasTotals.attr("width", $canvasTotals.parent().attr("width"));
-					//			$canvasTotals.attr("height", $canvasTotals.parent().attr("height"));
-					var ctxTotals = canvasTotals.getContext("2d");
-
-					this.chartTotals = new Chart(ctxTotals).PolarArea(dataTotals, this.chartOptions);
-
-					//then you just need to generate the legend
-					var legend = this.chartTotals.generateLegend();
-					this.$('.chart-legend').append(legend);
-
-					//			this.chart.onclick = function(value, category) {
-					//				self.trigger("click", category);
-					//			};
-				},
-				modelChanged : function() {
-					//			if (this.chart && this.seriesSource()) {
-					//				this.chart.redraw();
-					//			}
-				},
-				getDataForAttribute : function(entryAttribute) {
-					var data = {};
-					var reportDataSets = this.model.wrappedCollection;
-					//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, datasets: ");
-					//console.log(reportDataSets);
-
-					// add dataset labels
-					var labels = [];
-					var entries = reportDataSets.first().get("entries");
-					for (var i = 0; i < entries.length; i++) {
-						labels.push(entries[i].label);
-					}
-					data.labels = labels;
-					//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, data labels: ");
-					//console.log(data.labels);
-
-					// add datasets
-					var datasets = [];
-
-					reportDataSets.each(function(child, index) {
-						// the new dataset...
-						//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, child: ");
-						//console.log(child);
-						var dataset = {};
-
-						// ... it's label...
-						dataset.label = child.get("label");
-
-						// ... and it's data entries
-						var dataSetData = [];
-						for (var i = 0; i < child.get("entries").length; i++) {
-							//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, child.entries: ");
-							dataSetData.push(child.get("entries")[i].entryData[entryAttribute]);
-						}
-						dataset.data = dataSetData;
-						//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, dataset.data: ");
-						//console.log(dataset.data);
-
-						// add the dataset
-						datasets.push(dataset);
-					}, reportDataSets);
-
-					// add the datasets to the returned data
-					data.datasets = datasets;
-
-					// return the data
-					//console.log("Calipso.view.ModelDrivenReportView#getDataForAttribute, returns data: ");
-					//console.log(data);
-					return data;
-
-				},
-
-			});
-
-			Calipso.view.MainContentNavView = Marionette.ItemView.extend({
-
-				// Define view template
-				template : Calipso.getTemplate('MainContentNavView'),
-
-				initialize : function(options) {
-					Marionette.ItemView.prototype.initialize.apply(this, arguments);
-				},
-				onDomRefresh : function() {
-					//console.log("MainContentTabsView onDomRefresh");
-				}
-
-			}, {
-				getTypeName : function() {
-					return "MainContentNavView";
-				}
-			});
-
-			Calipso.view.GenericView = Marionette.ItemView.extend({
-				// Define view template
-				tagName : 'div',
-				className : "calipsoView",
-				events : {
-					"click button.destroy" : "back"
-				},
-
-				back : function(e) {
-					Calipso.stopEvent(e);
-					window.history.back();
-				},
-				// dynamically set the id
-				initialize : function(options) {
-					var _this = this;
-					Marionette.ItemView.prototype.initialize.apply(this, arguments);
-					this.$el.prop("id", "tab-" + this.model.get("id"));
-					var childViewTemplate = this.model.getItemViewTemplate();
-					if (childViewTemplate) {
-						this.tmpl = childViewTemplate;
-					}
-
-					this.formTemplate = this.options.formTemplate ? this.options.formTemplate : Backbone.Form.template;
-					if (!_this.model.isNew() && options.forceFetch) {
-						var modelUrl = Calipso.getBaseUrl() + "/api/rest" + "/" + this.model.getPathFragment() + "/" + this.model.get("id");
-						//console.log("GenericView#initialize, fetching model " + modelUrl);
-						this.model.fetch({
-							async : false,
-							url : modelUrl
-						});
-					}
-				},
-				formSchemaKey : "view",
-			}, {
-				// static members
-				getTypeName : function() {
-					return "GenericView";
-				}
-			});
-			Calipso.view.UseCaseItemView = Marionette.ItemView.extend({
-				schemaType : null,
-				mergableOptions: ['useCaseContext'],
-				initialize : function(options) {
-					Marionette.ItemView.prototype.initialize.apply(this, arguments);	myViewOptions: ['color', 'size', 'country'],
-    			this.mergeOptions(options, this.mergableOptions);
-					_.each(["useCaseContext", "model"], function(optionName){
-						if(!this[optionName]){
-							throw "Option or member override required: " + optionName;
-						}
-					});
-				},
-				onBeforeShow : function(){
-					//TODO: roles, masks, nested usecases
-					this.normalizedUseCase = this.useCaseContext.getViewOptions(this.regionName);
-					this.schema = this.buildSchema();
-					console.log("UseCaseItemView#onBeforeShow normalizedUseCase: ");
-					console.log(this.normalizedUseCase);
-				},
-				buildSchema : function(fields) {
-					var _this = this, schemaType = this.schemaType,
-						arrayItemProperty = this.arrayItemProperty, schema = null;
-
-					fields || (fields = this.normalizedUseCase.fields);
-					console.log("UseCaseItemView#buildSchema fields: ");
-					console.log(fields);
-					if(fields){
-						var schemaEntry;
-						var baseSchemaEntry;
-						var overrideSchemaEntry;
-
-						schema = arrayItemProperty ? [] : {};
-						_.each(fields, function(field, key){
-							baseSchemaEntry = Calipso.datatypes[field.datatype][schemaType];
-							overrideSchemaEntry = field[schemaType];
-							// if a schema entry exists, add it
-							if(baseSchemaEntry || overrideSchemaEntry){
-								// merge to new object
-								schemaEntry = $.extend({}, baseSchemaEntry, overrideSchemaEntry);
-
-								// if expected schema is of type array, push
-								if(arrayItemProperty){
-									schemaEntry[arrayItemProperty] = key;
-									schema.push(schemaEntry);
-								}// if expected schema is of type objet, add
-								else{
-									schema[key] = schemaEntry;
-								}
-							}
-
-						});
-					}
-
-					console.log("UseCaseItemView#buildSchema schema: ");
-					console.log(schema);
-					return schema;
-				},
-			},
-			{
-
-			});
 			// Model Driven Form View
 			Calipso.view.GenericFormView = Calipso.view.UseCaseItemView
 					.extend(
@@ -1522,44 +1247,24 @@ define(
 								},
 
 								initialize : function(options) {
-									Marionette.ItemView.prototype.initialize.apply(this, arguments);
-
-									if (options.modal) {
-										this.modal = options.modal;
-									}
-
-									if (options.addToCollection) {
-										this.addToCollection = options.addToCollection;
-									}
-
-									if (options.model) {
-										this.model = options.model;
-									}
-									if (!this.model) {
-										throw "GenericFormView: a 'model' option is required";
-									}
-									//console.log("GenericFormView#initialize, formSchemaKey: " + this.formSchemaKey);
-									if (options.formTemplateKey) {
-										this.formTemplateKey = options.formTemplateKey;
-									} else if (this.model.getFormTemplateKey()) {
-										this.formTemplateKey = this.model.getFormTemplateKey();
-									}
-									/*// use vertical form for searches
-									else if (this.formSchemaKey.slice(0, 6) == "search") {
-										this.formTemplateKey = "vertical";
-									}*/
-
+									Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
+									console.log("FORM options: ");
+									console.log(options);
+									this.mergeOptions(options, ["modal", "addToCollection", "formTemplateKey", "formTemplate"]);
+									console.log("FORM modal: "+this.modal);
 									// grab a handle for the search results collection if any, from options or model
+									//TODO: remove
 									if (this.options.searchResultsCollection) {
 										this.searchResultsCollection = options.searchResultsCollection;
 									} else if (this.model.wrappedCollection) {
 										this.searchResultsCollection = this.model.wrappedCollection;
 									}
 									//
-									if (options.formTemplate) {
-										this.formTemplate = options.formTemplate;
-									} else {
-										this.formTemplate = this.getFormTemplate(options.formTemplateKey ? options.formTemplateKey : this.formTemplateKey);
+									if (!this.formTemplate) {
+										this.formTemplate = this.getFormTemplate(
+											this.formTemplateKey ?
+											this.formTemplateKey :
+											this.model.getFormTemplateKey());
 									}
 
 								},
@@ -1623,7 +1328,7 @@ define(
 									// if no validation errors
 									else {
 										// Case: create/update
-										if (_this.formSchemaKey.indexOf("create") == 0 || _this.formSchemaKey.indexOf("update") == 0) {
+										if (_this.useCase.key.indexOf("create") == 0 || _this.useCase.key.indexOf("update") == 0) {
 											// persist changes
 
 											_this.model.save(null, {
@@ -1704,9 +1409,9 @@ define(
 									}
 									var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
 									if (!formSubmitButton) {
-										if (_self.useCase.key.indexOf("search") == 0) {
+										if (_self.useCaseContext.key.indexOf("search") == 0) {
 											formSubmitButton = "<i class=\"glyphicon glyphicon-search\"></i>&nbsp;Search";
-										} else if (_self.formSchemaKey.indexOf("create") == 0 || _self.formSchemaKey.indexOf("update") == 0) {
+										} else if (_self.useCaseContext.key.indexOf("create") == 0 || _self.useCaseContext.key.indexOf("update") == 0) {
 											formSubmitButton = "<i class=\"fa fa-floppy-o\"></i>&nbsp;Save";
 										} else {
 											formSubmitButton = "Submit";
@@ -2287,4 +1992,59 @@ define(
 				}
 			});
 
-		});
+
+	Calipso.view.BrowseLayout = Calipso.view.AbstractLayout.extend({
+		template : Calipso.getTemplate('md-browse-layout'),
+		regions : {
+			contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion"
+		},
+		regionViewTypes : {
+			contentRegion : Calipso.view.GenericFormView,
+		},
+	}, {
+		typeName : "Calipso.view.BrowseLayout"
+	});
+	Calipso.view.SearchLayout = Calipso.view.AbstractLayout.extend({
+		template : Calipso.getTemplate('md-search-layout'),
+		regions : {
+			formRegion : "#calipsoModelDrivenSearchLayout-sideBarRegion",
+			resultsRegion : "#calipsoModelDrivenSearchLayout-contentRegion"
+		},
+		regionViewTypes : {
+			formRegion : Calipso.view.GenericFormView,
+			resultsRegion : Calipso.view.ModelDrivenCollectionGridView
+		},
+	}, {
+		typeName : "Calipso.view.SearchLayout"
+	});
+
+
+
+	Calipso.view.DefaulfModalLayout = Calipso.view.AbstractLayout.extend({
+		template : Calipso.getTemplate('modal-layout'),
+		events : {
+			"click a.modal-close" : "closeModal",
+			"click button.modal-close" : "closeModal"
+		},
+		regions : {
+			modalBodyRegion : ".modal-body"
+		},
+		onShow : function() {
+			// render child view
+			this.showChildView("modalBodyRegion", this.options.childView);
+		},
+		closeModal : function(e) {
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("modal:close");
+		}
+	}, {
+		typeName : "Calipso.view.DefaulfModalLayout"
+	});
+
+
+
+
+
+
+
+});
