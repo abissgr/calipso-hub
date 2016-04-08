@@ -28,6 +28,12 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			'_=_' : 'toHome',
 			'#_=_' : 'toHome',
 			'home' : 'home',
+
+			'userDetails/:useCaseKey' : 'showUserDetailsView',
+			'userDetails/:useCaseKey/' : 'showUserDetailsView',
+			'userDetails/:useCaseKey?*queryString' : 'showUserDetailsView',
+			'userDetails/:useCaseKey/?*queryString' : 'showUserDetailsView',
+/*
 			'login' : 'login',
 			//'loginRegistered' : 'loginRegistered',
 			'changePassword' : 'changePassword',
@@ -36,7 +42,7 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			'logout' : 'logout',
 			'register' : 'register',
 			'myProfile' : 'myProfile',
-
+*/
 			'page/:templateName' : 'templatePage',
 			/*':mainRoutePart/reports' : 'mainNavigationReportRoute',
 			':mainRoutePart/reports/' : 'mainNavigationReportRoute',
@@ -49,7 +55,7 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			':mainRoutePart?*queryString' : 'showEntitySearch',
 
 			':mainRoutePart/:modelId' : 'showEntityView',
-			':mainRoutePart/:modelId/:usecase' : 'showUseCaseView',
+			':mainRoutePart/:modelId/:useCaseKey' : 'showUseCaseView',
 
 			'*path':  'notFoundRoute'
 		}

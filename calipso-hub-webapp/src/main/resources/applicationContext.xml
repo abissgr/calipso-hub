@@ -75,8 +75,9 @@
 	    </property>
 	</bean>
 	
+	<bean id="auditorBean" class="gr.abiss.calipso.web.spring.AuditorBean" />
+	<jpa:auditing auditor-aware-ref="auditorBean"/>
 	
-    <jpa:auditing auditor-aware-ref="auditorBean"/>
 	<context:component-scan base-package="
     	gr.abiss.calipso, 
     	org.resthub" />

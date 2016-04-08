@@ -232,6 +232,52 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 		dataTypeKey : "Csv",
 	});
 
+	Calipso.datatypes.Password = Calipso.datatypes.Base.extend({}, {
+		dataTypeKey : "Password",
+		"form" : {
+			type : "Password",
+			validators : [ 'required'],
+		}
+	});
+
+	Calipso.datatypes.ConfirmPassword = Calipso.datatypes.Base.extend({}, {
+		dataTypeKey : "ConfirmPassword",
+		"form" : {
+			type : 'Password',
+			validators : [ 'required', {
+				type : 'match',
+				field : 'password',
+				message : 'Passwords must match!'
+			} ],
+		}
+	});
+
+	Calipso.datatypes.CurrentPassword = Calipso.datatypes.Base.extend({}, {
+		dataTypeKey : "CurrentPassword",
+		"form" : {
+			type : 'Password',
+			validators : [ 'required', function checkPassword(value, formValues) {
+				// verify current password
+				var userDetails = new Calipso.model.UserDetailsModel({
+					email : Calipso.session.userDetails.get("email"),
+					password : value
+				});
+				userDetails.save(null, {
+					async : false,
+					url : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/verifyPassword",
+				});
+				var err = {
+					type : 'password',
+					message : 'Incorrect current password'
+				};
+				//console.log("checkPassword: ");
+				//console.log(userDetails);
+				if (!userDetails.get("id"))
+					return err;
+			} ],//valida
+		}
+	});
+
 	Calipso.datatypes.Edit = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "Edit",
 		"backgrid" : {

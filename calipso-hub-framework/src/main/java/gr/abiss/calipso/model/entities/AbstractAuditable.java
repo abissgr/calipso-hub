@@ -22,6 +22,7 @@ import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
 
 import java.util.Date;
 
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -33,7 +34,12 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.joda.time.DateTime;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Auditable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -42,29 +48,32 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * Abstract base class for all auditable persistent entities
  */
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractAuditable<U extends AbstractSystemUuidPersistable> 
-	extends AbstractSystemUuidPersistable
-	implements Auditable<U, String> {
+	extends AbstractSystemUuidPersistable{
 
 	private static final long serialVersionUID = 8809874829822002089L;
-
+	
+	@CreatedBy
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "created_by", referencedColumnName = "id", nullable = true)
 	private U createdBy;
 
-	@Temporal(TemporalType.TIMESTAMP)
+	@CreatedDate
+//	@Temporal(TemporalType.TIMESTAMP)
 	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
-	private Date createdDate;
+	private DateTime createdDate;
 
-	@JsonIgnore
+	@LastModifiedBy
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "updated_by", referencedColumnName = "id", nullable = true)
 	// TODO: not null
 	private U lastModifiedBy;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
-	private Date lastModifiedDate;
+	@LastModifiedDate
+//	@Temporal(TemporalType.TIMESTAMP)
+//	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
+	private DateTime lastModifiedDate;
 
 	public AbstractAuditable() {
 		super();
@@ -74,85 +83,38 @@ public abstract class AbstractAuditable<U extends AbstractSystemUuidPersistable>
 	public String toString() {
 		return new ToStringBuilder(this).appendSuper(super.toString()).toString();
 	}
-	/**
-	 * Called by Hibernate <code>@PrePersist</code> and <code>@PreUpdate</code>
-	 * to
-	 * keep the email hash of the user up-to date
-	 */
-	@PrePersist
-	@PreUpdate
-	private void updateAuditInfo() {
-		DateTime now = DateTime.now();
-		if (this.getCreatedDate() == null) {
-			this.setCreatedDate(now);
-		}
-		this.setLastModifiedDate(now);
-	}
 
-	/** 
-	 * @see org.springframework.data.domain.Auditable#getCreatedBy()
-	 */
-	@Override
 	public U getCreatedBy() {
 		return createdBy;
 	}
 
-	/**
-	 * @see org.springframework.data.domain.Auditable#setCreatedBy(java.lang.Object)
-	 */
-	@Override
-	public void setCreatedBy(final U createdBy) {
-
+	public void setCreatedBy(U createdBy) {
 		this.createdBy = createdBy;
 	}
 
-	/**
-	 * @see org.springframework.data.domain.Auditable#getCreatedDate()
-	 */
-	@Override
 	public DateTime getCreatedDate() {
-
-		return null == createdDate ? null : new DateTime(createdDate);
+		return createdDate;
 	}
 
-	/**
-	 * @see org.springframework.data.domain.Auditable#setCreatedDate(org.joda.time.DateTime)
-	 */
-	@Override
-	public void setCreatedDate(final DateTime createdDate) {
-
-		this.createdDate = null == createdDate ? null : createdDate.toDate();
+	public void setCreatedDate(DateTime createdDate) {
+		this.createdDate = createdDate;
 	}
 
-	/**
-	 * @see org.springframework.data.domain.Auditable#getLastModifiedBy()
-	 */
-	@Override
 	public U getLastModifiedBy() {
 		return lastModifiedBy;
 	}
 
-	/**
-	 * @see org.springframework.data.domain.Auditable#setLastModifiedBy(java.lang.Object)
-	 */
-	@Override
-	public void setLastModifiedBy(final U lastModifiedBy) {
+	public void setLastModifiedBy(U lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
-	/**
-	 * @see org.springframework.data.domain.Auditable#getLastModifiedDate()
-	 */
-	@Override
 	public DateTime getLastModifiedDate() {
-		return null == lastModifiedDate ? null : new DateTime(lastModifiedDate);
+		return lastModifiedDate;
 	}
 
-	/** 
-	 * @see org.springframework.data.domain.Auditable#setLastModifiedDate(org.joda.time.DateTime)
-	 */
-	@Override
-	public void setLastModifiedDate(final DateTime lastModifiedDate) {
-		this.lastModifiedDate = null == lastModifiedDate ? null : lastModifiedDate.toDate();
+	public void setLastModifiedDate(DateTime lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
 	}
+
+
 }

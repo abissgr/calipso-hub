@@ -17,8 +17,7 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', 'moment'],
-		function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, moment) {
+define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', 'moment' ], function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, moment) {
 
 	//////////////////////////////////////////
 	// Models
@@ -30,64 +29,6 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 	 * of the example for details. Properly extending this class allows
 	 * "model driven" routes, forms, grids and selection of item/collection/layout views.
 	 *
-	 * @example
-	 * // Load module
-	 * require(['models/generic-model'], function(GenericModel) {
-	 * 	// define our person model subclass
-	 * 	var PersonModel = GenericModel.extend({
-	 * 		// add stuff here
-	 * 	},
-	 * 	// static members
-	 * 	{	// OPTIONAL: set the form schema cache behavior
-	 * 		formSchemaCache : this.FORM_SCHEMA_CACHE_CLIENT
-	 * 	});
-	 *
-	 * 	// REQUIRED: our subclass name
-	 * 	PersonModel.getTypeName = function() {
-	 * 		return "PersonModel";
-	 * 	}
-	 * 	// REQUIRED: our subclass URL path fragment,
-	 * 	// e.g. "persons" for PersonModel. Used for dynamic MArionette router routes.
-	 * 	PersonModel.getPathFragment = function() {
-	 * 		return "persons";
-	 * 	}
-	 *
-	 * 	// REQUIRED: our subclass grid schema
-	 * 	PersonModel.getGridSchema = function() {
-	 * 		//...
-	 * 	}
-	 * 	// REQUIRED: our subclass form schema
-	 * 	PersonModel.getFormSchemas = function() {
-	 * 		//...
-	 * 	}
-	 *
-	 * 	// OPTIONAL: our subclass layout view,
-	 * 	// defaults to ModelDrivenBrowseLayout
-	 * 	PersonModel.getLayoutViewType = function() {
-	 * 		//...
-	 * 	}
-	 * 	// OPTIONAL: our subclass collection view,
-	 * 	// defaults to ModelDrivenCollectionGridView
-	 * 	PersonModel.getCollectionViewType = function() {
-	 * 		//...
-	 * 	}
-	 * 	// OPTIONAL: our subclass item view,
-	 * 	// defaults to ModelDrivenFormView
-	 * 	PersonModel.getItemViewType = function() {
-	 * 		//...
-	 * 	}
-	 * 	// OPTIONAL: our subclass item view template,
-	 * 	PersonModel.getItemViewTemplate = function() {
-	 * 		//...
-	 * 	}
-	 * 	// OPTIONAL: our subclass business key,
-	 * 	// used to check if the model has been loaded from the server.
-	 * 	// defaults to "name"
-	 * 	PersonModel.getBusinessKey = function() {
-	 * 		//...
-	 * 	}
-	 *
-	 * });
 	 * @constructor
 	 * @requires Backbone
 	 * @requires Backgrid
@@ -97,11 +38,10 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 	/** @lends Calipso.model.GenericModel.prototype */
 	{
 		getUseCase : function(key) {
-				return this.constructor.getUseCase(key);
+			return this.constructor.getUseCase(key);
 		},
-
 		getFields : function() {
-				return this.constructor.getFields();
+			return this.constructor.getFields();
 		},
 		getFormSubmitButton : function() {
 			return null;
@@ -225,73 +165,6 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			}
 			return required;
 		},
-		getFinalSchemaOLD : function(fieldName, fieldSchema, actionName, dontHintRequired) {
-			// get i18n labels configuration as defaults,
-			// then overwrite those using local settings
-
-			var labelsConfig = Calipso.util.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.' + actionName);
-			var labelsDefaultConfig = Calipso.util.getLabels("models." + this.getPathFragment() + '.' + fieldName + '.default');
-
-			var schema = $.extend({}, labelsConfig, fieldSchema);
-			//
-			// final title
-			//
-			var title = fieldSchema.titleHTML || fieldSchema.title;
-			if (_.isUndefined(title)) {
-				// build title from field name
-				title = labelsConfig.title || labelsDefaultConfig.title || fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) {
-					return str.toUpperCase();
-				});
-			}
-			if (title) {
-				// hint required?
-				var hint = "";
-				if(!dontHintRequired && this.isRequired(fieldSchema)){
-					hint = '<sup class="text-danger"><i class="fa fa-asterisk"></i></sup>';
-					title.trim();
-					if(title.lastIndexOf(":") == title.length - 1){
-						title = title.substring(0, title.length - 1);
-						hint += ":";
-					}
-				}
-				fieldSchema.titleHTML = title + hint;
-				fieldSchema.title = undefined;
-			}
-			//
-			// final options
-			//
-			if (labelsConfig.options) {
-				var optionListLabels = labelsConfig.options;
-				var newOptions = [];
-
-				// listgroup format
-				if (optionListLabels["0"] && (optionListLabels["0"].heading || optionListLabels["0"].text)) {
-					var i = 0;
-					while (optionListLabels[i + ""]) {
-						var optionLabels = optionListLabels[i + ""];
-						newOptions.push({
-							heading : optionLabels.heading,
-							text : optionLabels.text
-						});
-						i++;
-					}
-				}
-				// normal var/label options
-				else {
-					_.each(optionListLabels, function(value, key, obj) {
-						newOptions.push({
-							val : key,
-							label : value
-						});
-					});
-				}
-				fieldSchema.options = newOptions;
-			}
-			var schema = $.extend({}, labelsConfig, fieldSchema);
-			schema.fieldName = fieldName;
-			schema.actionName = actionName;
-			return schema;
-		},
 		initialize : function() {
 			Backbone.Model.prototype.initialize.apply(this, arguments);
 			var thisModel = this;
@@ -402,10 +275,10 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 			return fields;
 		},
 		fieldNames : [],
-		getFieldNames : function(){
+		getFieldNames : function() {
 			var _this = this;
-			if(!this.fieldNames){
-				_.each(this.fields, function(field, key){
+			if (!this.fieldNames) {
+				_.each(this.fields, function(field, key) {
 					_this.fieldNames.push(key);
 				});
 			}
@@ -454,55 +327,52 @@ define(['jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "l
 	 * static "fields" and "useCases" hashes
 	 */
 
-Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
-	var _this = this;
-	_.each(["fields", "useCases"], function(mergableStaticProp){
+	Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
+		var _this = this;
+		_.each([ "fields", "useCases" ], function(mergableStaticProp) {
 
-		if(!_.isUndefined(staticProps[mergableStaticProp]) && !_.isUndefined(_this[mergableStaticProp])){
-			_.each(_.keys(_this[mergableStaticProp]), function(key){
-				staticProps[mergableStaticProp][key] = $.extend({},
-					(_this[mergableStaticProp][key] || {}),
-					(staticProps[mergableStaticProp][key] || {})
-				);
-			});
-		}
-	});
-	return Backbone.Model.extend.apply(this, arguments);;
-};
-
-		// Role model
-		// ---------------------------------------
-		Calipso.model.RoleModel = Calipso.model.GenericModel.extend(
-		/** @lends Calipso.model.RoleModel.prototype */
-		{
-			toString : function() {
-				return this.get("name");
+			if (!_.isUndefined(staticProps[mergableStaticProp]) && !_.isUndefined(_this[mergableStaticProp])) {
+				_.each(_.keys(_this[mergableStaticProp]), function(key) {
+					staticProps[mergableStaticProp][key] = $.extend({}, (_this[mergableStaticProp][key] || {}), (staticProps[mergableStaticProp][key] || {}));
+				});
 			}
-		//urlRoot : "/api/rest/users"
-		}, {
-			// static members
-			parent : Calipso.model.GenericModel,
-			label : "Role",
-			pathFragment : "roles",
-			typeName : "Calipso.model.RoleModel",
-			formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
-
-
-			fields : {
-				name : {
-					"datatype" : "String",
-					backgrid : {
-						cell : Calipso.components.backgrid.ViewRowCell,
-					}
-				},
-				description : {
-					"datatype" : "String",
-				},
-				//edit : {
-				//	"datatype" : "Edit",
-				//},
-			},
 		});
+		return Backbone.Model.extend.apply(this, arguments);
+		;
+	};
+
+	// Role model
+	// ---------------------------------------
+	Calipso.model.RoleModel = Calipso.model.GenericModel.extend(
+	/** @lends Calipso.model.RoleModel.prototype */
+	{
+		toString : function() {
+			return this.get("name");
+		}
+	//urlRoot : "/api/rest/users"
+	}, {
+		// static members
+		parent : Calipso.model.GenericModel,
+		label : "Role",
+		pathFragment : "roles",
+		typeName : "Calipso.model.RoleModel",
+		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
+
+		fields : {
+			name : {
+				"datatype" : "String",
+				backgrid : {
+					cell : Calipso.components.backgrid.ViewRowCell,
+				}
+			},
+			description : {
+				"datatype" : "String",
+			},
+			edit : {
+				"datatype" : "Edit",
+			},
+		},
+	});
 
 	Calipso.model.UserModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.UserModel.prototype */
@@ -544,13 +414,12 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 			active : {
 				"datatype" : "Boolean",
 			},
-			/*roles : {
+			roles : {
 				"datatype" : "List",
 				"form" : {
 					"listModel" : Calipso.model.RoleModel
 				}
-			},*/
-
+			},
 			edit : {
 				"datatype" : "Edit",
 			},
@@ -558,9 +427,7 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 
 	});
 
-
-	Calipso.model.HostModel = Calipso.model.GenericModel.extend({
-	},
+	Calipso.model.HostModel = Calipso.model.GenericModel.extend({},
 	// static members
 	{
 		parent : Calipso.model.GenericModel,
@@ -568,11 +435,17 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 		typeName : "Calipso.model.HostModel",
 		fields : {
 			"domain" : {
-				"datatype" : "String"
-			}
+				"datatype" : "Link",
+				backgrid : {
+					cell : Calipso.components.backgrid.ViewRowCell,
+				}
+			},
+			edit : {
+				"datatype" : "Edit",
+			},
 		},
-		getPathFragment : function(){
-			return  "hosts";
+		getPathFragment : function() {
+			return "hosts";
 		},
 
 	});
@@ -601,7 +474,7 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 	{
 		initialize : function() {
 			Calipso.model.GenericModel.prototype.initialize.apply(this, arguments);
-			this.set("translatedName", Calipso.util.getLabels("countries."+this.get("id")));
+			this.set("translatedName", Calipso.util.getLabels("countries." + this.get("id")));
 		},
 		toString : function() {
 			return this.get("translatedName") || this.get("name");
@@ -709,12 +582,9 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 		typeName : "Calipso.model.BaseNotificationModel",
 	});
 
-	Calipso.model.UserDetailsModel = Calipso.model.UserModel.extend(
+	Calipso.model.UserDetailsModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
-		isSearchModel : function() {
-			return false;
-		},
 		getViewTitle : function() {
 			var schemaKey = this.getFormSchemaKey();
 			var title = "";
@@ -746,14 +616,39 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 		pathFragment : "userDetails",
 		baseFragment : '/apiauth/',
 		typeName : "Calipso.model.UserDetailsModel",
-		/**
-		* Get the default layout view at a static context for your subclass,
-		* like {@link ModelDrivenCrudLayout} or {@link ModelDrivenBrowseLayout}
-		*/
-		getLayoutViewType : function(instance) {
-			//console.log("UserDetailsModel.getLayoutViewType, layoutViewType: " + this.layoutViewType);
-			//console.log("UserDetailsModel.getLayoutViewType, modelType: " + this.getTypeName());
-			return Calipso.view.UserDetailsLayout;
+		useCases : {
+			login : {
+				view : Calipso.view.UserDetailsLayout,
+				fieldIncludes : ["email", "password" ],
+			},
+			resetPassword : {
+				view : Calipso.view.UserDetailsLayout,
+				fieldIncludes : ["id", "password", "passwordConfirmation" ],
+			},
+			forgotPassword : {// enter new password
+				view : Calipso.view.UserDetailsLayout,
+				fieldIncludes : ["id", "password", "passwordConfirmation" ],
+			},
+		},
+		fields : {
+			id : {
+				"datatype" : "Hidden",
+			},
+			email : {
+				"datatype" : "String",
+			},
+			resetPasswordToken : {
+				"datatype" : "String",
+			},
+			currentPassword : {
+				"datatype" : "CurrentPassword",
+			},
+			password : {
+				"datatype" : "Password",
+			},
+			passwordConfirmation : {
+				"datatype" : "ConfirmPassword",
+			}
 		},
 		getFormSchemas : function(instance) {
 			var passwordText = {
@@ -894,7 +789,9 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 			};
 			return {
 				locale : {
-					"default" : {type : 'Hidden'},
+					"default" : {
+						type : 'Hidden'
+					},
 				},
 				firstName : {
 					"create" : requiredText,
@@ -915,7 +812,7 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 					},
 					"default" : {
 						type : 'Text',
-						validators : [ 'required', 'email',  Calipso.components.backboneform.validators.getUserEmailValidator(instance)]
+						validators : [ 'required', 'email', Calipso.components.backboneform.validators.getUserEmailValidator(instance) ]
 					},
 				},
 				password : {
@@ -932,47 +829,47 @@ Calipso.model.GenericModel.extend = function(protoProps, staticProps) {
 
 	});
 
-/*
-	Calipso.model.UserDetailsConfirmationModel = Calipso.model.UserDetailsModel.extend(
-	{
-		getFormSubmitButton : function() {
-			return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Confirm"
-		}
-	}, {
-		label : "Email Confirmation",
+	/*
+		Calipso.model.UserDetailsConfirmationModel = Calipso.model.UserDetailsModel.extend(
+		{
+			getFormSubmitButton : function() {
+				return "<i class=\"fa fa-floppy-o\"></i>&nbsp;Confirm"
+			}
+		}, {
+			label : "Email Confirmation",
 
-		pathFragment : "accountConfirmations",
-		typeName : "Calipso.model.UserRegistrationModel",
-		layoutViewType : Calipso.view.UserRegistrationLayout,
-		getItemViewType : function() {
-			return Calipso.view.GenericFormPanelView.extend({
-				commit : function(e) {
-					Calipso.stopEvent(e);
-					if (!this.isFormValid()) {
-						return false;
+			pathFragment : "accountConfirmations",
+			typeName : "Calipso.model.UserRegistrationModel",
+			layoutViewType : Calipso.view.UserRegistrationLayout,
+			getItemViewType : function() {
+				return Calipso.view.GenericFormPanelView.extend({
+					commit : function(e) {
+						Calipso.stopEvent(e);
+						if (!this.isFormValid()) {
+							return false;
+						}
+						// if no validation errors,
+						// use the email confirmation link route
+						else {
+							Calipso.navigate("accountConfirmations/" + this.model.get("confirmationToken"), {
+								trigger : true
+							});
+						}
 					}
-					// if no validation errors,
-					// use the email confirmation link route
-					else {
-						Calipso.navigate("accountConfirmations/" + this.model.get("confirmationToken"), {
-							trigger : true
-						});
-					}
-				}
-			});
-		},
-		formSchemas : {
-			confirmationToken : {
-				"default" : {
-					title : 'Please check your email for a confirmation key',
-					type : 'Text',
-					validators : [ 'required' ]
-				}
+				});
 			},
-		},
+			formSchemas : {
+				confirmationToken : {
+					"default" : {
+						title : 'Please check your email for a confirmation key',
+						type : 'Text',
+						validators : [ 'required' ]
+					}
+				},
+			},
 
-	});
-*/
+		});
+	*/
 	// Report Dataset Model
 	// This model is used by the router controller when a
 	// subjectModelTypeFragment/reports

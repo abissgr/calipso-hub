@@ -23,7 +23,8 @@ define([ "lib/calipsolib/util",
          'lib/calipsolib/backgrid',
          'lib/calipsolib/view',
          'lib/calipsolib/model',
-         'lib/calipsolib/session'],
+         'lib/calipsolib/session',
+         'lib/calipsolib/controller'],
 function(Calipso) {
 	return Calipso;
 });
