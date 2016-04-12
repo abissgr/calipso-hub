@@ -58,7 +58,7 @@ public class SecurityUtil {
 			UserDetailsConfig userDetailsConfig, UserDetailsService userDetailsService) {
 		if(LOGGER.isDebugEnabled()){
 			if (userDetails != null){
-				LOGGER.debug("login, userDetails un: "+userDetails.getUsername()+", non-blank pw: "+StringUtils.isNotBlank(userDetails.getPassword()));
+				LOGGER.debug(request.getMethod() + " login, userDetails email: "+userDetails.getEmail()+", un: "+userDetails.getUsername()+", non-blank pw: "+StringUtils.isNotBlank(userDetails.getPassword()));
 			}
 		}
 		if (userDetails != null

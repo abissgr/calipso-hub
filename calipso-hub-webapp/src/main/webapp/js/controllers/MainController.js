@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'calipso', 'underscore', 'backbone', 'marionette', 'view/HomeLayout' ],
+define([ 'calipso', 'underscore', 'backbone', 'marionette' ],
 
-function(Calipso, _, Backbone, Marionette, HomeLayout, howItWorks, AccountApplicationModel, BrokerAccountModel) {
+function(Calipso, _, Backbone, Marionette) {
 	var labels = Calipso.util.getLabels();
 
 	var MainController = Calipso.controller.AbstractController.extend({

@@ -19,8 +19,8 @@
 
 
 define(
-		[  "lib/calipsolib/uifield", 'underscore', 'backbone', 'marionette' ],
-		function( Calipso, _, Backbone, BackboneMarionette) {
+		[  "lib/calipsolib/uifield", "lib/calipsolib/view", 'underscore', 'backbone', 'marionette' ],
+		function( Calipso, CalipsoView, _, Backbone, BackboneMarionette) {
 
 	// //////////////////////////////////////
 	// Controller
@@ -43,10 +43,11 @@ define(
 		home : function() {
 			//consolelog("AbstractController#home");
 			if (!Calipso.util.isAuthenticated()) {
-				return this._redir("login");
-				;
+				this._redir("userDetails/login");
 			}
-			this.layout.contentRegion.show(new HomeLayout());
+			else{
+				this.layout.contentRegion.show(new Calipso.view.HomeLayout());
+			}
 		},
 
 		_redir : function(firstLevelFragment, forwardAfter) {
@@ -67,13 +68,13 @@ define(
 				this.mainNavigationCrudRoute("userProfile", Calipso.session.userDetails.get("id"))
 			}
 		},
-		login : function() {
+		/*login : function() {
 			if (Calipso.util.isAuthenticated()) {
 				window.alert("Please logout before attempting a new login");
 			} else {
 				this.showLayoutForModel(new Calipso.model.UserDetailsModel(), null, null);
 			}
-		},
+		},*/
 		renderTokenPasswordChangeForm : function(username, token) {
 			var model = new Calipso.model.UserDetailsModel({
 				username : username,

@@ -48,15 +48,62 @@ define(
 			// Layouts
 			//////////////////////////////////////////////////
 
-			Calipso.view.AbstractLayout = Backbone.Marionette.LayoutView.extend({
+			Calipso.view.CalipsoLayout = Backbone.Marionette.LayoutView.extend({
+				initialize : function(options) {
+					Backbone.Marionette.LayoutView.prototype.initialize.apply(this, arguments);
+				},
+				getTypeName : function() {
+					return this.constructor.getTypeName();
+				}
+			}, {
+				typeName : "Calipso.view.CalipsoLayout",
+				getTypeName : function() {
+					return this.typeName;
+				}
+			});
+
+			Calipso.view.HomeLayout = Calipso.view.CalipsoLayout.extend({
+				onShow : function() {
+					var _this = this;
+					console.log("HomeLayout#onShow");
+				}
+			},
+			// static members
+			{
+				typeName : "HomeLayout",
+			});
+
+			Calipso.view.UseCaseLayout = Calipso.view.CalipsoLayout.extend({
 				taName : "div",
-				/** Stores the default forward path to use after a successful action */
-				defaultForward : null,
-				/** Stores the final configuration */
-				config : null,
+				useCaseContext : null,
+				// TODO:
 				skipSrollToTop : false,
 				// regionName : viewType
 				regionViewTypes : {},
+				modelEvents : {
+					// TODO: call next useCase as defined by useCaseConfig
+					"sync" : "onModelSync"
+				},
+				initialize : function(options) {
+					Calipso.view.CalipsoLayout.prototype.initialize.apply(this, arguments);
+					if (!this.skipSrollToTop) {
+						$(window).scrollTop(0);
+					}
+					this.useCaseContext = options.useCaseContext;
+					this.childViewOptions = options.childViewOptions || {};
+				},
+				onShow : function() {
+					var _this = this;
+					console.log(this.getTypeName() + ".onShow regionViewTypes: ");
+					console.log(this.regionViewTypes);
+					_.each(this.regionViewTypes, function(ViewType, regionName, list) {
+						console.log(_this.getTypeName() + ".onShow showing region: " + regionName + ", view: " + ViewType.getTypeName());
+						_this.showChildView(regionName, new ViewType(_.extend({
+							model : _this.useCaseContext.model,
+							useCaseContext : _this.useCaseContext
+						}, _this.childViewOptions)));
+					});
+				},
 				getRegionManager : function() {
 					var _layout = this;
 					// custom logic
@@ -70,133 +117,30 @@ define(
 					return new RegionManager();
 				},
 				showChildView : function(regionName, view) {
-					view.useCaseContext || (view.useCaseContext = this.useCaseContext);
+					view.useCaseContext == (view.useCaseContext ? view.useCaseContext : this.useCaseContext);
 					view.regionName = regionName;
 					view.regionPath = this.regionPath + "." + regionName;
+
+					console.log(this.getTypeName() + ".showChildView regionPath: " + view.regionPath + ", view: " + (view.getTypeName ? view.getTypeName() : "NONE") + ", useCase: " + (view.useCaseContext ? view.useCaseContext.key : "NONE"));
 					// render child view
+					if (regionName == "admin") {
+						throw "no admin region";
+					}
 					Backbone.Marionette.LayoutView.prototype.showChildView.apply(this, arguments);
 				},
-				// TODO: remove
-				onDomRefresh : function() {
-					this.updateTitle();
+				onModelSync : function(model, response, options) {
+					console.log(this.getTypeName() + ".onModelSync model: ");
+					console.log(model);
+					console.log(this.getTypeName() + ".onModelSync options: ");
+					console.log(options);
+					console.log(this.getTypeName() + ".onModelSync useCase: ");
+					console.log(this.useCase ? this.useCase.key : this.useCase);
 				},
-				/**
-				 * Get the default config.
-				 */
-				// TODO: remove
-				getDefaultConfig : function() {
-					var defaultConfig = {};
-					// superDefaultConfig = _.result(**SuperClassHere**.prototype, 'getDefaultConfig')
-					// _.extend(superDefaultConfig, defaultConfig);
-					return defaultConfig;
-				},
-				/**
-				 * Get an array of required option names. An error will be thrown
-				 * during initialization if anyone is undefined or null.
-				 */
-				// TODO: remove
-				getRequiredOptionNames : function() {
-					return [];
-				},
-				/**
-				 * Validate the final configuration. Called during initialization
-				 * by {Calipso.view.MainLayout#configure}. Internal use only.
-				 */
-				// TODO: remove
-				_validateConfiguration : function() {
-					var missing = [];
-					var requiredOptionNames = this.getRequiredOptionNames();
-					if (requiredOptionNames && requiredOptionNames.length > 0) {
-						for (var i = 0; i < requiredOptionNames.length; i++) {
-							var requiredOptionName = requiredOptionNames[i];
-							var finalOption = this.config[requiredOptionName];
-							if (finalOption == undefined || finalOption == null) {
-								missing.push(requiredOptionName);
-							}
-						}
-					}
-					if (missing.length > 0) {
-						throw this.getTypeName() + "#validateConfiguration ERROR: missing required options" + missing.toString();
-					}
-				},
-				/**
-				 * (Re) Configure by overwriting this.config with according to
-				 * this.model.getLayoutOptions and then by relevant options only.
-				 * Finally, validate configuration for missing required options.
-				 */
-				// TODO: remove
-				configure : function(options) {
-					if (options.model) {
-						this.model = options.model;
-						if (this.model.wrappedCollection) {
-							this.searchResultsCollection = this.model.wrappedCollection;
-						}
-					}
-					// initialize config using defaults
-					this.config = this.getDefaultConfig();
-					// (re) configure according to this.model.getLayoutOptions
-					// _.extend(this.config, this.model.getLayoutOptions(this.model));
-					// and then again by relevant options only
-					options = options || {};
-					_.extendOwn(this.config, options);
-					// validate config
-					this._validateConfiguration();
-				},
-				// TODO: remove
-				onBeforeRender : function() {
-					// set up final bits just before rendering the view's `el`
-					// TODO move this method call into non-public marionette API?
-					this.configure(this.options);
-				},
-				// TODO: remove??
-				updateTitle : function() {
-
-					// update title
-					var title = this.config.title;
-					if (!title && this.model && this.model.getViewTitle) {
-						title = this.model.getViewTitle();
-					}
-					if (title) {
-						this.$el.find(".view-title:first").html(title);
-					}
-				},
-				initialize : function(options) {
-					Backbone.Marionette.LayoutView.prototype.initialize.apply(this, arguments);
-					if (!this.skipSrollToTop) {
-						$(window).scrollTop(0);
-					}
-					this.useCaseContext = options.useCaseContext;
-					this.childViewOptions = options.childViewOptions || {};
-				},
-				onShow : function() {
-					var _this = this;
-					_.each(this.regionViewTypes, function(ViewType, regionName, list) {
-						_this.showChildView(regionName, new ViewType(_.extend({
-							model : _this.useCaseContext.model,
-							useCaseContext : _this.useCaseContext
-						}, _this.childViewOptions)));
-					});
-				},
-				getTypeName : function() {
-					return this.constructor.getTypeName();
-				}
 			}, {
-				typeName : "Calipso.view.AbstractLayout",
-				getTypeName : function() {
-					return this.typeName;
-				}
+				typeName : "Calipso.view.UseCaseLayout",
 			});
 
-			Calipso.view.MainLayout = Calipso.view.AbstractLayout.extend({
-				className : "container configurable-fluid",
-				initialize : function(options) {
-					Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
-				}
-			}, {
-				typeName : "Calipso.view.MainLayout"
-			});
-
-			Calipso.view.ModalLayout = Calipso.view.AbstractLayout.extend({
+			Calipso.view.ModalLayout = Calipso.view.UseCaseLayout.extend({
 				template : Calipso.getTemplate('modal-layout'),
 				events : {
 					"click a.modal-close" : "closeModal",
@@ -207,7 +151,7 @@ define(
 				},
 				childView : null,
 				initialize : function(options) {
-					Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
+					Calipso.view.UseCaseLayout.prototype.initialize.apply(this, arguments);
 					var _this = this;
 					if (options.childView) {
 						this.childView = options.childView;
@@ -236,7 +180,7 @@ define(
 				this.$el.clear().append('<a href="#" data-toggle="dropdown" class="dropdown-toggle">' + '<i class="fa fa-bell fa-fw"></i>' + '<sup class="badge badge-primary badge-notifications-count hidden"></sup>' + '<i class="fa fa-caret-down"></i>', view.el);
 			};*/
 
-			Calipso.view.HeaderView = Calipso.view.MainLayout.extend(
+			Calipso.view.HeaderView = Calipso.view.CalipsoLayout.extend(
 			/** @lends Calipso.view.HeaderView.prototype */
 			{
 				className : "container",
@@ -340,267 +284,9 @@ define(
 					});
 				}
 			}, {
-				getTypeName : function() {
-					return "HeaderView";
-				}
-			});
-			Calipso.view.ModelDrivenBrowseLayout = Calipso.view.MainLayout.extend(
-			/** @lends Calipso.view.ModelDrivenBrowseLayout.prototype */
-			{
-				tagName : 'div',
-				id : "calipsoModelDrivenBrowseLayout",
-				template : Calipso.getTemplate('md-browse-layout'),
-				/**
-				 * Get the default config. Overwrites {Calipso.view.MainLayout#getDefaultConfig}
-				 */
-				getDefaultConfig : function() {
-					var defaultConfig = Calipso.view.MainLayout.prototype.getDefaultConfig.apply(this);
-					// now set this class' default config
-					defaultConfig.skipToSingleResult = false;
-					return defaultConfig;
-				},
-				regions : {
-					contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion"
-				},
-				onShow : function() {
-					this.showContent(this.model);
-				},
-				initialize : function(options) {
-					Calipso.view.MainLayout.prototype.initialize.apply(this, arguments);
-					var _this = this;
-
-					this.listenTo(Calipso.vent, "updateSearchLocation", function(model) {
-						_this.updateSearchLocation(model);
-					}, this);
-
-					this.listenTo(Calipso.vent, "genericFormSaved", function(model) {
-						_this.onGenericFormSaved(model);
-					}, this);
-					this.listenTo(Calipso.vent, "genericShowContent", function(model) {
-						_this.onGenericShowContent(model);
-					});
-
-					this.listenTo(Calipso.vent, "genericFormSearched", function(model) {
-						_this.onGenericFormSearched(model);
-					});
-					// vent handling might be overriden by subclasses
-					if (!options.dontListenTo) {
-						this.listenTo(Calipso.vent, "layout:viewModel", function(itemModel) {
-							var options = {
-								model : itemModel,
-								formSchemaKey : "view"
-							};
-							_this.showItemViewForModel(options);
-						}, this);
-						this.listenTo(Calipso.vent, "layout:createModel", function(options) {
-							if (!options.formSchemaKey) {
-								options.formSchemaKey = "create"
-							}
-							if (!options.model && options.modelType) {
-								options.model = options.modelType.create();
-							}
-							_this.showItemViewForModel(options);
-						}, this);
-						//				this.listenTo(Calipso.vent, "layout:updateModel", function(itemModel) {
-						//					_this.showItemViewForModel(itemModel, "update");
-						//				}, this);
-					}
-
-				},
-				onGenericFormSaved : function(model) {
-					this.showContent(model);
-				},
-				onGenericFormSearched : function(model) {
-					this.showContent(model);
-				},
-				onGenericShowContent : function(model) {
-					this.showContent(model);
-				},
-				showItemViewForModel : function(options) {
-					var itemModel = options.model;
-					var formSchemaKey = itemModel ? itemModel.formSchemaKey : false;
-					if (!formSchemaKey) {
-						formSchemaKey = "view";
-					}
-					//  get item view type for model
-					var ItemViewType = itemModel.getItemViewType();
-					// console.log("ModelDrivenBrowseLayout on childView:openGridRowInTab, ItemViewType: " + ItemViewType.getTypeName());
-					// create new item view instance with model
-					var childView = new ItemViewType({
-						formSchemaKey : formSchemaKey,
-						model : itemModel
-					});
-					// show item view
-					this.showChildView("contentRegion", childView);
-					var navUrl = itemModel.getPathFragment() + "/" + (itemModel.isNew() ? "new" : itemModel.get("id"));
-					if (formSchemaKey != "view") {
-						navUrl += "/" + formSchemaKey;
-					}
-					Calipso.navigate(navUrl, {
-						trigger : false
-					});
-				},
-				updateSearchLocation : function() {
-					if (this.model && this.model.isSearchModel && this.model.isSearchModel()) {
-						var searchedUrl = "" + this.model.getPathFragment();
-						if (this.model.wrappedCollection && this.model.wrappedCollection.data) {
-							searchedUrl = searchedUrl + "?" + $.param(this.model.wrappedCollection.data);
-						}
-						if (searchedUrl) {
-							Calipso.navigate(searchedUrl, {
-								trigger : false
-							});
-						}
-					}
-				},
-				showContent : function(routeModel) {
-					$(window).scrollTop(0);
-					var _this = this;
-					var isSearch = routeModel.isSearchModel();
-					// get content view
-					var singleResultType = !isSearch || (_this.config.skipToSingleResult && searchResultsCollection.length == 1);
-					// get the model collection view type
-					var ContentViewType;
-					var contentView;
-					if (isSearch) {
-						contentView = this.getSearchResultsViewForModel(routeModel);
-						// change location bar if appropriate
-						this.updateSearchLocation()
-					} else {
-						ContentViewType = routeModel.getItemViewType();
-						// create a new collection instance
-						contentView = new ContentViewType({
-							model : routeModel
-						});
-
-					}
-					//TODO reuse active view if of the same type
-					this.showChildView("contentRegion", contentView);
-					// change location bar if appropriate
-
-				},
-				getSearchResultsViewForModel : function(routeModel) {
-					var _this = this;
-					var searchResultsView;
-					var ContentViewType;
-					if (_this.config.skipToSingleResult && routeModel.wrappedCollection.length == 1) {
-						var singleModel = routeModel.wrappedCollection.first();
-						var ContentViewType = routeModel.getItemViewType();
-						searchResultsView = new ContentViewType({
-							model : singleModel
-						});
-					} else {
-						ContentViewType = routeModel.getCollectionViewType();
-						searchResultsView = new ContentViewType({
-							model : routeModel,
-							collection : routeModel.wrappedCollection
-						});
-						return searchResultsView;
-					}
-
-				},
-				showFormForModel : function(routeModel, regionName, forceShow) {
-					var _this = this;
-					// create the search form view if not there
-					if (forceShow || !this[regionName].hasView()) {
-						var ContentViewType = routeModel.getItemViewType();
-						var formView = new ContentViewType({
-							model : routeModel
-						});
-						// show the search form
-						this.showChildView(regionName, formView);
-					}
-
-				},
-
-			}, {
-				// static members
-				getTypeName : function() {
-					return "ModelDrivenBrowseLayout";
-				}
+				typeName : "Calipso.view.HeaderView"
 			});
 
-			Calipso.view.ModelDrivenSearchLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
-			/** @lends Calipso.view.ModelDrivenSearchLayout.prototype */
-			{
-				tagName : 'div',
-				id : "calipsoModelDrivenSearchLayout",
-				template : Calipso.getTemplate('md-search-layout'),
-				/**
-				 * Get the default config. Overwrites {Calipso.view.MainLayout#getDefaultConfig}
-				 */
-				getDefaultConfig : function() {
-					var defaultConfig = Calipso.view.ModelDrivenBrowseLayout.prototype.getDefaultConfig.apply(this);
-					// now set this class' default config
-					//			defaultConfig.hideSidebarOnSearched = false;
-					//			defaultConfig.skipInitialResultsIfNoCriteria = true;
-					return defaultConfig;
-				},
-				onGenericFormSearched : function(options) {
-					var _this = this;
-					_this.collapseSearchForm();
-					_this.expandSearchResults();
-					_this.showContent(_this.model);
-				},
-				initialize : function(options) {
-					Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-					var _this = this;
-
-					if (this.options.searchResultsCollection) {
-						this.searchResultsCollection = options.searchResultsCollection;
-					} else {
-						this.searchResultsCollection = this.model.wrappedCollection;
-					}
-				},
-				regions : {
-					sidebarRegion : "#calipsoModelDrivenSearchLayout-sideBarRegion",
-					contentRegion : "#calipsoModelDrivenSearchLayout-contentRegion"
-				},
-				onShow : function() {
-					var _this = this;
-					var hasCriteria = this.searchResultsCollection && this.searchResultsCollection.hasCriteria();
-					var skipDefaultSearch = this.model.skipDefaultSearch && !hasCriteria;
-
-					this.showSidebar(this.model);
-					if (skipDefaultSearch) {
-						this.expandSearchForm();
-					} else {
-						this.expandSearchResults();
-						this.showContent(this.model);
-					}
-
-				},
-				expandSearchForm : function() {
-					this.$el.find("#collapseOne").collapse('show');
-				},
-				collapseSearchForm : function() {
-					this.$el.find("#collapseOne").collapse('hide');
-				},
-				expandSearchResults : function() {
-					this.$el.find("#collapseTwo").collapse('show');
-				},
-				collapseSearchResults : function() {
-					this.$el.find("#collapseTwo").collapse('hide');
-				},
-				showSidebar : function(routeModel) {
-					this.showFormForModel(routeModel, "sidebarRegion");
-
-				},
-			}, {
-				getTypeName : function() {
-					return "ModelDrivenSearchLayout";
-				}
-			});
-
-			Calipso.view.ModelDrivenReportLayout = Calipso.view.ModelDrivenSearchLayout.extend(
-			/** @lends Calipso.view.ModelDrivenReportLayout.prototype */
-			{
-				template : Calipso.getTemplate('md-report-layout'),
-			}, {
-				getTypeName : function() {
-					return "Calipso.view.ModelDrivenReportLayout";
-				}
-			});
 			///////////////////////////////////////////////////////
 			// Views
 			///////////////////////////////////////////////////////
@@ -655,19 +341,27 @@ define(
 			//
 			Calipso.view.ItemView = Marionette.ItemView.extend(
 			/** @lends Calipso.view.NotFoundView.prototype */
-			{}, {
+			{
+				initialize : function(models, options) {
+					Marionette.ItemView.prototype.initialize.apply(this, arguments);
+				},
 				getTypeName : function() {
-					return "ItemView";
+					return this.constructor.getTypeName();
+				}
+			}, {
+				typeName : "Calipso.view.ItemView",
+				getTypeName : function() {
+					return this.typeName;
 				}
 			});
 
-			Calipso.view.TemplateBasedItemView = Marionette.ItemView.extend(
+			Calipso.view.TemplateBasedItemView = Calipso.view.ItemView.extend(
 			/** @lends Calipso.view.TemplateBasedItemView.prototype */
 			{
 				template : Calipso.getTemplate("templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
 				tagName : "li",
 				initialize : function(models, options) {
-					Marionette.ItemView.prototype.initialize.apply(this, arguments);
+					Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
 				},
 				attributes : function() {
 					return this.getOption("attributes");
@@ -676,10 +370,9 @@ define(
 					return this.getOption("template");
 				},
 			}, {
-				getTypeName : function() {
-					return "Calipso.view.TemplateBasedItemView";
-				}
+				typeName : "Calipso.view.TemplateBasedItemView",
 			});
+
 			Calipso.view.TemplateBasedCollectionView = Backbone.Marionette.CompositeView.extend(
 			/** @lends Calipso.view.TemplateBasedCollectionView.prototype */
 			{
@@ -756,24 +449,28 @@ define(
 							this.collection = null;
 						}
 					}
-				}
-			/** use the template defined by the child if any
-			buildChildView: function(child, ChildViewClass, childViewOptions){
-				  var options = _.extend({}, childViewOptions);
-				  options.model = child;
-				("buildChildView, childViewOptions.template: "+childViewOptions.template);
-				  if(child.childViewTemplate){
-					  options.template = child.childViewTemplate;
-				  }
-				  return new ChildViewClass(options);
-				}*/
-			}, {
+				},
+				/** use the template defined by the child if any
+				buildChildView: function(child, ChildViewClass, childViewOptions){
+					  var options = _.extend({}, childViewOptions);
+					  options.model = child;
+					("buildChildView, childViewOptions.template: "+childViewOptions.template);
+					  if(child.childViewTemplate){
+						  options.template = child.childViewTemplate;
+					  }
+					  return new ChildViewClass(options);
+					},*/
 				getTypeName : function() {
-					return "Calipso.view.TemplateBasedCollectionView";
+					return this.constructor.getTypeName();
+				}
+			}, {
+				typeName : "Calipso.view.TemplateBasedCollectionView",
+				getTypeName : function() {
+					return this.typeName;
 				}
 			});
 
-			Calipso.view.TabLayout = Calipso.view.AbstractLayout.extend({
+			Calipso.view.TabLayout = Calipso.view.CalipsoLayout.extend({
 				template : Calipso.getTemplate('tabbed-layout'),
 				tabClass : "nav nav-tabs",
 				idProperty : "id",
@@ -787,7 +484,7 @@ define(
 					tabContentsRegion : '.region-tab-content'
 				},
 				initialize : function(options) {
-					Calipso.view.AbstractLayout.prototype.initialize.apply(this, arguments);
+					Calipso.view.CalipsoLayout.prototype.initialize.apply(this, arguments);
 					this.mergeOptions(options);
 				},
 				/**
@@ -875,17 +572,18 @@ define(
 			},
 			// static members
 			{
-				typeName : "TabLayout",
+				typeName : "Calipso.view.TabLayout",
 			});
-			Calipso.view.NotFoundView = Marionette.ItemView.extend(
+
+			Calipso.view.NotFoundView = Calipso.view.ItemView.extend(
 			/** @lends Calipso.view.NotFoundView.prototype */
 			{
 				className : 'container span8 home',
 				template : Calipso.getTemplate('notfound')
-			}, {
-				getTypeName : function() {
-					return "NotFoundView";
-				}
+			},
+			// static members
+			{
+				typeName : "Calipso.view.NotFoundView",
 			});
 			Calipso.view.FooterView = Marionette.ItemView.extend(
 			/** @lends Calipso.view.FooterView.prototype */
@@ -893,110 +591,17 @@ define(
 				className : "container",
 				template : Calipso.getTemplate('footer'),
 				className : "col-sm-12"
-			}, {
-				getTypeName : function() {
-					return "FooterView";
-				}
-			});
-
-			Calipso.view.StackView = Marionette.View.extend(
-			/** @lends Calipso.view.StackView.prototype */
+			},
+			// static members
 			{
-
-				hasRootView : false,
-
-				// Define options for transitioning views in and out
-				defaults : {
-					inTransitionClass : 'slideInFromRight',
-					outTransitionClass : 'slideOutToRight',
-					animationClass : 'animated',
-					transitionDelay : 1000,
-					'class' : 'stacks',
-					itemClass : 'stack-item'
-				},
-
-				initialize : function(options) {
-					this.views = [];
-					options = options || {};
-					this.options = _.defaults({}, this.defaults, options);
-				},
-
-				setRootView : function(view) {
-					this.hasRootView = true;
-					this.views.push(view);
-					view.render();
-					view.$el.addClass(this.options.itemClass);
-					this.$el.append(view.$el);
-				},
-
-				render : function() {
-					this.$el.addClass(this.options['class']);
-					return this;
-				},
-
-				// Pop the top-most view off of the stack.
-				pop : function() {
-					var self = this;
-					if (this.views.length > (this.hasRootView ? 1 : 0)) {
-						var view = this.views.pop();
-						this.transitionViewOut(view);
-					}
-				},
-
-				// Push a new view onto the stack.
-				// The itemClass will be auto-added to the parent element.
-				push : function(view) {
-					this.views.push(view);
-					view.render();
-					view.$el.addClass(this.options.itemClass);
-					this.transitionViewIn(view);
-					//(this.views);
-				},
-
-				// Transition the new view in.
-				// This is broken out as a method for convenient overriding of
-				// the default transition behavior. If you only want to change the
-				// animation use the trasition class options instead.
-				transitionViewIn : function(view) {
-					//console.log('in', this.options);
-					this.trigger('before:transitionIn', this, view);
-					view.$el.addClass('hiddenToRight');
-					this.$el.append(view.$el);
-
-					// Wait a brief moment so it triggers the css transactions
-					// If we don't delay, at least in my minimal testing, Chrome
-					// does not animate the content but instead snaps-to-position.
-					_.delay(function() {
-						view.$el.addClass(this.options.animationClass);
-						view.$el.addClass(this.options.inTransitionClass);
-						_.delay(function() {
-							view.$el.removeClass('hiddenToRight');
-							this.trigger('transitionIn', this, view);
-						}.bind(this), this.options.transitionDelay);
-					}.bind(this), 1);
-				},
-
-				// Trastition a view out.
-				// This is broken out as a method for convenient overriding of
-				// the default transition behavior. If you only want to change the
-				// animation use the trasition class options instead.
-				transitionViewOut : function(view) {
-					this.trigger('before:transitionOut', this, view);
-					view.$el.addClass(this.options.outTransitionClass);
-					_.delay(function() {
-						view.destroy();
-						this.trigger('transitionOut', this, view);
-						//console.log(this.views);
-					}.bind(this), this.options.transitionDelay);
-				}
-
+				typeName : "Calipso.view.FooterView",
 			});
 
-			Calipso.view.UseCaseItemView = Marionette.ItemView.extend({
+			Calipso.view.UseCaseItemView = Calipso.view.ItemView.extend({
 				schemaType : null,
 				mergableOptions : [ 'useCaseContext', 'formOptions' ],
 				initialize : function(options) {
-					Marionette.ItemView.prototype.initialize.apply(this, arguments);
+					Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
 					this.mergeOptions(options, this.mergableOptions);
 				},
 				onBeforeShow : function() {
@@ -1047,13 +652,9 @@ define(
 					return schema;
 				},
 			}, {
-
 				typeName : "Calipso.view.UseCaseItemView",
-				getTypeName : function() {
-					return this.typeName;
-					;
-				}
 			});
+
 			Calipso.view.ModelDrivenCollectionGridView = Calipso.view.UseCaseItemView.extend(
 			/**
 			 * @param options object members:
@@ -1200,9 +801,7 @@ define(
 			},
 			// static members
 			{
-				getTypeName : function() {
-					return "ModelDrivenCollectionGridView";
-				}
+				typeName : "Calipso.view.ModelDrivenCollectionGridView",
 			});
 
 			// Model Driven Form View
@@ -1315,7 +914,9 @@ define(
 									// if no validation errors
 									else {
 										// Case: create/update
-										if (_this.useCase.key.indexOf("create") == 0 || _this.useCase.key.indexOf("update") == 0) {
+
+										/*_this.useCase.key.indexOf("create") == 0 || _this.useCase.key.indexOf("update") == 0 */
+										if (_this.useCase.key.indexOf("search") != 0) {
 											// persist changes
 
 											_this.model.save(null, {
@@ -1549,31 +1150,21 @@ define(
 									templateKey = templateKey ? templateKey : "horizontal";
 									return this.formTemplates[templateKey];
 								}
+							},
+							// static members
+							{
+								typeName : "Calipso.view.GenericFormView",
 							});
 
 			Calipso.view.GenericFormPanelView = Calipso.view.GenericFormView.extend({
 				template : Calipso.getTemplate('md-formpanel-view'),
-			}, {});
-			Calipso.view.ReportFormView = Calipso.view.GenericFormView.extend({
-				renderForm : function() {
-					Calipso.view.GenericFormView.prototype.renderForm.apply(this, arguments);
-					var _this = this;
-					// switch period mode
-					this.form.on('timeUnit:change', function(form, timeUnitEditor) {
-						var timeUnit = timeUnitEditor.getValue();
-						var viewMode = timeUnit == "DAY" ? "months" : "years";
-						var format = timeUnit == "DAY" ? 'MM/YYYY' : 'YYYY';
-						form.fields.period.editor.callDataFunction("viewMode", viewMode);
-						form.fields.period.editor.callDataFunction("format", format);
-					});
-				}
-			}, {
-				getTypeName : function() {
-					return "Calipso.view.ReportFormView";
-				}
+			},
+			// static members
+			{
+				typeName : "Calipso.view.GenericFormPanelView",
 			});
 
-			Calipso.view.AbstractItemView = Backbone.Marionette.ItemView.extend({
+			Calipso.view.AbstractItemView = Calipso.view.ItemView.extend({
 
 				initialize : function(options) {
 
@@ -1581,7 +1172,7 @@ define(
 						this.id = _.uniqueId(this.getTypeName() + "_");
 						$(this.el).attr('id', this.id);
 					}
-					Marionette.ItemView.prototype.initialize.apply(this, arguments);
+					Calipso.view.prototype.initialize.apply(this, arguments);
 				},
 				//				render : function() {
 				//					$(this.el).attr('id', Marionette.getOption(this, "id"));
@@ -1597,28 +1188,11 @@ define(
 				//override toString to return something more meaningful
 				toString : function() {
 					return this.getTypeName() + "(" + JSON.stringify(this.attributes) + ")";
-				}
-			}, {
-				getTypeName : function() {
-					return "AbstractItemView";
-				}
-			});
-
-			Calipso.view.MainLayout.getTypeName = function() {
-				return "MainLayout";
-			};
-
-			Calipso.view.AppLayout = Calipso.view.MainLayout.extend({
-				tagName : "div",
-				template : Calipso.getTemplate('applayout'),// _.template(templates.applayout),
-				regions : {
-					navRegion : "#calipsoAppLayoutNavRegion",
-					contentRegion : "#calipsoAppLayoutContentRegion"
-				}
-			}, {
-				getTypeName : function() {
-					return "AppLayout";
-				}
+				},
+			},
+			// static members
+			{
+				typeName : "Calipso.view.AbstractItemView",
 			});
 
 			Calipso.collection.TabCollection = Backbone.Collection.extend({
@@ -1644,6 +1218,10 @@ define(
 				onModelRemoved : function(model, collection, options) {
 					//_self.tabKeys[model.get("id")] = null;
 				},
+			},
+			// static members
+			{
+				typeName : "Calipso.view.TabCollection",
 			});
 
 			Calipso.view.TabLabelsCollectionView = Backbone.Marionette.CollectionView.extend({
@@ -1684,7 +1262,11 @@ define(
 							});
 						},
 					});
-				}
+				},
+			},
+			// static members
+			{
+				typeName : "Calipso.view.TabLabelsCollectionView",
 			});
 
 			Calipso.view.TabContentsCollectionView = Backbone.Marionette.CollectionView.extend({
@@ -1712,274 +1294,27 @@ define(
 
 					return view;
 				},
-			});
-
-			Calipso.view.UserDetailsLayoutOLD = Calipso.view.ModelDrivenBrowseLayout.extend(
-			/** @lends Calipso.view.UserDetailsLayout.prototype */
+			},
+			// static members
 			{
-				template : Calipso.getTemplate('userDetails-layout'),
-				initialize : function(options) {
-					Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-					// //console.log("Calipso.view.UserRegistrationLayout#initialize");
-				},
-				regions : {
-					contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion",
-					forgotPasswordRegion : "#calipsoUserDetailsLayout-forgotPasswordRegion",
-				},
-				onShow : function() {
-					Calipso.view.ModelDrivenBrowseLayout.prototype.onShow.apply(this, arguments);
-					// add forgotten password form
-					var changePwUserDetails = new Calipso.model.UserDetailsModel({
-						formSchemaKey : "update-createToken",
-						isResetPasswordReguest : true,
-						email : this.model.get("email")
-					});
-					var ViewType = changePwUserDetails.getItemViewType();
-					this.showChildView("forgotPasswordRegion", new ViewType({
-						model : changePwUserDetails,
-					}));
-					if (this.model.get("showResetPasswordForm")) {
-						$("#loginCollapse1").collapse('hide');
-						$("#loginCollapse2").collapse('show');
-					}
-				},
-				onGenericFormSaved : function(model) {
-					// model is not neccessarily the same as this.model
-					if (model.get("isResetPasswordReguest")) {
-						Calipso.navigate("/page/userRegistrationSubmitted", {
-							trigger : true
-						});
-					} else {
-						this.handleUserDetails(model);
-					}
-				},
-				handleUserDetails : function(model) {
-					// if user details model is valid attach to session and FW to home
-					if (this.model.get("id")) {
-						Calipso.vent.trigger('session:created', this.model);
-					}
-					// login failed, show error
-					else if (!this.model.get("email") && !this.model.get("username")) {
-						window.alert("Invalid credentials!");
-					} else {
-						console.log("handleUserDetails: doing nothing");
-					}
-				}
-			}, {
-				// static members
-				getTypeName : function() {
-					return "Calipso.view.UserDetailsLayout";
-				}
+				typeName : "Calipso.view.TabContentsCollectionView",
 			});
 
-			Calipso.view.WizardLayout = Calipso.view.ModelDrivenBrowseLayout.extend({
-				className : "container configurable-fluid",
-				template : Calipso.getTemplate('wizard-layout'),
-				events : {
-					"click a.wizard-step" : "browseToStep"
-				},
+			Calipso.view.AppLayout = Calipso.view.CalipsoLayout.extend({
+				template : Calipso.getTemplate('applayout'),
+				tagName : "div",
+				template : Calipso.getTemplate('applayout'),// _.template(templates.applayout),
 				regions : {
-					stepRegion : ".wizard-step",
-					navRegion : ".wizard-title"
-				},
-				getRequiredOptionNames : function() {
-					return [ "steps" ];
-				},
-				showNav : function() {
-					var _layout = this;
-					// render navigation
-					var NavCollectionView = Calipso.view.TemplateBasedCollectionView.extend({
-						tagName : "ul",
-						className : "dropdown-menu",
-						childView : Calipso.view.TemplateBasedItemView.extend({
-							initialize : function(options) {
-								Calipso.view.TemplateBasedItemView.prototype.initialize.apply(this, arguments);
-								var model = this.model;
-								model.set("colIndex", _layout.stepsCollection.indexOf(model));
-								model.set("shownIndex", model.get("colIndex") + 1);
-								model.set("completed", model.get("colIndex") <= _layout.model.get("highestStepIndex"));
-								model.set("accessible", model.get("colIndex") <= _layout.model.get("highestStepIndex") + 1);
-								model.set("active", model.get("colIndex") == _layout.model.get("currentStepIndex"));
-
-								// add bootstrap classes
-								if (!this.model.get("accessible")) {
-									this.$el.addClass("disabled");
-								} else if (this.model.get("active")) {
-									this.$el.addClass("active");
-								}
-							},
-							onShow : function(options) {
-								/*this.$el.find('a[title]').tooltip({
-								 trigger: 'hover',
-								 placement: 'bottom',
-								 animate: true,
-								 delay: 500,
-								 container: 'body'
-								});*/
-							},
-							onBeforeDestroy : function() {
-								//this.$el.find('a[title]').tooltip('destroy');
-							}
-						}),
-						childViewOptions : {
-							tagName : "li",
-							template : Calipso.getTemplate("wizardTabItem")
-						}
-					});
-					this.showChildView("navRegion", new NavCollectionView({
-						collection : this.stepsCollection
-					}));
-
-					this.$el.find(".wizard-title").prepend('<button type="button" class="btn btn-default dropdown-toggle" ' + ' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + Calipso.util.getLabels("calipso.words.step") + " " + (this.model.get("currentStepIndex") + 1) + " / " + this.stepsCollection.length + ' <span class="caret"></span></button>');
-
-				},
-				onShow : function() {
-					var _layout = this;
-					this.stepsCollection = new Calipso.collection.GenericCollection(_layout.config.steps, {
-						model : Calipso.model["GenericModel"]
-					});
-					// render child view
-					this.showStep(parseInt(this.model.get("currentStepIndex") + "") + 1);
-				},
-				getStepModel : function(step) {
-					var model = step.model;
-					if (!model && step.modelPath) {
-						if (step.modelPath) {
-							model = Calipso.getPathValue(this.model, step.modelPath);
-							if (_.isUndefined(model)) {
-								throw ("Calipso.view.WizardLayout#getStepModel: no value found for modelPath: " + step.modelPath);
-							}
-						}
-					}
-					if (!model && step.modelType) {
-						model = new step.modelType();
-						if (step.modelPath) {
-							Calipso.setPathValue(this.model, step.modelPath, model);
-						}
-						if (step.parentModelPath) {
-							Calipso.setPathValue(model, step.parentModelPath, this.model);
-						}
-					}
-					if (!model) {
-						model = this.model;
-					}
-					if (!model) {
-						throw "Could not resolve or create step view model";
-					}
-					step.model = model;
-					return model;
-				},
-				browseToStep : function(e) {
-					var $link = $(e.currentTarget)
-					this.showStep(parseInt($link.data("step")));
-				},
-				showStep : function(stepIndex) {
-					var step = this.config.steps[stepIndex];
-					if (!step) {
-						throw "No wizard step defined for key: " + stepIndex;
-					}
-					var view = step.view;
-					if (!view) {
-						var viewOptions = step.viewOptions ? step.viewOptions : {};
-						viewOptions.model = this.getStepModel(step);
-						var ViewType = step.viewType ? step.viewType : viewOptions.model.getItemViewType();
-						view = new ViewType(viewOptions);
-					}
-					// render child view
-					var stepTitle = step.title ? step.title : ("Step " + (stepIndex + 1));
-					this.$el.find(".step-title").empty().append(stepTitle);
-					this.currentStepIndex = stepIndex;
-					this.model.set("currentStepIndex", stepIndex);
-					this.showChildView("stepRegion", view);
-					$('html, body').animate({
-						scrollTop : 0
-					}, 500);
-
-					// render nav/progress view
-					this.showNav();
-				},
-
-				onGenericFormSaved : function(model) {
-					this.showStep(parseInt(this.model.get("currentStepIndex") + "") + 1);
-				},
-			}, {
-				getTypeName : function() {
-					return "Calipso.view.WizardLayout";
-				}
-			});
-			//////////////////////////////////////////////////////
-			// user Registration: model, layout etc. Uses the
-			// userRegistrations path fragment/route.
-			//////////////////////////////////////////////////////
-
-			Calipso.view.UserRegistrationLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
-			/** @lends Calipso.view.UserRegistrationLayout.prototype */
-			{
-
-				template : Calipso.getTemplate('userRegistration-layout'),
-				initialize : function(options) {
-					Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-				},
-				onGenericFormSaved : function(model) {
-
-					Calipso.navigate("/page/userRegistrationSubmitted", {
-						trigger : true
-					});
-				},
-			/*
-			onGenericFormSaved : function(model) {
-				// if the user is active just navigate to login
-				// TODO: add message
-				if (model.get("active") == true) {
-					// console.log("Calipso.view.UserRegistrationLayout#onGenericFormSaved, user is active, saving to session");
-
-					Calipso.navigate("loginRegistered", {
-						trigger : true
-					});
-				} else {
-					var usernameOrEmail = model.get("email");
-					if (!usernameOrEmail) {
-						usernameOrEmail = model.get("username");
-					}
-
-					Calipso.navigate("changePasswordWithToken/" + usernameOrEmail, {
-						trigger : true
-					});
-
+					navRegion : "#calipsoAppLayoutNavRegion",
+					contentRegion : "#calipsoAppLayoutContentRegion"
 				}
 			},
-			*/
-			}, {
-				// static members
-				getTypeName : function() {
-					return "UserRegistrationLayout";
-				}
-			});
-			Calipso.view.UserProfileView = Calipso.view.TemplateBasedItemView.extend(
-			/** @lends Calipso.view.UserProfileView.prototype */
+			// static members
 			{
-				tagName : "div",
-				template : Calipso.getTemplate("userProfile"),
-			}, {
-				getTypeName : function() {
-					return "Calipso.view.UserProfileView";
-				}
-			});
-			Calipso.view.UserProfileLayout = Calipso.view.ModelDrivenBrowseLayout.extend(
-			/** @lends Calipso.view.UserProfileLayout.prototype */
-			{
-				initialize : function(options) {
-					Calipso.view.ModelDrivenBrowseLayout.prototype.initialize.apply(this, arguments);
-					// console.log("Calipso.view.UserProfileLayout#initialize");
-				},
-			}, {
-				// static members
-				getTypeName : function() {
-					return "UserProfileLayout";
-				}
+				typeName : "Calipso.view.AppLayout",
 			});
 
-			Calipso.view.BrowseLayout = Calipso.view.AbstractLayout.extend({
+			Calipso.view.BrowseLayout = Calipso.view.UseCaseLayout.extend({
 				template : Calipso.getTemplate('md-browse-layout'),
 				regions : {
 					contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion"
@@ -1987,11 +1322,13 @@ define(
 				regionViewTypes : {
 					contentRegion : Calipso.view.GenericFormView,
 				},
-			}, {
+			},
+			// static members
+			{
 				typeName : "Calipso.view.BrowseLayout"
 			});
 
-			Calipso.view.SearchLayout = Calipso.view.AbstractLayout.extend({
+			Calipso.view.SearchLayout = Calipso.view.UseCaseLayout.extend({
 				template : Calipso.getTemplate('md-search-layout'),
 				regions : {
 					formRegion : "#calipsoModelDrivenSearchLayout-sideBarRegion",
@@ -2001,11 +1338,13 @@ define(
 					formRegion : Calipso.view.GenericFormView,
 					resultsRegion : Calipso.view.ModelDrivenCollectionGridView
 				},
-			}, {
+			},
+			// static members
+			{
 				typeName : "Calipso.view.SearchLayout"
 			});
 
-			Calipso.view.DefaulfModalLayout = Calipso.view.AbstractLayout.extend({
+			Calipso.view.DefaulfModalLayout = Calipso.view.UseCaseLayout.extend({
 				template : Calipso.getTemplate('modal-layout'),
 				events : {
 					"click a.modal-close" : "closeModal",
@@ -2022,62 +1361,75 @@ define(
 					Calipso.stopEvent(e);
 					Calipso.vent.trigger("modal:close");
 				}
-			}, {
+			},
+			// static members
+			{
 				typeName : "Calipso.view.DefaulfModalLayout"
 			});
-
-
-
 
 			Calipso.view.UserDetailsLayout = Calipso.view.BrowseLayout.extend(
 			/** @lends Calipso.view.UserDetailsLayout.prototype */
 			{
 				template : Calipso.getTemplate('userDetails-layout'),
-				/*regions : {
-					contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion",
-					forgotPasswordRegion : "#calipsoUserDetailsLayout-forgotPasswordRegion",
+				onModelSync : function(model, response, options) {
+					Calipso.session.reset(model);
+					// if successful login
+					if(this.model.get("id")){
+						console.log(this.getTypeName() + "#onModelSync successful login");
+					}
+					// else just follow useCase configuration
+					else{
+						console.log(this.getTypeName() + "#onModelSync call super.onModelSync to apply nextUseCase config");
+							Calipso.view.UseCaseLayout.prototype.onModelSync.apply(this, arguments);
+					}
 				},
-				onShow : function() {
-					Calipso.view.ModelDrivenBrowseLayout.prototype.onShow.apply(this, arguments);
-					// add forgotten password form
-					var changePwUserDetails = new Calipso.model.UserDetailsModel({
-						formSchemaKey : "update-createToken",
-						isResetPasswordReguest : true,
-						email : this.model.get("email")
+
+			/*regions : {
+				contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion",
+				forgotPasswordRegion : "#calipsoUserDetailsLayout-forgotPasswordRegion",
+			},
+			onShow : function() {
+				Calipso.view.ModelDrivenBrowseLayout.prototype.onShow.apply(this, arguments);
+				// add forgotten password form
+				var changePwUserDetails = new Calipso.model.UserDetailsModel({
+					formSchemaKey : "update-createToken",
+					isResetPasswordReguest : true,
+					email : this.model.get("email")
+				});
+				var ViewType = changePwUserDetails.getItemViewType();
+				this.showChildView("forgotPasswordRegion", new ViewType({
+					model : changePwUserDetails,
+				}));
+				if (this.model.get("showResetPasswordForm")) {
+					$("#loginCollapse1").collapse('hide');
+					$("#loginCollapse2").collapse('show');
+				}
+			},
+			onGenericFormSaved : function(model) {
+				// model is not neccessarily the same as this.model
+				if (model.get("isResetPasswordReguest")) {
+					Calipso.navigate("/page/userRegistrationSubmitted", {
+						trigger : true
 					});
-					var ViewType = changePwUserDetails.getItemViewType();
-					this.showChildView("forgotPasswordRegion", new ViewType({
-						model : changePwUserDetails,
-					}));
-					if (this.model.get("showResetPasswordForm")) {
-						$("#loginCollapse1").collapse('hide');
-						$("#loginCollapse2").collapse('show');
-					}
-				},
-				onGenericFormSaved : function(model) {
-					// model is not neccessarily the same as this.model
-					if (model.get("isResetPasswordReguest")) {
-						Calipso.navigate("/page/userRegistrationSubmitted", {
-							trigger : true
-						});
-					} else {
-						this.handleUserDetails(model);
-					}
-				},
-				handleUserDetails : function(model) {
-					// if user details model is valid attach to session and FW to home
-					if (this.model.get("id")) {
-						Calipso.vent.trigger('session:created', this.model);
-					}
-					// login failed, show error
-					else if (!this.model.get("email") && !this.model.get("username")) {
-						window.alert("Invalid credentials!");
-					} else {
-						console.log("handleUserDetails: doing nothing");
-					}
-				}*/
-			}, {
-				// static members
+				} else {
+					this.handleUserDetails(model);
+				}
+			},
+			handleUserDetails : function(model) {
+				// if user details model is valid attach to session and FW to home
+				if (this.model.get("id")) {
+					Calipso.vent.trigger('session:created', this.model);
+				}
+				// login failed, show error
+				else if (!this.model.get("email") && !this.model.get("username")) {
+					window.alert("Invalid credentials!");
+				} else {
+					console.log("handleUserDetails: doing nothing");
+				}
+			}*/
+			},
+			// static members
+			{
 				typeName : "Calipso.view.UserDetailsLayout"
 			});
 		});

@@ -337,247 +337,64 @@ define(
 	Calipso.getTemplate = function(name) {
 		return calipsoTemplates[name];
 	}
-	Calipso.initializeApp = function(customConfig) {
-		customConfig = customConfig || {};
-		var config = {
-			contextPath : "/",
-			headerViewType : Calipso.view.HeaderView,
-			footerViewType : Calipso.view.FooterView,
-			sessionType : Calipso.util.Session,
-			apiAuthPath : "/apiauth",
-		};
-		Calipso.config = _.defaults(customConfig, config);
-
-		// console.log("Setting up Calipso.session...");
-		var SessionType = Calipso.getConfigProperty("sessionType");
-		Calipso.session = new SessionType();
-		// console.log("Calipso.session has been configured");
-
-		// console.log("Setting up Calipso.app...");
-		Calipso.app = new Marionette.Application({
-			config : Calipso.config,
-			routers : {}
-		});
-		// application configuration
-		Calipso.app.addRegions({
-			headerRegion : "#calipsoHeaderRegion",
-			mainContentRegion : "#calipsoMainContentRegion",
-			modalRegion : Calipso.view.ModalRegion,
-			footerRegion : "#calipsoFooterRegion"
-		});
-
-		Calipso.app.addInitializer(function(options) {
-
-			// init ALL app routers
-			_(options.routers).each(function(routerClass) {
-				var router = new routerClass();
-				Calipso.app.routers[routerClass.getTypeName()] = router;
-				// console.log("initialized router: " + routerClass.getTypeName());
-			});
-
-			Calipso.modelTypesMap = {};
-			var parseModel = function(ModelType) {
-				if (ModelType.getTypeName() != "Calipso.model.ReportDataSetModel" &&
-				ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
-				ModelType.getTypeName() != "Calipso.model.GenericModel") {
-
-					Calipso.modelTypesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
-
-				}
-			};
-		//console.logseCase("Calipso.model:");
-		//console.logseCase(Calipso.model);
-			_(Calipso.model).each(parseModel);
-			_(Calipso.customModel).each(parseModel);
-
-		});
-		// console.log("Calipso.app has been configured");
-
-		Calipso.util.getLabelskeleton = function() {
-			var modelKeys = {};
-/*
-						// iterate models
-						$.each(Calipso.modelTypesMap, function(modelKey, ModelType) {
-							if(ModelType && ModelType.getFormSchemas && ModelType.getFormSchemas()){
-								var formSchemas = ModelType.getFormSchemas();
-								// iterate fields
-								modelKeys[modelKey] = {};
-								$.each(formSchemas, function(fieldName, fieldSchema) {
-									// iterat actions, clone standar first
-									if(fieldSchema){
-										modelKeys[modelKey][fieldName] = {};
-										var getActionLabels = function(actionName, actionSchema){
-											var actionLabels = {};
-											if(!actionSchema.titleKey ){
-												var title = actionSchema.titleHTML || actionSchema.title;
-												// if not explicitly empty
-												if(_.isUndefined(title)){
-														title = fieldName.replace(/([A-Z])/g, ' $1')
-															// uppercase the first character
-															.replace(/^./, function(str){ return str.toUpperCase(); });
-												}
-												if(title){
-													actionLabels.title = title;
-												}
-
-											}
-											if(actionSchema && actionSchema.text){
-												actionLabels.text = actionSchema.text;
-											}
-											if(actionSchema && actionSchema.help){
-												actionLabels.help = actionSchema.help;
-											}
-											if(actionSchema && actionSchema.options
-												&& _.isArray(actionSchema.options)) {
-													var options = {};
-													$.each(actionSchema.options, function(oKey, oVal) {
-														if(""+oKey != ""+oVal && isNaN(oVal)){
-															if(!_.isUndefined(oVal.val) && !_.isUndefined(oVal.label)){
-																	options[""+oVal.val] = ""+oVal.label;
-															}
-															else if(oVal.heading){
-																// bootstrap list group
-																options[""+oKey] = {
-																	heading: ""+oVal.heading,
-																	text : ""+oVal.text
-																};
-															}
-															else{
-																	options[""+oKey] = ""+oVal;
-															}
-														}
-													});
-													if(options){
-														actionLabels.options = options;
-													}
-											}
-											if(actionLabels ){
-												modelKeys[modelKey][fieldName][actionName] = actionLabels;
-											}
-										}
-										$.each(fieldSchema, getActionLabels);
-
-									}
-								});
-
-							}
-							else{
-							//console.logseCase("No form schemas found for modelKey: " + modelKey);
-							}
-						});
-					//console.logseCase("labels JSON:\n"+ modelKeys.toSource());
-			*/
-			return modelKeys;
-		};
-
-		// register a handlebars helper for menuentries
-		Handlebars.registerHelper("baseUrl", function() {
-			return Calipso.getBaseUrl();
-		});
-		Handlebars.registerHelper("menuEntries", function() {
-			// console.log("menu entries...");
-
-			var menuEntries = {};
-			var modelTypesMap = Calipso.modelTypesMap;
-			var modelType;
-			for ( var modelKey in modelTypesMap) {
-				modelType = modelTypesMap[modelKey];
-				//TODO
-				if (true) {
-					menuEntries[modelType.getPathFragment()] = {
-						label : modelType.label,
-						modelKey : modelType.modelKey
-					};
-				}
-			}
-			return (menuEntries);
-		});
-
-		// register comparison helper
-		Handlebars.registerHelper('ifCond', function(v1, operator, v2, options) {
-
-			switch (operator) {
-			case '==':
-				return (v1 == v2) ? options.fn(this) : options.inverse(this);
-			case '===':
-				return (v1 === v2) ? options.fn(this) : options.inverse(this);
-			case '<':
-				return (v1 < v2) ? options.fn(this) : options.inverse(this);
-			case '<=':
-				return (v1 <= v2) ? options.fn(this) : options.inverse(this);
-			case '>':
-				return (v1 > v2) ? options.fn(this) : options.inverse(this);
-			case '>=':
-				return (v1 >= v2) ? options.fn(this) : options.inverse(this);
-			case '&&':
-				return (v1 && v2) ? options.fn(this) : options.inverse(this);
-			case '||':
-				return (v1 || v2) ? options.fn(this) : options.inverse(this);
-			default:
-				return options.inverse(this);
-			}
-		});
-
-		////////////////////////////////
-		// app init/events
-		////////////////////////////////
-		// initialize header, footer, history
-		Calipso.app.on("start", function() {
-
-			//	try "remember me"
-			Calipso.session.load();
-
-			// render basic structure
-			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
-				model : Calipso.session.userDetails
-			}));
-
-			// TODO: move after loading the sidebar DOM
-			//Loads the correct sidebar on window load,
-			//collapses the sidebar on window resize.
-			$(function() {
-				$(window).bind("load resize", function() {
-					width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
-					if (width < 768) {
-						$('div.sidebar-collapse').addClass('collapse');
-					} else {
-						$('div.sidebar-collapse').removeClass('collapse');
+	Calipso.isUserInAnyRole = function(inputRoles) {
+		var hasRole = false;
+		if(!_.isArray(inputRoles)){
+			inputRoles = [inputRoles];
+		}
+		// only process if the user is authenticated
+		if (Calipso.session.userDetails) {
+			var ownedRoles = Calipso.session.getRoles();
+			var inputRole;
+			for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
+				inputRole = inputRoles[j];
+				for (var k = 0; k < ownedRoles.length && hasRole == false; k++) {
+					var ownedRole = ownedRoles[k];
+					if (inputRole == ownedRole.name) {
+						hasRole = true;
 					}
-				});
-			});
-
-			Calipso.app.footerRegion.show(new Calipso.config.footerViewType());
-
-			var pushStateSupported = _.isFunction(history.pushState);
-			var contextPath = Calipso.getConfigProperty("contextPath");
-
-			// console.log("Calipso.app.on start, contextPath: " + contextPath);
-			if (contextPath.length > 1) {
-				// add leading slash if missing
-				if (contextPath.indexOf("/") != 0) {
-
-					//console.log("Calipso.app.on start, adding slash prefix");
-					contextPath = "/" + contextPath;
 				}
-
-				// add ending slash if missing
-				if (contextPath.substr(-1) != '/') {
-
-					//console.log("Calipso.app.on start, adding slash suffix");
-					contextPath += '/';
-				}
-
 			}
-			var startRoot = contextPath + "client/";
-			Backbone.history.start({
-				root : startRoot,
-				pushState : pushStateSupported
-			});
+		}
+		return hasRole;
+	}
 
-		});
 
+
+	Calipso.isUserInAnyRole = function(inputRoles) {
+		var hasRole = false;
+		if(!_.isArray(inputRoles)){
+			inputRoles = [inputRoles];
+		}
+		// only process if the user is authenticated
+		if (Calipso.session.userDetails) {
+			var ownedRoles = Calipso.session.getRoles();
+			var inputRole;
+			for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
+				inputRole = inputRoles[j];
+				for (var k = 0; k < ownedRoles.length && hasRole == false; k++) {
+					var ownedRole = ownedRoles[k];
+					if (inputRole == ownedRole.name) {
+						hasRole = true;
+					}
+				}
+			}
+		}
+		return hasRole;
+	}
+
+
+
+	Calipso.util.isAuthenticated = function() {
+		return Calipso.session && Calipso.session.isAuthenticated();
+	}
+
+	/*****************************************************
+	Applicartion initialization
+	*****************************************************/
+	Calipso._initializeVent = function(){
 		Calipso.vent.on('app:show', function(appView, navigateToUrl) {
-		//console.logseCase("Calipso.vent.on 'app:show', view: " + appView.getTypeName() + ", navigateToUrl: " + navigateToUrl);
+		console.log("Calipso.vent.on 'app:show', view: " + appView.getTypeName() + ", navigateToUrl: " + navigateToUrl);
 
 			var $wrapper = $("#container");
 			if (appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")) {
@@ -634,37 +451,10 @@ define(
 			// remove form
 			$("#calipso-social-signin-form").remove();
 			return false;
-		});
-		Calipso.vent.on('session:created', function(userDetails) {
-			// send logged in user on their way
-			var fw = "home";
-			if (Calipso.app.fw) {
-				fw = Calipso.app.fw;
-				Calipso.app.fw = null;
-			}
-			// reload the app if locale needs to be changed
-			var userLocale = userDetails.get("locale");
-			var oldLocale = localStorage.getItem("locale");
-			if (!oldLocale || oldLocale != userLocale) {
-				localStorage.setItem("locale", userDetails.get("locale"));
 
-				Calipso.navigate(fw, {
-					trigger : false
-				});
-				window.location.reload();
-			} else {
-				// locale is the same, proceed normally
-				Calipso.session.userDetails = userDetails;
-				Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
-					model : Calipso.session.userDetails
-				}));
-
-				Calipso.navigate(fw, {
-					trigger : true
-				});
-			}
 		});
 
+		// TODO: on userDetails model destroy
 		Calipso.vent.on('session:destroy', function(userDetails) {
 			Calipso.session.destroy();
 			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
@@ -737,9 +527,164 @@ define(
 			// console.log("vent event modal:destroy");
 			Calipso.app.modalRegion.closeModal();
 		});
+	}
 
-	};
+	Calipso._initializeAppConfig = function(customConfig) {
+		// set Calipso.config object
+		customConfig = customConfig || {};
+		var config = {
+			contextPath : "/",
+			headerViewType : Calipso.view.HeaderView,
+			footerViewType : Calipso.view.FooterView,
+			sessionType : Calipso.util.Session,
+			apiAuthPath : "/apiauth",
+		};
+		Calipso.config = _.defaults(customConfig, config);
+	}
 
+	Calipso._initializeAppSession = function() {
+		var SessionType = Calipso.getConfigProperty("sessionType");
+		Calipso.session = new SessionType();
+	}
+
+
+	Calipso._initializeAppInitializers = function() {
+
+		// initialize routers, models
+		Calipso.app.addInitializer(function(options) {
+			// set routers map
+			_(options.routers).each(function(routerClass) {
+				var router = new routerClass();
+				Calipso.app.routers[routerClass.getTypeName()] = router;
+			});
+
+			// set model types map
+			Calipso.modelTypesMap = {};
+			var parseModel = function(ModelType) {
+				if (ModelType.getTypeName() != "Calipso.model.ReportDataSetModel" &&
+				ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
+				ModelType.getTypeName() != "Calipso.model.GenericModel") {
+
+					Calipso.modelTypesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
+
+				}
+			};
+			_(Calipso.model).each(parseModel);
+			_(Calipso.customModel).each(parseModel);
+
+		});
+	}
+
+
+	Calipso._initializeAppVent = function() {
+		// TODO
+	}
+
+	Calipso._startHistory = function(){
+		/*
+					// TODO: move after loading the sidebar DOM
+					//Loads the correct sidebar on window load,
+					//collapses the sidebar on window resize.
+					$(function() {
+						$(window).bind("load resize", function() {
+							width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
+							if (width < 768) {
+								$('div.sidebar-collapse').addClass('collapse');
+							} else {
+								$('div.sidebar-collapse').removeClass('collapse');
+							}
+						});
+					});
+		*/
+		var pushStateSupported = _.isFunction(history.pushState);
+		var contextPath = Calipso.getConfigProperty("contextPath");
+
+		// console.log("Calipso.app.on start, contextPath: " + contextPath);
+		if (contextPath.length > 1) {
+			// add leading slash if missing
+			if (contextPath.indexOf("/") != 0) {
+				//console.log("Calipso.app.on start, adding slash prefix");
+				contextPath = "/" + contextPath;
+			}
+			// add ending slash if missing
+			if (contextPath.substr(-1) != '/') {
+				//console.log("Calipso.app.on start, adding slash suffix");
+				contextPath += '/';
+			}
+
+		}
+		var startRoot = contextPath + "client/";
+		Backbone.history.start({
+			root : startRoot,
+			pushState : pushStateSupported
+		});
+	}
+	Calipso.initializeApp = function(customConfig) {
+		// set Calipso.config object
+		Calipso._initializeAppConfig(customConfig);
+
+		// set Calipso.session object
+		Calipso._initializeAppSession();
+
+		// set Calipso.app object
+		Calipso.app = new Marionette.Application({
+			config : Calipso.config,
+			routers : {}
+		});
+
+		// set Calipso.app object regions
+		Calipso.app.addRegions({
+			headerRegion : "#calipsoHeaderRegion",
+			mainContentRegion : "#calipsoMainContentRegion",
+			modalRegion : Calipso.view.ModalRegion,
+			footerRegion : "#calipsoFooterRegion"
+		});
+
+		// set Calipso.app initializers
+		Calipso._initializeAppInitializers();
+
+	}
+
+	Calipso.updateHeaderFooter = function(){
+		console.log("Calipso.updateHeaderFooter");
+		// render basic structure
+		Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
+			model : Calipso.session.userDetails
+		}));
+		Calipso.app.footerRegion.show(new Calipso.config.footerViewType());
+	}
+
+	Calipso.start = function(initOptions, startOptions){
+		// initialize/configure application
+	  Calipso.initializeApp(initOptions);
+
+		////////////////////////////////
+		// app init/events
+		////////////////////////////////
+		// initialize header, footer, history
+		Calipso.app.on("start", function() {
+			console.log("Calipso.app started");
+
+			// setup vent
+			Calipso._initializeVent();
+			// start backbone history
+			Calipso._startHistory();
+		});
+		/*Calipso.session.on("remmber", function(model, options){
+			console.log("Calipso.session remmbered");
+			// start rendering
+			// todo: listen to sync events
+			// re-render HEADER/FOOTER
+
+
+		})*/
+		//	try "remember me" and start app
+		Calipso.session.on("remmber", function(model, optiona){
+			console.log("Calipso.start, session remmber cought, starting app");
+			Calipso.app.start(startOptions);
+		});
+		Calipso.session.start();
+	}
 	// //////////////////////////////////////
 	// Region
 	// //////////////////////////////////////
@@ -1128,9 +1073,6 @@ define(
 	});
 	Calipso.vent = new Calipso.util.Vent();
 
-	//////////////////////////////////////////////////
-	// session
-	//////////////////////////////////////////////////
 	Calipso._baseUrl = false;
 	Calipso.getBaseUrl = function() {
 		if (!Calipso._baseUrl) {
@@ -1147,33 +1089,6 @@ define(
 		return Calipso._baseUrl;
 	}
 
-	Calipso.isUserInAnyRole = function(inputRoles) {
-		var hasRole = false;
-		if(!_.isArray(inputRoles)){
-			inputRoles = [inputRoles];
-		}
-		// only process if the user is authenticated
-		if (Calipso.session.userDetails) {
-			var ownedRoles = Calipso.session.userDetails.get("roles");
-			var inputRole;
-			for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
-				inputRole = inputRoles[j];
-				for (var k = 0; k < ownedRoles.length && hasRole == false; k++) {
-					var ownedRole = ownedRoles[k];
-					if (inputRole == ownedRole.name) {
-						hasRole = true;
-					}
-				}
-			}
-		}
-		return hasRole;
-	}
-
-
-
-	Calipso.util.isAuthenticated = function() {
-		return Calipso.session && Calipso.session.isAuthenticated();
-	}
 
 	/**
 	* Get the model type corresponding to the given

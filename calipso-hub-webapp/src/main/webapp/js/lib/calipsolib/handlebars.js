@@ -17,7 +17,8 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment' ], function(Calipso, _, Handlebars, moment) {
+define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment' ],
+function(Calipso, _, Handlebars, moment) {
 
 	// register calipso helpers for handlebars
 	Handlebars.registerHelper("getLocale", function(propName, options) {
@@ -154,5 +155,52 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment' ], function
 		return value;
 	});
 
+	// register a handlebars helper for menuentries
+	Handlebars.registerHelper("baseUrl", function() {
+		return Calipso.getBaseUrl();
+	});
+	Handlebars.registerHelper("menuEntries", function() {
+		// console.log("menu entries...");
+
+		var menuEntries = {};
+		var modelTypesMap = Calipso.modelTypesMap;
+		var modelType;
+		for ( var modelKey in modelTypesMap) {
+			modelType = modelTypesMap[modelKey];
+			//TODO
+			if (true) {
+				menuEntries[modelType.getPathFragment()] = {
+					label : modelType.label,
+					modelKey : modelType.modelKey
+				};
+			}
+		}
+		return (menuEntries);
+	});
+
+	// register comparison helper
+	Handlebars.registerHelper('ifCond', function(v1, operator, v2, options) {
+
+		switch (operator) {
+		case '==':
+			return (v1 == v2) ? options.fn(this) : options.inverse(this);
+		case '===':
+			return (v1 === v2) ? options.fn(this) : options.inverse(this);
+		case '<':
+			return (v1 < v2) ? options.fn(this) : options.inverse(this);
+		case '<=':
+			return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+		case '>':
+			return (v1 > v2) ? options.fn(this) : options.inverse(this);
+		case '>=':
+			return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+		case '&&':
+			return (v1 && v2) ? options.fn(this) : options.inverse(this);
+		case '||':
+			return (v1 || v2) ? options.fn(this) : options.inverse(this);
+		default:
+			return options.inverse(this);
+		}
+	});
 	return Handlebars;
 });

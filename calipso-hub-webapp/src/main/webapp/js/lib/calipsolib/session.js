@@ -21,12 +21,21 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 
 	//
 	Calipso.util.Session = Backbone.Model.extend({
-		userDetails : false,
 
+		initialize : function(options) {
+			Backbone.Model.prototype.initialize.apply(this, arguments);
+			var _session = this;
+			this.userDetails = Calipso.model.UserDetailsModel.create();
+			this.listenTo(this.userDetails, 'sync', function(){
+				_session.reset();
+			});
+		},
+		getRoles : function(){
+			return _.extend({}, this.userDetails.get("roles"));
+		},
 		// Returns true if the user is authenticated.
 		isAuthenticated : function() {
-			var isAuth = this.userDetails && this.userDetails.get && this.userDetails.get("id");
-			return isAuth;
+			return this.userDetails && this.userDetails.get && this.userDetails.get("id");
 		},
 		ensureLoggedIn : function() {
 			if (!this.isAuthenticated()) {
@@ -44,6 +53,7 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 				$('#session-info').hide();
 			}
 		},
+		/*
 		// used to store an intercepted URL for use at a later time, for example
 		// after login
 		fw : null,
@@ -107,46 +117,67 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 
 		},
 
+		*/
+		reset : function(){
+			// send logged in user on their way
+			var fw = "home";
+			if (Calipso.app.fw) {
+				fw = Calipso.app.fw;
+				Calipso.app.fw = null;
+			}
+			// reload the app if locale needs to be changed
+			var userLocale = this.userDetails.get("locale");
+			var oldLocale = localStorage.getItem("locale");
+			if (!oldLocale || oldLocale != userLocale) {
+				localStorage.setItem("locale", this.userDetails.get("locale"));
+
+				Calipso.navigate(fw, {
+					trigger : false
+				});
+				window.location.reload();
+			} else {
+				// locale is the same, proceed normally
+				Calipso.updateHeaderFooter();
+				/*
+				Calipso.navigate(fw, {
+					trigger : true
+				});
+				*/
+			}
+
+		},
 		// Attempt to load the user using the "remember me" cookie token, if any
 		// exists.
 		// The cookie should not be accessible by js. Here we let the server pick
 		// it up
 		// by itself and return the user details if appropriate
-		load : function(loadUrl) {
+		start : function(loadUrl) {
+			console.log("Session start");
 			var _self = this;
 			// Backbone.methodOverride = true;
-			new Calipso.model.UserDetailsModel().fetch({
-				async : false,
-				url : loadUrl ? loadUrl : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails/remembered",
+			return this.userDetails.fetch({
+				//async : false,
+				url : loadUrl ? loadUrl : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails",
 				success : function(model, response, options) {
-					if (model.id) {
-						_self.userDetails = model;
-						Calipso.vent.trigger('session:created', _self.userDetails);
-					}
+					console.log("Session trigger remmber");
+					_self.trigger("remmber", model, options );
 				}
 			});
 
 		},
-
 		// Logout the user here and on the server side.
 		destroy : function() {
+			var _self = this;
 			if (this.userDetails) {
 				//this.userDetails.url = Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails";
 				this.userDetails.destroy({
 					async : false,
 					url : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails",
 					success : function(model, response) {
-						this.userDetails = model;
+							_self.userDetails = model;
+							_self.reset();
 					},
-					error : function() {
-						this.userDetails = null;
-						// TODO: have constants defined by dev.properties > calipso.properties > index.jsp
-						//						this.deleteCookie("JSESSIONID");
-						//						this.deleteCookie("calipso-sso");
-					}
 				});
-				this.userDetails.clear();
-				this.userDetails = null;
 			}
 		},
 		getBaseUrl : function() {

@@ -37,6 +37,9 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 	Calipso.model.GenericModel = Backbone.Model.extend(
 	/** @lends Calipso.model.GenericModel.prototype */
 	{
+		isPublic : function(){
+			return this.constructor.isPublic(key);
+		},
 		getUseCase : function(key) {
 			return this.constructor.getUseCase(key);
 		},
@@ -172,12 +175,14 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 			if (this.getFormSubmitButton()) {
 				this.set("calipsoFormSubmitButton", this.getFormSubmitButton());
 			}
+			/*
 			this.on("change", function(model, options) {
 				console.log("Model on change, saving self");
 				if (options && options.save === false) {
 					return;
 				}
 			});
+			*/
 		},
 		sync : function() {
 			// apply partial update hints
@@ -209,6 +214,9 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 		businessKey : "name",
 		baseFragment : '/api/rest/',
 		typeaheadSources : {},
+		isPublic : function(){
+			return this.public || false;
+		},
 		create : function(attrs, options) {
 			return new this(attrs, options);
 		},
@@ -598,12 +606,18 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 		toString : function() {
 			return this.get("username");
 		},
+		isNew : function(){
+			return true;
+		},
 		sync : function(method, model, options) {
+			this.set("id", null);
 			var _this = this;
 			options = options || {};
 			options.timeout = 30000;
 			if (!options.url) {
-				options.url = Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/" + _this.getPathFragment();
+				options.url = Calipso.getBaseUrl() +
+				Calipso.getConfigProperty("apiAuthPath") + "/" +
+				_this.getPathFragment()/* + "/" + _this.getΙδ()	*/;
 			}
 			// options.dataType = "jsonp"; // JSON is default.
 			return Backbone.sync(method, model, options);
@@ -613,6 +627,7 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 	// static members
 	{
 		parent : Calipso.model.GenericModel,
+		public : true,
 		pathFragment : "userDetails",
 		baseFragment : '/apiauth/',
 		typeName : "Calipso.model.UserDetailsModel",
@@ -650,6 +665,13 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 				"datatype" : "ConfirmPassword",
 			}
 		},
+   	getInstance: function () {
+	   	if (this._instance === undefined) {
+	    	this._instance = new this();
+	    }
+	    return this._instance;
+	  },
+		/*
 		getFormSchemas : function(instance) {
 			var passwordText = {
 				type : 'Password',
@@ -736,7 +758,7 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 					"create-withToken" : passwordConfirm,
 				},
 			};
-		}
+		}*/
 	});
 
 	// User Registration Model

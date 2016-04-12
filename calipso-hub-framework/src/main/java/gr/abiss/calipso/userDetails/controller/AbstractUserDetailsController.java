@@ -97,16 +97,16 @@ public abstract class AbstractUserDetailsController<S extends UserDetailsService
 //		return userDetails;
 //	}
 
-	/**
-	 * Logins the given user after reseting his password
-	 * @param request
-	 * @param response
-	 * @param user
-	 * @param token
-	 * @return
-	 */
-	@RequestMapping(value = "password-reset/{token}", method = RequestMethod.POST)
-	@ResponseBody
+//	/**
+//	 * Logins the given user after reseting his password
+//	 * @param request
+//	 * @param response
+//	 * @param user
+//	 * @param token
+//	 * @return
+//	 */
+//	@RequestMapping(value = "password-reset/{token}", method = RequestMethod.POST)
+//	@ResponseBody
 	public ICalipsoUserDetails resetPasswordAndLogin(
 HttpServletRequest request,
 			HttpServletResponse response, @RequestBody UserDetails user,
@@ -121,20 +121,20 @@ HttpServletRequest request,
 		return userDetails;
 	}
 
-	@RequestMapping(value = "password-reset-request/{userNameOrEmail}", method = RequestMethod.POST)
-	@ResponseBody
+//	@RequestMapping(value = "password-reset-request/{userNameOrEmail}", method = RequestMethod.POST)
+//	@ResponseBody
 	public void handlePasswordResetRequest(@PathVariable String userNameOrEmail) {
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("handlePasswordResetRequest: Trying to reset password");
 		}
 		service.handlePasswordResetRequest(userNameOrEmail);
 	}
-
-	@RequestMapping(value = "userDetails/remembered", method = RequestMethod.GET)
-	@ResponseBody
+	
+//	@RequestMapping(value = "userDetails", method = RequestMethod.GET)
+//	@ResponseBody
 	public ICalipsoUserDetails getRemembered(HttpServletRequest request,
 			HttpServletResponse response) {
-		
+
 		UserDetails resource = null;
 
 		Cookie tokenCookie = null;
@@ -167,9 +167,9 @@ HttpServletRequest request,
 		}
 		return this.create(request, response, resource);
 	}
-
-	@RequestMapping(value = "userDetails", method = RequestMethod.POST)
-	@ResponseBody
+//
+//	@RequestMapping(value = "login", method = RequestMethod.POST)
+//	@ResponseBody
 	public ICalipsoUserDetails create(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
 
 		if(LOGGER.isDebugEnabled()){
@@ -177,7 +177,6 @@ HttpServletRequest request,
 		}
 		return this.create(request, response, resource, true);
 	}
-
 	/**
 	 * Update the user details object, i.e. change the user password
 	 * @param request
@@ -185,9 +184,10 @@ HttpServletRequest request,
 	 * @param resource
 	 * @return
 	 */
-	@RequestMapping(value = "userDetails", method = RequestMethod.PUT)
+	@RequestMapping(value = "resetPassword", method = {RequestMethod.PUT,RequestMethod.POST,RequestMethod.PATCH})
 	@ResponseBody
 	public UserDetails update(HttpServletRequest request, HttpServletResponse response, @RequestBody UserDetails resource) {
+		
 		resource = (UserDetails) this.service.update(resource);
 		SecurityUtil.login(request, response, resource, userDetailsConfig, this.service);	
 		return resource;

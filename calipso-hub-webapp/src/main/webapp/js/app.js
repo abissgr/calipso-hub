@@ -34,12 +34,6 @@ function(
 		return Backbone.$.ajax.apply(Backbone.$, arguments);
 	};
 
-	// initialize/configure application 
-	Calipso.initializeApp({
-		contextPath: "calipso/",
-	});
-
-
 	//////////////////////////////////
 	// intercept links
 	//////////////////////////////////
@@ -84,16 +78,24 @@ function(
 	//////////////////////////////////
 	// Start the app
 	//////////////////////////////////
-	var options = {};
-	options.routers = {};
-	options.routers.main = MainRouter;
-	options.menu = [ {
+
+
+  var initOptions = {
+    contextPath: "calipso/",
+  };
+
+	var startOptions = {};
+	startOptions.routers = {};
+	startOptions.routers.main = MainRouter;
+	startOptions.menu = [ {
 		label: "Users",
 		url: "users"
 	},{
 		label: "Hosts",
 		url: "hosts"
 	} ];
-    
-	Calipso.app.start(options);
+
+  Calipso.start(initOptions, startOptions);
+
+	return Calipso;
 });
