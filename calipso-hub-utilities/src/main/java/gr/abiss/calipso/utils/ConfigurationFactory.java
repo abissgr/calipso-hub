@@ -12,6 +12,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  */
 public class ConfigurationFactory {
 	public static final String BASE_URL = "calipso.baseurl";
+	public static final String SCRIPT_MAIN = "scriptMain";
+	
 	public static final String INIT_DATA = "calipso.initData";
 	public static final String FILES_DIR = "calipso.files.dir";
 	private static CompositeConfiguration config = new CompositeConfiguration();

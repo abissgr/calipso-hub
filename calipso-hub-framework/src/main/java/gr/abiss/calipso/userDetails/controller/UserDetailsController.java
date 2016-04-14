@@ -76,7 +76,6 @@ public class UserDetailsController {
 	
 	@Inject
 	@Qualifier("userDetailsService")
-	// somehow required for CDI to work on 64bit JDK?
 	public void setService(UserDetailsService service) {
 		this.service = service;
 	}
@@ -84,12 +83,26 @@ public class UserDetailsController {
 	//
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
-	public ICalipsoUserDetails login(@RequestBody UserDetails resource) {
+	public ICalipsoUserDetails create(@RequestBody ICalipsoUserDetails resource) {
 
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("Login");
+			LOGGER.debug("create");
 		}
-		return this.create(resource, true);
+		if(resource.getEmailOrUsername() != null){
+			// change password
+			if(resource.getResetPasswordToken() != null){
+				resource = this.resetPasswordAndLogin(resource);
+			}
+			// if login
+			else if(resource.getPassword() != null){
+				resource = this.login(resource, true);
+			}
+			// forgot password
+			else{
+				this.service.handlePasswordResetRequest(resource.getEmailOrUsername());
+			}
+		}
+		return resource;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -129,93 +142,61 @@ public class UserDetailsController {
 				}
 			}
 		}
-		return this.login(resource);
+		return this.create(resource);
 
 	}
-	
+
+	/**
+	 * Log out the user
+	 */
+	@RequestMapping(method = RequestMethod.DELETE)
+	@ResponseBody
+	public ICalipsoUserDetails delete() {
+		// logout
+		SecurityUtil.logout(request, response, userDetailsConfig);
+		return new UserDetails();
+	}
 	
 
-	public ICalipsoUserDetails resetPasswordAndLogin(@RequestBody UserDetails user,
-			@PathVariable String token) {
+	public ICalipsoUserDetails resetPasswordAndLogin(@RequestBody ICalipsoUserDetails userDetails) {
 
-		String userNameOrEmail = user.getEmailOrUsername();
-		ICalipsoUserDetails userDetails = service.resetPassword(
-				userNameOrEmail, token, user.getPassword());
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("resetPasswordAndLogin");
+		}
+		userDetails = service.resetPassword(userDetails);
 		SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
 		
 		
 		return userDetails;
 	}
 	
-	public void handlePasswordResetRequest(@PathVariable String userNameOrEmail) {
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("handlePasswordResetRequest: Trying to reset password");
-		}
-		service.handlePasswordResetRequest(userNameOrEmail);
-	}
-
-	protected ICalipsoUserDetails create( UserDetails resource, boolean apply) {
-		ICalipsoUserDetails userDetails = null;
+	protected ICalipsoUserDetails login(ICalipsoUserDetails userDetails, boolean apply) {
 
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("protected create");
+			LOGGER.debug("login");
 		}
-		if(resource != null){
-
-			if(BooleanUtils.isTrue(resource.getIsResetPasswordReguest())){
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.debug("Forgotten password request, will createg token");
-				}
-				this.handlePasswordResetRequest(resource.getEmailOrUsername());
-				userDetails = resource;
-				
-			}
-			else if(resource.getResetPasswordToken() != null){
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.debug("Trying to change password ewith reset token anf login");
-				}
-				userDetails = this.resetPasswordAndLogin(resource, resource.getResetPasswordToken());
-				
-			}
-			else{
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.debug("Trying to " + (apply?"login":"confirm password") + " with: "+resource);
-				}
-				userDetails = login(request, response, resource, apply, userDetails);
-			}
-			
-		}
-		return userDetails;
-	}
-	protected ICalipsoUserDetails login(HttpServletRequest request,
-			HttpServletResponse response, UserDetails resource, boolean apply,
-			ICalipsoUserDetails userDetails) {
 		try {
-			userDetails = resource != null ? this.service.create(resource) : null;
-
-			LOGGER.info("create userDetails: " + userDetails);
+			userDetails = this.service.create(userDetails);
 			if (userDetails != null && userDetails.getId() != null) {
 				if(apply){
+					LOGGER.info("login, applying: " + userDetails);
 					SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
+				}
+				else{
+
+					LOGGER.info("login, skipping: " + userDetails);
 				}
 			} else {
 				if(apply){
+					LOGGER.info("login, logging out: " + userDetails);
 					SecurityUtil.logout(request, response, userDetailsConfig);
 				}
+				LOGGER.info("login, anew: " + userDetails);
 				userDetails = new UserDetails();
 			}
 		}
 		catch (Throwable e) {
-			StackTraceElement[] elems = e.getStackTrace();
-			LOGGER.error("printing stacktrace...");
-			for(int i=0;i<elems.length;i++){
-				StackTraceElement elem = elems[i];
-				LOGGER.error(elem.getFileName() + ", line "
-						+ elem.getLineNumber());
-			}
-			LOGGER.error(
-					"UserDetailsController failed creating new userDetails",
-					e);
+			LOGGER.error("login: failed creating new userDetails",	e);
 		}
 		return userDetails;
 	}

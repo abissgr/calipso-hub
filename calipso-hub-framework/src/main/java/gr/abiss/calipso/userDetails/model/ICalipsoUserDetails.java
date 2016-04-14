@@ -10,7 +10,9 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonDeserialize(as=UserDetails.class)
 public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public String getEmailOrUsername();
@@ -19,13 +21,6 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public void setId(String id);
 	
-
-	public Boolean getIsResetPasswordReguest();
-
-	public void setIsResetPasswordReguest(Boolean isReset);
-	
-	
-
 	public String getFirstName();
 
 	public void setFirstName(String firstName);
@@ -98,8 +93,6 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 
 	public String getRedirectUrl();
 
-	public void setConfirmationToken(String confirmationToken);
-
 	public void setResetPasswordToken(String resetPasswordToken);
 
 	public Map<String, String> getMetadata();
@@ -107,8 +100,6 @@ public interface ICalipsoUserDetails extends SocialUserDetails {
 	public void setMetadata(Map<String, String> metadata);
 
 	public void addMetadatum(String predicate, String object);
-
-	public String getConfirmationToken();
 
 	public String getResetPasswordToken();
 

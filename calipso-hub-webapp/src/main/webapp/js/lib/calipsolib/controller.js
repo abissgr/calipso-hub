@@ -29,11 +29,14 @@ define(
 		constructor : function(options) {
 			//consolelog("AbstractController#constructor");
 			Marionette.Controller.prototype.constructor.call(this, options);
-			this.layout = new Calipso.view.AppLayout({
-				model : Calipso.session
-			});
-			Calipso.vent.trigger('app:show', this.layout);
+			//this.layout = new Calipso.view.AppLayout({
+			//	model : Calipso.session
+			//});
+			//Calipso.vent.trigger('app:show', this.layout);
 
+		},
+		showView : function(view){
+			Calipso.app.mainContentRegion.show(view);
 		},
 		toHome : function() {
 			Calipso.navigate("home", {
@@ -41,13 +44,13 @@ define(
 			});
 		},
 		home : function() {
-			//consolelog("AbstractController#home");
-			if (!Calipso.util.isAuthenticated()) {
+			console.log("AbstractController#home");
+			/*if (!Calipso.util.isAuthenticated()) {
 				this._redir("userDetails/login");
 			}
-			else{
-				this.layout.contentRegion.show(new Calipso.view.HomeLayout());
-			}
+			else{*/
+				this.showView(new Calipso.view.HomeLayout());
+			//}
 		},
 
 		_redir : function(firstLevelFragment, forwardAfter) {
@@ -74,7 +77,7 @@ define(
 			} else {
 				this.showLayoutForModel(new Calipso.model.UserDetailsModel(), null, null);
 			}
-		},*/
+		},
 		renderTokenPasswordChangeForm : function(username, token) {
 			var model = new Calipso.model.UserDetailsModel({
 				username : username,
@@ -105,9 +108,9 @@ define(
 				}
 			}
 			this.showLayoutForModel(userDetails, null, null);
-		},
+		},*/
 		logout : function() {
-			Calipso.vent.trigger("session:destroy");
+			Calipso.session.logout();
 			// this.login();
 			//window.parent.destroy();
 		},
@@ -124,7 +127,9 @@ define(
 		showLayoutForModel : function(givenModel, useCaseContext, layoutOptions) {
 			// instantiate and show the layout
 			var view = new useCaseContext.view({model: givenModel, useCaseContext: useCaseContext});
-			Calipso.vent.trigger("app:show", view);
+			//Calipso.vent.trigger("app:show", view);
+
+			this.showView(view);
 		},
 		/**
 		 * Get a model representing the current request.
@@ -157,9 +162,9 @@ define(
 			// Obtain a model for the view:
 			// if a model id is present, obtain a promise
 			// for the corresponding instance
-
+			console.log("getModelForRoute ModelType: " + ModelType.getTypeName() + ", modelId: " + modelId);
 			var modelForRoute;
-			if (modelId) {
+			if (modelId || (ModelType.getTypeName() == "Calipso.model.UserDetailsModel")) {
 				modelForRoute = ModelType.create({
 					id : modelId,
 				});
@@ -237,7 +242,7 @@ define(
 			this.showUseCaseView(mainRoutePart, modelId, "view", null);
 		},
 		showUserDetailsView : function(useCaseKey, httpParams) {
-			this.showUseCaseView( "userDetails", useCaseKey, useCaseKey, httpParams)
+			this.showUseCaseView( "userDetails", null, useCaseKey, httpParams)
 		},
 		showUseCaseView : function(mainRoutePart, modelId, useCaseKey, httpParams) {
 			console.log("showUseCaseView mainRoutePart: " + mainRoutePart + ", modelId: " + modelId + ", useCaseKey: " + useCaseKey);
@@ -271,8 +276,8 @@ define(
 			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
 			var renderFetchable = function() {
 
-				Calipso.vent.trigger("app:show", useCaseContext.createView());
-
+				//Calipso.vent.trigger("app:show", useCaseContext.createView());
+				_self.showView(useCaseContext.createView());
 				// TODO: remove/move to header view events;
 				// update page header tabs etc.
 				// this has been left over from when the associated markup was
@@ -292,7 +297,9 @@ define(
 		},
 		notFoundRoute : function() {
 			// build the model instancde representing the current request
-			Calipso.vent.trigger("app:show", new Calipso.view.NotFoundView());
+
+						this.showView(new Calipso.view.NotFoundView());
+			//Calipso.vent.trigger("app:show", new Calipso.view.NotFoundView());
 
 		},
 		//		decodeParam : function(s) {
@@ -330,7 +337,8 @@ define(
 				template : Calipso.getTemplate(templateName),
 				tagName : "div"
 			});
-			Calipso.vent.trigger("app:show", pageView);
+			this.showView(pageView);
+			//Calipso.vent.trigger("app:show", pageView);
 		},
 		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart) {
 			if (typeof this[mainRoutePart] == 'function') {
@@ -340,7 +348,7 @@ define(
 		},
 		notFoundRoute : function(path) {
 			// console.log("notFoundRoute, path: "+path);
-			this.layout.contentRegion.show(new Calipso.view.NotFoundView());
+			this.showView(new Calipso.view.NotFoundView());
 		},
 		editItem : function(item) {
 			//console.log("MainController#editItem, item: " + item);

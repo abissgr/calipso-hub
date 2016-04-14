@@ -31,6 +31,7 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +96,7 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 	private String redirectUrl = null;
 
-	@JsonSerialize(using = SkipPropertySerializer.class)
+	@JsonIgnore//Serialize(using = SkipPropertySerializer.class)
 	private Boolean active = false;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
@@ -111,8 +112,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private List<? extends GrantedAuthority> authorities;
 	private Map<String, String> metadata;
 	
-	@JsonSerialize(using = SkipPropertySerializer.class)
-	private String confirmationToken;
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	private String resetPasswordToken;
 	
@@ -548,14 +547,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 	}
 
 	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setConfirmationToken(java.lang.String)
-	 */
-	@Override
-	public void setConfirmationToken(String confirmationToken) {
-		this.confirmationToken = confirmationToken;
-	}
-
-	/**
 	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setResetPasswordToken(java.lang.String)
 	 */
 	@Override
@@ -591,14 +582,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 		LOGGER.info("addMetadatum predicate: " + predicate + ", object: "
 				+ object);
 		this.metadata.put(predicate, object);
-	}
-
-	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getConfirmationToken()
-	 */
-	@Override
-	public String getConfirmationToken() {
-		return confirmationToken;
 	}
 
 	/**
@@ -689,7 +672,7 @@ public class UserDetails implements  ICalipsoUserDetails{
 	 */
 	@Override
 	public boolean isEnabled() {
-		return this.active;
+		return BooleanUtils.isTrue(this.active);
 	}
 
 	/**
@@ -744,14 +727,4 @@ public class UserDetails implements  ICalipsoUserDetails{
 		this.passwordConfirmation = passwordConfirmation;
 	}
 
-	@Override
-	public Boolean getIsResetPasswordReguest() {
-		// TODO Auto-generated method stub
-		return this.isResetPasswordReguest ;
-	}
-
-	@Override
-	public void setIsResetPasswordReguest(Boolean isResetPasswordReguest) {
-		this.isResetPasswordReguest = isResetPasswordReguest;
-	}
 }

@@ -27,7 +27,7 @@ import org.resthub.common.service.CrudService;
 
 public interface UserDetailsService extends CrudService<ICalipsoUserDetails, String> {
 
-	ICalipsoUserDetails resetPassword(String userNameOrEmail, String token, String newPassword);
+	ICalipsoUserDetails resetPassword(ICalipsoUserDetails userDetails);
 
 	void handlePasswordResetRequest(String userNameOrEmail);
 

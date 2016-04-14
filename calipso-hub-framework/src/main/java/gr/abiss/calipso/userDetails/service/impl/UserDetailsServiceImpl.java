@@ -221,13 +221,15 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Override
 	@Transactional(readOnly = false)
-	public ICalipsoUserDetails resetPassword(String usernameOrEmail, String token, String newPassword) {
-		Assert.notNull(usernameOrEmail);
-		ICalipsoUserDetails userDetails = null;
+	public ICalipsoUserDetails resetPassword(ICalipsoUserDetails userDetails) {
+		String userNameOrEmail = userDetails.getEmailOrUsername();
+		String token = userDetails.getResetPasswordToken();
+		String newPassword = userDetails.getPassword();
+		Assert.notNull(userNameOrEmail);
 		LocalUser localUser = this.localUserService.handlePasswordResetToken(
-				usernameOrEmail, token, newPassword);
+				userNameOrEmail, token, newPassword);
 		if (localUser == null) {
-			throw new UsernameNotFoundException("Could not match username: " + usernameOrEmail);
+			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
 		localUser.setResetPasswordToken(null);
 		localUser.setPassword(newPassword);

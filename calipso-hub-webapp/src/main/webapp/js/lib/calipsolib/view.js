@@ -63,6 +63,7 @@ define(
 			});
 
 			Calipso.view.HomeLayout = Calipso.view.CalipsoLayout.extend({
+					template : Calipso.getTemplate('homeLayout'),
 				onShow : function() {
 					var _this = this;
 					console.log("HomeLayout#onShow");
@@ -80,10 +81,7 @@ define(
 				skipSrollToTop : false,
 				// regionName : viewType
 				regionViewTypes : {},
-				modelEvents : {
-					// TODO: call next useCase as defined by useCaseConfig
-					"sync" : "onModelSync"
-				},
+				viewEvents : {},
 				initialize : function(options) {
 					Calipso.view.CalipsoLayout.prototype.initialize.apply(this, arguments);
 					if (!this.skipSrollToTop) {
@@ -117,25 +115,41 @@ define(
 					return new RegionManager();
 				},
 				showChildView : function(regionName, view) {
+					var _this = this;
 					view.useCaseContext == (view.useCaseContext ? view.useCaseContext : this.useCaseContext);
 					view.regionName = regionName;
 					view.regionPath = this.regionPath + "." + regionName;
 
-					console.log(this.getTypeName() + ".showChildView regionPath: " + view.regionPath + ", view: " + (view.getTypeName ? view.getTypeName() : "NONE") + ", useCase: " + (view.useCaseContext ? view.useCaseContext.key : "NONE"));
-					// render child view
-					if (regionName == "admin") {
-						throw "no admin region";
-					}
+					// bind to view events according to viewEvents hash
+					_.each(this.viewEvents, function(method, eventName, list){
+						//console.log(_this.getTypeName() + " subscribing to view event: " + eventName);
+						_this.listenTo(view, eventName, function(options){
+							// if method is own method name
+							if (_.isString(method) && _this[method]){
+								_this[method](options);
+							}
+							// if method is a function
+							else if (_.isFunction(method)){
+								method(options);
+							}
+						});
+					});
 					Backbone.Marionette.LayoutView.prototype.showChildView.apply(this, arguments);
 				},
-				onModelSync : function(model, response, options) {
-					console.log(this.getTypeName() + ".onModelSync model: ");
-					console.log(model);
-					console.log(this.getTypeName() + ".onModelSync options: ");
-					console.log(options);
-					console.log(this.getTypeName() + ".onModelSync useCase: ");
-					console.log(this.useCase ? this.useCase.key : this.useCase);
+				onModelSync : function(args) {
+					// execute next useCase by default
+					this.nextUseCase();
 				},
+				nextUseCase : function(){
+					console.log(this.getTypeName() + ".nextUseCase, navigating to defaultNext: " + this.useCaseContext.defaultNext);
+					// TODO: handle from (and reuse) layout
+					if(this.useCaseContext.defaultNext){
+						Calipso.navigate('/' + this.model.getPathFragment() + '/' + this.useCaseContext.defaultNext, {trigger : true})
+					}
+					else{
+						throw "Use case does not define a defaultNext";
+					}
+				}
 			}, {
 				typeName : "Calipso.view.UseCaseLayout",
 			});
@@ -279,7 +293,7 @@ define(
 				},
 				login : function(e) {
 					Calipso.stopEvent(e);
-					Calipso.navigate("login", {
+					Calipso.navigate("userDetails/login", {
 						trigger : true
 					});
 				}
@@ -602,6 +616,7 @@ define(
 				mergableOptions : [ 'useCaseContext', 'formOptions' ],
 				initialize : function(options) {
 					Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
+					var _this = this;
 					this.mergeOptions(options, this.mergableOptions);
 				},
 				onBeforeShow : function() {
@@ -609,6 +624,7 @@ define(
 					this.useCase = this.useCaseContext.getUseCase(this.regionName, this.schemaType);
 					this.schema = this.buildSchema();
 				},
+				/** builds a UI-specific schema for the given fields */
 				buildSchema : function(fields) {
 					var _this = this, schemaType = this.schemaType, isArray = this.schemaType == "backgrid", schema = null;
 
@@ -620,6 +636,8 @@ define(
 
 						schema = isArray ? [] : {};
 						_.each(fields, function(field, key) {
+							//console.log(_this.getTypeName() + "#buildSchema key: " + key + ", field: ");
+							//console.log(field);
 							baseSchemaEntry = Calipso.datatypes[field.datatype][schemaType];
 							overrideSchemaEntry = field[schemaType];
 							// if a schema entry exists, add it
@@ -773,7 +791,7 @@ define(
 					// console.log("ModelDrivenCollectionGridView showed");
 
 				},
-				// REMOVE
+				// TODO: REMOVE. old Ie8 feature
 				showFixedHeader : function() {
 					var fixedHeaderContainer = this.$el.find(".backgrid-fixed-header");
 					if (fixedHeaderContainer.length > 0) {
@@ -804,7 +822,10 @@ define(
 				typeName : "Calipso.view.ModelDrivenCollectionGridView",
 			});
 
-			// Model Driven Form View
+			/*
+			 * Use-case driven form view.
+			 * @fires GenericFormView#model:sync when the model is persisted successfully
+			 */
 			Calipso.view.GenericFormView = Calipso.view.UseCaseItemView
 					.extend(
 							{
@@ -927,6 +948,12 @@ define(
 														_this.addToCollection.add(_this.model);
 														_this.model.trigger("added");
 													}
+													// trigger model:sync
+													_this.triggerMethod("model:sync", {
+														model : _this.model,
+														view : _this,
+														collection : _this.collection
+													});
 													if (_this.modal) {
 														Calipso.vent.trigger("modal:destroy");
 													} else {
@@ -1037,6 +1064,16 @@ define(
 									// flag changed
 									this.listenTo(this.form, 'change', function() {
 										_self.hasDraft = true;
+									});
+
+									// proxy model events to parent layout
+									this.listenTo(this.form, "all", function(eventName){
+										console.log(_self.getTypeName() + " triggering event form:" + eventName);
+										_self.triggerMethod("form:" + eventName, {
+											model : _self.model,
+											view : _self,
+											collection : _self.collection
+										});
 									});
 								},
 								onFormRendered : function() {
@@ -1371,7 +1408,25 @@ define(
 			/** @lends Calipso.view.UserDetailsLayout.prototype */
 			{
 				template : Calipso.getTemplate('userDetails-layout'),
-				onModelSync : function(model, response, options) {
+				viewEvents : {
+					"model:sync" : "onModelSync"
+				},
+				onModelSync : function(options) {
+					// if successful login
+					if(this.model.get("id")){
+						var fw = this.model.get(fw) || "/home";
+						console.log(this.getTypeName() + "#onModelSync successful login, fw: " + fw);
+							Calipso.navigate(fw, {
+								trigger : true
+							});
+					}
+					// else just follow useCase configuration
+					else{
+						console.log(this.getTypeName() + "#onModelSync call super.onModelSync to apply nextUseCase config");
+							Calipso.view.UseCaseLayout.prototype.onModelSync.apply(this, arguments);
+					}
+				},
+				/*onModelSync : function(model, response, options) {
 					Calipso.session.reset(model);
 					// if successful login
 					if(this.model.get("id")){
@@ -1382,7 +1437,7 @@ define(
 						console.log(this.getTypeName() + "#onModelSync call super.onModelSync to apply nextUseCase config");
 							Calipso.view.UseCaseLayout.prototype.onModelSync.apply(this, arguments);
 					}
-				},
+				},*/
 
 			/*regions : {
 				contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion",

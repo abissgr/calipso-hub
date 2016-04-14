@@ -2,11 +2,16 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%
-    String basePath = gr.abiss.calipso.utils.ConfigurationFactory
-            .getConfiguration()
-            .getString(
-                    gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
+    org.apache.commons.configuration.Configuration configuration = 
+    	    gr.abiss.calipso.utils.ConfigurationFactory.getConfiguration();
+
+	String basePath = configuration.getString(
+	        gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
+	String scriptMain = configuration.getString(
+	        gr.abiss.calipso.utils.ConfigurationFactory.SCRIPT_MAIN, "main");
     pageContext.setAttribute("basePath", basePath);
+    pageContext.setAttribute("scriptMain", scriptMain);
+    
 %>
     <meta charset="utf-8" />
     <title>Calipso-hub</title>

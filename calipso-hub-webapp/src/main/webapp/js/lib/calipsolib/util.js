@@ -455,7 +455,7 @@ define(
 		});
 
 		// TODO: on userDetails model destroy
-		Calipso.vent.on('session:destroy', function(userDetails) {
+		/*Calipso.vent.on('session:destroy', function(userDetails) {
 			Calipso.session.destroy();
 			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 				model : userDetails
@@ -464,7 +464,7 @@ define(
 				trigger : true
 			});
 		});
-
+*/
 		Calipso.vent.on('nav-menu:change', function(modelkey) {
 			// console.log("vent event nav-menu:change");
 		});
@@ -670,20 +670,8 @@ define(
 			// start backbone history
 			Calipso._startHistory();
 		});
-		/*Calipso.session.on("remmber", function(model, options){
-			console.log("Calipso.session remmbered");
-			// start rendering
-			// todo: listen to sync events
-			// re-render HEADER/FOOTER
 
-
-		})*/
-		//	try "remember me" and start app
-		Calipso.session.on("remmber", function(model, optiona){
-			console.log("Calipso.start, session remmber cought, starting app");
-			Calipso.app.start(startOptions);
-		});
-		Calipso.session.start();
+		Calipso.session.start(startOptions);
 	}
 	// //////////////////////////////////////
 	// Region
@@ -1095,8 +1083,8 @@ define(
 	* business key/URI componenent
 	*/
 	Calipso.util.getModelType = function(modelTypeKey) {
-		console.log("getModelType, modelTypeKey: " + modelTypeKey);
-		console.log(Calipso.modelTypesMap);
+		// console.log("getModelType, modelTypeKey: " + modelTypeKey);
+		// console.log(Calipso.modelTypesMap);
 		// load model Type
 		var ModelType;
 		if (Calipso.modelTypesMap[modelTypeKey]) {
@@ -1228,11 +1216,11 @@ define(
 			fieldMasks : null,
 			view : null,
 			viewOptions : {},
-			mergableOptions: ['key', 'roleIncludes', 'roleExcludes',
+			mergableOptions: ['key', 'defaultNext', 'roleIncludes', 'roleExcludes',
 				'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'view', 'views', 'regions', 'viewOptions', 'model'],
 			initialize : function(options){
-			//console.logseCase("UseCaseContext#initialize, options:")
-		    console.log(options);
+				//console.logseCase("UseCaseContext#initialize, options:")
+		    //console.log(options);
 				Marionette.Object.prototype.initialize.apply(this, arguments);
 				this.mergeOptions(options, this.mergableOptions);
 				this.initFields();

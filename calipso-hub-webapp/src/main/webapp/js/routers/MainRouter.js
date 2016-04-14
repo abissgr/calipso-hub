@@ -29,6 +29,8 @@ define(['marionette', 'calipso', 'controllers/MainController'], function (Marion
 			'#_=_' : 'toHome',
 			'home' : 'home',
 
+			'logout' : 'logout',
+			
 			'userDetails/:useCaseKey' : 'showUserDetailsView',
 			'userDetails/:useCaseKey/' : 'showUserDetailsView',
 			'userDetails/:useCaseKey?*queryString' : 'showUserDetailsView',

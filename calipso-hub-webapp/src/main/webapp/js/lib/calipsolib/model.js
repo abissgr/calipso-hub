@@ -593,6 +593,7 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 	Calipso.model.UserDetailsModel = Calipso.model.GenericModel.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
+		// TODO: move to usecases/labels
 		getViewTitle : function() {
 			var schemaKey = this.getFormSchemaKey();
 			var title = "";
@@ -606,9 +607,7 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 		toString : function() {
 			return this.get("username");
 		},
-		isNew : function(){
-			return true;
-		},
+		/*
 		sync : function(method, model, options) {
 			this.set("id", null);
 			var _this = this;
@@ -617,11 +616,12 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 			if (!options.url) {
 				options.url = Calipso.getBaseUrl() +
 				Calipso.getConfigProperty("apiAuthPath") + "/" +
-				_this.getPathFragment()/* + "/" + _this.getΙδ()	*/;
+				_this.getPathFragment(); // + "/" + _this.getΙδ()	;
 			}
 			// options.dataType = "jsonp"; // JSON is default.
 			return Backbone.sync(method, model, options);
 		}
+		*/
 
 	},
 	// static members
@@ -638,11 +638,17 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 			},
 			resetPassword : {
 				view : Calipso.view.UserDetailsLayout,
-				fieldIncludes : ["id", "password", "passwordConfirmation" ],
+				fieldIncludes : ["email", "resetPasswordToken", "password", "passwordConfirmation" ],
+				fields : {
+					email : {
+						dataType : "Hidden"
+					}
+				}
 			},
 			forgotPassword : {// enter new password
 				view : Calipso.view.UserDetailsLayout,
-				fieldIncludes : ["id", "password", "passwordConfirmation" ],
+				fieldIncludes : ["email" ],
+				defaultNext : "resetPassword",
 			},
 		},
 		fields : {
@@ -665,7 +671,7 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 				"datatype" : "ConfirmPassword",
 			}
 		},
-   	getInstance: function () {
+   	create: function () {
 	   	if (this._instance === undefined) {
 	    	this._instance = new this();
 	    }

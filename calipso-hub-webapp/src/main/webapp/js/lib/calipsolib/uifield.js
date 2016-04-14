@@ -40,6 +40,13 @@ function(Calipso, _, Handlebars, moment, Backbone, BackboneForms, BackboneFormsB
 		return extended;
 	};
 */
+	Calipso.datatypes.Hidden = Calipso.datatypes.Base.extend({}, {
+		dataTypeKey : "String",
+		"form" : {
+			type : "Hidden",
+			validators : [ /*'required'*/],
+		}
+	});
 	Calipso.datatypes.String = Calipso.datatypes.Base.extend({}, {
 		dataTypeKey : "String",
 		"backgrid" : {
