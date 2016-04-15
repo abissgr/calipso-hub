@@ -66,7 +66,7 @@ define(
 					template : Calipso.getTemplate('homeLayout'),
 				onShow : function() {
 					var _this = this;
-					console.log("HomeLayout#onShow");
+					//console.log("HomeLayout#onShow");
 				}
 			},
 			// static members
@@ -92,10 +92,10 @@ define(
 				},
 				onShow : function() {
 					var _this = this;
-					console.log(this.getTypeName() + ".onShow regionViewTypes: ");
-					console.log(this.regionViewTypes);
+					//console.log(this.getTypeName() + ".onShow regionViewTypes: ");
+					//console.log(this.regionViewTypes);
 					_.each(this.regionViewTypes, function(ViewType, regionName, list) {
-						console.log(_this.getTypeName() + ".onShow showing region: " + regionName + ", view: " + ViewType.getTypeName());
+						//console.log(_this.getTypeName() + ".onShow showing region: " + regionName + ", view: " + ViewType.getTypeName());
 						_this.showChildView(regionName, new ViewType(_.extend({
 							model : _this.useCaseContext.model,
 							useCaseContext : _this.useCaseContext
@@ -141,7 +141,7 @@ define(
 					this.nextUseCase();
 				},
 				nextUseCase : function(){
-					console.log(this.getTypeName() + ".nextUseCase, navigating to defaultNext: " + this.useCaseContext.defaultNext);
+					//console.log(this.getTypeName() + ".nextUseCase, navigating to defaultNext: " + this.useCaseContext.defaultNext);
 					// TODO: handle from (and reuse) layout
 					if(this.useCaseContext.defaultNext){
 						Calipso.navigate('/' + this.model.getPathFragment() + '/' + this.useCaseContext.defaultNext, {trigger : true})
@@ -311,7 +311,8 @@ define(
 				var templateHelpers = Marionette.getOption(self, "templateHelpers");
 				// add i18n labels from requirejs i18n
 				var result = {
-					labels : Calipso.util.getLabels()
+					labels : Calipso.util.getLabels(),
+					useCase : self.useCaseContext,
 				};
 				target = target || {};
 
@@ -614,6 +615,11 @@ define(
 			Calipso.view.UseCaseItemView = Calipso.view.ItemView.extend({
 				schemaType : null,
 				mergableOptions : [ 'useCaseContext', 'formOptions' ],
+				templateHelpers : {
+					viewId : function() {
+						return Marionette.getOption(this, "id");
+					},
+				},
 				initialize : function(options) {
 					Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
 					var _this = this;
@@ -664,9 +670,8 @@ define(
 
 						});
 					}
-
-					console.log("UseCaseItemView#buildSchema schema: ");
-					console.log(schema);
+					//console.log("UseCaseItemView#buildSchema schema: ");
+					//console.log(schema);
 					return schema;
 				},
 			}, {
@@ -685,13 +690,26 @@ define(
 				keyPropertyCopy : "name",
 				labelPropertyCopy : "label",
 
+				collection : null,
+				backgrid : null,
 				// Define view template
 				template : Calipso.getTemplate('md-collection-grid-view'),
 				events : {
 					"click button.btn-windowcontrols-destroy" : "back"
 				},
-				collection : null,
-				backgrid : null,
+
+				templateHelpers : {
+					viewId : function() {
+						return Marionette.getOption(this, "id");
+					},
+					resultsInfo : function() {
+						var resultsInfo = this.model.wrappedCollection.state;
+						var pastResults = (resultsInfo.pageSize * (resultsInfo.currentPage - resultsInfo.firstPage));
+						resultsInfo.pageStart = pastResults + 1;
+						resultsInfo.pageEnd = pastResults + this.model.wrappedCollection.length;
+						return resultsInfo;
+					},
+				},
 				back : function(e) {
 					Calipso.stopEvent(e);
 					window.history.back();
@@ -703,6 +721,10 @@ define(
 					this.collection = options.collection || options.model.wrappedCollection;
 					if (!this.collection) {
 						throw "no collection or collection wrapper model was provided";
+					}
+					else{
+						console.log(this.getTypeName() + "initialize, collection");
+						console.log(this.collection);
 					}
 
 					if (options.callCollectionFetch) {
@@ -722,9 +744,8 @@ define(
 				},
 				onShow : function() {
 					var _self = this;
-					console.log("GRID onshow schema: ");
-					;
-					console.log(this.schema);
+					//console.log("GRID onshow schema: ");
+					//console.log(this.schema);
 					this.backgrid = new Backgrid.Grid({
 						className : "backgrid responsive-table",
 						columns : _self.schema,
@@ -846,22 +867,12 @@ define(
 								// Define view template
 								formTitle : "options.formTitle",
 								template : Calipso.getTemplate('md-form-view'),
-								templateHelpers : {
-									formSchemaKey : function() {
-										return this.formSchemaKey;
-									},
-									formTitle : function() {
-										var title = Calipso.getObjectProperty(this.model, "label", "");
-										return title;
-									},
-								},
-
 								initialize : function(options) {
 									Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
-									console.log("FORM options: ");
-									console.log(options);
+									//console.log("FORM options: ");
+									//console.log(options);
 									this.mergeOptions(options, [ "modal", "addToCollection", "formTemplateKey", "formTemplate" ]);
-									console.log("FORM modal: " + this.modal);
+									//console.log("FORM modal: " + this.modal);
 									// grab a handle for the search results collection if any, from options or model
 									//TODO: remove
 									if (this.options.searchResultsCollection) {
@@ -1068,7 +1079,7 @@ define(
 
 									// proxy model events to parent layout
 									this.listenTo(this.form, "all", function(eventName){
-										console.log(_self.getTypeName() + " triggering event form:" + eventName);
+										//console.log(_self.getTypeName() + " triggering event form:" + eventName);
 										_self.triggerMethod("form:" + eventName, {
 											model : _self.model,
 											view : _self,
@@ -1175,23 +1186,22 @@ define(
 					<% } %>\
 					</form>\
 			'),
-
-								},
-								/**
-								 * Returns a Backbone.Form template
-								 * @param  {[Calipso.view.GenericFormView]} the form view instance
-								 * @param  {[String]} the template key, usually one of {"horizontal", "inline", "vertical"}
-								 * @return {[type]} the compiled template
-								 */
-								getFormTemplate : function(instance, templateKey) {
-									templateKey = templateKey ? templateKey : "horizontal";
-									return this.formTemplates[templateKey];
-								}
-							},
-							// static members
-							{
-								typeName : "Calipso.view.GenericFormView",
-							});
+		},
+		/**
+		 * Returns a Backbone.Form template
+		 * @param  {[Calipso.view.GenericFormView]} the form view instance
+		 * @param  {[String]} the template key, usually one of {"horizontal", "inline", "vertical"}
+		 * @return {[type]} the compiled template
+		 */
+		getFormTemplate : function(instance, templateKey) {
+			templateKey = templateKey ? templateKey : "horizontal";
+			return this.formTemplates[templateKey];
+		}
+	},
+	// static members
+	{
+		typeName : "Calipso.view.GenericFormView",
+	});
 
 			Calipso.view.GenericFormPanelView = Calipso.view.GenericFormView.extend({
 				template : Calipso.getTemplate('md-formpanel-view'),
@@ -1203,6 +1213,11 @@ define(
 
 			Calipso.view.AbstractItemView = Calipso.view.ItemView.extend({
 
+				templateHelpers : {
+					viewId : function() {
+						return Marionette.getOption(this, "id");
+					},
+				},
 				initialize : function(options) {
 
 					if (!options || !options.id) {
@@ -1210,14 +1225,6 @@ define(
 						$(this.el).attr('id', this.id);
 					}
 					Calipso.view.prototype.initialize.apply(this, arguments);
-				},
-				//				render : function() {
-				//					$(this.el).attr('id', Marionette.getOption(this, "id"));
-				//				},
-				templateHelpers : {
-					viewId : function() {
-						return Marionette.getOption(this, "id");
-					}
 				},
 				getTypeName : function() {
 					return this.constructor.getTypeName();
@@ -1338,9 +1345,8 @@ define(
 			});
 
 			Calipso.view.AppLayout = Calipso.view.CalipsoLayout.extend({
-				template : Calipso.getTemplate('applayout'),
 				tagName : "div",
-				template : Calipso.getTemplate('applayout'),// _.template(templates.applayout),
+				template : Calipso.getTemplate('applayout'),
 				regions : {
 					navRegion : "#calipsoAppLayoutNavRegion",
 					contentRegion : "#calipsoAppLayoutContentRegion"
@@ -1357,7 +1363,7 @@ define(
 					contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion"
 				},
 				regionViewTypes : {
-					contentRegion : Calipso.view.GenericFormView,
+					contentRegion : Calipso.view.GenericFormPanelView,
 				},
 			},
 			// static members
@@ -1414,15 +1420,15 @@ define(
 				onModelSync : function(options) {
 					// if successful login
 					if(this.model.get("id")){
+						// TODO: add 'forward' HTTP/URL param in controller cases
 						var fw = this.model.get(fw) || "/home";
 						console.log(this.getTypeName() + "#onModelSync successful login, fw: " + fw);
 							Calipso.navigate(fw, {
 								trigger : true
 							});
 					}
-					// else just follow useCase configuration
+					// else just follow useCase.defaultNext configuration
 					else{
-						console.log(this.getTypeName() + "#onModelSync call super.onModelSync to apply nextUseCase config");
 							Calipso.view.UseCaseLayout.prototype.onModelSync.apply(this, arguments);
 					}
 				},

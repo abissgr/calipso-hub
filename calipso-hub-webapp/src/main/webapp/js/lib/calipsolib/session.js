@@ -28,14 +28,10 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 			this.userDetails = Calipso.model.UserDetailsModel.create();
 			this.listenTo(this.userDetails, 'sync', function(model, response, options){
 				var changedId = !_.isUndefined(model.changed.id);
-				console.log("Calipso.util.Session cought userDetails sync, resetting: " + !_.isNull(model.get('id')));
+				console.log("Calipso.util.Session cought userDetails sync, resetting: " + changedId);
 				// if login/logout
 				if(changedId){
 					Calipso.updateHeaderFooter();
-					// if login
-					if(!_.isNull(model.get('id'))){
-						_session.onLogin();
-					};
 				}
 
 			});

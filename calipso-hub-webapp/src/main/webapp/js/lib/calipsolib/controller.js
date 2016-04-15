@@ -27,13 +27,7 @@ define(
 	// //////////////////////////////////////
 	Calipso.controller.AbstractController = Marionette.Controller.extend({
 		constructor : function(options) {
-			//consolelog("AbstractController#constructor");
 			Marionette.Controller.prototype.constructor.call(this, options);
-			//this.layout = new Calipso.view.AppLayout({
-			//	model : Calipso.session
-			//});
-			//Calipso.vent.trigger('app:show', this.layout);
-
 		},
 		showView : function(view){
 			Calipso.app.mainContentRegion.show(view);
@@ -44,7 +38,6 @@ define(
 			});
 		},
 		home : function() {
-			console.log("AbstractController#home");
 			/*if (!Calipso.util.isAuthenticated()) {
 				this._redir("userDetails/login");
 			}
@@ -52,7 +45,6 @@ define(
 				this.showView(new Calipso.view.HomeLayout());
 			//}
 		},
-
 		_redir : function(firstLevelFragment, forwardAfter) {
 			var url = Calipso.app.config.contextPath + "client/" + firstLevelFragment;
 			Calipso.app.fw = forwardAfter;
@@ -60,7 +52,7 @@ define(
 			Calipso.navigate(firstLevelFragment, {
 				trigger : true
 			});
-			return false;
+
 		},
 		myProfile : function() {
 			if (!Calipso.util.isAuthenticated()) {
@@ -124,6 +116,7 @@ define(
 		 * @param  {Calipso.view.MainLayout]} the layout type to use. If absent the method will
 		 *                                             obtain the layout type from givenModel.getLayoutType()
 		 */
+		// TODO: remove
 		showLayoutForModel : function(givenModel, useCaseContext, layoutOptions) {
 			// instantiate and show the layout
 			var view = new useCaseContext.view({model: givenModel, useCaseContext: useCaseContext});
@@ -145,9 +138,7 @@ define(
 		 * initialized but, similarly to the model instance, it is not fetched
 		 * from the server.
 		 *
-		 * @param {string}
-		 *           modelTypeKey the URL fragment representing the model type
-		 *           key, e.g. "users" for UserModel
+		 * @param ModelType the model type
 		 * @param {string}
 		 *           modelId the model identifier. The identifier may be either
 		 *           a primary or business key, depending on your server side
@@ -158,83 +149,32 @@ define(
 		 * @see Calipso.model.GenericModel.getBusinessKey
 		 */
 		getModelForRoute : function(ModelType, modelId, httpParams) {
-
-			// Obtain a model for the view:
-			// if a model id is present, obtain a promise
-			// for the corresponding instance
-			console.log("getModelForRoute ModelType: " + ModelType.getTypeName() + ", modelId: " + modelId);
-			var modelForRoute;
-			if (modelId || (ModelType.getTypeName() == "Calipso.model.UserDetailsModel")) {
-				modelForRoute = ModelType.create({
-					id : modelId,
-				});
-			} else {
-				// create a model to use as a wrapper for a collection of
-				// instances of the same type, fill it with any given search criteria
-				if (!httpParams) {
-					httpParams = {};
-				}
-				modelForRoute = new ModelType(httpParams);
+			if(_.isString(httpParams)){
+				httpParams = Calipso.getHttpUrlParams(httpParams);
+			}
+			// Obtain a model for the view
+			var modelAttributes = _.extend({id : modelId}, httpParams);
+			var modelForRoute = ModelType.create(modelAttributes);
+			// if search model
+			if (!modelId && ModelType.getTypeName() != "Calipso.model.UserDetailsModel") {
 				var collectionOptions = {
 					model : ModelType,
-					url : Calipso.getBaseUrl() + "/api/rest/" + ModelType.getPathFragment()
+					url : Calipso.getBaseUrl() + "/api/rest/" + ModelType.getPathFragment(),
+					data : modelAttributes
 				};
 				if (httpParams) {
-					if (httpParams[""] || httpParams[""] == null) {
-						delete httpParams[""];
-					}
 					collectionOptions.data = httpParams;
 				}
+				// create a model to use as a wrapper for a collection of
+				// instances of the same type, fill it with any given search criteria
 				modelForRoute.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
-
 			}
 			return modelForRoute;
-		},
-		// TODO: remove
-		mainNavigationReportRoute : function(mainRoutePart, queryString) {
-
-			// TODO: temp fix
-			var isReport = window.location.href.indexOf("/reports") > -1;
-			// console.log("AbstractController#mainNavigationReportRoute, isReport: " + isReport);
-			if (!isReport) {
-				this.mainNavigationSearchRoute(mainRoutePart, queryString);
-			} else {
-				var _self = this;
-				var httpParams = Calipso.getHttpUrlParams();
-
-				// get the model the report focuses on
-				var ModelType = Calipso.util.getModelType(mainRoutePart);
-				if (!Calipso.util.isAuthenticated() && !ModelType.isPublic()) {
-					return this._redir("login");
-				}
-
-				// build a report dataset collection using the model's report URL
-				var reportModel = new Calipso.model.ReportDataSetModel({
-					subjectModelType : ModelType
-				});
-				var collectionOptions = {
-					model : Calipso.model.ReportDataSetModel,
-					url : Calipso.getBaseUrl() + "/api/rest/" + reportModel.getPathFragment(),
-					pathFragment : reportModel.getPathFragment(),
-				};
-				if (httpParams) {
-					if (httpParams[""] || httpParams[""] == null) {
-						delete httpParams[""];
-					}
-					collectionOptions.data = httpParams;
-				}
-
-				reportModel.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
-				;
-				this.renderFetchable(reportModel);
-
-			}
-
 		},
 		/**
 		 *
 		 */
-		showEntitySearch : function(mainRoutePart, queryString) {
+		showEntitySearch : function(mainRoutePart, httpParams) {
 			var httpParams = Calipso.getHttpUrlParams();
 			this.showUseCaseView(mainRoutePart, null, "search", httpParams);
 		},
@@ -242,10 +182,23 @@ define(
 			this.showUseCaseView(mainRoutePart, modelId, "view", null);
 		},
 		showUserDetailsView : function(useCaseKey, httpParams) {
-			this.showUseCaseView( "userDetails", null, useCaseKey, httpParams)
+			// temp line
+			this.showUseCaseView( "userDetails", null, useCaseKey, httpParams);
+			/*
+			if(!useCaseKey){
+				Calipso.navigate(
+					Calipso.util.session.isAuthenticated() ? "userDetails/changePassword" : "userDetails/login" ,
+					{
+						trigger : true
+					});
+			}
+			else{
+				this.showUseCaseView( "userDetails", null, useCaseKey, httpParams);
+			}
+			*/
 		},
 		showUseCaseView : function(mainRoutePart, modelId, useCaseKey, httpParams) {
-			console.log("showUseCaseView mainRoutePart: " + mainRoutePart + ", modelId: " + modelId + ", useCaseKey: " + useCaseKey);
+			console.log("showUseCaseView mainRoutePart: " + mainRoutePart + ", modelId: " + modelId + ", useCaseKey: " + useCaseKey + ", httpParams: " + httpParams);
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if (qIndex > -1) {
@@ -286,12 +239,12 @@ define(
 			};
 			if (model.getTypeName() != "Calipso.model.UserDetailsModel"
 				&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))) {
-				//console.log("renderFetchable: fetch");
+				console.log("renderFetchable: fetch");
 				fetchable.fetch({
 					data : fetchable.data
 				}).then(renderFetchable);
 			} else {
-				//console.log("renderFetchable: dont fetch");
+				console.log("renderFetchable: dont fetch");
 				renderFetchable();
 			}
 		},

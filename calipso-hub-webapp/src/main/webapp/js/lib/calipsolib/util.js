@@ -71,7 +71,7 @@ define(
 		util : {
 			getLocale : function(){
 				var locale = localStorage.getItem('locale');
-			//console.logseCase("Calipso.util.getLocale: " + locale);
+			//console.log("Calipso.util.getLocale: " + locale);
 				return locale;
 			},
 		},
@@ -112,14 +112,14 @@ define(
 		var urlParams = {};
 		if (!url) {
 			url = window.location.href;
+			url = url.indexOf("?") > -1 ? url.substring(url.indexOf("?") + 1) : "";
 		}
-		var queryString = url.indexOf("?") > -1 ? url.substring(url.indexOf("?") + 1) : "";
-		var keyValuePairs = queryString.split('&');
+		var keyValuePairs = url.split('&');
 		for ( var i in keyValuePairs) {
 			var keyValuePair = keyValuePairs[i].split('=');
 			urlParams[Calipso.decodeParam(keyValuePair[0])] = (keyValuePair.length > 1) ? this.decodeParam(keyValuePair[1]) : null;
 		}
-		;
+		delete urlParams[""];
 		return urlParams;
 	};
 
@@ -130,12 +130,12 @@ define(
 			// handle status codes
 			statusCode : {
 				401 : function() {
-				//console.logseCase("Backbone.$.ajaxSetup 401");
+				//console.log("Backbone.$.ajaxSetup 401");
 					window.alert("Your session has expired");
 					Calipso.navigate("login");
 				},
 				403 : function() {
-				//console.logseCase("Backbone.$.ajaxSetup 403");
+				//console.log("Backbone.$.ajaxSetup 403");
 					window.alert("Your session has expired");
 					Calipso.navigate("login");
 				}
@@ -234,10 +234,10 @@ define(
 	 * @param  {[String]} the desired locale
 	 */
 	Calipso.changeLocale = function(newLocale) {
-	//console.logseCase("Calipso.changeLocale: " + newLocale);
+	//console.log("Calipso.changeLocale: " + newLocale);
 		if(newLocale){
 			var currentLocale = localStorage.getItem('locale');
-			//console.logseCase("Calipso.changeLocale, currentLocale: " + currentLocale);
+			//console.log("Calipso.changeLocale, currentLocale: " + currentLocale);
 			if(!currentLocale || currentLocale != newLocale){
 				var applyLocale = function(){
 					localStorage.setItem('locale', newLocale);
@@ -394,18 +394,12 @@ define(
 	*****************************************************/
 	Calipso._initializeVent = function(){
 		Calipso.vent.on('app:show', function(appView, navigateToUrl) {
-		console.log("Calipso.vent.on 'app:show', view: " + appView.getTypeName() + ", navigateToUrl: " + navigateToUrl);
 
 			var $wrapper = $("#container");
 			if (appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")) {
 				$wrapper.attr("class", appView.containerClass);
 			}
 			Calipso.app.mainContentRegion.show(appView);
-			if (navigateToUrl) {
-				Calipso.navigate(navigateToUrl, {
-					trigger : false
-				});
-			}
 		});
 
 		Calipso.vent.on('session:social-popup', function(providerId) {
@@ -793,14 +787,14 @@ define(
 			return PageableCollection.prototype.fetch.apply(this, arguments);
 		},
 		hasCriteria : function() {
-			var minData = 0;
+			var hasCriteria = false;
 			var ignoredCriteria = [ "page", "size", "direction" ];
 			for (var i = 0; i < ignoredCriteria.length; i++) {
 				if (this.data[ignoredCriteria[i]] != undefined) {
-					minData++;
+					hasCriteria = true;
 				}
 			}
-			return _.size(this.data) > minData;
+			return hasCriteria;
 		},
 		getGridSchema : function() {
 			// use explicit configuration if available
@@ -1216,13 +1210,17 @@ define(
 			fieldMasks : null,
 			view : null,
 			viewOptions : {},
-			mergableOptions: ['key', 'defaultNext', 'roleIncludes', 'roleExcludes',
-				'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'view', 'views', 'regions', 'viewOptions', 'model'],
+			mergableOptions: ['key', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model',
+				'view', 'views', 'regions', 'viewOptions',
+				'roleIncludes', 'roleExcludes',
+				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks'],
+
 			initialize : function(options){
-				//console.logseCase("UseCaseContext#initialize, options:")
+				//console.log("UseCaseContext#initialize, options:")
 		    //console.log(options);
 				Marionette.Object.prototype.initialize.apply(this, arguments);
 				this.mergeOptions(options, this.mergableOptions);
+				console.log("UseCaseContext#initialize, key: " + this.key + ", title: " + this.title + ", description: " + this.description + ", defaultNext: " + this.defaultNext);
 				this.initFields();
 		  },
 			createView : function(options){
@@ -1236,22 +1234,22 @@ define(
 			initFields : function(){
 				var _this = this;
 				// add fields
-			//console.logseCase("UseCaseContext.initFields, fieldIncludes: ");
-			//console.logseCase(_this.fieldIncludes);
-			//console.logseCase("UseCaseContext.initFields, fieldExcludes: ");
-			//console.logseCase(_this.fieldExcludes);
+			//console.log("UseCaseContext.initFields, fieldIncludes: ");
+			//console.log(_this.fieldIncludes);
+			//console.log("UseCaseContext.initFields, fieldExcludes: ");
+			//console.log(_this.fieldExcludes);
 				this.fields = {};
 				_.each(_this.model.constructor.getFields(), function(value, key, list){
 					var included = !_this.fieldIncludes || $.inArray(key, _this.fieldIncludes) > -1;
 					var excluded = _this.fieldExcludes && $.inArray(key, _this.fieldExcludes) > -1;
 					var excludedTypes = _this.fieldTypeExcludes && $.inArray(key, _this.fieldTypeExcludes) > -1;
-				//console.logseCase("UseCaseContext.initFields, included: " + included + ", excluded: " + excluded);
+				//console.log("UseCaseContext.initFields, included: " + included + ", excluded: " + excluded);
 					if(included	&& !excluded	&& !excludedTypes){
 						_this.fields[key] = value;
-					//console.logseCase("getUseCase included field: " + key);
+					//console.log("getUseCase included field: " + key);
 					}
 					else{
-				//console.logseCase("getUseCase excluded field: " + key);
+				//console.log("getUseCase excluded field: " + key);
 					}
 				})
 
@@ -1272,22 +1270,23 @@ define(
 						_.extend(useCaseOptions, value);
 					}
 				});
-
+				console.log("getUseCase returns useCaseOptions ");
+				console.log(useCaseOptions);
 				return new Calipso.datatypes.UseCaseContext(useCaseOptions);
 			}
 
 		},
 		{
 			create : function(options){
-		//console.logseCase("UseCaseContext#create options: ");
-		//console.logseCase(options);
+		//console.log("UseCaseContext#create options: ");
+		//console.log(options);
 				var modelUseCase = options.model.getUseCase(options.key);
-			//console.logseCase("UseCaseContext#create modelUseCase: ");
-			//console.logseCase(modelUseCase);
+			//console.log("UseCaseContext#create modelUseCase: ");
+			//console.log(modelUseCase);
 
 				var foptions = _.extend(modelUseCase, options);
-			//console.logseCase("UseCaseContext#create final options: ");
-			//console.logseCase(foptions);
+			//console.log("UseCaseContext#create final options: ");
+			//console.log(foptions);
 				return new Calipso.datatypes.UseCaseContext(foptions);
 			}
 		}

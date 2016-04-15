@@ -3,73 +3,9 @@
 <div class="row">
 	<div class="col-md-4"></div>
 	<div class="col-md-4">
-		<!--Panel Group -->
-		<div class="panel-group panel-group-lists" id="accordionFaq"
-			role="tablist" aria-multiselectable="true">
-
-			<!-- Panel: Login/Change Password -->
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="fheading1">
-					<h4 class="panel-title">
-						<a role="button" data-toggle="collapse"
-							data-parent="#accordionFaq" href="#loginCollapse1"
-							aria-expanded="true" aria-controls="loginCollapse1"> <i
-							class="fa fa-lock"></i> <span class="view-title">
-                                
-                        {{#if username}}
-                        {{labels.tmpl.userRegistration.titleNewPassword}}
-                        {{else}}
-                        {{labels.tmpl.userRegistration.titleLogin}}
-                        {{/if}}
-                            </span>
-						</a>
-					</h4>
-				</div>
-				<div id="loginCollapse1" class="panel-collapse collapse in"
-					role="tabpanel" aria-labelledby="faqHeading1">
-					<div class="panel-body">
-						{{#if username}}
-                        <p>{{labels.tmpl.userRegistration.formHelpNewPassword}}</p>
-						{{else}}
-                        <p>{{labels.tmpl.userRegistration.formHelpLogin}}</p>
-						{{/if}}
-						<div id="calipsoModelDrivenBrowseLayout-contentRegion">
-							<!--Body content-->
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Panel: Forgot Password -->
-			<div class="panel panel-info">
-				<div class="panel-heading" role="tab" id="faqHeading2">
-					<h4 class="panel-title">
-						<a class="collapsed" role="button" data-toggle="collapse"
-							data-parent="#accordionFaq" href="#loginCollapse2"
-							aria-expanded="false" aria-controls="loginCollapse2"> <i
-							class="fa fa-unlock"></i>
-						{{#if username}}
-                        {{labels.tmpl.userRegistration.titleExpiredLink}}
-                        {{else}}
-                        {{labels.tmpl.userRegistration.titleForgotPassword}}
-                        {{/if}}
-						</a>
-					</h4>
-				</div>
-				<div id="loginCollapse2" class="panel-collapse collapse"
-					role="tabpanel" aria-labelledby="faqHeading2">
-					<div class="panel-body">
-					   <div class="panel-body">
-					       <p>{{labels.tmpl.userRegistration.formHelpForgotPassword}}</p>
-	                        <div id="calipsoUserDetailsLayout-forgotPasswordRegion">
-	                            <!--Body content-->
-	                        </div>
-					   </div>
-					</div>
-				</div>
-			</div>
+		<div id="calipsoModelDrivenBrowseLayout-contentRegion">
+			<!--Body content-->
 		</div>
-        <!-- /Panel Group -->
 	</div>
 </div>
 <!--/col -->

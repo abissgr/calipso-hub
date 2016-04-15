@@ -1,7 +1,18 @@
 <div class="tmpl-hint">start md-formpanel-view</div>
 <div class="panel panel-default">
-  <div class="panel-heading">{{ formTitle }}</div>
+  <div class="panel-heading">
+      {{#if useCase.title}}
+        {{ useCase.title}}
+      {{else}}
+        {{{ useCase.titleHtml}}}
+      {{/if}}
+  </div>
   <div class="panel-body">
+    {{#if useCase.description}}
+      <p>{{ useCase.description}}</p>
+    {{else}}
+      {{{ useCase.descriptionHtml}}}
+    {{/if}}
     <div class="generic-form-view">
     </div>
     <br class="clear" />

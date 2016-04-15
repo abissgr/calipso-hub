@@ -633,10 +633,14 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 		typeName : "Calipso.model.UserDetailsModel",
 		useCases : {
 			login : {
+				titleHtml : "<i class='fa fa-lock'></i> User Login",
+				description : "To login, please enter your credentials below.",
 				view : Calipso.view.UserDetailsLayout,
 				fieldIncludes : ["email", "password" ],
 			},
 			resetPassword : {
+				titleHtml : "<i class='fa fa-lock'></i> Reset password",
+				description : "To create a new password, please complete the form below.",
 				view : Calipso.view.UserDetailsLayout,
 				fieldIncludes : ["email", "resetPasswordToken", "password", "passwordConfirmation" ],
 				fields : {
@@ -646,6 +650,8 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 				}
 			},
 			forgotPassword : {// enter new password
+				titleHtml : "<i class='fa fa-lock'></i> Forgot password",
+				description : "Please enter your email address bellow. You will receive a confirmation email in your inbox with instructions to create a new password. ",
 				view : Calipso.view.UserDetailsLayout,
 				fieldIncludes : ["email" ],
 				defaultNext : "resetPassword",
@@ -671,10 +677,14 @@ define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", "
 				"datatype" : "ConfirmPassword",
 			}
 		},
-   	create: function () {
+   	create: function (options) {
 	   	if (this._instance === undefined) {
-	    	this._instance = new this();
+	    	this._instance = new this(options);
 	    }
+			else{
+				this._instance.clear();
+			}
+			this._instance.set(options);
 	    return this._instance;
 	  },
 		/*
