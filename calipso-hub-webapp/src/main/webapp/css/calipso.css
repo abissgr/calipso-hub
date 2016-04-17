@@ -80,10 +80,10 @@ div#sidebar-collapse-accordion div.panel-body{
 Bootstrap 3 - Disabled dropdown links
 
 Mimic cursor style from native .dropdown-menu > .disabled > a{} styles,
-since `pointer-events: none` kills the cursor state, too. 
+since `pointer-events: none` kills the cursor state, too.
 */
 .dropdown-menu > .disabled{
- cursor: not-allowed; 
+ cursor: not-allowed;
 }
 
 /* The real magic ;) */
@@ -505,7 +505,7 @@ width: 100%;
 
 .tt-dropdown-menu, .tt-menu {
 	z-index:2500;
-    min-width: 120%; 
+    min-width: 120%;
     max-height: 250px;
     overflow-y: auto;
     margin-top: 2px;
@@ -552,6 +552,7 @@ width: 100%;
 /*//////////////////////////////////////////////
 // Responsive table method using display:block and data attributes
 //////////////////////////////////////////////*/
+/* this is included in bootstrap
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -561,7 +562,8 @@ width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-}
+}*/
+
 /*
 
 .container {

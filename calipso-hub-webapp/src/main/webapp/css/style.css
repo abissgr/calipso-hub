@@ -30,9 +30,9 @@ body, html {
 .panel-title a[data-toggle="collapse"]{
 	display: block;
 }
-.control-label{
+/*.control-label{
 	margin-right: 10px;
-}
+}*/
 .list-group-horizontal, 
     .list-group-horizontal .list-group-item {
     display: inline-block;

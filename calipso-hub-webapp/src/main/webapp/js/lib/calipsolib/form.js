@@ -18,7 +18,7 @@
  */
 
 define(
-		[ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone-forms',
+		[ "lib/calipsolib/form-templates", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone-forms',
 		'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette',
 
 		'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'intlTelInput'],
@@ -136,11 +136,12 @@ define(
 		 * @param {Boolean|String} [options.hintRequiredFields]
 		 */
 		initialize : function(options) {
+			options || (options = {});
 			var hintRequiredFields = options.hintRequiredFields;
 			if (!_.isUndefined(hintRequiredFields)) {
 				this.hintRequiredFields = hintRequiredFields;
 			}
-			this.formSchemaKey = options.formSchemaKey;
+			this.fieldTemplate = options.fieldTemplate || Calipso.util.formTemplates["field-horizontal"];
 			Backbone.Form.prototype.initialize.apply(this, arguments);
 		},
 
@@ -165,6 +166,12 @@ define(
 			});
 
 			return values;
+		},
+		createField: function(key, schema) {
+	    if(!schema.template && this.fieldTemplate){
+	   	 schema.template = this.fieldTemplate;
+	    }
+			return Backbone.Form.prototype.createField.apply(this, arguments);;
 		},
 		getDraft : function(){
 			var values = {};
@@ -405,6 +412,17 @@ define(
 	});
 	Calipso.components.backboneform.Textarea = Calipso.components.backboneform.Text.extend({
 		tagName : "textarea"
+	});
+	Calipso.components.backboneform.NonEmptyOrHidden = Calipso.components.backboneform.Text.extend({
+		render : function(){
+			console.log("RENDER value: " + this.getValue());
+			if (this.getValue()) {
+				return this.setElement(editor.render().el.attr("type", "hidden"));
+    	}
+			else{
+				return Calipso.components.backboneform.Text.render.apply(this, arguments);
+			}
+		}
 	});
 	Calipso.components.backboneform.NumberText = Calipso.components.backboneform.Text.extend({
 		getValue : function() {
