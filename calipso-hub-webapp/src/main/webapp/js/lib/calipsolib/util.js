@@ -1346,9 +1346,6 @@ Calipso.cloneSpecificValue = function(val) {
 				var _this = this;
 
 				_.each(fields, function(field, key, list){
-					var included = ;
-					var excluded = ;
-					var excludedTypes = ;
 					// if included, not excluded and not filed type excluded
 					if((!_this.fieldIncludes || $.inArray(key, _this.fieldIncludes) > -1)
 						&& !(_this.fieldExcludes && $.inArray(key, _this.fieldExcludes) > -1)

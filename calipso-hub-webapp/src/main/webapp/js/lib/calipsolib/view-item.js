@@ -45,7 +45,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	//	    }
 	//	});
 	//
-	
+
 
 	Calipso.view.TemplateBasedItemView = Calipso.view.ItemView.extend(
 	/** @lends Calipso.view.TemplateBasedItemView.prototype */
@@ -159,7 +159,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	Calipso.view.ModelDrivenCollectionGridView = Calipso.view.UseCaseItemView.extend(
 	/**
 	 * @param options object members:
-	 *  - collection/wrappedCollection
+	 *  - collection or model.wrappedCollection
 	 *  - callCollectionFetch: whether to fetch the collection from the server
 	 * @lends Calipso.view.ModelDrivenCollectionGridView.prototype
 	 * */
@@ -191,6 +191,13 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		back : function(e) {
 			Calipso.stopEvent(e);
 			window.history.back();
+		},
+		getResultsInfo : function() {
+			var resultsInfo = this.model.wrappedCollection.state;
+			var pastResults = (resultsInfo.pageSize * (resultsInfo.currentPage - resultsInfo.firstPage));
+			resultsInfo.pageStart = pastResults + 1;
+			resultsInfo.pageEnd = pastResults + this.model.wrappedCollection.length;
+			return resultsInfo;
 		},
 		initialize : function(options) {
 			//console.log("ModelDrivenCollectionGridView.initialize, options: " + options);
@@ -230,7 +237,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 			this.$('.backgrid-table-container').append(this.backgrid.render().$el);
 			// TODO: refresh stuff
-			_self.listenTo(_self.collection, "backgrid:refresh", function(){});
+			_self.listenTo(_self.collection, "backgrid:refresh", function(){
+				var resultsInfo = _self.getResultsInfo();
+				_self.$el.find("p.resultsInfo").html(
+					resultsInfo.pageStart + " - " + resultsInfo.pageEnd + " (" + resultsInfo.totalRecords + ")");
+			});
 			var paginator = new Backgrid.Extension.Paginator({
 
 				// If you anticipate a large number of pages, you can adjust
