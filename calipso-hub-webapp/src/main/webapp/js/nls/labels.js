@@ -1,3 +1,17 @@
+/*
+ * 
+ * To add a language create a new folder named using the two-letter 
+ * ISO standard and add a labels.js without the "root" level, eg:
+ * 
+ * define({
+ *     "tmpl" : {
+ *    },
+ *    "calipso" : {
+ *    }
+ * });
+ * 
+ */
+
 define({
 	"root" : {
 		"intlTelInput" : {
@@ -41,7 +55,7 @@ define({
 				"update" : "Update",
 			},
 			"select2" : {
-				"placeholder": "Type to select",
+				"placeholder" : "Type to select",
 			},
 			"vatInput" : {
 				"countryMissmatch" : "VAT number doesn't match the country code. ",
@@ -49,267 +63,99 @@ define({
 			},//vatInput
 		},//calipso
 		"models" : {
-
 			"users" : {
 				"firstName" : {
-					"search" : {
-						"title" : "First Name"
-					},
-					"default" : {
-						"title" : "First Name"
-					}
+					"label" : "First Name"
 				},
 				"lastName" : {
-					"search" : {
-						"title" : "Last Name"
-					},
-					"default" : {
-						"title" : "Last Name"
-					}
+					"label" : "Last Name"
 				},
 				"username" : {
-					"search" : {
-						"title" : "Username"
-					},
-					"default" : {
-						"title" : "Username"
-					}
+					"label" : "Username"
 				},
 				"email" : {
-					"search" : {
-						"title" : "Email"
-					},
-					"default" : {
-						"title" : "Email"
-					}
+					"label" : "Email"
 				},
 				"telephone" : {
-					"default" : {
-						"title" : "Telephone"
-					}
+					"label" : "Telephone"
 				},
 				"cellphone" : {
-					"default" : {
-						"title" : "Cellphone"
-					}
+					"label" : "Cellphone"
 				},
 				"active" : {
-					"base" : {
-						"title" : "Active"
-					},
-					"create" : {
-						"title" : "Active",
-						"help" : "Select to skip email confirmation"
-					},
-					"update" : {
-						"title" : "Active"
-					}
+					"label" : "Active"
 				},
 				"roles" : {
-					"base" : {
-						"title" : "Roles"
-					},
-					"search" : {
-						"title" : "Roles"
-					},
-					"create" : {
-						"title" : "Roles"
-					},
-					"update" : {
-						"title" : "Roles"
-					}
+					"label" : "Roles"
 				}
 			},
 			"roles" : {
 				"name" : {
-					"search" : {
-						"title" : "Name"
-					},
-					"default" : {
-						"title" : "Name"
-					}
+					"label" : "Name"
 				},
 				"description" : {
-					"search" : {
-						"title" : "Description"
-					},
-					"default" : {
-						"title" : "Description"
-					}
+					"label" : "Description"
 				}
 			},
 			"countries" : {
 				"name" : {
-					"search" : {
-						"title" : "Name"
-					},
-					"default" : {
-						"title" : "Name"
-					}
+					"label" : "Name"
 				},
 				"nativeName" : {
-					"search" : {
-						"title" : "Native Name"
-					},
-					"default" : {
-						"title" : "Native Name"
-					}
+					"label" : "Native Name"
 				},
 				"callingCode" : {
-					"search" : {
-						"title" : "Calling Code"
-					},
-					"default" : {
-						"title" : "Calling Code"
-					}
+					"label" : "Calling Code"
 				},
 				"capital" : {
-					"search" : {
-						"title" : "Capital"
-					},
-					"default" : {
-						"title" : "Capital"
-					}
+					"label" : "Capital"
 				},
 				"currency" : {
-					"search" : {
-						"title" : "Currency"
-					},
-					"default" : {
-						"title" : "Currency"
-					}
+					"label" : "Currency"
 				},
 				"languages" : {
-					"search" : {
-						"title" : "Languages"
-					},
-					"default" : {
-						"title" : "Languages"
-					}
+					"label" : "Languages"
 				}
 			},
 			"userDetails" : {
-				"id" : {
-					"update" : {
-						"title" : "Id"
-					}
-				},
-				"isResetPasswordReguest" : {
-					"update-createToken" : {
-						"title" : "Is Reset Password Reguest"
-					}
-				},
+				"id" : {},
+				"isResetPasswordReguest" : {},
 				"email" : {
-					"create" : {
-						"title" : "Email"
-					},
-					"update-createToken" : {
-						"title" : "Email"
-					}
+					"label" : "Email"
 				},
-				"resetPasswordToken" : {
-					"create-withToken" : {
-						"title" : "Reset Password Token"
-					},
-					"help" : {
-						"title" : "Reset Password Token"
-					}
-				},
-				"currentPassword" : {
-					"update" : {
-						"title" : "Current Password"
-					}
-				},
+				"resetPasswordToken" : {},
+				"currentPassword" : {},
 				"password" : {
-					"create" : {
-						"title" : "Password"
-					},
-					"update" : {
-						"title" : "New Password"
-					},
-					"create-withToken" : {
-						"title" : "Password"
-					}
+					"label" : "Password"
 				},
-				"passwordConfirmation" : {
-					"update" : {
-						"title" : "Password Confirmation"
-					},
-					"create-withToken" : {
-						"title" : "Password Confirmation"
-					}
-				}
+				"passwordConfirmation" : {}
 			},
 			"userProfile" : {
 				"firstName" : {
-					"search" : {
-						"title" : "First Name"
-					},
-					"default" : {
-						"title" : "First Name"
-					}
+					"label" : "First Name"
 				},
 				"lastName" : {
-					"search" : {
-						"title" : "Last Name"
-					},
-					"default" : {
-						"title" : "Last Name"
-					}
+					"label" : "Last Name"
 				},
 				"username" : {
-					"search" : {
-						"title" : "Username"
-					},
-					"default" : {
-						"title" : "Username"
-					}
+					"label" : "Username"
 				},
 				"email" : {
-					"search" : {
-						"title" : "Email"
-					},
-					"default" : {
-						"title" : "Email"
-					}
+					"label" : "Email"
 				},
 				"telephone" : {
-					"default" : {
-						"title" : "Telephone"
-					}
+					"label" : "Telephone"
 				},
 				"cellphone" : {
-					"default" : {
-						"title" : "Cellphone"
-					}
+					"label" : "Cellphone"
 				},
 				"active" : {
-					"base" : {
-						"title" : "Active"
-					},
-					"create" : {
-						"title" : "Active",
-						"help" : "Select to skip email confirmation"
-					},
-					"update" : {
-						"title" : "Active"
-					}
+					"label" : "Active"
 				},
 				"roles" : {
-					"base" : {
-						"title" : "Roles"
-					},
-					"search" : {
-						"title" : "Roles"
-					},
-					"create" : {
-						"title" : "Roles"
-					},
-					"update" : {
-						"title" : "Roles"
-					}
+					"label" : "Roles"
 				}
-			},
+			}
 		},// models
 		countries : {
 			"AD" : "Andorra",

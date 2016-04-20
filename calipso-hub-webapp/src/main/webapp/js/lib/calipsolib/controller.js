@@ -208,15 +208,22 @@ define(
 
 			var ModelType = Calipso.util.getModelType(mainRoutePart);
 
+			// check for usecase routes for new instances
+			if(ModelType.hasUseCase(modelId)){
+				useCaseKey = modelId;
+				modelId = null;
+			}
+
+			// check if model type is public
 			if (!Calipso.util.isAuthenticated() && !ModelType.isPublic()) {
 				return this._redir("login");
 			}
 			var model = this.getModelForRoute(ModelType, modelId, httpParams);
 
-			// TODO: support loading of useCase modules?
-			var useCaseContext = new Calipso.datatypes.UseCaseContext(
-				$.extend({}, ModelType.useCases[useCaseKey], {key : useCaseKey}, {model : model})
-			);
+			// TODO: support loading of standalone (i.e. non-model) useCase modules?
+			var useCaseContext = Calipso.datatypes.UseCaseContext.createContext({
+				key : useCaseKey, model : model
+			});
 
 			// fetch model(s) and show view
 			var fetchable = model.wrappedCollection ? model.wrappedCollection : model;

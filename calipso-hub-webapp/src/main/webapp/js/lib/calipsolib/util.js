@@ -25,42 +25,7 @@ define(
 			BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 /*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, jqueryColor, intlTelInput, q, chartjs) {
 
-	// deepExtend mixinTemplateHelpers
 
-	_.mixin({ 'deepExtend': function (obj) {
-	  var parentRE = /#{\s*?_\s*?}/,
-	  slice = Array.prototype.slice;
-
-	  _.each(slice.call(arguments, 1), function(source) {
-	    for (var prop in source) {
-	      if (_.isUndefined(obj[prop]) || _.isFunction(obj[prop]) || _.isNull(source[prop]) || _.isDate(source[prop])) {
-	        obj[prop] = source[prop];
-	      }
-	      else if (_.isString(source[prop]) && parentRE.test(source[prop])) {
-	        if (_.isString(obj[prop])) {
-	          obj[prop] = source[prop].replace(parentRE, obj[prop]);
-	        }
-	      }
-	      else if (_.isArray(obj[prop]) || _.isArray(source[prop])){
-	        if (!_.isArray(obj[prop]) || !_.isArray(source[prop])){
-	          throw new Error('Trying to combine an array with a non-array (' + prop + ')');
-	        } else {
-	          obj[prop] = _.reject(_.deepExtend(_.clone(obj[prop]), source[prop]), function (item) { return _.isNull(item);});
-	        }
-	      }
-	      else if (_.isObject(obj[prop]) || _.isObject(source[prop])){
-	        if (!_.isObject(obj[prop]) || !_.isObject(source[prop])){
-	          throw new Error('Trying to combine an object with a non-object (' + prop + ')');
-	        } else {
-	          obj[prop] = _.deepExtend(_.clone(obj[prop]), source[prop]);
-	        }
-	      } else {
-	        obj[prop] = source[prop];
-	      }
-	    }
-	  });
-	  return obj;
-	}});
 	/**
 	 * Calipso namespace
 	 * @namespace
@@ -86,7 +51,45 @@ define(
 		datatypes : {},
 	};
 
+	var baseComponents = {
+		view : {
+			"Layout" : Backbone.Marionette.LayoutView,
+			"CompositeView" : Backbone.Marionette.CompositeView,
+			"CollectionView" : Backbone.Marionette.CollectionView,
+			"ItemView" : Backbone.Marionette.ItemView
+		},
+		model : {
+			"Model" : Backbone.Model
+		}
+	}
+	_.each(baseComponents, function(packageComponents, packageName, list){
+		Calipso[packageName] || (Calipso[packageName] = {});
+		_.each(packageComponents, function(BaseType, newClassName, list){
+			Calipso[packageName][newClassName] = BaseType.extend({
+				initialize : function(models, options) {
+					BaseType.prototype.initialize.apply(this, arguments);
+				},
+				getTypeName : function() {
+					return this.constructor.getTypeName();
+				}
+			}, {
+				typeName : "Calipso." + packageName + "." + newClassName,
+				getTypeName : function() {
+					return this.typeName;
+				}
+			});
+			/**
+			* Encance the extend function to properly merge the
+			* static "fields" and "useCases" hashes
+			*/
 
+			Calipso[packageName][newClassName].extend = function(protoProps, staticProps) {
+				staticProps.superClass = this;
+				return BaseType.extend.apply(this, arguments);
+				;
+			};
+		});
+	});
 	// default locale is set in
 	moment.locale(Calipso.util.getLocale());
 
@@ -107,6 +110,115 @@ define(
 	Calipso.decodeParam = function(s) {
 		return decodeURIComponent(s.replace(Calipso.decodeParamRegex, " "));
 	};
+
+
+Calipso.isSpecificValue = function(val) {
+	return (val instanceof Date
+		|| val instanceof RegExp
+	) ? true : false;
+}
+
+Calipso.cloneSpecificValue = function(val) {
+	if (val instanceof Date) {
+		return new Date(val.getTime());
+	} else if (val instanceof RegExp) {
+		return new RegExp(val);
+	} else {
+		throw new Error('Unexpected situation');
+	}
+}
+
+/**
+ * Recursive cloning array.
+ */
+ Calipso.deepCloneArray = function(arr) {
+	var clone = [];
+	arr.forEach(function (item, index) {
+		if (typeof item === 'object' && item !== null) {
+			if (Array.isArray(item)) {
+				clone[index] = Calipso.deepCloneArray(item);
+			} else if (Calipso.isSpecificValue(item)) {
+				clone[index] = Calipso.cloneSpecificValue(item);
+			} else {
+				clone[index] = Calipso.deepExtend({}, item);
+			}
+		} else {
+			clone[index] = item;
+		}
+	});
+	return clone;
+}
+
+/**
+ * Extening object that entered in first argument.
+ *
+ * Returns extended object or false if have no target object or incorrect type.
+ *
+ * If you wish to clone source object (without modify it), just use empty new
+ * object as first argument, like this:
+ *   deepExtend({}, yourObj_1, [yourObj_N]);
+ */
+	Calipso.deepExtend = function (/*obj_1, [obj_2], [obj_N]*/) {
+	if (arguments.length < 1 || typeof arguments[0] !== 'object') {
+		return false;
+	}
+	if (arguments.length < 2) {
+		return arguments[0];
+	}
+	var target = arguments[0];
+	// convert arguments to array and cut off target object
+	var args = Array.prototype.slice.call(arguments, 1);
+	var val, src, clone;
+
+	args.forEach(function (obj) {
+		// skip argument if it is array or isn't object
+		if (typeof obj !== 'object' || Array.isArray(obj)) {
+			return;
+		}
+
+		Object.keys(obj).forEach(function (key) {
+			src = target[key]; // source value
+			val = obj[key]; // new value
+			// recursion prevention
+			if (val === target) {
+				return;
+			}
+			// reuse object references of platform components
+			else if (val.extend || _.isFunction(val)) {
+				target[key] = val;
+				return;
+			/**
+			 * if new value isn't object then just overwrite by new value
+			 * instead of extending.
+			 */
+			} else if (typeof val !== 'object' || val === null) {
+				target[key] = val;
+				return;
+
+			// just clone arrays (and recursive clone objects inside)
+			} else if (Array.isArray(val)) {
+				target[key] = val;//Calipso.deepCloneArray(val);
+				return;
+
+			// custom cloning and overwrite for specific objects
+			} else if (Calipso.isSpecificValue(val)) {
+				target[key] = Calipso.cloneSpecificValue(val);
+				return;
+
+			// overwrite by new value if source isn't object or array
+			} else if (typeof src !== 'object' || src === null || Array.isArray(src)) {
+				target[key] = Calipso.deepExtend({}, val);
+				return;
+			// source value and new value is objects both, extending...
+			} else {
+				target[key] = Calipso.deepExtend(src, val);
+				return;
+			}
+		});
+	});
+
+	return target;
+}
 
 	Calipso.getHttpUrlParams = function(url) {
 		var urlParams = {};
@@ -555,7 +667,7 @@ define(
 			// set model types map
 			Calipso.modelTypesMap = {};
 			var parseModel = function(ModelType) {
-				if (ModelType.getTypeName() != "Calipso.model.ReportDataSetModel" &&
+				if (ModelType.getTypeName() != "Calipso.model.Model" &&
 				ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
 				ModelType.getTypeName() != "Calipso.model.GenericModel") {
 
@@ -565,7 +677,6 @@ define(
 			};
 			_(Calipso.model).each(parseModel);
 			_(Calipso.customModel).each(parseModel);
-
 		});
 	}
 
@@ -640,7 +751,7 @@ define(
 	}
 
 	Calipso.updateHeaderFooter = function(){
-		console.log("Calipso.updateHeaderFooter");
+		//console.log("Calipso.updateHeaderFooter");
 		// render basic structure
 		Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 			model : Calipso.session.userDetails
@@ -657,7 +768,7 @@ define(
 		////////////////////////////////
 		// initialize header, footer, history
 		Calipso.app.on("start", function() {
-			console.log("Calipso.app started");
+			//console.log("Calipso.app started");
 
 			// setup vent
 			Calipso._initializeVent();
@@ -1205,23 +1316,22 @@ define(
 			//schemaType : null, specfied by view instead
 			roleIncludes : null,
 			roleExcludes : null,
+			fields : null,
 			fieldIncludes : null,
 			fieldExcludes : null,
 			fieldMasks : null,
 			view : null,
 			viewOptions : {},
 			mergableOptions: ['key', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model',
-				'view', 'views', 'regions', 'viewOptions',
+				'view', 'viewOptions',
 				'roleIncludes', 'roleExcludes',
-				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks'],
+				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'overrides'],
 
 			initialize : function(options){
-				//console.log("UseCaseContext#initialize, options:")
-		    //console.log(options);
 				Marionette.Object.prototype.initialize.apply(this, arguments);
 				this.mergeOptions(options, this.mergableOptions);
-				console.log("UseCaseContext#initialize, key: " + this.key + ", title: " + this.title + ", description: " + this.description + ", defaultNext: " + this.defaultNext);
-				this.initFields();
+				//console.log("UseCaseContext#initialize, key: " + this.key + ", title: " + this.title + ", description: " + this.description + ", defaultNext: " + this.defaultNext);
+
 		  },
 			createView : function(options){
 				options || (options = {});
@@ -1231,66 +1341,96 @@ define(
 				return new this.view(viewOptions);
 
 			},
-			initFields : function(){
+			getFields : function(){
+				// if not given, pick them up from model
+				var fields = Calipso.deepExtend(this.model.getFields() || {}, this.fields || {});
+				var caseFields = {};
 				var _this = this;
-				// add fields
-			//console.log("UseCaseContext.initFields, fieldIncludes: ");
-			//console.log(_this.fieldIncludes);
-			//console.log("UseCaseContext.initFields, fieldExcludes: ");
-			//console.log(_this.fieldExcludes);
-				this.fields = {};
-				_.each(_this.model.constructor.getFields(), function(value, key, list){
+
+				_.each(fields, function(value, key, list){
 					var included = !_this.fieldIncludes || $.inArray(key, _this.fieldIncludes) > -1;
 					var excluded = _this.fieldExcludes && $.inArray(key, _this.fieldExcludes) > -1;
 					var excludedTypes = _this.fieldTypeExcludes && $.inArray(key, _this.fieldTypeExcludes) > -1;
-				//console.log("UseCaseContext.initFields, included: " + included + ", excluded: " + excluded);
+					//console.log("UseCaseContext.initFields, included: " + included + ", excluded: " + excluded);
 					if(included	&& !excluded	&& !excludedTypes){
-						_this.fields[key] = value;
-					//console.log("getUseCase included field: " + key);
+						caseFields[key] = value;
+						if(!caseFields[key].label){
+							caseFields[key].label = Calipso.util.getLabels(
+								caseFields[key].labelKey || "models." + _this.model.getPathFragment() + "." + key + ".label");
+						}
 					}
-					else{
-				//console.log("getUseCase excluded field: " + key);
-					}
-				})
-
+				});
+				return caseFields;
 			},
-			getUseCase(regionName, viewName){
+			getChild(regionName, viewName){
 				var _this = this;
 				var useCaseOptions = {};
+
+					//console.log("UseCaseContext#getChild regionName: " + regionName + ", viewName: " + viewName);
+				// base config
 				_.each(this.mergableOptions, function(mergableProp){
-					useCaseOptions[mergableProp] = _this[mergableProp];
+					useCaseOptions[mergableProp] = _.clone(_this[mergableProp]);
 				});
-				_.each(useCaseOptions.regions, function(value, key, list){
-					if(key == regionName){
-						_.extend(useCaseOptions, value);
-					}
-				});
-				_.each(useCaseOptions.views, function(value, key, list){
-					if(key == viewName){
-						_.extend(useCaseOptions, value);
-					}
-				});
-				console.log("getUseCase returns useCaseOptions ");
-				console.log(useCaseOptions);
+				if(_this.overrides){
+					delete useCaseOptions.overrides;
+					// override keys: regionName, viewName, regionName-ViewName
+					_.each([regionName, viewName, regionName + '-' + viewName], function(overrideKey){
+						if(_this.overrides[overrideKey]){
+							//console.log("UseCaseContext#getChild overrideKey: " + overrideKey);
+							//console.log(_this.overrides[overrideKey]);
+							Calipso.deepExtend(useCaseOptions, _this.overrides[overrideKey]);
+						}
+					});
+				}
+
+					//console.log("UseCaseContext#getChild result: " );
+					//console.log(useCaseOptions);
 				return new Calipso.datatypes.UseCaseContext(useCaseOptions);
 			}
 
 		},
 		{
-			create : function(options){
-		//console.log("UseCaseContext#create options: ");
-		//console.log(options);
-				var modelUseCase = options.model.getUseCase(options.key);
-			//console.log("UseCaseContext#create modelUseCase: ");
-			//console.log(modelUseCase);
+			createContext : function(options){
+				//console.log("UseCaseContext#create options: ");
+				//console.log(options);
+				var modelUseCase = options.model.getUseCaseContext(options.key);
+				//console.log("UseCaseContext#create modelUseCase: ");
+				//console.log(modelUseCase);
 
 				var foptions = _.extend(modelUseCase, options);
-			//console.log("UseCaseContext#create final options: ");
-			//console.log(foptions);
+				//console.log("UseCaseContext#create final options: ");
+				//console.log(foptions);
 				return new Calipso.datatypes.UseCaseContext(foptions);
 			}
 		}
 	);
+	// plumbing for handlebars template helpers
+	// Also provides i18n labels
+	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
+		var self = this;
+		var templateHelpers = Marionette.getOption(self, "templateHelpers");
+		// add i18n labels from requirejs i18n
+		var result = {
+			labels : Calipso.util.getLabels(),
+			useCase : self.useCaseContext,
+		};
+		target = target || {};
+
+		if (_.isFunction(templateHelpers)) {
+			templateHelpers = templateHelpers.call(self);
+		}
+
+		// This _.each block is what we're adding
+		_.each(templateHelpers, function(helper, index) {
+			if (_.isFunction(helper)) {
+				result[index] = helper.call(self);
+			} else {
+				result[index] = helper;
+			}
+		});
+
+		return _.extend(target, result);
+	};
 
 	return Calipso;
 

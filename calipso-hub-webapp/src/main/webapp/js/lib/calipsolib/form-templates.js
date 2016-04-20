@@ -40,11 +40,11 @@ function(Calipso, BackboneFormsBootstrap) {
 	    </div>\
 	  '),
 		horizontal : _.template('\
-		<form class="form-horizontal">\
+		<form class="form-horizontal" role="form">\
 	    <div data-fieldsets></div>\
-	    <% if (submitButton) { %>\
-	    <button type="submit" class="btn"><%= submitButton %></button>\
-	    <% } %>\
+			<% if (submitButton) { %>\
+			<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
+			<% } %>\
 	  </form>'),
 		// TODO: fix or remove each entry
 		nav : _.template('\
