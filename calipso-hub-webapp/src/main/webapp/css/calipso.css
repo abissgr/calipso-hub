@@ -549,209 +549,64 @@ width: 100%;
     margin: 0;
 }
 
-/*//////////////////////////////////////////////
-// Responsive table method using display:block and data attributes
-//////////////////////////////////////////////*/
-/* this is included in bootstrap
-* {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-*:before, *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}*/
-
-/*
-
-.container {
-  margin: 5% 3%;
-}
-@media (min-width: 48em) {
-  .container {
-    margin: 2%;
-  }
-}
-@media (min-width: 75em) {
-  .container {
-    margin: 2em auto;
-    max-width: 75em;
-  }
-}
-*/
-
-.responsive-table {
-  width: 100%;
-  margin-bottom: 1.5em;
-}
-@media (min-width: 48em) {
-  .responsive-table {
-    font-size: .9em;
-  }
-}
-@media (min-width: 62em) {
-  .responsive-table {
-    font-size: 1em;
-  }
-}
-.responsive-table thead {
-  position: absolute;
-  clip: rect(1px 1px 1px 1px);
-  /* IE6, IE7 */
-  clip: rect(1px, 1px, 1px, 1px);
-  padding: 0;
-  height: 1px;
-  width: 1px;
-  overflow: hidden;
-}
-@media (min-width: 48em) {
-  .responsive-table thead {
-    position: relative;
-    clip: auto;
-    height: auto;
-    width: auto;
-    overflow: auto;
-  }
-}
-./*responsive-table thead th {
-  font-weight: normal;
-  text-align: center;
-}*/
-.responsive-table thead th:first-of-type {
-  text-align: left;
-}
-.responsive-table tbody,
-.responsive-table tr,
-.responsive-table th,
-.responsive-table td {
-  display: block;
-  padding: 0;
-  text-align: left;
-  white-space: normal;
-}
-@media (min-width: 48em) {
-  .responsive-table tr {
-    display: table-row;
-  }
-}
-.responsive-table th,
-.responsive-table td {
-  padding: .5em;
-  vertical-align: middle;
-}
-@media (min-width: 30em) {
-  .responsive-table th,
-  .responsive-table td {
-    padding: .75em .5em;
-  }
-}
-@media (min-width: 48em) {
-  .responsive-table th,
-  .responsive-table td {
-    display: table-cell;
-    padding: .5em;
-  }
-}
-@media (min-width: 62em) {
-  .responsive-table th,
-  .responsive-table td {
-    padding: .75em .5em;
-  }
-}
-@media (min-width: 75em) {
-  .responsive-table th,
-  .responsive-table td {
-    padding: .75em;
-  }
-}
-.responsive-table caption {
-  margin-bottom: 1em;
-  font-size: 1em;
-  font-weight: bold;
-  text-align: center;
-}
-@media (min-width: 48em) {
-  .responsive-table caption {
-    font-size: 1.5em;
-  }
-}
-.responsive-table tfoot {
-  font-size: .8em;
-  font-style: italic;
-}
-@media (min-width: 62em) {
-  .responsive-table tfoot {
-    font-size: .9em;
-  }
-}
-@media (min-width: 48em) {
-  .responsive-table tbody {
-    display: table-row-group;
-  }
-}
-.responsive-table tbody tr {
-  margin-bottom: 1em;
-}
-@media (min-width: 48em) {
-  .responsive-table tbody tr {
-    display: table-row;
-    /*border-width: 1px;*/
-  }
-}
-.responsive-table tbody tr:last-of-type {
-  margin-bottom: 0;
-}
-@media (min-width: 48em) {
-  .responsive-table tbody tr:nth-of-type(even) {
-    background-color: #f8f8f8;
-  }
-}
-.responsive-table tbody th[scope="row"] {
-  background-color: #1d96b2;
-  color: white;
-}
-@media (min-width: 48em) {
-  .responsive-table tbody th[scope="row"] {
-    text-align: left;
-  }
-}
-.responsive-table tbody td {
-}
-@media (min-width: 30em) {
-  .responsive-table tbody td {
-  }
-}
-@media (min-width: 48em) {
-  .responsive-table tbody td {
-   /* text-align: center;*/
-  }
-}
-.responsive-table tbody td[data-type=currency] {
-  text-align: right;
-}
-.responsive-table tbody td[data-title]:before {
-  content: attr(data-title);
-  float: left;
-  font-size: .8em;
-  color: rgba(94, 93, 82, 0.75);
-}
-@media (min-width: 30em) {
-  .responsive-table tbody td[data-title]:before {
-    font-size: .9em;
-  }
-}
-@media (min-width: 48em) {
-  .responsive-table tbody td[data-title]:before {
-    content: none;
-  }
-}
-
 .footer-nav, .footer-logo{
 	float: left
 }
 
 .no-gutter > [class*='col-'] {
     padding: 0;
+}
+
+
+/* Responsive table */
+@media screen and (max-width: 620px)
+
+{
+
+    table.responsive-table thead {
+
+      display: none;
+
+    }
+
+    table.responsive-table tr {
+
+      margin-bottom: 10px;
+
+      display: block;
+
+      border-bottom: 2px solid #ddd;
+
+    }
+
+    table.responsive-table td {
+
+      display: block;
+
+      text-align: right;
+
+      font-size: 13px;
+
+      border-bottom: 1px dotted #ccc;
+
+    }
+
+    table.responsive-table td:last-child {
+
+      border-bottom: 0;
+
+    }
+
+    table.responsive-table td:before {
+
+      content: attr(data-title);
+
+      float: left;
+
+      text-transform: uppercase;
+
+      font-weight: bold;
+
+    }
+
 }

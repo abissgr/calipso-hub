@@ -45,8 +45,8 @@ define(
 				this.showView(new Calipso.view.HomeLayout());
 			//}
 		},
-		_redir : function(firstLevelFragment, forwardAfter) {
-			var url = Calipso.app.config.contextPath + "client/" + firstLevelFragment;
+		_redir : function(route, forwardAfter) {
+			var url = Calipso.app.config.contextPath + "client/" + route;
 			Calipso.app.fw = forwardAfter;
 			//consolelog("AbstractController#_redir to " + url);
 			Calipso.navigate(firstLevelFragment, {
@@ -54,12 +54,19 @@ define(
 			});
 
 		},
-		myProfile : function() {
-			if (!Calipso.util.isAuthenticated()) {
-				Calipso.navigate("login", {
+		_ensureLoggedIn : function(){
+			var pass = Calipso.util.isAuthenticated();
+			if (!pass) {
+				Calipso.app.fw = Backbone.history.getFragment();
+				console.log("_ensureLoggedIn FW: " + Calipso.app.fw);
+				Calipso.navigate("userDetails/login", {
 					trigger : true
 				});
-			} else {
+			}
+			return pass;
+		},
+		myProfile : function() {
+			if (this._ensureLoggedIn()) {
 				this.mainNavigationCrudRoute("userProfile", Calipso.session.userDetails.get("id"))
 			}
 		},
@@ -215,44 +222,43 @@ define(
 			}
 
 			// check if model type is public
-			if (!Calipso.util.isAuthenticated() && !ModelType.isPublic()) {
-				return this._redir("login");
-			}
-			var model = this.getModelForRoute(ModelType, modelId, httpParams);
+			if (ModelType.isPublic() || this._ensureLoggedIn()) {
+				var model = this.getModelForRoute(ModelType, modelId, httpParams);
 
-			// TODO: support loading of standalone (i.e. non-model) useCase modules?
-			var useCaseContext = Calipso.datatypes.UseCaseContext.createContext({
-				key : useCaseKey, model : model
-			});
+				// TODO: support loading of standalone (i.e. non-model) useCase modules?
+				var useCaseContext = Calipso.datatypes.UseCaseContext.createContext({
+					key : useCaseKey, model : model
+				});
 
-			// fetch model(s) and show view
-			var fetchable = model.wrappedCollection ? model.wrappedCollection : model;
+				// fetch model(s) and show view
+				var fetchable = model.wrappedCollection ? model.wrappedCollection : model;
 
-			// TODO: move to useCases
-			// oif true, occupy the main region with the search form instead of
-			// showing the form and grid side-by-side
-			var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
-			// promise to fetch then render
-			// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
-			var renderFetchable = function() {
+				// TODO: move to useCases
+				// oif true, occupy the main region with the search form instead of
+				// showing the form and grid side-by-side
+				var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
+				// promise to fetch then render
+				// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
+				var renderFetchable = function() {
 
-				//Calipso.vent.trigger("app:show", useCaseContext.createView());
-				_self.showView(useCaseContext.createView());
-				// TODO: remove/move to header view events;
-				// update page header tabs etc.
-				// this has been left over from when the associated markup was
-				// not part of some view
-				_self.syncMainNavigationState(model);
-			};
-			if (model.getTypeName() != "Calipso.model.UserDetailsModel"
-				&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))) {
-				console.log("renderFetchable: fetch");
-				fetchable.fetch({
-					data : fetchable.data
-				}).then(renderFetchable);
-			} else {
-				console.log("renderFetchable: dont fetch");
-				renderFetchable();
+					//Calipso.vent.trigger("app:show", useCaseContext.createView());
+					_self.showView(useCaseContext.createView());
+					// TODO: remove/move to header view events;
+					// update page header tabs etc.
+					// this has been left over from when the associated markup was
+					// not part of some view
+					_self.syncMainNavigationState(model);
+				};
+				if (model.getTypeName() != "Calipso.model.UserDetailsModel"
+					&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))) {
+					console.log("renderFetchable: fetch");
+					fetchable.fetch({
+						data : fetchable.data
+					}).then(renderFetchable);
+				} else {
+					console.log("renderFetchable: dont fetch");
+					renderFetchable();
+				}
 			}
 		},
 		notFoundRoute : function() {

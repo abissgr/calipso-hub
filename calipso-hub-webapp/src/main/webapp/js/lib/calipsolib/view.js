@@ -577,12 +577,10 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		onModelSync : function(options) {
 			// if successful login
-			console.log(this.getTypeName() + "#onModelSync options: ");
-			console.log(options);
 			if (this.model.get("id")) {
 				// TODO: add 'forward' HTTP/URL param in controller cases
-				var fw = this.model.get(fw) || "/home";
-				console.log(this.getTypeName() + "#onModelSync successful login, fw: " + fw);
+				var fw = Calipso.app.fw || "/home";
+				Calipso.app.fw = null;
 				Calipso.navigate(fw, {
 					trigger : true
 				});

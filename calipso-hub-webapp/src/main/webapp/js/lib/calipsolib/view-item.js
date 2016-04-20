@@ -228,7 +228,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			//console.log("GRID onshow schema: ");
 			//console.log(this.schema);
 			this.backgrid = new Backgrid.Grid({
-				className : "backgrid responsive-table",
+				className : "backgrid table-striped responsive-table",
 				columns : _self.schema,
 				row : Calipso.components.backgrid.SmartHighlightRow,
 				collection : _self.collection,
@@ -239,8 +239,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			// TODO: refresh stuff
 			_self.listenTo(_self.collection, "backgrid:refresh", function(){
 				var resultsInfo = _self.getResultsInfo();
-				_self.$el.find("p.resultsInfo").html(
-					resultsInfo.pageStart + " - " + resultsInfo.pageEnd + " (" + resultsInfo.totalRecords + ")");
+				_self.$el.find(".resultsInfo").html(
+					resultsInfo.pageStart + " - " + resultsInfo.pageEnd + " / " + resultsInfo.totalRecords);
 			});
 			var paginator = new Backgrid.Extension.Paginator({
 
