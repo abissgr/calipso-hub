@@ -17,8 +17,8 @@
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
 
-define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form", 
-         "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', 'moment' ], 
+define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form",
+         "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', 'moment' ],
 function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, moment) {
 
 	/**
@@ -393,7 +393,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	});
 
 	Calipso.model.UserProfileModel = Calipso.model.UserModel.extend(
-	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
 		skipDefaultSearch : false
 	},
@@ -525,7 +524,10 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 				fieldIncludes : [ "email", "resetPasswordToken", "password", "passwordConfirmation" ],
 				fields : {
 					email : {
-						dataType : "Hidden"
+						hideNonEmpty : true
+					},
+					resetPasswordToken : {
+						hideNonEmpty : true
 					}
 				}
 			},

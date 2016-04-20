@@ -24,7 +24,9 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 	Calipso.uifield = {};
 
 	// Base attribute dataType
-	Calipso.datatypes.Base = Marionette.Object.extend({}, {
+	Calipso.datatypes.Base = Marionette.Object.extend({
+		hideNonEmpty : false
+	}, {
 	});
 /*
 	Calipso.datatypes.Base.extend = function(protoProps, staticProps) {
@@ -40,7 +42,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 	};
 */
 	Calipso.datatypes.Hidden = Calipso.datatypes.Base.extend({}, {
-		dataTypeKey : "String",
+		dataTypeKey : "Hidden",
 		"form" : {
 			type : "Hidden",
 			validators : [ /*'required'*/],

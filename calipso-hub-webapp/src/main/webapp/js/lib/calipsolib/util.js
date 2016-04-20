@@ -79,14 +79,12 @@ define(
 				}
 			});
 			/**
-			* Encance the extend function to properly merge the
-			* static "fields" and "useCases" hashes
+			* Encance the extend function to a reference to super
 			*/
 
 			Calipso[packageName][newClassName].extend = function(protoProps, staticProps) {
 				staticProps.superClass = this;
 				return BaseType.extend.apply(this, arguments);
-				;
 			};
 		});
 	});
@@ -1347,17 +1345,24 @@ Calipso.cloneSpecificValue = function(val) {
 				var caseFields = {};
 				var _this = this;
 
-				_.each(fields, function(value, key, list){
-					var included = !_this.fieldIncludes || $.inArray(key, _this.fieldIncludes) > -1;
-					var excluded = _this.fieldExcludes && $.inArray(key, _this.fieldExcludes) > -1;
-					var excludedTypes = _this.fieldTypeExcludes && $.inArray(key, _this.fieldTypeExcludes) > -1;
-					//console.log("UseCaseContext.initFields, included: " + included + ", excluded: " + excluded);
-					if(included	&& !excluded	&& !excludedTypes){
-						caseFields[key] = value;
-						if(!caseFields[key].label){
-							caseFields[key].label = Calipso.util.getLabels(
-								caseFields[key].labelKey || "models." + _this.model.getPathFragment() + "." + key + ".label");
+				_.each(fields, function(field, key, list){
+					var included = ;
+					var excluded = ;
+					var excludedTypes = ;
+					// if included, not excluded and not filed type excluded
+					if((!_this.fieldIncludes || $.inArray(key, _this.fieldIncludes) > -1)
+						&& !(_this.fieldExcludes && $.inArray(key, _this.fieldExcludes) > -1)
+						&& !(_this.fieldTypeExcludes && $.inArray(key, _this.fieldTypeExcludes) > -1) ){
+						// switch to hidden if appropriate
+						if(field.hideNonEmpty && _this.model.get(key)){
+							field.datatype = "Hidden";
 						}
+						// resolve label
+						if(!field.label){
+							field.label = Calipso.util.getLabels(
+								field.labelKey || "models." + _this.model.getPathFragment() + "." + key + ".label");
+						}
+						caseFields[key] = field;
 					}
 				});
 				return caseFields;
