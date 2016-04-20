@@ -260,7 +260,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				collection : _self.collection
 			});
 
-			this.$('.backgrid-paginator-container').append(paginator.render().el);
+			this.$('.backgrid-table-container').append(paginator.render().el);
 			//						//console.log("ModelDrivenCollectionGridView.onShow, collection url: "+);
 			this.onGridRendered();
 			if (this.callCollectionFetch) {

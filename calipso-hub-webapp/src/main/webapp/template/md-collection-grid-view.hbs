@@ -1,5 +1,16 @@
 <div class="tmpl-hint">start generic-collection-grid-view.hbs</div>
-<p class="resultsInfo">{{resultsInfo.pageStart}} - {{resultsInfo.pageEnd}} / {{resultsInfo.totalRecords}}</p>
-<div class="backgrid-table-container"></div>
-<div class="backgrid-paginator-container"></div>
+<p class="right">
+
+</p>
+<div class="panel panel-default backgrid-table-container">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+    Panel heading
+    <span class="badge resultsInfo">
+      {{resultsInfo.pageStart}} - {{resultsInfo.pageEnd}} / {{resultsInfo.totalRecords}}
+    </span>
+  </div>
+  <div class="panel-body">
+    <div class="backgrid-paginator-container"></div>
+  </div>
 <div class="tmpl-hint">end generic-collection-grid-view.hbs</div>
