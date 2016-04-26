@@ -28,11 +28,48 @@ See the [checkout and build](docs/checkout_and_build.md) guide.
 
 #### Dynamic Routes
 
+
+
 #### Views
 
 ##### Template Helpers
 
 #### Model Metadata
+
+```javascript
+var BookModel = Calipso.model.GenericModel.extend({
+    
+},
+// static members
+{
+    pathFragment : "books",
+    typeName : "BookModel",
+    layoutViewType : Calipso.view.ModelDrivenSearchLayout,
+    // define the model field types and configuration
+    fields : {
+        name : {
+            "datatype" : "String",
+            backgrid : {
+                cell : Calipso.components.backgrid.ViewRowCell,
+            }
+        },
+        isbn : {
+            "datatype" : MyIsbnType,
+        },
+        edit : {
+            "datatype" : "Edit",
+        },
+    },
+    // define the model use cases or overrides to super class use cases
+    useCases : {
+    
+    }
+});
+```
+
+##### Path Fragment
+
+##### Type Name
 
 ##### Fields
 
