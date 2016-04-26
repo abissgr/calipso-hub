@@ -20,4 +20,43 @@ The Maven modules of this project produce a WAR that can be used as an overlay i
 
 ## Documentation
 
-Check out the [docs folder](docs).
+### Installation
+
+See the [checkout and build](docs/checkout_and_build.md) guide.
+
+### Javascript Stack
+
+#### Dynamic Routes
+
+#### Views
+
+##### Template Helpers
+
+#### Model Metadata
+
+##### Fields
+
+##### Use Cases
+
+#### Internationalization
+
+### Spring Stack
+
+#### Architecture
+
+##### Tiers
+
+##### Service URLs
+
+##### Authentication and Authorization
+
+##### Persistence
+
+##### Email
+
+##### Internationalization
+
+#### SCRUD HOWTO
+
+Check out the [SCRUD HOWTO](docs/scrud_howto.md) guide.
+
