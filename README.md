@@ -1,20 +1,14 @@
 
 ## Overview
 
-Calipso-hub is a high level framework for rapid development of maintainable and scalable enterprise applications. 
-
-
-
-Relational databases are supported by JPA. NoSQL stores are supported as well, while application instances also contain their own clusterable ElasticSearch node.
-
-The Maven modules of this project produce a WAR that can be used as an overlay in your project. The artifact makes it easy to quickly prototype the full stack of a Spring application and provides many ready to use features such as:
+Calipso-hub is a high level framework for rapid development of maintainable and scalable enterprise applications. It's features include:
 
  - Authentication and authorization services, including RESTful Single Sign On
  - OAuth integration with social netorks (facebook, linkedin, google+ etc.), including implicit sign-in and transparent user registration
  - Email services with Thymeleaf templates for email verification, password reset etc.
- - CRUD, View and Search RESTful services for your Entity Model classes
- - Similarly domain-driven single-page client based on backbone.marionette
- - JPA and NoSQL persistence
+ - Declarative, use-case-driven development on the front-end
+ - CRUD, View and Search RESTful services for your Entity Model classes on the back-end
+ - JPA and NoSQL persistence for your data
 
 ## Documentation
 
@@ -113,6 +107,10 @@ The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is bu
 ##### Authentication and Authorization
 
 ##### Persistence
+
+Relational databases are supported by JPA (Hibernate is used under the hood). 
+NoSQL stores are supported as well, while application instances also contain 
+their own clusterable ElasticSearch node.
 
 ##### Email
 
