@@ -39,6 +39,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import gr.abiss.calipso.util.PasswordHasher;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +160,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				if (StringUtils.isBlank(usernameOrEmail)) {
 					usernameOrEmail = tryUserDetails.getEmail();
 				}
-				String password = tryUserDetails.getPassword();
+				final String password = tryUserDetails.getPassword();
 				// TODO
 				Map<String, String> metadata = tryUserDetails.getMetadata();
 
@@ -232,7 +233,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
 		localUser.setResetPasswordToken(null);
-		localUser.setPassword(newPassword);
+
+		final String hashedPassword = PasswordHasher.hashPassword(newPassword);
+		localUser.setPassword(hashedPassword);
+
 		userDetails = UserDetails.fromUser(localUser);
 		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 		// LOGGER.info("create returning loggedInUserDetails: " +

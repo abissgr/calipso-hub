@@ -41,6 +41,7 @@ import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.persistence.Query;
 
+import gr.abiss.calipso.util.PasswordHasher;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
@@ -55,6 +56,7 @@ import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import sun.security.util.Password;
 
 //@Named("userService")
 public class UserServiceImpl extends GenericEntityServiceImpl<User, String, UserRepository> 
@@ -91,7 +93,13 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		if(LOGGER.isDebugEnabled()) LOGGER.debug("findByCredentials, userNameOrEmail: " + userNameOrEmail + ", password: " + password + ", metadata: " + metadata);
 		User user = null;
 		try {
-			user = this.repository.findByCredentials(userNameOrEmail, password);
+			final String hashedPassword = PasswordHasher.hashPassword(password);
+			final User found = this.repository.findByUsernameOrEmail(userNameOrEmail);
+
+            if (PasswordHasher.checkPassword(password, hashedPassword)) {
+                user = found;
+            }
+
 			LOGGER.error("findByCredentials: matched user: "+user);
 			if (user != null) {
 				if (!CollectionUtils.isEmpty(metadata)) {
@@ -111,7 +119,7 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User create(User resource) {
-		Role userRole = roleRepository.findByName(Role.ROLE_USER);
+		final Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
 		resource.setResetPasswordToken(generator.generateKey());
 		resource = super.create(resource);
@@ -166,7 +174,10 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
 		user.setResetPasswordToken(null);
-		user.setPassword(newPassword);
+
+		final String hashedPassword = PasswordHasher.hashPassword(newPassword);
+		user.setPassword(hashedPassword);
+
 		user = this.update(user);
 
 		LOGGER.info("handlePasswordResetToken returning local user: " + user);
@@ -231,7 +242,10 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		user.setUsername(userAccountData.getUsername());
 		user.setFirstName(userAccountData.getFirstName());
 		user.setLastName(userAccountData.getLastName());
-		user.setPassword(userAccountData.getPassword());
+
+		final String hashedPassword = PasswordHasher.hashPassword(userAccountData.getPassword());
+		user.setPassword(hashedPassword);
+
 		User existing = this.repository.findByUsernameOrEmail(user.getEmail());
 		if(existing == null){
 			existing = this.repository.findByUsernameOrEmail(user.getUsername());
@@ -268,10 +282,12 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 		// make sure a user matching the credentials is found
 		User u = this.findByCredentials(userNameOrEmail, oldPassword, null);
 		Assert.notNull(u, "Failed updating user pass: A user could not be found with the given credentials");
-		
+
 		// update password and return user
-		u.setPassword(newPassword);
+		final String hashedPassword = PasswordHasher.hashPassword(newPassword);
+		u.setPassword(hashedPassword);
 		u.setLastPassWordChangeDate(new Date());
+
 		u = this.update(u);
 		return u;
 	}

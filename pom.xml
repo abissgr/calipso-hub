@@ -18,16 +18,18 @@
 		<url>http://abiss.gr</url>
 	</organization>
 	<url>http://www.abiss.gr</url>
+
 	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
 		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			<id>nf-nexus</id>
+			<url>http://nexus.nf.local/nexus/content/repositories/releases</url>
 		</repository>
+		<snapshotRepository>
+			<id>nf-nexus</id>
+			<url>http://nexus.nf.local/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
 	</distributionManagement>
+
 	<licenses>
 		<license>
 			<name>GNU AFFERO GENERAL PUBLIC LICENSE</name>
@@ -789,6 +791,12 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
+		</repository>
+
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo1.maven.org/maven2</url>
 		</repository>
 	</repositories>
 </project>
