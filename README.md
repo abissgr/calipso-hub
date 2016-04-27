@@ -46,8 +46,8 @@ making it natural for new code to be added in the form of reusable components.
 Calipso defines a metadata profile for it's backbone models. The metadata are used for 
 dynamically handle URL routes, render fields of a form or grid and more.
  
-Metadata are typically defined declaratively as static properties (e.g. <code>pathFragment</code>)
-of a model type. The corresponding getter methods can be used as well (e.g. getPathFragment).
+Metadata are typically defined/overriden declaratively as static properties (e.g. `pathFragment`)
+of a model type. The corresponding getter methods can be used as well (e.g. `getPathFragment`).
 
 The following is a typical example:
 
@@ -66,6 +66,7 @@ var BookModel = Calipso.model.GenericModel.extend({
             "datatype" : "String",
         },
         isbn : {
+            // custom field type
             "datatype" : MyIsbnType,
         },
         edit : {
@@ -75,7 +76,7 @@ var BookModel = Calipso.model.GenericModel.extend({
     // Define or override the use cases of this model type. See also  
     // the [Use Cases section](#use-cases) for more details.
     useCases : {
-        // each use case matches it's own URL route, for example
+        // Each use case matches it's own URL route, for example
         // this one matches "books/publish"
         publish :{
             // ...
