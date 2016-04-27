@@ -661,8 +661,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<plugins>
-		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
