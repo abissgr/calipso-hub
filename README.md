@@ -3,9 +3,7 @@
 
 Calipso-hub is a high level framework for rapid development of maintainable and scalable enterprise applications. 
 
-The SPA JS client provides a responsive UI based on Bootstrap and Backbone.Marionette. The APIs abstract a number of other libraries and allow declarative definitions of view hierarchies described as use cases in JSON notation. Dynamic views and components include domain-driven forms, grids and other UI components, while new code is naturally introduced as components that are reusable and maintainable.
 
-The stateless back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven RESTful services for your entities, including complete coverage iof SCRUD usecases.
 
 Relational databases are supported by JPA. NoSQL stores are supported as well, while application instances also contain their own clusterable ElasticSearch node.
 
@@ -26,15 +24,38 @@ See the [checkout and build](docs/checkout_and_build.md) guide.
 
 ### Javascript Stack
 
-#### Dynamic Routes
+The javascript stack provides a [responsive](https://en.wikipedia.org/wiki/Responsive_web_design), 
+[SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework that is compatible 
+with the [Spring stack](#spring-stack).
 
+The stack goals are productive developers and maintainable code. It allows you to quickly and 
+consistently implement use cases or other functional requirements declaratively (via JSON notation), 
+making it natural for new code to be added in the form of reusable components.
+
+#### Routes
+
+##### Dynamic Routes
+
+##### Implicit Routes
+
+##### Explicit Routes
 
 
 #### Views
 
+##### Build-in Views
+
 ##### Template Helpers
 
 #### Model Metadata
+
+Calipso defines a metadata profile for it's backbone models. The metadata are used for 
+dynamically handle URL routes, render fields of a form or grid and more.
+ 
+Metadata are typically defined declaratively as static properties (e.g. <code>pathFragment</code>)
+of a model type. The corresponding getter methods can be used as well (e.g. getPathFragment).
+
+The following is a typical example:
 
 ```javascript
 var BookModel = Calipso.model.GenericModel.extend({
@@ -42,16 +63,13 @@ var BookModel = Calipso.model.GenericModel.extend({
 },
 // static members
 {
+    // Use this model for routes starting with "books"
     pathFragment : "books",
-    typeName : "BookModel",
-    layoutViewType : Calipso.view.ModelDrivenSearchLayout,
-    // define the model field types and configuration
+    // Define the fields of this model type. See also  
+    // the [Fields section](#fields) for more details
     fields : {
         name : {
             "datatype" : "String",
-            backgrid : {
-                cell : Calipso.components.backgrid.ViewRowCell,
-            }
         },
         isbn : {
             "datatype" : MyIsbnType,
@@ -60,9 +78,14 @@ var BookModel = Calipso.model.GenericModel.extend({
             "datatype" : "Edit",
         },
     },
-    // define the model use cases or overrides to super class use cases
+    // Define or override the use cases of this model type. See also  
+    // the [Use Cases section](#use-cases) for more details.
     useCases : {
-    
+        // each use case matches it's own URL route, for example
+        // this one matches "books/publish"
+        publish :{
+            // ...
+        }
     }
 });
 ```
@@ -80,6 +103,8 @@ var BookModel = Calipso.model.GenericModel.extend({
 ### Spring Stack
 
 #### Architecture
+
+The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven RESTful services for your entities, including complete coverage of SCRUD use cases.
 
 ##### Tiers
 
