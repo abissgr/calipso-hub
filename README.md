@@ -106,7 +106,7 @@ var BookModel = Calipso.model.GenericModel.extend({
     // Define or override the use cases of this model type. See also  
     // the [Use Cases section](#use-cases) for more details.
     useCases : {
-        // Each use case matches it's own URL route, for example
+        // Each use case matches it\'s own URL route, for example
         // this one matches "books/publish"
         publish :{
             // ...
@@ -129,7 +129,7 @@ var BookModel = Calipso.model.GenericModel.extend({
 
 #### Architecture
 
-The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven RESTful services for your entities, including complete coverage of SCRUD use cases.
+The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) services for your entities, including complete coverage of [SCRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) use cases.
 
 ##### Tiers
 
@@ -139,9 +139,10 @@ The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is bu
 
 ##### Persistence
 
-Relational databases are supported by JPA (Hibernate is used under the hood). 
-NoSQL stores are supported as well, while application instances also contain 
-their own clusterable ElasticSearch node.
+Relational databases are supported by [JPA](https://en.wikipedia.org/wiki/Java_Persistence_API) ([Hibernate](http://hibernate.org/) is used under the hood). 
+[NoSQL](https://en.wikipedia.org/wiki/NoSQL) stores like [MongoDB](https://www.mongodb.org/), [Cassandra](http://cassandra.apache.org/), 
+[Couchbase](http://www.couchbase.com) and [Neo4j](http://neo4j.com/) are supported as well, while application instances also contain 
+their own clusterable [ElasticSearch](https://www.elastic.co/) node by default.
 
 ##### Email
 
