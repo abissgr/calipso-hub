@@ -30,9 +30,39 @@ making it natural for new code to be added in the form of reusable components.
 
 ##### Dynamic Routes
 
+Assuming the base webapp URL is `/calipso/client` then dynamic routes in the form 
+of `/calipso/client/urlFragment/useCaseName` apply, where __urlFragment__ matches a model by the 
+corresponding static property and __useCaseName__ the use case defined within the model (or a super type) 
+under the same key. For example, `/calipso/client/books/publish` mathes the following:
+
+
+```javascript
+var BookModel = Calipso.model.GenericModel.extend({
+    
+},
+// static members
+{
+    // Use this model for routes starting with "books"
+    pathFragment : "books",
+    // Define or override the use cases of this model type. See also  
+    // the [Use Cases section](#use-cases) for more details.
+    useCases : {
+        // Each use case matches it's own URL route, for example
+        // this one matches "books/publish"
+        publish :{
+            // use case configuration...
+        }
+    }
+});
+
 ##### Implicit Routes
 
+In absence of a use case key like `/calipso/client/urlFragment`, the __search__ use case is used, i.e. 
+`/calipso/client/urlFragment/search`.
+
 ##### Explicit Routes
+
+Explicit routes are defined in the usual backbone/marionette way when needed.
 
 
 #### Views
