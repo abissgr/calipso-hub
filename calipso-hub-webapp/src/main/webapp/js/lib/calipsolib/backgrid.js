@@ -27,6 +27,9 @@ define(
 			Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
 			BootstrapSwitch) {
 
+			// Override column defaults globally
+			Backgrid.Column.prototype.defaults.sortType = "toggle";
+
 			// make backgrid tables responsive
 			var BackgridCellInitialize = Backgrid.Cell.prototype.initialize;
 			Backgrid.Cell.prototype.initialize = function() {
