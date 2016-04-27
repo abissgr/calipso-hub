@@ -47,13 +47,14 @@ var BookModel = Calipso.model.GenericModel.extend({
     // Define or override the use cases of this model type. See also  
     // the [Use Cases section](#use-cases) for more details.
     useCases : {
-        // Each use case matches its own URL route, for example
+        // Each use case matches it's own URL route, for example
         // this one matches "books/publish"
         publish :{
             // use case configuration...
         }
     }
 });
+```
 
 ##### Implicit Routes
 
