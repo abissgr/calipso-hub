@@ -1,7 +1,7 @@
 
 
 
-Experiments on a modern, full stack, high level framework for rapid development of maintainable and scalable applications.
+Experiments on a full stack, high level framework for lazy application hackers and scalable developer teams. 
 
 ## Table of Contents
 
