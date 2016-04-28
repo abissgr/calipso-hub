@@ -81,7 +81,6 @@ define(
 			/**
 			* Encance the extend function to a reference to super
 			*/
-
 			Calipso[packageName][newClassName].extend = function(protoProps, staticProps) {
 				staticProps.superClass = this;
 				return BaseType.extend.apply(this, arguments);

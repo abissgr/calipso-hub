@@ -25,7 +25,7 @@ define(
 	// //////////////////////////////////////
 	// Controller
 	// //////////////////////////////////////
-	Calipso.controller.AbstractController = Marionette.Controller.extend({
+	Calipso.Controller = Marionette.Controller.extend({
 		constructor : function(options) {
 			Marionette.Controller.prototype.constructor.call(this, options);
 		},
@@ -181,12 +181,12 @@ define(
 		/**
 		 *
 		 */
-		showEntitySearch : function(mainRoutePart, httpParams) {
+		showEntitySearch : function(pathFragment, httpParams) {
 			var httpParams = Calipso.getHttpUrlParams();
-			this.showUseCaseView(mainRoutePart, null, "search", httpParams);
+			this.showUseCaseView(pathFragment, null, "search", httpParams);
 		},
-		showEntityView : function(mainRoutePart, modelId) {
-			this.showUseCaseView(mainRoutePart, modelId, "view", null);
+		showEntityView : function(pathFragment, modelId) {
+			this.showUseCaseView(pathFragment, modelId, "view", null);
 		},
 		showUserDetailsView : function(useCaseKey, httpParams) {
 			// temp line
@@ -204,8 +204,8 @@ define(
 			}
 			*/
 		},
-		showUseCaseView : function(mainRoutePart, modelId, useCaseKey, httpParams) {
-			console.log("showUseCaseView mainRoutePart: " + mainRoutePart + ", modelId: " + modelId + ", useCaseKey: " + useCaseKey + ", httpParams: " + httpParams);
+		showUseCaseView : function(pathFragment, modelId, useCaseKey, httpParams) {
+			console.log("showUseCaseView pathFragment: " + pathFragment + ", modelId: " + modelId + ", useCaseKey: " + useCaseKey + ", httpParams: " + httpParams);
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if (qIndex > -1) {
@@ -213,7 +213,7 @@ define(
 			}
 			// build the model instance representing the current request
 
-			var ModelType = Calipso.util.getModelType(mainRoutePart);
+			var ModelType = Calipso.util.getModelType(pathFragment);
 
 			// check for usecase routes for new instances
 			if(ModelType.hasUseCase(modelId)){
@@ -238,7 +238,7 @@ define(
 				// showing the form and grid side-by-side
 				var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
 				// promise to fetch then render
-				// console.log("AbstractController#mainNavigationCrudRoute, mainRoutePart: " + mainRoutePart + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
+				// console.log("AbstractController#mainNavigationCrudRoute, pathFragment: " + pathFragment + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
 				var renderFetchable = function() {
 
 					//Calipso.vent.trigger("app:show", useCaseContext.createView());
@@ -262,23 +262,20 @@ define(
 			}
 		},
 		notFoundRoute : function() {
-			// build the model instancde representing the current request
-
-						this.showView(new Calipso.view.NotFoundView());
-			//Calipso.vent.trigger("app:show", new Calipso.view.NotFoundView());
+			this.showView(new Calipso.view.NotFoundView());
 
 		},
 		//		decodeParam : function(s) {
 		//			return decodeURIComponent(s.replace(/\+/g, " "));
 		//		},
 		syncMainNavigationState : function(modelForRoute) {
-			var mainRoutePart = modelForRoute.getPathFragment(), contentNavTabName = modelForRoute.get("id");
-			//console.log("AbstractController#syncMainNavigationState, mainRoutePart: " + mainRoutePart + ", contentNavTabName: " + contentNavTabName);
+			var pathFragment = modelForRoute.getPathFragment(), contentNavTabName = modelForRoute.get("id");
+			//console.log("AbstractController#syncMainNavigationState, pathFragment: " + pathFragment + ", contentNavTabName: " + contentNavTabName);
 			// update active nav menu tab
-			if (mainRoutePart && mainRoutePart != this.lastMainNavTabName) {
+			if (pathFragment && pathFragment != this.lastMainNavTabName) {
 				$('.navbar-nav li.active').removeClass('active');
-				$('#mainNavigationTab-' + mainRoutePart).addClass('active');
-				this.lastMainNavTabName = mainRoutePart;
+				$('#mainNavigationTab-' + pathFragment).addClass('active');
+				this.lastMainNavTabName = pathFragment;
 			}
 			// update active content tab
 			if (contentNavTabName && contentNavTabName != this.lastContentNavTabName) {
@@ -306,10 +303,10 @@ define(
 			this.showView(pageView);
 			//Calipso.vent.trigger("app:show", pageView);
 		},
-		tryExplicitRoute : function(mainRoutePart, secondaryRoutePart) {
-			if (typeof this[mainRoutePart] == 'function') {
+		tryExplicitRoute : function(pathFragment, secondaryRoutePart) {
+			if (typeof this[pathFragment] == 'function') {
 				// render explicit route
-				this[mainRoutePart](secondaryRoutePart);
+				this[pathFragment](secondaryRoutePart);
 			}
 		},
 		notFoundRoute : function(path) {

@@ -19,9 +19,10 @@
 define([ 'calipso', 'underscore', 'backbone', 'marionette' ],
 
 function(Calipso, _, Backbone, Marionette) {
-	var labels = Calipso.util.getLabels();
+	
+	//var labels = Calipso.util.getLabels();
 
-	var MainController = Calipso.controller.AbstractController.extend({
+	var MainController = Calipso.Controller.extend({
 
 
 	});

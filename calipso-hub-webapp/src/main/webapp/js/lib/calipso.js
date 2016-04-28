@@ -24,7 +24,7 @@ define([ "lib/calipsolib/util",
          'lib/calipsolib/view',
          'lib/calipsolib/model',
          'lib/calipsolib/session',
-         'lib/calipsolib/controller'],
+         'lib/calipsolib/router'],
 function(Calipso) {
 	return Calipso;
 });

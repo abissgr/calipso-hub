@@ -18,50 +18,17 @@
  */
 define(['marionette', 'calipso', 'controllers/MainController'], function (Marionette, Calipso, MainController) {
 
-	return Marionette.AppRouter.extend({
+	/**
+	 * This is an example of extending Calipso.Approuter in your app. 
+	 *  Any appRoutes you define here will be merged with 
+	 * the super type routes.
+	 */
+	return Calipso.AppRouter.extend({
 
 		controller : new MainController(),
-
 		appRoutes : {
-
-			'' : 'home',
-			'_=_' : 'toHome',
-			'#_=_' : 'toHome',
-			'home' : 'home',
-
-			'logout' : 'logout',
-			
-			'userDetails/:useCaseKey' : 'showUserDetailsView',
-			'userDetails/:useCaseKey/' : 'showUserDetailsView',
-			'userDetails/:useCaseKey?*queryString' : 'showUserDetailsView',
-			'userDetails/:useCaseKey/?*queryString' : 'showUserDetailsView',
-/*
-			'login' : 'login',
-			//'loginRegistered' : 'loginRegistered',
-			'changePassword' : 'changePassword',
-			'changePasswordWithToken/:username' : 'renderTokenPasswordChangeForm',
-			'changePasswordWithToken/:username/:token' : 'renderTokenPasswordChangeForm',
-			'logout' : 'logout',
-			'register' : 'register',
-			'myProfile' : 'myProfile',
-*/
-			'page/:templateName' : 'templatePage',
-			/*':mainRoutePart/reports' : 'mainNavigationReportRoute',
-			':mainRoutePart/reports/' : 'mainNavigationReportRoute',
-			':mainRoutePart/reports/?*queryString' : 'mainNavigationReportRoute',
-			':mainRoutePartreports?*queryString' : 'mainNavigationReportRoute',
-*/
-			':mainRoutePart' : 'showEntitySearch',
-			':mainRoutePart/' : 'showEntitySearch',
-			':mainRoutePart/?*queryString' : 'showEntitySearch',
-			':mainRoutePart?*queryString' : 'showEntitySearch',
-
-			':mainRoutePart/:modelId' : 'showEntityView',
-			':mainRoutePart/:modelId/:useCaseKey' : 'showUseCaseView',
-
-			'*path':  'notFoundRoute'
+			// custom/explicit routes here
 		}
-
 	},
 	{
 	// static members

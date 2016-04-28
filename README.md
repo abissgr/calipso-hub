@@ -1,4 +1,5 @@
 
+
 ## Overview
 
 Calipso-hub is a high level framework for rapid development of maintainable and scalable enterprise applications. It's features include:
@@ -12,32 +13,32 @@ Calipso-hub is a high level framework for rapid development of maintainable and 
 
 ## Documentation
 
- - [Installation](#installation)
- - [Javascript Stack](#javascript-stack)
-   - [Routes](#routes)
-     - [Dynamic Routes](#dynamic-routes)
-     - [Implicit Routes](#implicit-routes)
-     - [Explicit Routes](#explicit-routes)
-   - [Views](#views)
-     - [Build-in Views](#build-in-views)
-     - [Template Helpers](#template-helpers)
-   - [Model Metadata](#model-metadata)
-     - [Path Fragment](#path-fragment)
-     - [Type Name](#type-name)
-     - [Fields](#fields)
-     - [Use Cases](#use-cases)
-   - [Internationalization](#internationalization)
- - [Spring Stack](#spring-stack)
-   - [Architecture](#architecture)
-     - [Tiers](#tiers)
-     - [Service URLs](#service-urls)
-     - [Authentication and Authorization](#authentication-and-authorization)
-     - [Persistence](#persistence)
-     - [Email](#email)
-     - [Internationalization](#internationalization)
-   - [SCRUD HOWTO](#scrud-howto)
-
-
+- [Installation](#installation)
+- [Javascript Stack](#javascript-stack)
+  - [Routing](#routing)
+    - [Implicit Routes](#implicit-routes)
+      - [Use Case Routes](#use-case-routes)
+      - [Search Routes](#search-routes)
+      - [Page Routes](#page-routes)
+    - [Explicit Routes](#explicit-routes)
+  - [Views](#views)
+    - [Build-in Views](#build-in-views)
+    - [Template Helpers](#template-helpers)
+  - [Model Metadata](#model-metadata)
+    - [Path Fragment](#path-fragment)
+    - [Type Name](#type-name)
+    - [Fields](#fields)
+    - [Use Cases](#use-cases)
+  - [Internationalization](#internationalization)
+- [Spring Stack](#spring-stack)
+  - [Architecture](#architecture)
+    - [Tiers](#tiers)
+    - [Service URLs](#service-urls)
+    - [Authentication and Authorization](#authentication-and-authorization)
+    - [Persistence](#persistence)
+    - [Email](#email)
+    - [Internationalization](#internationalization)
+  - [SCRUD HOWTO](#scrud-howto)
 ### Installation
 
 See the [checkout and build](docs/checkout_and_build.md) guide.
@@ -52,14 +53,21 @@ The stack goals are productive developers and maintainable code. It allows you t
 consistently implement use cases or other functional requirements declaratively (via JSON notation),
 making it natural for new code to be added in the form of reusable components.
 
-#### Routes
+#### Routing
 
-##### Dynamic Routes
+`Calipso.Router` and `Calipso.Controller` extend the respective types of Backbone/Marionette to dynamically handle declarative [use cases](#use-cases) defined by models.
 
-Assuming the base webapp URL is `/calipso/client` then dynamic routes in the form
-of `/calipso/client/urlFragment/useCaseName` apply, where __urlFragment__ matches a model by the
+##### Implicit Routes
+
+Routers extending `Calipso.AppRouter` can define their own explicit routes but also inherit a set of implicit, dynamic routes described bellow.
+
+###### Use Case Routes
+
+Use case routes are suffixed by "useCases/". Assuming the base webapp URL is `/calipso/client` then
+dynamic routes in the form of `/calipso/client/useCases/pathFragment/useCaseName` apply,
+where __pathFragment__ matches a model by it's
 corresponding static property and __useCaseName__ the use case defined within the model (or a super type)
-under the same key. For example, `/calipso/client/books/publish` mathes the following:
+under the same key. For example, `/calipso/client/useCases/books/publish` mathes the following:
 
 
 ```javascript
@@ -80,16 +88,44 @@ var BookModel = Calipso.model.GenericModel.extend({
         }
     }
 });
+
 ```
 
-##### Implicit Routes
+###### Search Routes
 
-In absence of a use case key like `/calipso/client/urlFragment`, the __search__ use case is used, i.e.
-`/calipso/client/urlFragment/search`.
+In absence of a use case key like `/calipso/client/useCases/pathFragment?queryString`, the __search__ use case is used by default, i.e.
+`/calipso/client/useCases/pathFragment/search?queryString`. The [queryString](https://en.wikipedia.org/wiki/Query_string) will
+be used as search criteria if present.
+
+###### Page Routes
+
+Page routes like `/calipso/client/page/pageFragment` are suffixed by "page" and will render an item view using the template
+matched by the __pageFragment__. For example, `/calipso/client/page/support` will use the template in `/calipso/templates/support.hbs`.
+
+The view model in page routes is the current userDetails (logged in user).
 
 ##### Explicit Routes
 
-Explicit routes are defined in the usual backbone/marionette way when needed.
+Explicit routes are defined in the usual backbone/marionette way when needed. Your controller only needs to define it's own
+and those will extend `Calipso.AppRouter`'s routes, for example:
+
+
+```javascript
+// This is an example of extending Calipso.Approuter in your app.
+// Any appRoutes you define here will be merged with
+// the super type routes.
+var MyRouter = Calipso.AppRouter.extend({
+
+    controller : new MainController(),
+    appRoutes : {
+        // explicit routes here will be merged with
+        // those defined by Calipso.AppRouter automatically
+        "release/the/kraken" : "releaseTheKraken"
+    }
+});
+
+```
+
 
 
 #### Views
