@@ -39,6 +39,7 @@ Calipso-hub is a high level framework for rapid development of maintainable and 
     - [Email](#email)
     - [Internationalization](#internationalization)
   - [SCRUD HOWTO](#scrud-howto)
+
 ### Installation
 
 See the [checkout and build](docs/checkout_and_build.md) guide.
@@ -83,7 +84,7 @@ var BookModel = Calipso.model.GenericModel.extend({
     useCases : {
         // Each use case matches it's own URL route, for example
         // this one matches "books/publish"
-        publish :{
+        publish : {
             // use case configuration...
         }
     }
