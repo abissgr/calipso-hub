@@ -143,10 +143,10 @@ dynamically handle URL routes, render fields of a form or grid and more.
 Metadata are typically defined/overriden declaratively as static properties (e.g. `pathFragment`)
 of a model type. The corresponding getter methods can be used as well (e.g. `getPathFragment`).
 
-The following is a typical example:
+The following is a typical example of model metadata, in this case `pathFragment`, `fields` and `useCases`:
 
 ```javascript
-var BookModel = Calipso.model.GenericModel.extend({
+var BookModel = Calipso.Model.extend({
 
 },
 // static members
@@ -186,6 +186,48 @@ var BookModel = Calipso.model.GenericModel.extend({
 ##### Fields
 
 ##### Use Cases
+
+Use cases allow you to declaratively define how a route should be handled.
+
+###### Base Cases
+
+All models extending `Calipso.model` inherit the following use cases:
+
+```js
+useCases : {
+  create : {
+    view : Calipso.view.BrowseLayout,
+  },
+  update : {
+    view : Calipso.view.BrowseLayout,
+  },
+  search : {
+    view : Calipso.view.SearchLayout,
+  },
+},
+```
+
+###### Deep Merging
+
+Use cases of a model are *deeply* merged wth the use cases defined by the model it extends, for example:
+
+```js
+useCases : {
+  create : {
+    // No need to define a view as it will be
+    // inherited from Calipso.Model
+    //view : Calipso.view.BrowseLayout,
+    viewOptions : {
+      //...
+    }
+  },
+  //...
+},
+```
+
+###### Use Case Properties
+
+
 
 #### Internationalization
 

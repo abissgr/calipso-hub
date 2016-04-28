@@ -30,8 +30,8 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	 * @requires Backbone
 	 * @augments module:Backbone.Model
 	 */
-	Calipso.model.UseCaseBasedModel = Calipso.model.Model.extend(
-	/** @lends Calipso.model.UseCaseBasedModel.prototype */
+	Calipso.Model = Calipso.model.Model.extend(
+	/** @lends Calipso.Model.prototype */
 	{
 		skipDefaultSearch : false,
 
@@ -109,7 +109,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		/** Retrieve the form schema every time it is accessed */
 		FORM_SCHEMA_CACHE_NONE : "FORM_SCHEMA_CACHE_NONE",
 		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_CLIENT,
-		typeName : "Calipso.model.UseCaseBasedModel",
+		typeName : "Calipso.Model",
 		superClass : null,
 		label : "GenericModel",
 		showInMenu : false,
@@ -147,22 +147,17 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		useCases : {
 			create : {
 				view : Calipso.view.BrowseLayout,
-				viewOptions : {
-					childViewOptions : {
-						formOptions : {
-							submitButton : "WOW"
-						}
-					}
-				},
 			},
 			update : {
 				view : Calipso.view.BrowseLayout,
 				viewOptions : {
-					childViewOptions : {
+					/*
+          childViewOptions : {
 						formOptions : {
 							submitButton : "WOW"
 						}
 					}
+          */
 				}
 			},
 			search : {
@@ -245,7 +240,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 	// Role model
 	// ---------------------------------------
-	Calipso.model.RoleModel = Calipso.model.UseCaseBasedModel.extend(
+	Calipso.model.RoleModel = Calipso.Model.extend(
 	/** @lends Calipso.model.RoleModel.prototype */
 	{
 		toString : function() {
@@ -254,7 +249,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		parent : Calipso.model.UseCaseBasedModel,
+		parent : Calipso.Model,
 		label : "Role",
 		pathFragment : "roles",
 		typeName : "Calipso.model.RoleModel",
@@ -276,7 +271,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		},
 	});
 
-	Calipso.model.UserModel = Calipso.model.UseCaseBasedModel.extend(
+	Calipso.model.UserModel = Calipso.Model.extend(
 	/** @lends Calipso.model.UserModel.prototype */
 	{
 		toString : function() {
@@ -285,7 +280,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		parent : Calipso.model.UseCaseBasedModel,
+		parent : Calipso.Model,
 		label : "User",
 		showInMenu : true,
 		pathFragment : "users",
@@ -372,10 +367,10 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 	});
 
-	Calipso.model.HostModel = Calipso.model.UseCaseBasedModel.extend({},
+	Calipso.model.HostModel = Calipso.Model.extend({},
 	// static members
 	{
-		parent : Calipso.model.UseCaseBasedModel,
+		parent : Calipso.Model,
 		label : "Host",
 		pathFragment : "hosts",
 		typeName : "Calipso.model.HostModel",
@@ -411,11 +406,11 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 	// Country model
 	// ---------------------------------------
-	Calipso.model.CountryModel = Calipso.model.UseCaseBasedModel.extend(
+	Calipso.model.CountryModel = Calipso.Model.extend(
 	/** @lends Calipso.model.RoleModel.prototype */
 	{
 		initialize : function() {
-			Calipso.model.UseCaseBasedModel.prototype.initialize.apply(this, arguments);
+			Calipso.Model.prototype.initialize.apply(this, arguments);
 			this.set("translatedName", Calipso.util.getLabels("countries." + this.get("id")));
 		},
 		toString : function() {
@@ -427,7 +422,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		parent : Calipso.model.UseCaseBasedModel,
+		parent : Calipso.Model,
 		label : "Role",
 		pathFragment : "countries",
 		typeName : "Calipso.model.RoleModel",
@@ -476,15 +471,15 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 	// Notification Model
 	// -----------------------------------------
-	Calipso.model.BaseNotificationModel = Calipso.model.UseCaseBasedModel.extend({},
+	Calipso.model.BaseNotificationModel = Calipso.Model.extend({},
 	// static members
 	{
-		parent : Calipso.model.UseCaseBasedModel,
+		parent : Calipso.Model,
 		pathFragment : "baseNotifications",
 		typeName : "Calipso.model.BaseNotificationModel",
 	});
 
-	Calipso.model.UserDetailsModel = Calipso.model.UseCaseBasedModel.extend(
+	Calipso.model.UserDetailsModel = Calipso.Model.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
 		// TODO: move to usecases/labels
@@ -505,7 +500,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	},
 	// static members
 	{
-		parent : Calipso.model.UseCaseBasedModel,
+		parent : Calipso.Model,
 		public : true,
 		pathFragment : "userDetails",
 		baseFragment : '/apiauth/',
