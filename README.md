@@ -1,20 +1,12 @@
 
 
-## Overview
 
-Calipso-hub is a high level framework for rapid development of maintainable and scalable enterprise applications. It's features include:
+Experiments on a modern, full stack, high level framework for rapid development of maintainable and scalable applications.
 
- - Authentication and authorization services, including RESTful Single Sign On
- - OAuth integration with social netorks (facebook, linkedin, google+ etc.), including implicit sign-in and transparent user registration
- - Email services with Thymeleaf templates for email verification, password reset etc.
- - Declarative, use-case-driven development on the front-end
- - CRUD, View and Search RESTful services for your Entity Model classes on the back-end
- - JPA and NoSQL persistence for your data
-
-## Documentation
+## Table of Contents
 
 - [Installation](#installation)
-- [Javascript Stack](#javascript-stack)
+- [Client Stack](#client-stack)
   - [Routing](#routing)
     - [Implicit Routes](#implicit-routes)
       - [Use Case Routes](#use-case-routes)
@@ -30,7 +22,7 @@ Calipso-hub is a high level framework for rapid development of maintainable and 
     - [Fields](#fields)
     - [Use Cases](#use-cases)
   - [Internationalization](#internationalization)
-- [Spring Stack](#spring-stack)
+- [Server Stack](#server-stack)
   - [Architecture](#architecture)
     - [Tiers](#tiers)
     - [Service URLs](#service-urls)
@@ -40,29 +32,29 @@ Calipso-hub is a high level framework for rapid development of maintainable and 
     - [Internationalization](#internationalization)
   - [SCRUD HOWTO](#scrud-howto)
 
-### Installation
+## Installation
 
 See the [checkout and build](docs/checkout_and_build.md) guide.
 
-### Javascript Stack
+## Client Stack
 
 The javascript stack provides a [responsive](https://en.wikipedia.org/wiki/Responsive_web_design),
 [SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework that is compatible
-with the [Spring stack](#spring-stack).
+with the [Server Stack](#server-stack).
 
 The stack goals are productive developers and maintainable code. It allows you to quickly and
 consistently implement use cases or other functional requirements declaratively (via JSON notation),
 making it natural for new code to be added in the form of reusable components.
 
-#### Routing
+### Routing
 
 `Calipso.Router` and `Calipso.Controller` extend the respective types of Backbone/Marionette to dynamically handle declarative [use cases](#use-cases) defined by models.
 
-##### Implicit Routes
+#### Implicit Routes
 
 Routers extending `Calipso.AppRouter` can define their own explicit routes but also inherit a set of implicit, dynamic routes described bellow.
 
-###### Use Case Routes
+##### Use Case Routes
 
 Use case routes are suffixed by "useCases/". Assuming the base webapp URL is `/calipso/client` then
 dynamic routes in the form of `/calipso/client/useCases/pathFragment/useCaseName` apply,
@@ -92,20 +84,20 @@ var BookModel = Calipso.model.GenericModel.extend({
 
 ```
 
-###### Search Routes
+##### Search Routes
 
 In absence of a use case key like `/calipso/client/useCases/pathFragment?queryString`, the __search__ use case is used by default, i.e.
 `/calipso/client/useCases/pathFragment/search?queryString`. The [queryString](https://en.wikipedia.org/wiki/Query_string) will
 be used as search criteria if present.
 
-###### Page Routes
+##### Page Routes
 
 Page routes like `/calipso/client/page/pageFragment` are suffixed by "page" and will render an item view using the template
 matched by the __pageFragment__. For example, `/calipso/client/page/support` will use the template in `/calipso/templates/support.hbs`.
 
 The view model in page routes is the current userDetails (logged in user).
 
-##### Explicit Routes
+#### Explicit Routes
 
 Explicit routes are defined in the usual backbone/marionette way when needed. Your controller only needs to define it's own
 and those will extend `Calipso.AppRouter`'s routes, for example:
@@ -129,13 +121,13 @@ var MyRouter = Calipso.AppRouter.extend({
 
 
 
-#### Views
+### Views
 
-##### Build-in Views
+#### Build-in Views
 
-##### Template Helpers
+#### Template Helpers
 
-#### Model Metadata
+### Model Metadata
 
 Calipso defines a metadata profile for it's backbone models. The metadata are used for
 dynamically handle URL routes, render fields of a form or grid and more.
@@ -179,13 +171,13 @@ var BookModel = Calipso.Model.extend({
 });
 ```
 
-##### Path Fragment
+#### Path Fragment
 
-##### Type Name
+#### Type Name
 
-##### Fields
+#### Fields
 
-##### Use Cases
+#### Use Cases
 
 Use cases allow you to declaratively define how a route should be handled.
 
@@ -203,7 +195,7 @@ var BookModel = Calipso.Model.extend({
 });
 ```
 
-###### Base Cases
+##### Base Cases
 
 All models extending `Calipso.model` inherit the following use cases:
 
@@ -221,7 +213,7 @@ useCases : {
 },
 ```
 
-###### Deep Merging
+##### Deep Merging
 
 Use cases of a model are *deeply* merged wth the use cases defined by the model it extends, for example:
 
@@ -239,14 +231,14 @@ useCases : {
 },
 ```
 
-###### Use Case Properties
+##### Use Case Properties
 
 
 - `fieldIncludes`: Include matching field names. Matches must not be matched by `fieldExcludes`.
 - `fieldExcludes`: Exclude matching field names.
 - `view`: The view __type__ to render e.g. `Calipso.view.HomeLayout`
 - `viewOptions`: Options to merge with the ones given to the view
-- `overrides`: Provides nested use case configuration to merge and apply to the specified region's view.
+- `overrides`: Provides nested use case configuration to merge and apply to any view's region name or `schemaType`.
 - `fields`: Override the fields used by the region view
 
 Here's an example `useCases` configuration:
@@ -276,31 +268,33 @@ useCases : {
   },
 },
 ```
-#### Internationalization
+### Internationalization
 
-### Spring Stack
+## Server Stack
 
-#### Architecture
+### Architecture
 
 The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) services for your entities, including complete coverage of [SCRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) use cases.
 
-##### Tiers
+#### Tiers
 
-##### Service URLs
+#### Service URLs
 
-##### Authentication and Authorization
+#### Authentication and Authorization
 
-##### Persistence
+#### Persistence
 
 Relational databases are supported by [JPA](https://en.wikipedia.org/wiki/Java_Persistence_API) ([Hibernate](http://hibernate.org/) is used under the hood).
 [NoSQL](https://en.wikipedia.org/wiki/NoSQL) stores like [MongoDB](https://www.mongodb.org/), [Cassandra](http://cassandra.apache.org/),
 [Couchbase](http://www.couchbase.com) and [Neo4j](http://neo4j.com/) are supported as well, while application instances also contain
 their own clusterable [ElasticSearch](https://www.elastic.co/) node by default.
 
-##### Email
+#### Email
 
-##### Internationalization
+Easy email services with i18n support and Thymeleaf templates. Build-in services include email verification, password reset etc.
 
-#### SCRUD HOWTO
+#### Internationalization
+
+### SCRUD HOWTO
 
 Check out the [SCRUD HOWTO](docs/scrud_howto.md) guide.
