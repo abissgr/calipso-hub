@@ -189,6 +189,20 @@ var BookModel = Calipso.Model.extend({
 
 Use cases allow you to declaratively define how a route should be handled.
 
+```javascript
+var BookModel = Calipso.Model.extend({
+
+},
+// static members
+{
+  // Define or override the use cases of this model type. See also  
+  // the [Use Cases section](#use-cases) for more details.
+  useCases : {
+    // use case configuration here
+  }
+});
+```
+
 ###### Base Cases
 
 All models extending `Calipso.model` inherit the following use cases:
@@ -228,7 +242,40 @@ useCases : {
 ###### Use Case Properties
 
 
+- `fieldIncludes`: Include matching field names. Matches must not be matched by `fieldExcludes`.
+- `fieldExcludes`: Exclude matching field names.
+- `view`: The view __type__ to render e.g. `Calipso.view.HomeLayout`
+- `viewOptions`: Options to merge with the ones given to the view
+- `overrides`: Provides nested use case configuration to merge and apply to the specified region's view.
+- `fields`: Override the fields used by the region view
 
+Here's an example `useCases` configuration:
+
+```js
+useCases : {
+  create : {
+    view : Calipso.view.UserRegistrationLayout,
+    fieldIncludes : [ "firstName", "lastName", "email" ]
+  },
+  search : {
+    view : Calipso.view.SearchLayout,
+    overrides : {
+      //
+      backgridView : {
+        fieldIncludes : [ "username", "firstName", "lastName", "edit" ]
+      },
+      formView : {
+        fieldIncludes : [ "username", "firstName", "lastName", "email" ],
+        fields : {
+          username : {
+            "datatype" : "Boolean",
+          }
+        }
+      },
+    }
+  },
+},
+```
 #### Internationalization
 
 ### Spring Stack
