@@ -409,4 +409,4 @@ Easy email services with i18n support and Thymeleaf templates. Build-in services
 
 ### SCRUD HOWTO
 
-Check out the [SCRUD HOWTO](docs/scrud_howto.md) guide.
+Check out the [SCRUD HOWTO](etc/scrud_howto.md) guide.
