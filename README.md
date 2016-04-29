@@ -119,15 +119,27 @@ var MyRouter = Calipso.AppRouter.extend({
 
 ```
 
-
-
 ### Views
 
-#### Build-in Views
+Build-in views extend those of [Marionette](http://marionettejs.com/docs/current/) and include generic layouts, model-driven grids/forms etc.
 
-#### Template Helpers
+View templates use [Handlebars](http://handlebarsjs.com/) by default. The build-in template helpers include:
 
-### Model Metadata
+- baseUrl
+- ifCond
+- ifLoggedIn
+- ifLoggedOut
+- ifUserInRole
+- ifUserNotInRole
+- moment
+- momentDateTime
+- momentFromNow
+- getLocale
+- getUserDetailsProperty
+- getUserDetailsMetadatum
+- getValueLabel
+
+### Models
 
 Calipso defines a metadata profile for it's backbone models. The metadata are used for
 dynamically handle URL routes, render fields of a form or grid and more.
@@ -171,9 +183,124 @@ var BookModel = Calipso.Model.extend({
 });
 ```
 
+#### Type Name
+
+This is only useful for debugging (TODO: named constructors)
+
 #### Path Fragment
 
-#### Type Name
+The path fragment corresponding to the model type. This is used to map URL routes to a specific model and the use cases it defines. For example `useCases/books/publish` maps to
+
+```javascript
+var BookModel = Calipso.Model.extend({
+
+},
+// static members
+{
+    // Use this model for routes starting with "books"
+    pathFragment : "books",
+    // Define or override the use cases of this model type. See also  
+    // the [Use Cases section](#use-cases) for more details.
+    useCases : {
+        // Each use case matches its own URL route, for example
+        // this one matches "books/publish"
+        publish :{
+            // ...
+        }
+    }
+});
+```
+
+#### Use Cases
+
+Use cases allow you to declaratively define how a route should be handled.
+
+```javascript
+var BookModel = Calipso.Model.extend({
+
+},
+// static members
+{
+  // Define or override the use cases of this model type. See also  
+  // the [Use Cases section](#use-cases) for more details.
+  useCases : {
+    // use case configuration here
+  }
+});
+```
+
+##### Base Cases
+
+All models extending `Calipso.model` inherit the following use cases:
+
+```js
+useCases : {
+  create : {
+    view : Calipso.view.BrowseLayout,
+  },
+  update : {
+    view : Calipso.view.BrowseLayout,
+  },
+  search : {
+    view : Calipso.view.SearchLayout,
+  },
+},
+```
+
+##### Deep Merging
+
+Use cases of a model are *deeply* merged wth the use cases defined by the model it extends, for example:
+
+```js
+useCases : {
+  create : {
+    // No need to define a view as it will be
+    // inherited from Calipso.Model
+    //view : Calipso.view.BrowseLayout,
+    viewOptions : {
+      //...
+    }
+  },
+  //...
+},
+```
+
+##### Use Case Properties
+
+- `fieldIncludes`: Include matching field names. Matches must not be matched by `fieldExcludes`.
+- `fieldExcludes`: Exclude matching field names.
+- `view`: The view __type__ to render e.g. `Calipso.view.HomeLayout`
+- `viewOptions`: Options to merge with the ones given to the view
+- `overrides`: Provides nested use case configuration to merge and apply to any view's region name or `schemaType`.
+- `fields`: Override the fields used by the region view
+
+Here's an example `useCases` configuration:
+
+```js
+useCases : {
+  create : {
+    view : Calipso.view.UserRegistrationLayout,
+    fieldIncludes : [ "firstName", "lastName", "email" ]
+  },
+  search : {
+    view : Calipso.view.SearchLayout,
+    overrides : {
+      //
+      backgridView : {
+        fieldIncludes : [ "username", "firstName", "lastName", "edit" ]
+      },
+      formView : {
+        fieldIncludes : [ "username", "firstName", "lastName", "email" ],
+        fields : {
+          username : {
+            "datatype" : "Boolean",
+          }
+        }
+      },
+    }
+  },
+},
+```
 
 #### Fields
 
@@ -251,97 +378,6 @@ Name | Alias(es)
 `CurrentPassword` | -
 `edit` | `Edit`
 
-#### Use Cases
-
-Use cases allow you to declaratively define how a route should be handled.
-
-```javascript
-var BookModel = Calipso.Model.extend({
-
-},
-// static members
-{
-  // Define or override the use cases of this model type. See also  
-  // the [Use Cases section](#use-cases) for more details.
-  useCases : {
-    // use case configuration here
-  }
-});
-```
-
-##### Base Cases
-
-All models extending `Calipso.model` inherit the following use cases:
-
-```js
-useCases : {
-  create : {
-    view : Calipso.view.BrowseLayout,
-  },
-  update : {
-    view : Calipso.view.BrowseLayout,
-  },
-  search : {
-    view : Calipso.view.SearchLayout,
-  },
-},
-```
-
-##### Deep Merging
-
-Use cases of a model are *deeply* merged wth the use cases defined by the model it extends, for example:
-
-```js
-useCases : {
-  create : {
-    // No need to define a view as it will be
-    // inherited from Calipso.Model
-    //view : Calipso.view.BrowseLayout,
-    viewOptions : {
-      //...
-    }
-  },
-  //...
-},
-```
-
-##### Use Case Properties
-
-
-- `fieldIncludes`: Include matching field names. Matches must not be matched by `fieldExcludes`.
-- `fieldExcludes`: Exclude matching field names.
-- `view`: The view __type__ to render e.g. `Calipso.view.HomeLayout`
-- `viewOptions`: Options to merge with the ones given to the view
-- `overrides`: Provides nested use case configuration to merge and apply to any view's region name or `schemaType`.
-- `fields`: Override the fields used by the region view
-
-Here's an example `useCases` configuration:
-
-```js
-useCases : {
-  create : {
-    view : Calipso.view.UserRegistrationLayout,
-    fieldIncludes : [ "firstName", "lastName", "email" ]
-  },
-  search : {
-    view : Calipso.view.SearchLayout,
-    overrides : {
-      //
-      backgridView : {
-        fieldIncludes : [ "username", "firstName", "lastName", "edit" ]
-      },
-      formView : {
-        fieldIncludes : [ "username", "firstName", "lastName", "email" ],
-        fields : {
-          username : {
-            "datatype" : "Boolean",
-          }
-        }
-      },
-    }
-  },
-},
-```
 ### Internationalization
 
 ## Server Stack
