@@ -249,7 +249,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		parent : Calipso.Model,
 		label : "Role",
 		pathFragment : "roles",
 		typeName : "Calipso.model.RoleModel",
@@ -257,16 +256,16 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 		fields : {
 			name : {
-				"datatype" : "String",
+				fieldType : "String",
 				backgrid : {
 					cell : Calipso.components.backgrid.ViewRowCell,
 				}
 			},
 			description : {
-				"datatype" : "String",
+				fieldType : "String",
 			},
 			edit : {
-				"datatype" : "Edit",
+				fieldType : "Edit",
 			},
 		},
 	});
@@ -280,7 +279,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		parent : Calipso.Model,
 		label : "User",
 		showInMenu : true,
 		pathFragment : "users",
@@ -300,7 +298,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 						fieldIncludes : [ "username", "firstName", "lastName", "email" ],
 						fields : {
 							username : {
-								"datatype" : "Boolean",
+								fieldType : "Boolean",
 							}
 						}
 					},
@@ -310,58 +308,58 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		/*
 
 			id : {
-				"datatype" : "Hidden",
+				fieldType : "Hidden",
 			},
 			email : {
-				"datatype" : "String",
+				fieldType : "String",
 			},
 			resetPasswordToken : {
-				"datatype" : "String",
+				fieldType : "String",
 			},
 			currentPassword : {
-				"datatype" : "CurrentPassword",
+				fieldType : "CurrentPassword",
 			},
 			password : {
-				"datatype" : "Password",
+				fieldType : "Password",
 			},
 			passwordConfirmation : {
-				"datatype" : "ConfirmPassword",
+				fieldType : "ConfirmPassword",
 			}
 		*/
 		fields : {
 			username : {
-				"datatype" : "String",
+				fieldType : "String",
 				backgrid : {
 					cell : Calipso.components.backgrid.ViewRowCell,
 				}
 			},
 
 			firstName : {
-				"datatype" : "String",
+				fieldType : "String",
 			},
 			lastName : {
-				"datatype" : "String",
+				fieldType : "String",
 			},
 			email : {
-				"datatype" : "Email",
+				fieldType : "Email",
 			},
 			telephone : {
-				"datatype" : "Tel",
+				fieldType : "Tel",
 			},
 			cellphone : {
-				"datatype" : "Tel",
+				fieldType : "Tel",
 			},
 			active : {
-				"datatype" : "Boolean",
+				fieldType : "Boolean",
 			},
 			roles : {
-				"datatype" : "List",
+				fieldType : "List",
 			//"form" : {
 			//	"listModel" : Calipso.model.RoleModel
 			//}
 			},
 			edit : {
-				"datatype" : "Edit",
+				fieldType : "Edit",
 			},
 		},
 
@@ -370,19 +368,18 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	Calipso.model.HostModel = Calipso.Model.extend({},
 	// static members
 	{
-		parent : Calipso.Model,
 		label : "Host",
 		pathFragment : "hosts",
 		typeName : "Calipso.model.HostModel",
 		fields : {
 			"domain" : {
-				"datatype" : "Link",
+				fieldType : "Link",
 				backgrid : {
 					cell : Calipso.components.backgrid.ViewRowCell,
 				}
 			},
 			edit : {
-				"datatype" : "Edit",
+				fieldType : "Edit",
 			},
 		},
 	});
@@ -393,7 +390,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	},
 	// static members
 	{
-		parent : Calipso.model.UserModel,
 		viewFragment : "userProfile",
 		typeName : "Calipso.model.UserProfileModel",
 		layoutViewType : Calipso.view.UserProfileLayout,
@@ -422,49 +418,48 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		parent : Calipso.Model,
 		label : "Role",
 		pathFragment : "countries",
 		typeName : "Calipso.model.RoleModel",
 		fields : {
 			"name" : {
-				"datatype" : "String",
+				fieldType : "String",
 				form : {
 					validators : [ 'required' ]
 				}
 			},
 			"nativeName" : {
-				"datatype" : "String",
+				fieldType : "String",
 				form : {
 					validators : [ 'required' ]
 				}
 			},
 			"callingCode" : {
-				"datatype" : "String",
+				fieldType : "String",
 				form : {
 					validators : [ 'required' ]
 				}
 			},
 			"capital" : {
-				"datatype" : "String",
+				fieldType : "String",
 				form : {
 					validators : [ 'required' ]
 				}
 			},
 			"currency" : {
-				"datatype" : "String",
+				fieldType : "String",
 				form : {
 					validators : [ 'required' ]
 				}
 			},
 			"languages" : {
-				"datatype" : "String",
+				fieldType : "String",
 				form : {
 					validators : [ 'required' ]
 				}
 			},
 			"edit" : {
-				"datatype" : "Edit",
+				fieldType : "Edit",
 			},
 		},
 	});
@@ -474,7 +469,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	Calipso.model.BaseNotificationModel = Calipso.Model.extend({},
 	// static members
 	{
-		parent : Calipso.Model,
 		pathFragment : "baseNotifications",
 		typeName : "Calipso.model.BaseNotificationModel",
 	});
@@ -500,7 +494,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	},
 	// static members
 	{
-		parent : Calipso.Model,
 		public : true,
 		pathFragment : "userDetails",
 		baseFragment : '/apiauth/',
@@ -536,22 +529,22 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		},
 		fields : {
 			id : {
-				"datatype" : "Hidden",
+				fieldType : "Hidden",
 			},
 			email : {
-				"datatype" : "String",
+				fieldType : "String",
 			},
 			resetPasswordToken : {
-				"datatype" : "String",
+				fieldType : "String",
 			},
 			currentPassword : {
-				"datatype" : "CurrentPassword",
+				fieldType : "CurrentPassword",
 			},
 			password : {
-				"datatype" : "Password",
+				fieldType : "Password",
 			},
 			passwordConfirmation : {
-				"datatype" : "ConfirmPassword",
+				fieldType : "ConfirmPassword",
 			}
 		},
 		create : function(options) {

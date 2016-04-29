@@ -48,7 +48,6 @@ define(
 		controller : {},
 		hbs : {},
 		labels : labels,
-		datatypes : {},
 	};
 
 	var baseComponents = {
@@ -600,7 +599,7 @@ Calipso.cloneSpecificValue = function(val) {
 
 		Calipso.vent.on('modal:showUseCaseContext', function(options) {
 			var useCaseContext = options.useCaseContext ||
-				 Calipso.datatypes.UseCaseContext.create({
+				 Calipso.UseCaseContext.create({
 					key : options.useCaseKey,
 					model : options.model || options.modelType.create()
 				});
@@ -1307,7 +1306,7 @@ Calipso.cloneSpecificValue = function(val) {
 		}
 	};
 
-	Calipso.datatypes.UseCaseContext = Marionette.Object.extend(
+	Calipso.UseCaseContext = Marionette.Object.extend(
 		{
 			key : null,
 			//schemaType : null, specfied by view instead
@@ -1386,7 +1385,7 @@ Calipso.cloneSpecificValue = function(val) {
 
 					//console.log("UseCaseContext#getChild result: " );
 					//console.log(useCaseOptions);
-				return new Calipso.datatypes.UseCaseContext(useCaseOptions);
+				return new Calipso.UseCaseContext(useCaseOptions);
 			}
 
 		},
@@ -1401,7 +1400,7 @@ Calipso.cloneSpecificValue = function(val) {
 				var foptions = _.extend(modelUseCase, options);
 				//console.log("UseCaseContext#create final options: ");
 				//console.log(foptions);
-				return new Calipso.datatypes.UseCaseContext(foptions);
+				return new Calipso.UseCaseContext(foptions);
 			}
 		}
 	);

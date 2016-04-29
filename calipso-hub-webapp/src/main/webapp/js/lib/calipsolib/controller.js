@@ -226,7 +226,7 @@ define(
 				var model = this.getModelForRoute(ModelType, modelId, httpParams);
 
 				// TODO: support loading of standalone (i.e. non-model) useCase modules?
-				var useCaseContext = Calipso.datatypes.UseCaseContext.createContext({
+				var useCaseContext = Calipso.UseCaseContext.createContext({
 					key : useCaseKey, model : model
 				});
 

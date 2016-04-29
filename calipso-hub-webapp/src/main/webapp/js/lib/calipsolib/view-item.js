@@ -122,7 +122,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				_.each(fields, function(field, key) {
 					//console.log(_this.getTypeName() + "#buildSchema key: " + key + ", field: ");
 					//console.log(field);
-					baseSchemaEntry = Calipso.datatypes[field.datatype][schemaType];
+					baseSchemaEntry = Calipso.fields[field.fieldType][schemaType];
 					overrideSchemaEntry = field[schemaType];
 					// if a schema entry exists, add it
 					if (baseSchemaEntry || overrideSchemaEntry) {

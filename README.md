@@ -1,7 +1,7 @@
 
 
 
-Experiments on a full stack, high level framework for lazy application hackers and scalable developer teams. 
+Experiments on a full stack, high level framework for lazy application hackers and scalable developer teams.
 
 ## Table of Contents
 
@@ -176,6 +176,77 @@ var BookModel = Calipso.Model.extend({
 #### Type Name
 
 #### Fields
+
+Fields provide metadata about a model's properties, basically their data type and how they should be rendered in forms, grids or generic HTML markup.
+
+Here is an example model configuration:
+
+```js
+Calipso.model.ServerModel = Calipso.Model.extend({},
+// static members
+{
+  fields : {
+    "domain" : {
+      fieldType : "string",
+      backgrid : {
+        cell : Calipso.components.backgrid.ViewRowCell,
+      }
+    },
+    "ip" : {
+      fieldType : "link",
+    },
+  },
+});
+```
+
+Fields may also override a field type's component or component options used for rendering. The build-in support for "schemas" includes:
+
+- `form`: Uses the backbone.forms [schema definition](https://github.com/powmedia/backbone-forms#schema-definition)
+- `backgrid`: Uses backgrid's [column configuration](http://backgridjs.com/index.html#grid
+
+Here's an example where  a model field overrides the default fieldType configuration to use a custom backgrid cell:
+
+```js
+fields : {
+  "domain" : {
+    fieldType : "string",
+    backgrid : {
+      cell : Calipso.components.backgrid.ViewRowCell,
+    }
+  }
+}
+```
+
+##### Built-in Field Types
+
+Name | Alias(es)
+--- | --- | ---
+`string` | `String`
+`text` | `Text`
+`hidden` | `Hidden`
+`bool` | `boolean`, `Boolean`
+`int` | `integer`, `Integer`
+`float` | `decimal`, `Decimal`, `Float`
+`money` | `Money`
+`datetime` | `Datetime`
+`date` | `Date`
+`time` | `Time`
+`lov` | `Lov`
+`list` | `List`
+`email` | `Email`
+`tel` | `Tel`
+`link` | `Link`
+`file` | `File`
+`img` | `image`, `Image`
+`colour` | `Colour`, `color`, `Color`
+`json` | `Json`
+`md` | `markdown`, `Markdown`
+`html` | `Html`
+`csv` | `Csv`
+`pwd` | `password`, `Password`
+`ConfirmPassword` | -
+`CurrentPassword` | -
+`edit` | `Edit`
 
 #### Use Cases
 
