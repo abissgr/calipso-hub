@@ -36,7 +36,7 @@ Experiments on a full stack, high level framework for lazy application hackers a
 
 ## Installation
 
-See the [checkout and build](docs/checkout_and_build.md) guide.
+See the [checkout and build](src/etc/checkout_and_build.md) guide.
 
 ## Client Stack
 
