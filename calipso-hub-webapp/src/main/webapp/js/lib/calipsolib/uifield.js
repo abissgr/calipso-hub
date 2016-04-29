@@ -286,12 +286,6 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 		}
 	});
 
-	var sFields = "";
-	_.each(Calipso.fields, function(field, fieldName, list){
-		sFields = sFields + " | `" + fieldName + "`";
-	});
-	console.log(sFields);
-
 	return Calipso;
 
 });

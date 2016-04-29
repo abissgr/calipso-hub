@@ -42,7 +42,6 @@
 	<modules>
 		<module>calipso-hub-utilities</module>
 		<module>calipso-hub-framework</module>
-		<module>calipso-hub-core</module>
 		<module>calipso-hub-webapp</module>
 	</modules>
 
