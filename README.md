@@ -199,12 +199,9 @@ Calipso.model.ServerModel = Calipso.Model.extend({},
 });
 ```
 
-Fields may also override a field type's component or component options used for rendering. The build-in support for "schemas" includes:
+Fields may also override a field type's component or component options used for rendering.
 
-- `form`: Uses the backbone.forms [schema definition](https://github.com/powmedia/backbone-forms#schema-definition)
-- `backgrid`: Uses backgrid's [column configuration](http://backgridjs.com/index.html#grid
-
-Here's an example where  a model field overrides the default fieldType configuration to use a custom backgrid cell:
+Here's an example where  a model field overrides the default fieldType's backgrid configuration to use a custom backgrid cell:
 
 ```js
 fields : {
@@ -216,6 +213,12 @@ fields : {
   }
 }
 ```
+The build-in schemas types include:
+
+- `form`: Uses the backbone.forms [schema definition](https://github.com/powmedia/backbone-forms#schema-definition)
+- `backgrid`: Uses backgrid's [column configuration](http://backgridjs.com/index.html#grid
+
+Additional schema types cna be supported by your views by extending `Calipso.view.UseCaseItemView`.
 
 ##### Built-in Field Types
 
