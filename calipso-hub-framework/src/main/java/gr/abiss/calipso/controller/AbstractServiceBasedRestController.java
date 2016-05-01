@@ -110,7 +110,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 @RequestMapping(produces = { "application/json", "application/xml" })
 //@Api(description = "All generic operations for entities", value = "")
 public abstract class AbstractServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
-		extends ServiceBasedRestController<T, ID, S> {
+		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceBasedRestController.class);
  

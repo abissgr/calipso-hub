@@ -29,7 +29,7 @@ import gr.abiss.calipso.notification.model.NotificationType;
 import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.repository.geography.ContinentRepository;
 import gr.abiss.calipso.repository.geography.CountryRepository;
-import gr.abiss.calipso.service.HostService;
+//import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.service.cms.TextService;
@@ -55,9 +55,9 @@ public class AppInitializer {
 	@Named("userService")
 	private UserService userService;
 
-	@Inject
-	@Named("hostService")
-	private HostService hostService;
+//	@Inject
+//	@Named("hostService")
+//	private HostService hostService;
 	
 	@Inject
 	@Named("textService")
@@ -98,29 +98,29 @@ public class AppInitializer {
 
 			Date now = new Date();
 
-			Host h1 = new Host("www.abiss.gr");
-			h1.addAlias("abiss.gr");
-			h1 = hostService.create(h1);
-			Host h2 = new Host("dev.abiss.gr");
-			h2 = hostService.create(h2);
-			Host h3 = new Host("calipso.abiss.gr");
-			h3 = hostService.create(h3);
+//			Host h1 = new Host("www.abiss.gr");
+//			h1.addAlias("abiss.gr");
+//			h1 = hostService.create(h1);
+//			Host h2 = new Host("dev.abiss.gr");
+//			h2 = hostService.create(h2);
+//			Host h3 = new Host("calipso.abiss.gr");
+//			h3 = hostService.create(h3);
 
-			Text t1 = new Text("test2");
-			t1.setHost(h2);
-			t1.setSource("test2");
-			t1.setSourceContentType(Text.MIME_MARKDOWN);
-			textService.create(t1);
-			Text t2 = new Text("test2");
-			t2.setHost(h1);
-			t2.setSource("test2");
-			t2.setSourceContentType(Text.MIME_MARKDOWN);
-			textService.create(t2);
-			Text t3 = new Text("test3");
-			t3.setHost(h1);
-			t3.setSource("test3");
-			t3.setSourceContentType(Text.MIME_MARKDOWN);
-			textService.create(t3);
+//			Text t1 = new Text("test2");
+//			t1.setHost(h2);
+//			t1.setSource("test2");
+//			t1.setSourceContentType(Text.MIME_MARKDOWN);
+//			textService.create(t1);
+//			Text t2 = new Text("test2");
+//			t2.setHost(h1);
+//			t2.setSource("test2");
+//			t2.setSourceContentType(Text.MIME_MARKDOWN);
+//			textService.create(t2);
+//			Text t3 = new Text("test3");
+//			t3.setHost(h1);
+//			t3.setSource("test3");
+//			t3.setSourceContentType(Text.MIME_MARKDOWN);
+//			textService.create(t3);
 			
 			User u0 = new User();
 			u0.setEmail("info@abiss.gr");
