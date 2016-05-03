@@ -16,28 +16,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.controller.geography;
+package gr.abiss.calipso.service.impl;
 
-import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.service.geography.CountryService;
+import gr.abiss.calipso.model.Host;
+import gr.abiss.calipso.repository.HostRepository;
+import gr.abiss.calipso.service.EmailService;
+import gr.abiss.calipso.service.HostService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.crypto.keygen.KeyGenerators;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
-//import com.wordnik.swagger.annotations.Api;
+@Named("hostService")
+public class HostServiceImpl extends GenericEntityServiceImpl<Host, String, HostRepository> 
+	implements HostService{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(HostServiceImpl.class);
 
-@Controller
-//@Api(value = "Countries")
-@RequestMapping(value = "/api/rest/countries", produces = { "application/json", "application/xml" })
-public class CountryController extends AbstractServiceBasedRestController<Country, String, CountryService> {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(CountryController.class);
-    
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Host findByDomain(String domain) {
+		return this.repository.findByDomain(domain);
+	}
 }

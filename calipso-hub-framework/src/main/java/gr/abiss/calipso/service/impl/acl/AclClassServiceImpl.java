@@ -22,12 +22,6 @@ public class AclClassServiceImpl extends
 		AclClassService {
 
 	@Override
-	@Inject
-	public void setRepository(AclClassRepository aclClassRepository) {
-		super.setRepository(aclClassRepository);
-	}
-
-	@Override
 	public AclClass findByClassName(String name) {
 		return this.repository.findByClassName(name);
 	}

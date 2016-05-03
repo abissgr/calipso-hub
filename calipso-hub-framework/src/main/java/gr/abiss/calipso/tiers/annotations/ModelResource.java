@@ -16,22 +16,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service.impl.geography;
+package gr.abiss.calipso.tiers.annotations;
 
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.repository.geography.CountryRepository;
-import gr.abiss.calipso.service.geography.CountryService;
-import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.springframework.transaction.annotation.Transactional;
+import java.io.Serializable;
+import java.lang.annotation.*;
 
 
-@Named("countryService")
-@Transactional(readOnly = true)
-public class CountryServiceImpl extends GenericEntityServiceImpl<Country, String, CountryRepository> implements CountryService {
+//Make the annotation available at runtime:
+@Retention(RetentionPolicy.RUNTIME)
+//Allow to use only on types:
+@Target(ElementType.TYPE)
+@Documented
+/**
+ * Marks a Model ato generate SCRUD tiers for
+ */
+public @interface ModelResource {
 
+    Class<? extends Serializable> idClass() default String.class;
+    String path() default "";
 }

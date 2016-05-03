@@ -34,12 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleServiceImpl extends GenericEntityServiceImpl<Role, String, RoleRepository> implements RoleService {
 
 	@Override
-	@Inject
-	public void setRepository(RoleRepository roleRepository) {
-		super.setRepository(roleRepository);
-	}
-
-	@Override
 	public Role findByIdOrName(String idOrName) {
 		Role role = this.repository.findOne(idOrName);
 		if (role == null) {

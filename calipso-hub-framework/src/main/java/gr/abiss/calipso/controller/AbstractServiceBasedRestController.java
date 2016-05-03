@@ -35,6 +35,7 @@ import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.TimeUnit;
 import gr.abiss.calipso.service.GenericEntityService;
 import gr.abiss.calipso.service.cms.BinaryFileService;
+import gr.abiss.calipso.service.geography.CountryService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.utils.ConfigurationFactory;
@@ -106,8 +107,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 //import com.wordnik.swagger.annotations.ApiOperation;
 //import com.wordnik.swagger.annotations.ApiParam;
 
-@Controller
-@RequestMapping(produces = { "application/json", "application/xml" })
+//@Controller
+//@RequestMapping(produces = { "application/json", "application/xml" })
 //@Api(description = "All generic operations for entities", value = "")
 public abstract class AbstractServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
@@ -116,9 +117,16 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
  
 	private BinaryFileService binaryFileService;
 
+	@Override
+	@Inject
+	//@Qualifier("countryService") // somehow required for CDI to work on 64bit JDK?
+	public void setService(S service) {
+		this.service = service;
+	}
+	
 //	@Override
 	@Inject
-	@Qualifier("binaryFileService") // somehow required for CDI to work on 64bit JDK?
+	@Qualifier("binaryFileService")
 	public void setService(BinaryFileService binaryFileService) {
 		this.binaryFileService = binaryFileService;
 	}
@@ -650,9 +658,7 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
         }catch(Exception e) {
             LOGGER.error("Could not upload file(s) ", e);
 		}
-        
-//        Map<String, Object> files= new HashMap<String, Object>();
-        //files.put("files", list);
+
         return bf;
     }
     

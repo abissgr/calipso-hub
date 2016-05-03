@@ -16,11 +16,5 @@ public class AclEntryServiceImpl extends
 		GenericServiceImpl<AclEntry, Long, AclEntryRepository> implements
 		AclEntryService {
 
-	@Override
-	@Inject
-	public void setRepository(AclEntryRepository aclEntryRepository) {
-		super.setRepository(aclEntryRepository);
-	}
-
 }
 

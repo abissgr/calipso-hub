@@ -36,6 +36,9 @@
     <logger name="org.hibernate.type">
         <level value="ERROR" />
     </logger>
+<!--     <logger name="org.springframework"> -->
+<!--         <level value="debug" /> -->
+<!--     </logger> -->
     <logger name="gr.abiss">
         <level value="debug" />
     </logger>

@@ -17,12 +17,5 @@ public class AclObjectIdentityServiceImpl
 		GenericServiceImpl<AclObjectIdentity, Long, AclObjectIdentityRepository>
 		implements AclObjectIdentityService {
 
-	@Override
-	@Inject
-	public void setRepository(
-			AclObjectIdentityRepository aclObjectIdentityRepository) {
-		super.setRepository(aclObjectIdentityRepository);
-	}
-
 }
 

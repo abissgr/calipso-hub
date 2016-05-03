@@ -16,22 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service.impl.geography;
+package gr.abiss.calipso.service;
 
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.repository.geography.CountryRepository;
-import gr.abiss.calipso.service.geography.CountryService;
-import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
+import gr.abiss.calipso.model.Host;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+public interface HostService extends GenericEntityService<Host, String> {
 
-import org.springframework.transaction.annotation.Transactional;
-
-
-@Named("countryService")
-@Transactional(readOnly = true)
-public class CountryServiceImpl extends GenericEntityServiceImpl<Country, String, CountryRepository> implements CountryService {
+	Host findByDomain(String domain);
 
 }

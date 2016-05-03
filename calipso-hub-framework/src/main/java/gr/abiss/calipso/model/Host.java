@@ -54,7 +54,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 /**
  */
 @Entity
-@ModelResource
+@ModelResource(path = "hosts")
 @Table(name = "host")
 public class Host extends AbstractAuditable<User> {
 

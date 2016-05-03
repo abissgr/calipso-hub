@@ -69,11 +69,6 @@ public class UserServiceImpl extends GenericEntityServiceImpl<User, String, User
 	public void setRoleRepository(RoleRepository roleRepository) {
 		this.roleRepository = roleRepository;
 	}
-	@Override
-	@Inject
-	public void setRepository(UserRepository userRepository) {
-		super.setRepository(userRepository);
-	}
 
 	@Override
 	@Transactional(readOnly = false)

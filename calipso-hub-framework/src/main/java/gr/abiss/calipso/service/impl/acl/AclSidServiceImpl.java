@@ -16,12 +16,5 @@ public class AclSidServiceImpl extends
 		GenericServiceImpl<AclSid, Long, AclSidRepository> implements
 		AclSidService {
 
-	@Override
-	@Inject
-	public void setRepository(
-			AclSidRepository aclSidRepository) {
-		super.setRepository(aclSidRepository);
-	}
-
 }
 

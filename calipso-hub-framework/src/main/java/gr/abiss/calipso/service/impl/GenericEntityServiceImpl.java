@@ -49,7 +49,14 @@ implements GenericEntityService<T, ID>{
 	
 	protected UserRepository userRepository;
 	protected EmailService emailService;
-
+	
+	@Override
+	@Inject
+	public void setRepository(R repository) {
+		LOGGER.debug("setRepository: " + repository);
+		super.setRepository(repository);
+	}
+	
 	@Inject
 	public void setEmailService(EmailService emailService) {
 		this.emailService = emailService;

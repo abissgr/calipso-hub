@@ -16,22 +16,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service.impl.geography;
+package gr.abiss.calipso.tiers.annotations;
 
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.repository.geography.CountryRepository;
-import gr.abiss.calipso.service.geography.CountryService;
-import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
+import java.io.Serializable;
+import java.lang.annotation.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+//Make the annotation available at runtime:
+@Retention(RetentionPolicy.RUNTIME)
+//Allow to use only on types:
+@Target(ElementType.TYPE)
+@Documented
+/**
+ * Marks Model relationships
+ */
+public @interface ModelRelatedResource {
 
-import org.springframework.transaction.annotation.Transactional;
-
-
-@Named("countryService")
-@Transactional(readOnly = true)
-public class CountryServiceImpl extends GenericEntityServiceImpl<Country, String, CountryRepository> implements CountryService {
+    Class<?> beanClass() default Object.class;
+    Class<? extends Serializable> idClass() default Long.class;
+    String parentProperty();
+    String path() default "";
 
 }

@@ -40,11 +40,11 @@ public class UserController extends AbstractServiceBasedRestController<User, Str
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-	@Override
-	@Inject
-	@Qualifier("userService") // somehow required for CDI to work on 64bit JDK?
-	public void setService(UserService service) {
-		this.service = service;
-	}
+//	@Override
+//	@Inject
+//	@Qualifier("userService") // somehow required for CDI to work on 64bit JDK?
+//	public void setService(UserService service) {
+//		this.service = service;
+//	}
     
 }
