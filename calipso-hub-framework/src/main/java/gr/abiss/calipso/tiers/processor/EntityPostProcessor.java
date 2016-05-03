@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -123,7 +124,7 @@ public class EntityPostProcessor implements BeanDefinitionRegistryPostProcessor{
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 //		BeanDefinitionRegistry registry = ((BeanDefinitionRegistry) context);
 		try {
-			afterPropertiesSet();
+			findModels();
 			readEntities(registry);
 			writeBeans(registry);
 			LOGGER.info("Completed generation");
@@ -208,43 +209,6 @@ public class EntityPostProcessor implements BeanDefinitionRegistryPostProcessor{
 		}
 	}
 
-	protected void createRepository(BeanDefinitionRegistry registry, Class<?> entity, ModelResourceDetails wrapper,
-			BeanDefinitionDetails details) throws NotFoundException, CannotCompileException {
-		if (details.repositoryDefinition == null) {
-			Class<?> repoSUperInterface = BaseRepository.class;
-			String newBeanNameSuffix = "Repository";
-			String newBeanClassName = entity.getSimpleName().replace("Model", "").replace("Entity", "") + newBeanNameSuffix;
-			String newBeanRegistryName = StringUtils.uncapitalize(newBeanClassName);
-			String newBeanPackage = this.repositoryBasePackage + '.';
-
-			// grab the generic types
-			ArrayList<Class<?>> genericTypes = getGenericTypes(wrapper);
-			
-			// create and register the new interface
-			Class<?> newRepoInterface = JavassistUtil.createInterface(newBeanPackage + newBeanClassName,
-					repoSUperInterface, genericTypes);
-			AbstractBeanDefinition def = BeanDefinitionBuilder.rootBeanDefinition(RepositoryFactoryBean.class)
-					.addPropertyValue("repositoryInterface", newRepoInterface).getBeanDefinition();
-			registry.registerBeanDefinition(newBeanRegistryName, def);
-
-			// note the repo
-			details.repositoryDefinition = def;
-			details.repositoryClass = newRepoInterface;
-			details.repositoryBeanName = newBeanRegistryName;
-			
-			LOGGER.info("Created Repository: " + newRepoInterface.getName());
-			if(ArrayUtils.isNotEmpty(newRepoInterface.getAnnotations())){
-				for(Annotation annot : newRepoInterface.getAnnotations()){
-					LOGGER.info("Controller Annotation: " + annot);
-				}
-			}
-			LOGGER.info("Generated registry entry '" + newBeanRegistryName + "' for model " + entity.getSimpleName()
-					+ " . Generic signature: " + GenericTypeResolver.resolveTypeArguments(newRepoInterface, repoSUperInterface));
-		} else {
-			LOGGER.info("Found repository for {}", entity.getSimpleName());
-		}
-	}
-
 	protected void createService(BeanDefinitionRegistry registry, Class<?> entity, ModelResourceDetails wrapper,
 			BeanDefinitionDetails details) throws NotFoundException, CannotCompileException {
 		if (details.serviceDefinition == null) {
@@ -290,7 +254,8 @@ public class EntityPostProcessor implements BeanDefinitionRegistryPostProcessor{
 			details.serviceClass = serviceClass;
 			LOGGER.info("generateBeansForEntity: serviceClass {}", serviceClass.getName() + ":  " + serviceClass);
 
-		} else {
+		} 
+		else {
 			details.serviceClass = this.getClass(details.serviceDefinition.getBeanClassName());
 			// grab the service interface
 			if(!details.serviceClass.isInterface()){
@@ -308,6 +273,50 @@ public class EntityPostProcessor implements BeanDefinitionRegistryPostProcessor{
 		}
 	}
 
+	protected void createRepository(BeanDefinitionRegistry registry, Class<?> entity, ModelResourceDetails wrapper,
+			BeanDefinitionDetails details) throws NotFoundException, CannotCompileException {
+		if (details.repositoryDefinition == null) {
+			Class<?> repoSUperInterface = BaseRepository.class;
+			String newBeanNameSuffix = "Repository";
+			String newBeanClassName = entity.getSimpleName().replace("Model", "").replace("Entity", "") + newBeanNameSuffix;
+			String newBeanRegistryName = StringUtils.uncapitalize(newBeanClassName);
+			String newBeanPackage = this.repositoryBasePackage + '.';
+
+			// grab the generic types
+			ArrayList<Class<?>> genericTypes = getGenericTypes(wrapper);
+			
+			// create and register the new interface
+			Class<?> newRepoInterface = JavassistUtil.createInterface(newBeanPackage + newBeanClassName,
+					repoSUperInterface, genericTypes);
+			AbstractBeanDefinition def = BeanDefinitionBuilder.rootBeanDefinition(RepositoryFactoryBean.class)
+					.addPropertyValue("repositoryInterface", newRepoInterface).getBeanDefinition();
+			registry.registerBeanDefinition(newBeanRegistryName, def);
+
+			// note the repo
+			details.repositoryDefinition = def;
+			details.repositoryClass = newRepoInterface;
+			details.repositoryBeanName = newBeanRegistryName;
+			
+			
+			LOGGER.info("Generated registry entry '" + newBeanRegistryName + "' for model " + entity.getSimpleName()
+					+ " . Generic signature: " + GenericTypeResolver.resolveTypeArguments(newRepoInterface, repoSUperInterface));
+		} 
+		else {
+			// grab the repository interface
+			details.repositoryClass = this.getClass(details.repositoryDefinition.getBeanClassName());
+			// get the actual interface in case of a factory
+			if(RepositoryFactoryBean.class.isAssignableFrom(details.repositoryClass)){
+				for(PropertyValue propertyValue : details.repositoryDefinition.getPropertyValues().getPropertyValueList()){
+					if(propertyValue.getName().equals("repositoryInterface")){
+						Object obj = propertyValue.getValue();
+						details.repositoryClass = String.class.isAssignableFrom(obj.getClass()) ? this.getClass(obj.toString()) : (Class<?>) obj;
+					}
+				}	
+			}
+			LOGGER.info("Found repository for {}: {}", entity.getSimpleName(), details.repositoryClass.getSimpleName());
+		}
+	}
+	
 	protected ArrayList<Class<?>> getGenericTypes(ModelResourceDetails wrapper) {
 		ArrayList<Class<?>> genericTypes = new ArrayList<Class<?>>(2);
 		genericTypes.add(wrapper.getDomainClass());
@@ -316,19 +325,19 @@ public class EntityPostProcessor implements BeanDefinitionRegistryPostProcessor{
 	}
 
 	/**
-	 * Iterate over registered beans to find any manually-created componenets we
-	 * can skipp from generating.
+	 * Iterate over registered beans to find any manually-created components
+	 * (Controllers, Services, Repositories) we can skipp from generating.
 	 * 
 	 * @param registry
 	 */
-	public void readEntities(BeanDefinitionRegistry registry) {
+	protected void readEntities(BeanDefinitionRegistry registry) {
 		for (String name : registry.getBeanDefinitionNames()) {
 
 			BeanDefinition d = registry.getBeanDefinition(name);
 
 			if (d instanceof AbstractBeanDefinition) {
 				AbstractBeanDefinition def = (AbstractBeanDefinition) d;
-
+				// if controller
 				if (isOfType(def, ModelController.class)) {
 					Class<?> entity = GenericTypeResolver.resolveTypeArguments(this.getClass(def.getBeanClassName()),
 							ModelController.class)[0];
@@ -338,10 +347,8 @@ public class EntityPostProcessor implements BeanDefinitionRegistryPostProcessor{
 						details.controller = def;
 					}
 				}
-
+				// if service 
 				if (isOfType(def, GenericEntityServiceImpl.class)) {
-					// Class<?> entity = getEntityType(def,
-					// GenericEntityServiceImpl.class);
 					Class<?> entity = GenericTypeResolver.resolveTypeArguments(
 							this.getClass(def.getBeanClassName()),
 							GenericEntityService.class)[0];
@@ -402,11 +409,9 @@ public class EntityPostProcessor implements BeanDefinitionRegistryPostProcessor{
 	}
 
 	//@Override
-	public void afterPropertiesSet() throws Exception {
-		LOGGER.info("afterPropertiesSet");
+	protected void findModels() throws Exception {
 		Set<BeanDefinition> entityBeanDefs = EntityUtil.findAnnotatedClasses(basePackage);
 		for (BeanDefinition beanDef : entityBeanDefs) {
-			LOGGER.info("afterPropertiesSet beanDef: " + beanDef);
 			Class<?> entity = this.getClass(beanDef.getBeanClassName());
 			entityBeanDefinitionsMap.put(entity, new BeanDefinitionDetails());
 		}
