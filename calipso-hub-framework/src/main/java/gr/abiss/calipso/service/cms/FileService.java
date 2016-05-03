@@ -19,9 +19,9 @@
 package gr.abiss.calipso.service.cms;
 
 import gr.abiss.calipso.model.cms.File;
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.service.ModelService;
 
-public interface FileService extends GenericEntityService<File, String> {
+public interface FileService extends ModelService<File, String> {
 
 
 }

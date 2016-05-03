@@ -18,9 +18,9 @@
  */
 package gr.abiss.calipso.controller.geography;
 
-import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.service.geography.CountryService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
 
 import javax.inject.Inject;
 
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 //@Api(value = "Countries")
 @RequestMapping(value = "/api/rest/countries", produces = { "application/json", "application/xml" })
-public class CountryController extends AbstractServiceBasedRestController<Country, String, CountryService> {
+public class CountryController extends AbstractModelController<Country, String, CountryService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CountryController.class);
     

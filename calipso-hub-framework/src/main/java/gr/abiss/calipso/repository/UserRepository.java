@@ -20,14 +20,14 @@ package gr.abiss.calipso.repository;
 
 import java.util.Date;
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.UserDTO;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository extends BaseRepository<User, String> {
+public interface UserRepository extends ModelRepository<User, String> {
 
 //	@Query("select u from User u where u.confirmationToken = ?1")
 //	public User findByConfirmationToken(String token);

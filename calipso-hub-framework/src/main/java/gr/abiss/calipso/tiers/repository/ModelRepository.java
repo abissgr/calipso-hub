@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.repository;
+package gr.abiss.calipso.tiers.repository;
 
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.ReportDataSet;
@@ -38,7 +38,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @NoRepositoryBean
-public interface BaseRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
+public interface ModelRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
 
 	public EntityManager getEntityManager();
 

@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.tiers.annotations;
+package gr.abiss.calipso.tiers.annotation;
 
 import java.io.Serializable;
 import java.lang.annotation.*;
-
 
 //Make the annotation available at runtime:
 @Retention(RetentionPolicy.RUNTIME)
@@ -28,10 +27,12 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Documented
 /**
- * Marks a Model ato generate SCRUD tiers for
+ * Marks Model relationships
  */
-public @interface ModelResource {
+public @interface ModelRelatedResource {
 
-    Class<? extends Serializable> idClass() default String.class;
+    Class<?> beanClass() default Object.class;
+    String parentProperty();
     String path() default "";
+
 }

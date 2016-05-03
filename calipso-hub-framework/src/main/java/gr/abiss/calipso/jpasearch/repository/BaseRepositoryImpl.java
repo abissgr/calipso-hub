@@ -24,6 +24,7 @@ import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
 import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
@@ -57,7 +58,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 public class BaseRepositoryImpl<T, ID extends Serializable> extends
-		SimpleJpaRepository<T, ID> implements BaseRepository<T, ID> {
+		SimpleJpaRepository<T, ID> implements ModelRepository<T, ID> {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BaseRepositoryImpl.class);

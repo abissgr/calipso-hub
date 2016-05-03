@@ -20,12 +20,12 @@ package gr.abiss.calipso.repository;
 
 import java.util.List;
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.model.Role;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 import org.springframework.data.jpa.repository.Query;
 
-public interface RoleRepository extends BaseRepository<Role, String> {
+public interface RoleRepository extends ModelRepository<Role, String> {
 
 	@Query("select r from Role r where r.name = ?1")
 	public Role findByName(String name);

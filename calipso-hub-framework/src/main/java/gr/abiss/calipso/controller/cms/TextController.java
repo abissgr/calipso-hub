@@ -18,9 +18,9 @@
  */
 package gr.abiss.calipso.controller.cms;
 
-import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.service.cms.TextService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
 
 import javax.inject.Inject;
 
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping(value = "/api/rest/texts", produces = { "application/json", "application/xml" })
-public class TextController extends AbstractServiceBasedRestController<Text, String, TextService> {
+public class TextController extends AbstractModelController<Text, String, TextService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TextController.class);
 

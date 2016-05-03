@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.controller;
+package gr.abiss.calipso.tiers.controller;
 
 
 import gr.abiss.calipso.jpasearch.annotation.ApplyCurrentPrincipal;
@@ -33,11 +33,9 @@ import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.model.types.TimeUnit;
-import gr.abiss.calipso.service.GenericEntityService;
 import gr.abiss.calipso.service.cms.BinaryFileService;
-import gr.abiss.calipso.service.geography.CountryService;
+import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 
 import java.awt.image.BufferedImage;
@@ -47,12 +45,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,10 +66,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.lucene.index.Fields;
 import org.imgscalr.Scalr;
 import org.resthub.common.exception.NotFoundException;
 import org.resthub.web.controller.ServiceBasedRestController;
@@ -89,7 +83,6 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -103,40 +96,32 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.fasterxml.jackson.annotation.JsonView;
-//import com.wordnik.swagger.annotations.Api;
-//import com.wordnik.swagger.annotations.ApiOperation;
-//import com.wordnik.swagger.annotations.ApiParam;
 
-//@Controller
-//@RequestMapping(produces = { "application/json", "application/xml" })
-//@Api(description = "All generic operations for entities", value = "")
-public abstract class AbstractServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
+public abstract class AbstractModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceBasedRestController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelController.class);
  
 	private BinaryFileService binaryFileService;
-
-	@Override
-	@Inject
-	//@Qualifier("countryService") // somehow required for CDI to work on 64bit JDK?
-	public void setService(S service) {
-		this.service = service;
-	}
-	
-//	@Override
-	@Inject
-	@Qualifier("binaryFileService")
-	public void setService(BinaryFileService binaryFileService) {
-		this.binaryFileService = binaryFileService;
-	}
-	
 	
 	@Autowired
 	protected HttpServletRequest request;
 
 	@Autowired
 	private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+	@Override
+	@Inject
+	public void setService(S service) {
+		this.service = service;
+	}
+	
+	@Inject
+	@Qualifier("binaryFileService")
+	public void setService(BinaryFileService binaryFileService) {
+		this.binaryFileService = binaryFileService;
+	}
+	
 
 	/**
 	 * Find all resources matching the given criteria and return a paginated
@@ -662,61 +647,4 @@ public abstract class AbstractServiceBasedRestController<T extends Persistable<I
         return bf;
     }
     
-	@RequestMapping(value = "reports", produces = { "application/json" }, method = RequestMethod.GET)
-	@ResponseBody
-	//@ApiOperation(value = "reports", httpMethod = "GET")
-	public Page<ReportDataSet> getReportDatasets(
-
-			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
-			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
-			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction,
-			
-			@RequestParam(value = "timeUnit", required = false, defaultValue = "DAY") TimeUnit timeUnit,
-			@RequestParam(value = "dateField", required = false, defaultValue = "createdDate") String dateField,
-			@RequestParam(value = "period", required = false) String period,
-			@RequestParam(value = "reportType", required = false) String reportType) {
-		
-		if(StringUtils.isBlank(period)){
-			GregorianCalendar now = new GregorianCalendar();
-			StringBuffer buff = new StringBuffer();
-			if(timeUnit.equals(TimeUnit.DAY)){
-				buff.append(now.get(Calendar.MONTH)).append('/');
-			}
-			period = buff.append(now.get(Calendar.YEAR)).toString();
-		}
-		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", period: " + period +", reportName: " + reportType );
-		GregorianCalendar start = null;
-		GregorianCalendar end = null;
-		if(timeUnit.equals(TimeUnit.DAY)){
-			String[] monthYear = period.split("/");
-			start = new GregorianCalendar(Integer.parseInt(monthYear[1]), Integer.parseInt(monthYear[0]) - 1, 0);
-			end = new GregorianCalendar(Integer.parseInt(monthYear[1]), Integer.parseInt(monthYear[0]) - 1, 0);
-			end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
-		}
-		else{
-			start = new GregorianCalendar(Integer.parseInt(period), 0, 0);
-			end = new GregorianCalendar(Integer.parseInt(period), 11, 0);
-			end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
-		}
-
-			start.set(Calendar.HOUR_OF_DAY, start.getMinimum(Calendar.HOUR_OF_DAY));
-			start.set(Calendar.MINUTE, start.getMinimum(Calendar.MINUTE));
-			start.set(Calendar.SECOND, start.getMinimum(Calendar.SECOND));
-			start.set(Calendar.MILLISECOND, start.getMinimum(Calendar.MILLISECOND));
-			
-
-			end.set(Calendar.HOUR_OF_DAY, end.getMinimum(Calendar.HOUR_OF_DAY));
-			end.set(Calendar.MINUTE, end.getMinimum(Calendar.MINUTE));
-			end.set(Calendar.SECOND, end.getMinimum(Calendar.SECOND));
-			end.set(Calendar.MILLISECOND, end.getMinimum(Calendar.MILLISECOND));
-			
-		Map<String, String[]> paramsMap = request.getParameterMap();
-		LOGGER.info("getReportDatasets, timeUnit: " + timeUnit + ", dateField: " + dateField + ", dateFrom: " + start + ", dateTo: " + end + ", reportName: " + reportType );
-		Pageable pageable = buildPageable(page, size, sort, direction, paramsMap);
-		Page<ReportDataSet> results = this.service.getReportDatasets(pageable, timeUnit, dateField, start.getTime(), end.getTime(), reportType);
-		LOGGER.info("getReportDatasets returning " + results.getTotalElements());
-		return results;
-	}
-	
 }

@@ -18,9 +18,9 @@
  */
 package gr.abiss.calipso.controller;
 
-import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.service.RoleService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
 
 import javax.inject.Inject;
 
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 //@Api(value = "Roles")
 @Controller
 @RequestMapping(value = "/api/rest/roles", produces = { "application/json", "application/xml" })
-public class RoleController extends AbstractServiceBasedRestController<Role, String, RoleService> {
+public class RoleController extends AbstractModelController<Role, String, RoleService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
 

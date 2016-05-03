@@ -27,6 +27,7 @@ import gr.abiss.calipso.repository.RoleRepository;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.integration.LocalUserService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
@@ -57,7 +58,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 //@Named("userService")
-public class UserServiceImpl extends GenericEntityServiceImpl<User, String, UserRepository> 
+public class UserServiceImpl extends AbstractModelServiceImpl<User, String, UserRepository> 
 	implements UserService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);

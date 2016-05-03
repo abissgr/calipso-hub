@@ -22,7 +22,7 @@ import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.repository.cms.BinaryFileRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.cms.BinaryFileService;
-import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 @Named("binaryFileService")
-public class BinaryFileServiceImpl extends GenericEntityServiceImpl<BinaryFile, String, BinaryFileRepository> 
+public class BinaryFileServiceImpl extends AbstractModelServiceImpl<BinaryFile, String, BinaryFileRepository> 
 	implements BinaryFileService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BinaryFileServiceImpl.class);

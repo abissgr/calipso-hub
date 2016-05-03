@@ -19,8 +19,8 @@
 package gr.abiss.calipso.service.geography;
 
 import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.service.ModelService;
 
-public interface CountryService extends GenericEntityService<Country, String> {
+public interface CountryService extends ModelService<Country, String> {
 
 }

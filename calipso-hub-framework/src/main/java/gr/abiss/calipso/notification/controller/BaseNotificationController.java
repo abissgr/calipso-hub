@@ -18,9 +18,9 @@
  */
 package gr.abiss.calipso.notification.controller;
 
-import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 import gr.abiss.calipso.notification.model.BaseNotification;
 import gr.abiss.calipso.notification.service.BaseNotificationService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
 
 import javax.inject.Inject;
 
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 //@Api(value = "Notifications")
 @RequestMapping(value = "/api/rest/baseNotifications", produces = { "application/json", "application/xml" })
-public class BaseNotificationController extends AbstractServiceBasedRestController<BaseNotification, String, BaseNotificationService> {
+public class BaseNotificationController extends AbstractModelController<BaseNotification, String, BaseNotificationService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseNotificationController.class);
 

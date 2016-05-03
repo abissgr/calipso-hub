@@ -19,9 +19,9 @@
 package gr.abiss.calipso.service.cms;
 
 import gr.abiss.calipso.model.cms.Tag;
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.service.ModelService;
 
-public interface TagService extends GenericEntityService<Tag, String> {
+public interface TagService extends ModelService<Tag, String> {
 
 
 }

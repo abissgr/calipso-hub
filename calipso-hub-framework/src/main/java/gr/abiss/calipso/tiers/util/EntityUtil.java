@@ -18,15 +18,19 @@
  */
 package gr.abiss.calipso.tiers.util;
 
-import gr.abiss.calipso.tiers.annotations.ModelRelatedResource;
-import gr.abiss.calipso.tiers.annotations.ModelResource;
+import gr.abiss.calipso.tiers.annotation.ModelRelatedResource;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.Entity;
 
@@ -34,6 +38,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 public class EntityUtil {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(EntityUtil.class);
 	
 	@SuppressWarnings("unchecked")
 	public static <T> T getParentEntity(Object child){
@@ -58,5 +64,19 @@ public class EntityUtil {
         provider.addIncludeFilter(new AnnotationTypeFilter(ModelRelatedResource.class));
         return provider;
     }
+    
+    public static Class<?> getIdType(Class<?> modelType) {
+    	Class<?> idType = null;
+		Method testMethod = null;
+        try {
+			testMethod = modelType.getMethod("getId");
+		} catch (Exception e) {
+			LOGGER.error("Could not determine ID type", e);
+		}
+		if(testMethod != null){
+			idType = testMethod.getReturnType();
+		}
+		return idType;
+	}
 
 }

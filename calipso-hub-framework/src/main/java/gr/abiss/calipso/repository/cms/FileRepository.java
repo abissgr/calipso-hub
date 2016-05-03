@@ -18,11 +18,11 @@
  */
 package gr.abiss.calipso.repository.cms;
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.model.cms.File;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 import org.springframework.data.jpa.repository.Query;
 
-public interface FileRepository extends BaseRepository<File, String> {
+public interface FileRepository extends ModelRepository<File, String> {
 
 }

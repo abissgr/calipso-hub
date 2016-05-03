@@ -22,11 +22,11 @@ import java.io.Serializable;
 
 import org.springframework.data.jpa.repository.Query;
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.notification.model.BaseNotification;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
-public interface BaseNotificationRepository extends BaseRepository<BaseNotification, String> {
+public interface BaseNotificationRepository extends ModelRepository<BaseNotification, String> {
 	
 	@Query("select count(n) from BaseNotification n where n.seen = false and n.recepient.id = ?1")
 	Long countUnseen(Serializable recepientId);

@@ -19,9 +19,9 @@
 package gr.abiss.calipso.repository.geography;
 
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.model.geography.Country;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
-public interface CountryRepository extends BaseRepository<Country, String> {
+public interface CountryRepository extends ModelRepository<Country, String> {
 	
 }

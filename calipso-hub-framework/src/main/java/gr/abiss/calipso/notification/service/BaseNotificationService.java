@@ -20,11 +20,11 @@ package gr.abiss.calipso.notification.service;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.notification.model.BaseNotification;
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 
-public interface BaseNotificationService extends GenericEntityService<BaseNotification, String> {
+public interface BaseNotificationService extends ModelService<BaseNotification, String> {
 
 	/**
 	 * Count the unseen notifications addressed to the current principal

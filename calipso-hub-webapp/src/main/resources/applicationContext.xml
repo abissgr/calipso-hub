@@ -19,7 +19,7 @@
         http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
         
-    <bean id="entityPostProcessor" class="gr.abiss.calipso.tiers.processor.EntityPostProcessor" />
+    <bean id="entityPostProcessor" class="gr.abiss.calipso.tiers.processor.ModelDrivenBeansGenerator" />
     
     <!-- override resthub's MapperFeature.DEFAULT_VIEW_INCLUSION config -->
     <bean id="jsonObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
@@ -86,7 +86,7 @@
 	<jpa:repositories base-package="
     	gr.abiss.calipso, 
     	org.resthub"
-		factory-class="gr.abiss.calipso.jpasearch.repository.RepositoryFactoryBean" />
+		factory-class="gr.abiss.calipso.tiers.repository.ModelRepositoryFactoryBean" />
 
 	<!-- THYMELEAF: Template Resolver for email templates -->
 	<bean id="emailTemplateResolver"

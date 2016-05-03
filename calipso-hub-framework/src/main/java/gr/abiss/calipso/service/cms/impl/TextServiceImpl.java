@@ -22,7 +22,7 @@ import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.repository.cms.PageRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.cms.TextService;
-import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named("textService")
-public class TextServiceImpl extends GenericEntityServiceImpl<Text, String, PageRepository> 
+public class TextServiceImpl extends AbstractModelServiceImpl<Text, String, PageRepository> 
 	implements TextService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TextServiceImpl.class);

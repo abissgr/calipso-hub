@@ -19,9 +19,9 @@
 package gr.abiss.calipso.service.cms;
 
 import gr.abiss.calipso.model.cms.Folder;
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.service.ModelService;
 
-public interface FolderService extends GenericEntityService<Folder, String> {
+public interface FolderService extends ModelService<Folder, String> {
 
 
 }

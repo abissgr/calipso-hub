@@ -223,7 +223,7 @@ To use this module in your RESTHub project you need to do the following:
 ```xml
     <!-- Dynamic JPA Search -->
     <jpa:repositories base-package="my.package" 
-        factory-class="gr.abiss.calipso.jpasearch.repository.RepositoryFactoryBean" />
+        factory-class="gr.abiss.calipso.tiers.repository.RepositoryFactoryBean" />
 ```
 see also "1.3.2 Adding custom behavior to all repositories" [2].
 

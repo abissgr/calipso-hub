@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.repository;
+package gr.abiss.calipso.tiers.repository;
 
+import gr.abiss.calipso.jpasearch.repository.BaseRepositoryImpl;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 
 import java.io.Serializable;
@@ -29,7 +30,7 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
-public class RepositoryFactoryBean<R extends JpaRepository<T, I>, T, I extends Serializable> 
+public class ModelRepositoryFactoryBean<R extends JpaRepository<T, I>, T, I extends Serializable> 
 extends JpaRepositoryFactoryBean<R, T, I> {
 
 	@Override
@@ -62,7 +63,7 @@ extends JpaRepositoryFactoryBean<R, T, I> {
 			// The RepositoryMetadata can be safely ignored, it is used by the
 			// JpaRepositoryFactory
 			// to check for QueryDslJpaRepository's which is out of scope.
-			return BaseRepository.class;
+			return ModelRepository.class;
 		}
 	}
 }

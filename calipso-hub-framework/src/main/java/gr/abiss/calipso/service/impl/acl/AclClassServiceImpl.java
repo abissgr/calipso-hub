@@ -2,7 +2,7 @@ package gr.abiss.calipso.service.impl.acl;
 
 import java.util.Date;
 
-import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
+import gr.abiss.calipso.jpasearch.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.model.acl.AclClass;
 import gr.abiss.calipso.model.dto.ReportDataSet;
 import gr.abiss.calipso.model.types.AggregateFunction;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Named("aclClassService")
 @Transactional(readOnly = true)
 public class AclClassServiceImpl extends
-		GenericServiceImpl<AclClass, Long, AclClassRepository> implements
+		AbstractAclAwareServiceImpl<AclClass, Long, AclClassRepository> implements
 		AclClassService {
 
 	@Override

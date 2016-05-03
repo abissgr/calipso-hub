@@ -22,7 +22,7 @@ import gr.abiss.calipso.model.cms.Folder;
 import gr.abiss.calipso.repository.cms.FolderRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.cms.FolderService;
-import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named("folderService")
-public class FolderServiceImpl extends GenericEntityServiceImpl<Folder, String, FolderRepository> 
+public class FolderServiceImpl extends AbstractModelServiceImpl<Folder, String, FolderRepository> 
 	implements FolderService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FolderServiceImpl.class);

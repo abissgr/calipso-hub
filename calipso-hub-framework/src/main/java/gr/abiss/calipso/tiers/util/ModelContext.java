@@ -21,14 +21,15 @@ package gr.abiss.calipso.tiers.util;
 import org.hibernate.annotations.ManyToAny;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.core.GenericCollectionTypeResolver;
 import org.springframework.data.domain.Persistable;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
-import gr.abiss.calipso.tiers.annotations.ModelRelatedResource;
-import gr.abiss.calipso.tiers.annotations.ModelResource;
+import gr.abiss.calipso.tiers.annotation.ModelRelatedResource;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -37,63 +38,80 @@ import javax.persistence.OneToOne;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * Adapter class for classes with {@link javax.persistence.ModelResource} and {@link gr.abiss.calipso.tiers.annotations.ModelRelatedResource}
- * annotationss.
+ * Adapter-ish context class for classes with {@link javax.persistence.ModelResource} 
+ * and {@link gr.abiss.calipso.tiers.annotation.ModelRelatedResource}
+ * annotations.
  */
-public final class ModelResourceDetails<E extends Persistable<ID>, ID extends Serializable, B> {
+public final class ModelContext {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ModelResourceDetails.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModelContext.class);
 
-    private final Class<ID> idClass;
-    private final Class<E> domainClass;
-    private final Class<? extends Identifiable<ID>> parentClass;
-    private final Class<?> beanClass;
-    private final String name, path, parentProperty;
+    private Class<?> modelType;
+    
+    private Class<?> modelIdType;
+    
+    private final Class<?> parentClass;
+    private final String name, path, parentProperty, generatedClassNamePrefix;
 
-    public ModelResourceDetails(ModelResource resource, Class<?> domainClass){
+    private Class<?> repositoryType;
+    private Class<?> serviceInterfaceType;
+    private Class<?> serviceImplType;
+    private AbstractBeanDefinition repositoryDefinition, serviceDefinition, controllerDefinition;
+
+	public List<Class<?>> getGenericTypes() {
+		List<Class<?>> genericTypes = new LinkedList<Class<?>>();
+		genericTypes.add(this.getModelType());
+		genericTypes.add(this.getModelIdType());
+		return genericTypes;
+	}
+	
+    public ModelContext(ModelResource resource, Class<?> domainClass){
     	Assert.notNull(domainClass, "A domain class is required");
         this.name = getPath(domainClass);
         this.path = "/" + name;
 
-        this.idClass = (Class<ID>) resource.idClass();
-        this.domainClass = (Class<E>) domainClass;
-        this.beanClass = domainClass;
+        this.modelType = (Class<?>) domainClass;
+        this.generatedClassNamePrefix = domainClass.getSimpleName().replace("Model", "").replace("Entity", "");
         this.parentClass = null;
         this.parentProperty = null;
+        
+        this.modelIdType = EntityUtil.getIdType(domainClass);
+        
     }
-
-    public ModelResourceDetails(ModelRelatedResource resource, Class<?> domainClass){
+	
+    public ModelContext(ModelRelatedResource resource, Class<?> domainClass){
         this.name = getPath(domainClass);
 
         String parentProperty = resource.parentProperty();
-        this.parentClass = (Class<? extends Identifiable<ID>>) ReflectionUtils.findField(domainClass, parentProperty).getType();
+        this.parentClass = (Class<?>) ReflectionUtils.findField(domainClass, parentProperty).getType();
 
         String parentName = getPath(parentClass);
         this.path = "/" + parentName + "/{peId}/" + this.name;
 
-        this.idClass = (Class<ID>) resource.idClass();
-        this.domainClass = (Class<E>) domainClass;
-        this.beanClass = resource.beanClass().equals( Object.class )
-                ? domainClass
-                : resource.beanClass();
+        this.modelType = (Class<?>) domainClass;
+        this.modelIdType = EntityUtil.getIdType(domainClass);
+        this.generatedClassNamePrefix = domainClass.getSimpleName().replace("Model", "").replace("Entity", "");
 
         this.parentProperty = resource.parentProperty();
     }
 
-    public static <E extends Persistable<ID>, ID extends Serializable, B> ModelResourceDetails<E, ID, B> from(Class<?> domainClass){
+    public static ModelContext from(Class<?> domainClass){
 
         ModelResource ar = domainClass.getAnnotation(ModelResource.class);
         ModelRelatedResource anr = domainClass.getAnnotation(ModelRelatedResource.class);
 
-        LOGGER.info("from ,ar: " + ar + ", anr: " + anr);
-        ModelResourceDetails wrapper = null;
+        ModelContext wrapper = null;
         if( ar != null ){
-            wrapper = new ModelResourceDetails(ar, domainClass);
+            wrapper = new ModelContext(ar, domainClass);
         }else if( anr != null ){
-            wrapper = new ModelResourceDetails(anr, domainClass);
+            wrapper = new ModelContext(anr, domainClass);
         }else{
             // look for an ancestor who might be a resource
             Class<?> superClass = domainClass.getSuperclass();
@@ -101,10 +119,15 @@ public final class ModelResourceDetails<E extends Persistable<ID>, ID extends Se
                 wrapper = from( domainClass.getSuperclass() );
             }
         }
+        wrapper.setModelType(domainClass);
         return wrapper;
     }
 
-    public static <E extends Persistable<ID>, ID extends Serializable, B> ModelResourceDetails<E, ID, B> from(Field field){
+    private void setModelType(Class<?> modelType) {
+		this.modelType = modelType;
+	}
+
+	public static ModelContext from(Field field){
         Class<?> domainClass = field.getType();
         if( Collection.class.isAssignableFrom(domainClass) ){
             domainClass = GenericCollectionTypeResolver.getCollectionFieldType(field);
@@ -112,26 +135,50 @@ public final class ModelResourceDetails<E extends Persistable<ID>, ID extends Se
         return from(domainClass);
     };
 
-    public Class<?> getParentIdClass(){
-        Assert.notNull(parentClass, "No parent class found");
-        Class<?> pid = ModelResourceDetails.from( parentClass ).getIdClass();
-        return pid;
-    }
+    
+    
+    public Class<?> getServiceInterfaceType() {
+		return serviceInterfaceType;
+	}
+
+	public void setServiceInterfaceType(Class<?> serviceInterfaceType) {
+		this.serviceInterfaceType = serviceInterfaceType;
+	}
+
+	public Class<?> getServiceImplType() {
+		return serviceImplType;
+	}
+
+	public void setServiceImplType(Class<?> serviceImplType) {
+		this.serviceImplType = serviceImplType;
+	}
+
+	public Class<?> getRepositoryType() {
+		return repositoryType;
+	}
+
+	public void setRepositoryType(Class<?> repositoryType) {
+		this.repositoryType = repositoryType;
+	}
 
     public boolean isNested(){
         return parentClass != null;
     }
 
-    public boolean isNestedCollection(){
+    public String getGeneratedClassNamePrefix() {
+		return generatedClassNamePrefix;
+	}
+
+	public boolean isNestedCollection(){
         if( !isNested() ){
             return false;
         }
 
-        ModelRelatedResource anr = domainClass.getAnnotation(ModelRelatedResource.class);
+        ModelRelatedResource anr = modelType.getAnnotation(ModelRelatedResource.class);
         Assert.notNull(anr, "Not a nested resource");
 
         String parentProperty = anr.parentProperty();
-        Field field = ReflectionUtils.findField(domainClass, parentProperty);
+        Field field = ReflectionUtils.findField(modelType, parentProperty);
         if( hasAnnotation(field, OneToOne.class, org.hibernate.mapping.OneToOne.class) ){
             return false;
         }else if( hasAnnotation(field, ManyToOne.class, org.hibernate.mapping.ManyToOne.class,
@@ -174,20 +221,12 @@ public final class ModelResourceDetails<E extends Persistable<ID>, ID extends Se
         return result;
     }
 
-	public Class<ID> getIdClass() {
-		return idClass;
+	public Class<?> getModelIdType() {
+		return modelIdType;
 	}
 
-	public Class<E> getDomainClass() {
-		return domainClass;
-	}
-
-	public Class<? extends Identifiable<ID>> getParentClass() {
-		return parentClass;
-	}
-
-	public Class<?> getBeanClass() {
-		return beanClass;
+	public Class<?> getModelType() {
+		return modelType;
 	}
 
 	public String getName() {
@@ -200,6 +239,30 @@ public final class ModelResourceDetails<E extends Persistable<ID>, ID extends Se
 
 	public String getParentProperty() {
 		return parentProperty;
+	}
+
+	public AbstractBeanDefinition getRepositoryDefinition() {
+		return repositoryDefinition;
+	}
+
+	public void setRepositoryDefinition(AbstractBeanDefinition repositoryDefinition) {
+		this.repositoryDefinition = repositoryDefinition;
+	}
+
+	public AbstractBeanDefinition getServiceDefinition() {
+		return serviceDefinition;
+	}
+
+	public void setServiceDefinition(AbstractBeanDefinition serviceDefinition) {
+		this.serviceDefinition = serviceDefinition;
+	}
+
+	public AbstractBeanDefinition getControllerDefinition() {
+		return controllerDefinition;
+	}
+
+	public void setControllerDefinition(AbstractBeanDefinition controllerDefinition) {
+		this.controllerDefinition = controllerDefinition;
 	};
     
     

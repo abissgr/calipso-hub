@@ -18,6 +18,7 @@
 package gr.abiss.calipso.jpasearch.repository;
 
 import gr.abiss.calipso.model.interfaces.Rateable;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 import java.io.Serializable;
 
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @see gr.abiss.calipso.model.interfaces.Rateable
  */
 @NoRepositoryBean
-public interface RateableRepository<T extends Rateable<?>, ID extends Serializable> extends BaseRepository<T, ID> {
+public interface RateableRepository<T extends Rateable<?>, ID extends Serializable> extends ModelRepository<T, ID> {
 
 	@Transactional(readOnly = false)
 	@Modifying

@@ -27,11 +27,11 @@ import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.repository.acl.AclClassRepository;
 import gr.abiss.calipso.repository.acl.AclObjectIdentityRepository;
 import gr.abiss.calipso.repository.acl.AclSidRepository;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
@@ -67,11 +67,11 @@ import org.springframework.util.CollectionUtils;
  * @param <R> The repository class
  */
 @Transactional(readOnly = true)
-public abstract class GenericServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends BaseRepository<T, ID>>
+public abstract class AbstractAclAwareServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
 		extends CrudServiceImpl<T, ID, R> implements GenericService<T, ID> {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(GenericServiceImpl.class);
+			.getLogger(AbstractAclAwareServiceImpl.class);
 
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
 	private AclClassRepository aclClassRepository;

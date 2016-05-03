@@ -18,9 +18,9 @@
  */
 package gr.abiss.calipso.controller;
 
-import gr.abiss.calipso.controller.AbstractServiceBasedRestController;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
 
 import javax.inject.Inject;
 
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 //@Api(value = "Users")
 @RequestMapping(value = "/api/rest/users", produces = { "application/json", "application/xml" })
-public class UserController extends AbstractServiceBasedRestController<User, String, UserService> {
+public class UserController extends AbstractModelController<User, String, UserService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 

@@ -27,7 +27,7 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.notification.model.BaseNotification;
 import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.notification.repository.BaseNotificationRepository;
-import gr.abiss.calipso.service.impl.GenericEntityServiceImpl;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 
@@ -42,7 +42,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 @Named("baseNotificationService")
-public class BaseNotificationServiceImpl extends GenericEntityServiceImpl<BaseNotification, String, BaseNotificationRepository> 
+public class BaseNotificationServiceImpl extends AbstractModelServiceImpl<BaseNotification, String, BaseNotificationRepository> 
 	implements BaseNotificationService{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseNotificationServiceImpl.class);

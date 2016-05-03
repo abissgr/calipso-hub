@@ -22,7 +22,7 @@ import gr.abiss.calipso.model.entities.AbstractAuditable;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
-import gr.abiss.calipso.tiers.annotations.ModelResource;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.MD5Utils;
 

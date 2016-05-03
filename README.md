@@ -388,10 +388,27 @@ Name | Alias(es)
 
 The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) services for your entities, including complete coverage of [SCRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) use cases.
 
-#### Tiers
 
 #### Service URLs
 
+#### Model-Driven Tiers
+
+A SCRUD stack will be created automatically for entities annotated with `@ModelResource`. The generated classes include Conteoller, Service (both interface and impl) and Repository beans. For example:
+
+```java
+
+@Entity
+@ModelResource(path = "books")
+@Table(name = "book")
+public class Book extends AbstractAuditable<User> {
+    //...
+}
+```
+     
+
+#### Custom Tiers
+
+If you want to manually create custom SCRUD stack check out the old [guide](src/etc/scrud_howto.md).
 #### Authentication and Authorization
 
 #### Persistence
@@ -406,7 +423,3 @@ their own clusterable [ElasticSearch](https://www.elastic.co/) node by default.
 Easy email services with i18n support and Thymeleaf templates. Build-in services include email verification, password reset etc.
 
 #### Internationalization
-
-### SCRUD HOWTO
-
-Check out the [SCRUD HOWTO](src/etc/scrud_howto.md) guide.

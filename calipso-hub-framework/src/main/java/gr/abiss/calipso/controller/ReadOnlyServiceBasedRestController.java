@@ -18,7 +18,8 @@
 package gr.abiss.calipso.controller;
 
 
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import gr.abiss.calipso.tiers.service.ModelService;
 
 import java.io.Serializable;
 
@@ -42,9 +43,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Controller
 @RequestMapping(produces = { "application/json", "application/xml" })
 //@Api(description = "All generic operations for entities", value = "")
-public abstract class ReadOnlyServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends GenericEntityService<T, ID>>
+public abstract class ReadOnlyServiceBasedRestController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends
-		AbstractServiceBasedRestController<T, ID, S> {
+		AbstractModelController<T, ID, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReadOnlyServiceBasedRestController.class);
 

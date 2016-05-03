@@ -19,9 +19,9 @@
 package gr.abiss.calipso.service.cms;
 
 import gr.abiss.calipso.model.cms.Text;
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.service.ModelService;
 
-public interface TextService extends GenericEntityService<Text, String> {
+public interface TextService extends ModelService<Text, String> {
 
 
 }

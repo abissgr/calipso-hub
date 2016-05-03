@@ -16,23 +16,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service;
-
-
-import gr.abiss.calipso.jpasearch.service.GenericService;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+package gr.abiss.calipso.tiers.annotation;
 
 import java.io.Serializable;
+import java.lang.annotation.*;
 
-import org.springframework.data.domain.Persistable;
-import org.springframework.stereotype.Service;
 
-@Service
-public interface GenericEntityService <T extends Persistable<ID>, ID extends Serializable>
-extends GenericService<T, ID>{
+//Make the annotation available at runtime:
+@Retention(RetentionPolicy.RUNTIME)
+//Allow to use only on types:
+@Target(ElementType.TYPE)
+@Documented
+/**
+ * Marks a Model ato generate SCRUD tiers for
+ */
+public @interface ModelResource {
 
-	public ICalipsoUserDetails getPrincipal();
-
-	public LocalUser getPrincipalLocalUser();
+    Class<? extends Serializable> idClass() default String.class;
+    String path() default "";
 }

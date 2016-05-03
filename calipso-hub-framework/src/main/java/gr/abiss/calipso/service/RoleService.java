@@ -20,8 +20,9 @@ package gr.abiss.calipso.service;
 
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.tiers.service.ModelService;
 
-public interface RoleService extends GenericEntityService<Role, String> {
+public interface RoleService extends ModelService<Role, String> {
 
 	Role findByIdOrName(String idOrName);
 

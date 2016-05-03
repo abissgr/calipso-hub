@@ -18,11 +18,11 @@
  */
 package gr.abiss.calipso.repository.cms;
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
 import gr.abiss.calipso.model.cms.BinaryFile;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 import org.springframework.data.jpa.repository.Query;
 
-public interface BinaryFileRepository extends BaseRepository<BinaryFile, String> {
+public interface BinaryFileRepository extends ModelRepository<BinaryFile, String> {
 
 }

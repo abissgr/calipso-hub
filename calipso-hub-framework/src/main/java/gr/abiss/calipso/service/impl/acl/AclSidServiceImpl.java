@@ -1,6 +1,6 @@
 package gr.abiss.calipso.service.impl.acl;
 
-import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
+import gr.abiss.calipso.jpasearch.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.model.acl.AclSid;
 import gr.abiss.calipso.repository.acl.AclSidRepository;
 import gr.abiss.calipso.service.acl.AclSidService;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Named("aclSidService")
 @Transactional(readOnly = true)
 public class AclSidServiceImpl extends
-		GenericServiceImpl<AclSid, Long, AclSidRepository> implements
+		AbstractAclAwareServiceImpl<AclSid, Long, AclSidRepository> implements
 		AclSidService {
 
 }

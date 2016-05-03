@@ -22,6 +22,7 @@ import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.repository.RoleRepository;
 import gr.abiss.calipso.service.RoleService;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Named("roleService")
 @Transactional(readOnly = true)
-public class RoleServiceImpl extends GenericEntityServiceImpl<Role, String, RoleRepository> implements RoleService {
+public class RoleServiceImpl extends AbstractModelServiceImpl<Role, String, RoleRepository> implements RoleService {
 
 	@Override
 	public Role findByIdOrName(String idOrName) {

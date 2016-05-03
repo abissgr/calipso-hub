@@ -4,13 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-
 import javassist.CannotCompileException;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -38,31 +31,30 @@ import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.ShortMemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JavassistUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavassistUtil.class);
 			
-    public static String getGenericSignature(ClassPool pool, Class<?> baseImpl, Collection<Class<?>> interfaces, Collection<Class<?>> classes) throws NotFoundException {
-//    	LOGGER.info("pool: " + pool);
-//    	LOGGER.info("baseImpl: " + baseImpl);
-//    	LOGGER.info("interfaces: " + interfaces);
-//    	LOGGER.info("classes: " + classes);
-    	StringBuilder name = new StringBuilder( baseImpl.getSimpleName() );
-        String baseImplSig = baseImpl.getName().replace(".", "/");
-
-        // TODO find out why we have the root Object in there...
-        StringBuilder sig = new StringBuilder("Ljava/lang/Object;L" + baseImplSig + "<");
-        if(classes != null){
-            for(Class<?> c  : classes){
+    public static String getGenericSignature(ClassPool pool, Class<?> targetType, Collection<Class<?>> impolementedTnterfaces, Collection<Class<?>> genericArguments) throws NotFoundException {
+    	StringBuilder name = new StringBuilder( targetType.getSimpleName() );
+    	StringBuilder sig = new StringBuilder("Ljava/lang/Object;L")
+    		.append((targetType.getName().replace(".", "/")))
+    		.append("<");
+        if(genericArguments != null){
+            for(Class<?> c  : genericArguments){
                 pool.appendClassPath( new ClassClassPath(c));
                 CtClass ct = pool.get( c.getName() );
                 sig.append("L")
-                        .append( ct.getName().replace('.', '/') )
-                        .append(";");
+	                .append( ct.getName().replace('.', '/') )
+	                .append(";");
 
                 // while we're at it, append the class types to the name
-                name.append("_")
-                        .append(c.getSimpleName());
+                name.append("_").append(c.getSimpleName());
             }
         }
         sig.append(">;");
@@ -72,8 +64,8 @@ public class JavassistUtil {
     public static Class<?> createInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs) throws NotFoundException, CannotCompileException {
         ClassPool pool = ClassPool.getDefault();
         
-        // add classpath
-        //pool.insertClassPath( new ClassClassPath(superInterface));
+        // add classpaths
+        // pool.insertClassPath( new ClassClassPath(superInterface));
         for(Class<?> c : typeArgs){
             pool.insertClassPath( new ClassClassPath(c));
         }
@@ -89,7 +81,6 @@ public class JavassistUtil {
     protected static void addTypeAnnotations(CtClass clazz, Map<Class<?>, Map<String, Object>> typeAnnotations) {
 		ClassFile ccFile = clazz.getClassFile();
 		AnnotationsAttribute attr = getAnnotationsAttribute(ccFile);
-		//AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 		for(Class<?> annotationClass : typeAnnotations.keySet()){
 			attr.addAnnotation(
 				getTypeAnnotation(ccFile, ccFile.getConstPool(), annotationClass, typeAnnotations.get(annotationClass)));
@@ -103,12 +94,10 @@ public class JavassistUtil {
 				Object value = members.get(valueName);
 				if (valueName != null && value != null) {
 					MemberValue memberValue = createMemberValue(constPool, value);
-					LOGGER.info("Adding annotation member, name: " + valueName + ", value: "+ memberValue);
 					annot.addMemberValue(valueName, memberValue);
 				}
 			}
 		}
-		LOGGER.info("getTypeAnnotation: " + annot);
 		return annot;
 	}
 
@@ -124,7 +113,6 @@ public class JavassistUtil {
 
 	
     protected static MemberValue createMemberValue(ConstPool constPool, Object val) {
-    	LOGGER.info("createMemberValue: " + val);
 		MemberValue memberVal = null;
 
 		if (val instanceof Boolean) {
@@ -173,7 +161,6 @@ public class JavassistUtil {
 				enumMemberValue[i] = new EnumMemberValue(constPool); 
 				enumMemberValue[i].setType(sVal[i].getClass().getName());
 				enumMemberValue[i].setValue(sVal[i].toString());
-				LOGGER.info("Adding enum member value: " + enumMemberValue[i]);
 			}
 			memberVal = new ArrayMemberValue(constPool);
 			((ArrayMemberValue) memberVal).setValue(enumMemberValue);

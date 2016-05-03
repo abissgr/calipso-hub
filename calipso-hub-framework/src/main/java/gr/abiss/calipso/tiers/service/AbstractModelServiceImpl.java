@@ -16,13 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-package gr.abiss.calipso.service.impl;
+package gr.abiss.calipso.tiers.service;
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepository;
-import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
+import gr.abiss.calipso.jpasearch.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
-import gr.abiss.calipso.service.GenericEntityService;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
@@ -39,11 +38,11 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
 
-public abstract class GenericEntityServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends BaseRepository<T, ID>>
-		extends GenericServiceImpl<T, ID, R> 
-implements GenericEntityService<T, ID>{
+public abstract class AbstractModelServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
+		extends AbstractAclAwareServiceImpl<T, ID, R> 
+implements ModelService<T, ID>{
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(GenericEntityServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceImpl.class);
 	
 	private final StringKeyGenerator generator = KeyGenerators.string();
 	
