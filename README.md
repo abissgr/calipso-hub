@@ -26,13 +26,13 @@ Experiments on a full stack, high level framework for lazy application hackers a
   - [Internationalization](#internationalization)
 - [Server Stack](#server-stack)
   - [Architecture](#architecture)
-    - [Tiers](#tiers)
-    - [Service URLs](#service-urls)
-    - [Authentication and Authorization](#authentication-and-authorization)
-    - [Persistence](#persistence)
-    - [Email](#email)
-    - [Internationalization](#internationalization)
-  - [SCRUD HOWTO](#scrud-howto)
+  - [Service URLs](#service-urls)
+  - [Model-Driven Tiers](#model-driven-tiers)
+  - [Custom Tiers](#custom-tiers)
+  - [Authentication and Authorization](#authentication-and-authorization)
+  - [Persistence](#persistence)
+  - [Email](#email)
+  - [Internationalization](#internationalization)
 
 ## Installation
 
@@ -389,9 +389,9 @@ Name | Alias(es)
 The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) services for your entities, including complete coverage of [SCRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) use cases.
 
 
-#### Service URLs
+### Service URLs
 
-#### Model-Driven Tiers
+### Model-Driven Tiers
 
 A SCRUD stack will be created automatically for entities annotated with `@ModelResource`. The generated classes include Conteoller, Service (both interface and impl) and Repository beans. For example:
 
@@ -404,22 +404,22 @@ public class Book extends AbstractAuditable<User> {
     //...
 }
 ```
-     
 
-#### Custom Tiers
+
+### Custom Tiers
 
 If you want to manually create custom SCRUD stack check out the old [guide](src/etc/scrud_howto.md).
-#### Authentication and Authorization
+### Authentication and Authorization
 
-#### Persistence
+### Persistence
 
 Relational databases are supported by [JPA](https://en.wikipedia.org/wiki/Java_Persistence_API) ([Hibernate](http://hibernate.org/) is used under the hood).
 [NoSQL](https://en.wikipedia.org/wiki/NoSQL) stores like [MongoDB](https://www.mongodb.org/), [Cassandra](http://cassandra.apache.org/),
 [Couchbase](http://www.couchbase.com) and [Neo4j](http://neo4j.com/) are supported as well, while application instances also contain
 their own clusterable [ElasticSearch](https://www.elastic.co/) node by default.
 
-#### Email
+### Email
 
 Easy email services with i18n support and Thymeleaf templates. Build-in services include email verification, password reset etc.
 
-#### Internationalization
+### Internationalization
