@@ -18,10 +18,12 @@
 		<project.parent.basedir>../</project.parent.basedir>
 		<maven.test.skip>true</maven.test.skip>
 		<jetty.daemon>true</jetty.daemon>
-		<jetty.jvmArgs>-XX:MaxPermSize=512m</jetty.jvmArgs>
-		<scriptmain>main</scriptmain>
+        <maven.build.timestamp.format>EEE, d MMM yyyy HH:mm:ss Z</maven.build.timestamp.format>
+        <dev.build.timestamp>${maven.build.timestamp}</dev.build.timestamp>
 		<build.profile.filters>dev.properties</build.profile.filters>
+        <requirejs.resources>etc/licence</requirejs.resources>
 	</properties>
+	
 	<build>
 		<filters>
 			<filter>${project.parent.basedir}/${build.profile.filters}</filter>
@@ -33,12 +35,6 @@
 			</resource>
 		</resources>
 		<plugins>
-			<!--plugin> <groupId>org.codehaus.enunciate</groupId> <artifactId>maven-enunciate-plugin</artifactId> 
-				<version>1.8.1</version> <executions> <execution> <goals> <goal>assemble</goal> 
-				</goals> </execution> </executions> <dependencies> <dependency> <groupId>com.sun</groupId> 
-				<artifactId>tools</artifactId> <version>1.0</version> <scope>system</scope> 
-				<systemPath>/usr/lib/jvm/jdk1.7.0/lib/tools.jar</systemPath> </dependency> 
-				</dependencies> </plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -100,25 +96,20 @@
 				</configuration>
 			</plugin>
 
-			         <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <webResources>
-<!--                         <resource> -->
-<!--                             <directory>${requirejs.resources}</directory> -->
-<!--                         </resource> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webResources>
+						<resource>
+						  <directory>${requirejs.resources}</directory>
+						</resource>
                         <resource>
-                            <directory>src/main/webapp</directory>
-                            <includes>
-                                <include>**/*.jsp</include>
-                            </includes>
-                            <!-- enable filtering -->
-                            <filtering>true</filtering>
+                            <directory>etc/licence</directory>
                         </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
+					</webResources>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -182,31 +173,68 @@
 	<profiles>
 		<profile>
 			<id>optimize</id>
+			<properties>
+                <maven.build.timestamp.format>EEE, d MMM yyyy HH:mm:ss Z</maven.build.timestamp.format>
+                <dev.build.timestamp>${maven.build.timestamp}</dev.build.timestamp>
+                <maven.test.skip>true</maven.test.skip>
+                <jetty.daemon>true</jetty.daemon>
+                <jetty.jvmArgs>-XX:MaxPermSize=512m</jetty.jvmArgs>
+                <requirejs.resources>${basedir}/target/requirejs-optimized</requirejs.resources>
+            </properties>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>com.github.bringking</groupId>
-					    <artifactId>requirejs-maven-plugin</artifactId>
-					    <version>2.0.4</version>
+						<artifactId>requirejs-maven-plugin</artifactId>
+						<version>2.0.4</version>
 						<executions>
 							<execution>
+								<id>execution-id-requirejs-js</id>
 								<goals>
 									<goal>optimize</goal>
 								</goals>
+                                <phase>process-resources</phase>
+								<configuration>
+									<!-- path to optimizer json config file(s) -->
+                                    <configFile>
+                                        ${basedir}/src/main/webapp/js/build/build-config.js
+                                    </configFile>
+								</configuration>
+							</execution>
+							<execution>
+								<id>execution-id-requirejs-css</id>
+								<goals>
+									<goal>optimize</goal>
+								</goals>
+								<phase>process-resources</phase>
+
+								<configuration>
+									<configFile>
+										${basedir}/src/main/webapp/js/build/build-css-config.js
+									</configFile>
+								</configuration>
 							</execution>
 						</executions>
 						<configuration>
-							<!-- path to optimizer json config file -->
-							<configFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/build-maven-config.js</configFile>
 							<!-- optional path to optimizer executable -->
-							<optimizerFile>/root/resthub/resthub-archetypes/target/checkout/resthub-jpa-backbonejs-multi-archetype/src/main/webapp/js/build/r.js</optimizerFile>
-							<!-- whether or not to process config with maven filters -->
-							<filterConfig>true</filterConfig>
+							<optimizerFile>
+								${basedir}/src/main/webapp/js/build/r.js
+							</optimizerFile>
+							<optimizerParameters>
+								<parameter>optimize=uglify</parameter>
+							</optimizerParameters>
+							<!-- Whether or not to process configFile with maven filters. If you 
+								use this option, some options in your configFile must resolve to absolute 
+								paths (see below) -->
+							<filterConfig>
+								false
+							</filterConfig>
 							<!-- Skip requirejs optimization if true -->
-							<skip>false</skip>
+							<skip>
+								false
+							</skip>
 						</configuration>
 					</plugin>
-
 				</plugins>
 			</build>
 		</profile>

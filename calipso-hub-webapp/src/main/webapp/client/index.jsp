@@ -34,7 +34,7 @@
     </footer>
     
     <!-- Placed at the end of the document so the pages load faster -->
-    <script data-main="${basePath}/js/${scriptMain}" id="calipso-script-main" src="${basePath}/js/lib/require.js">
+    <script data-main="${basePath}/js/main" id="calipso-script-main" src="${basePath}/js/lib/require.js">
     </script>
 </body>
 </html>

@@ -1362,7 +1362,7 @@ Calipso.cloneSpecificValue = function(val) {
 				});
 				return caseFields;
 			},
-			getChild(regionName, viewName){
+			getChild : function(regionName, viewName){
 				var _this = this;
 				var useCaseOptions = {};
 

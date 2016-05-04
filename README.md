@@ -385,7 +385,11 @@ Name | Alias(es)
 
 ### Optimization
 
-The calipso-hub-web module provides an __optimize__ profile that minifies javascript and CSS resources using [requirejs](http://requirejs.org/) and the [requirejs-maven-plugin](https://github.com/bringking/requirejs-maven-plugin).
+The calipso-hub-web module provides an __optimize__ profile that minifies javascript and CSS resources using [requirejs](http://requirejs.org/) and the [requirejs-maven-plugin](https://github.com/bringking/requirejs-maven-plugin). 
+
+```bash
+~/git/calipso-hub/calipso-hub-webapp$ mvn clean install jetty:run-war -P optimize
+```
 
 ## Server Stack
 

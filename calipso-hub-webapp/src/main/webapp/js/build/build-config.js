@@ -1,18 +1,18 @@
 ({
-    appDir: "../..",
-    baseUrl: "js",
-    dir: "./",
-
-    optimizeCss: "standard.keepLines",
+	include: ['main'],
+   baseUrl: "../../js",
+   out: '../../../../../target/requirejs-optimized/js/main.js',
     mainConfigFile: "../main.js",
 
-    inlineText: true,
-    removeCombined: true,
-    fileExclusionRegExp: /^build/,
+    wrapShim:               true,
+    removeCombined:         true,
+    findNestedDependencies: true, 
 
-    modules: [
-    {
-        name: "main"
-    }
-    ]
+    fileExclusionRegExp: /^build/,
+    
+
+    inlineText: true,
+    paths:{
+   	'handlebars-compiler' : 'lib/handlebars' 
+    },
 })

@@ -7,10 +7,8 @@
 
 	String basePath = configuration.getString(
 	        gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
-	String scriptMain = configuration.getString(
-	        gr.abiss.calipso.utils.ConfigurationFactory.SCRIPT_MAIN, "main");
+	
     pageContext.setAttribute("basePath", basePath);
-    pageContext.setAttribute("scriptMain", scriptMain);
     
 %>
     <meta charset="utf-8" />
