@@ -41,7 +41,9 @@ See the [checkout and build](src/etc/checkout_and_build.md) guide.
 ## Client Stack
 
 The javascript stack provides a [responsive](https://en.wikipedia.org/wiki/Responsive_web_design),
-[SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework based on [backbone.marionette](http://marionettejs.com/).
+[SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework based on libraries like 
+[backbone.marionette](http://marionettejs.com/), [bootstrap](http://getbootstrap.com/) and 
+[requirejs](http://requirejs.org/).
 
 The stack contributes to productive developers and maintainable code. It allows you to quickly and
 consistently implement use cases or other functional requirements declaratively (via JSON notation),
@@ -380,6 +382,10 @@ Name | Alias(es)
 `edit` | `Edit`
 
 ### Internationalization
+
+### Optimization
+
+The calipso-hub-web module provides an __optimize__ profile that minifies javascript and CSS resources using [requirejs](http://requirejs.org/) and the [requirejs-maven-plugin](https://github.com/bringking/requirejs-maven-plugin).
 
 ## Server Stack
 
