@@ -41,16 +41,15 @@ See the [checkout and build](src/etc/checkout_and_build.md) guide.
 ## Client Stack
 
 The javascript stack provides a [responsive](https://en.wikipedia.org/wiki/Responsive_web_design),
-[SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework that is compatible
-with the [Server Stack](#server-stack).
+[SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework based on [backbone.marionette](http://marionettejs.com/).
 
-The stack goals are productive developers and maintainable code. It allows you to quickly and
+The stack contributes to productive developers and maintainable code. It allows you to quickly and
 consistently implement use cases or other functional requirements declaratively (via JSON notation),
 making it natural for new code to be added in the form of reusable components.
 
 ### Routing
 
-`Calipso.Router` and `Calipso.Controller` extend the respective types of Backbone/Marionette to dynamically handle declarative [use cases](#use-cases) defined by models.
+`Calipso.Router` and `Calipso.Controller` extend the respective types of [backbone.marionette](http://marionettejs.com/) to dynamically handle declarative [use cases](#use-cases) defined by models, as well as "normal" explicit routes marionette developers are used to.
 
 #### Implicit Routes
 
@@ -409,6 +408,7 @@ public class Book extends AbstractAuditable<User> {
 ### Custom Tiers
 
 If you want to manually create custom SCRUD stack check out the old [guide](src/etc/scrud_howto.md).
+
 ### Authentication and Authorization
 
 ### Persistence
