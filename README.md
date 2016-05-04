@@ -24,6 +24,7 @@ Experiments on a full stack, high level framework for lazy application hackers a
     - [Fields](#fields)
       - [Built-in Field Types](#built-in-field-types)
   - [Internationalization](#internationalization)
+  - [Optimization](#optimization)
 - [Server Stack](#server-stack)
   - [Architecture](#architecture)
   - [Service URLs](#service-urls)
