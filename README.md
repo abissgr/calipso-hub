@@ -46,7 +46,7 @@ The javascript stack provides a [responsive](https://en.wikipedia.org/wiki/Respo
 [requirejs](http://requirejs.org/).
 
 The stack contributes to productive developers and maintainable code. It allows you to quickly and
-consistently implement use cases or other functional requirements declaratively (via JSON notation),
+consistently implement use cases or other functional requirements declaratively, using [#models](metadata in JSON notation),
 making it natural for new code to be added in the form of reusable components.
 
 ### Routing
