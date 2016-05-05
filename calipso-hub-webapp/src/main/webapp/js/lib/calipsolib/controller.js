@@ -30,6 +30,7 @@ define(
 			Marionette.Controller.prototype.constructor.call(this, options);
 		},
 		showView : function(view){
+			console.log("Calipso.Controller#showView: " + view.getTypeName());
 			Calipso.app.mainContentRegion.show(view);
 		},
 		toHome : function() {
@@ -67,47 +68,9 @@ define(
 		},
 		myProfile : function() {
 			if (this._ensureLoggedIn()) {
-				this.mainNavigationCrudRoute("userProfile", Calipso.session.userDetails.get("id"))
+				this.showUseCaseView( "users", Calipso.session.userDetails.get("id"), "view", null);
 			}
 		},
-		/*login : function() {
-			if (Calipso.util.isAuthenticated()) {
-				window.alert("Please logout before attempting a new login");
-			} else {
-				this.showLayoutForModel(new Calipso.model.UserDetailsModel(), null, null);
-			}
-		},
-		renderTokenPasswordChangeForm : function(username, token) {
-			var model = new Calipso.model.UserDetailsModel({
-				username : username,
-				resetPasswordToken : token,
-				formSchemaKey : "create-withToken",
-			});
-			this.showLayoutForModel(model, null, null);
-		},
-		accountConfirm : function(confirmationToken) {
-			if (confirmationToken) {
-				var url = Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/accountConfirmations/" + confirmationToken;
-				var options = Calipso.app.routeOptions;
-				// TODO: leave any forward at Calipso.app.fw
-				Calipso.session.load(url);
-			} else {
-				throw "accountConfirm route requires the confirmation token as a URI component";
-			}
-		},
-		changePassword : function() {
-			var userDetails = Calipso.session.userDetails;
-			if (!Calipso.util.isAuthenticated()) {
-				userDetails = new Calipso.model.UserDetailsModel({
-					showResetPasswordForm : true
-				});
-				var httpParams = Calipso.getHttpUrlParams();
-				if(httpParams.email){
-					userDetails.set("email", httpParams.email);
-				}
-			}
-			this.showLayoutForModel(userDetails, null, null);
-		},*/
 		logout : function() {
 			Calipso.session.logout();
 			// this.login();

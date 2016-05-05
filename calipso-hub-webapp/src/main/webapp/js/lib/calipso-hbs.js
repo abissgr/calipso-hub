@@ -83,7 +83,7 @@ function(
 	"modal-layout":modal_layout,
 	"header":header,
 	"header-menuitem":header_menuitem,
-	"homeLayout" : homeLayout, 
+	"homeLayout" : homeLayout,
 	"md-browse-layout":md_browse_layout,
 	"md-search-layout":md_search_layout,
 	"md-report-layout":md_report_layout,

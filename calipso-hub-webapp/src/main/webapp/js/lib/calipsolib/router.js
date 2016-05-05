@@ -35,8 +35,8 @@ define(
 			'_=_' : 'toHome',
 			'#_=_' : 'toHome',
 			'home' : 'home',
-
 			'logout' : 'logout',
+			'myProfile' : 'myProfile',
 
 			'userDetails/:useCaseKey' : 'showUserDetailsView',
 			'userDetails/:useCaseKey/' : 'showUserDetailsView',

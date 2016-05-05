@@ -621,7 +621,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				this.id = _.uniqueId(this.getTypeName() + "_");
 				$(this.el).attr('id', this.id);
 			}
-			Calipso.view.prototype.initialize.apply(this, arguments);
+			Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
 		},
 		getTypeName : function() {
 			return this.constructor.getTypeName();
@@ -634,6 +634,14 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	// static members
 	{
 		typeName : "Calipso.view.AbstractItemView",
+	});
+
+	Calipso.view.UserProfileView = Calipso.view.AbstractItemView.extend({
+		template : Calipso.getTemplate('userProfile'),
+	},
+	// static members
+	{
+		typeName : "Calipso.view.UserProfileView",
 	});
 
 	Calipso.collection.TabCollection = Backbone.Collection.extend({

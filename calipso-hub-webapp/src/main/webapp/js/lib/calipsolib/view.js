@@ -529,6 +529,16 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "Calipso.view.BrowseLayout"
 	});
 
+	Calipso.view.UserProfileLayout = Calipso.view.BrowseLayout.extend({
+		regionViewTypes : {
+			contentRegion : Calipso.view.UserProfileView,
+		},
+	},
+	// static members
+	{
+		typeName : "Calipso.view.UserProfileLayout"
+	});
+
 	Calipso.view.SearchLayout = Calipso.view.UseCaseLayout.extend({
 		template : Calipso.getTemplate('md-search-layout'),
 		regions : {
@@ -590,62 +600,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				Calipso.view.UseCaseLayout.prototype.onModelSync.apply(this, arguments);
 			}
 		},
-	/*onModelSync : function(model, response, options) {
-		Calipso.session.reset(model);
-		// if successful login
-		if(this.model.get("id")){
-			console.log(this.getTypeName() + "#onModelSync successful login");
-		}
-		// else just follow useCase configuration
-		else{
-			console.log(this.getTypeName() + "#onModelSync call super.onModelSync to apply nextUseCase config");
-				Calipso.view.UseCaseLayout.prototype.onModelSync.apply(this, arguments);
-		}
-	},*/
-
-	/*regions : {
-		contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion",
-		forgotPasswordRegion : "#calipsoUserDetailsLayout-forgotPasswordRegion",
-	},
-	onShow : function() {
-		Calipso.view.ModelDrivenBrowseLayout.prototype.onShow.apply(this, arguments);
-		// add forgotten password form
-		var changePwUserDetails = new Calipso.model.UserDetailsModel({
-			formSchemaKey : "update-createToken",
-			isResetPasswordReguest : true,
-			email : this.model.get("email")
-		});
-		var ViewType = changePwUserDetails.getItemViewType();
-		this.showChildView("forgotPasswordRegion", new ViewType({
-			model : changePwUserDetails,
-		}));
-		if (this.model.get("showResetPasswordForm")) {
-			$("#loginCollapse1").collapse('hide');
-			$("#loginCollapse2").collapse('show');
-		}
-	},
-	onGenericFormSaved : function(model) {
-		// model is not neccessarily the same as this.model
-		if (model.get("isResetPasswordReguest")) {
-			Calipso.navigate("/page/userRegistrationSubmitted", {
-				trigger : true
-			});
-		} else {
-			this.handleUserDetails(model);
-		}
-	},
-	handleUserDetails : function(model) {
-		// if user details model is valid attach to session and FW to home
-		if (this.model.get("id")) {
-			Calipso.vent.trigger('session:created', this.model);
-		}
-		// login failed, show error
-		else if (!this.model.get("email") && !this.model.get("username")) {
-			window.alert("Invalid credentials!");
-		} else {
-			console.log("handleUserDetails: doing nothing");
-		}
-	}*/
 	},
 	// static members
 	{

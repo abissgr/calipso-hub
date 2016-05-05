@@ -284,6 +284,9 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		pathFragment : "users",
 		typeName : "Calipso.model.UserModel",
 		useCases : {
+      view : {
+				view : Calipso.view.UserProfileLayout,
+			},
 			create : {
 				view : Calipso.view.UserRegistrationLayout,
 				fieldIncludes : [ "firstName", "lastName", "email" ]
@@ -384,17 +387,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		},
 	});
 
-	Calipso.model.UserProfileModel = Calipso.model.UserModel.extend(
-	{
-		skipDefaultSearch : false
-	},
-	// static members
-	{
-		viewFragment : "userProfile",
-		typeName : "Calipso.model.UserProfileModel",
-		layoutViewType : Calipso.view.UserProfileLayout,
-		itemViewType : Calipso.view.UserProfileView,
-	});
 
 	//////////////////////////////////////////////////
 	// More models
