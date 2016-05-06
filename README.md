@@ -531,7 +531,7 @@ public class BookServiceImpl extends AbstractModelServiceImpl<Book, String, Book
 }
 ```
 
-#### Conteoller
+#### Controller
 
 To manually create your own controller, extend `AbstractModelController<T, ID, S>` class, with T, ID and S being
 the entity model, id class and service interface types respectively.
