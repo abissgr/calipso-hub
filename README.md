@@ -42,8 +42,8 @@ See the [checkout and build](src/etc/checkout_and_build.md) guide.
 ## Client Stack
 
 The javascript stack provides a [responsive](https://en.wikipedia.org/wiki/Responsive_web_design),
-[SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework based on libraries like 
-[backbone.marionette](http://marionettejs.com/), [bootstrap](http://getbootstrap.com/) and 
+[SPA](http://en.wikipedia.org/wiki/Single-page_application) client framework based on libraries like
+[backbone.marionette](http://marionettejs.com/), [bootstrap](http://getbootstrap.com/) and
 [requirejs](http://requirejs.org/).
 
 The stack contributes to productive developers and maintainable code. It allows you to quickly and
@@ -386,7 +386,7 @@ Name | Alias(es)
 
 ### Optimization
 
-The calipso-hub-web module provides an __optimize__ profile that minifies javascript and CSS resources using [requirejs](http://requirejs.org/) and the [requirejs-maven-plugin](https://github.com/bringking/requirejs-maven-plugin). 
+The calipso-hub-web module provides an __optimize__ profile that minifies javascript and CSS resources using [requirejs](http://requirejs.org/) and the [requirejs-maven-plugin](https://github.com/bringking/requirejs-maven-plugin).
 
 ```bash
 ~/git/calipso-hub/calipso-hub-webapp$ mvn clean install jetty:run-war -P optimize
@@ -398,27 +398,151 @@ The calipso-hub-web module provides an __optimize__ profile that minifies javasc
 
 The [stateless](https://en.wikipedia.org/wiki/Stateless_protocol) back-end is build on top of the [Spring Framework](https://projects.spring.io/spring-framework/) and provides dynamic, model driven [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) services for your entities, including complete coverage of [SCRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) use cases.
 
-
-### Service URLs
-
 ### Model-Driven Tiers
 
-A SCRUD stack will be created automatically for entities annotated with `@ModelResource`. The generated classes include Conteoller, Service (both interface and impl) and Repository beans. For example:
+To have a SCRUD stack automatically generated for your entity model, simply annotate it with `@ModelResource`:
+
 
 ```java
-
 @Entity
 @ModelResource(path = "books")
 @Table(name = "book")
 public class Book extends AbstractAuditable<User> {
-    //...
+  //...
 }
 ```
+
+ During startup, the application will automatically generate and register Conteoller, Service (both interface and impl) and Repository beans for your entity model.
+
+
+#### RESTful Service URLs
+
+The generated beans will follow REST conventions to expose SCRUD service endpoints
+ for your entity models in a regular way. Consider the RESTful URLs for the book an entity model above:
+
+ HTTP Method   | HTTP URL | Action
+ ------------- | ---------|--------------
+ GET           | api/rest/books/id | [Fetch](#fetch) a book matching the id
+ GET           | api/rest/books?foo=bar&foo.subFoo=baz | [Search](#search) books
+ POST          | api/rest/books | [Create](#create) a new book
+ PUT           | api/rest/books/id | [Update](#update) the book matching the id
+ DELETE        | api/rest/books/id | [Delete](#delete) the book matching the id
+
+##### Fetch
+
+ ```
+ GET http://localhost:8080/calipso/books/id
+ ```
+
+ Find the book having "id" as the id value and return it in the response. Throw an 404 HTTP error if no match is found.
+
+#### Search
+
+ ```
+ GET http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz
+ ```
+
+ Get a paginated collection of all books matching the given criteria. No actual java implementation is required for your entity models, their properties are dynamically mapped to the HTTP parameters by the default. additionally, the following predefined parameters are supported:
+
+ Name       | Required | Default | Description
+ ---------- | -------- | ------- | --------------
+ page       | false    | 0       | Page number starting from 0 (default)
+ size       | false    | 10      | Page size, default to 10
+ properties | false    | "id"    | Ordered list of comma-separeted property names used for sorting results. Default is "id"
+ direction  | false    | "ASC"   | Optional sort direction, either "ASC" or "DESC". Default is "ASC".
+
+
+##### Create
+
+```
+POST http://localhost:8080/calipso/books
+```
+
+Create a new book using the request body and return it in the response.
+
+
+#### Update
+
+```
+PUT http://localhost:8080/calipso/books/id
+```
+
+Update the book matchign "id" using the request body and return the result in the response. Partial updates are easily supported, just mark your Java entity class using <code>implements PartiallyUpdateable</code> to support partial updates. No actual implementation is needed.
+
+
+#### Delete
+
+```
+DELETE http://localhost:8080/calipso/books/id
+```
+
+Delete the book matching "id"
 
 
 ### Custom Tiers
 
-If you want to manually create custom SCRUD stack check out the old [guide](src/etc/scrud_howto.md).
+To get an idea of the generated beans or to manually create your own,
+just follow the examples given  bellow. No SCRUD related code is needed
+other than extending the build-in interfaces or classes as appropriate.
+
+
+#### Repository
+
+You can implement your repository just by extending the `ModelRepository<T, ID>`
+interface, with T and ID being the entity model and id class respectively.
+
+```java
+import gr.abiss.calipso.tiers.repository.ModelRepository;
+
+public interface BookRepository extends ModelRepository<Book, String> {
+
+}
+```
+
+#### Service
+
+A service requires both interface and implementation classes. However,
+no implementation code is actually required.
+
+##### Service Interface
+
+Just extend the `ModelService<T, ID>` interface, with T and ID being
+the entity model and id class respectively.
+
+```java
+import gr.abiss.calipso.tiers.service.ModelService;
+
+public interface BookService extends ModelService<Book, String> {
+
+}
+```
+
+##### Service Implementation
+
+Similarly, extend the `AbstractModelServiceImpl<T, ID, R>` class, with T, ID and R being
+the entity model, id class and repository interface types respectively.
+
+```java
+@Named("bookService")
+@Transactional(readOnly = true)
+public class BookServiceImpl extends AbstractModelServiceImpl<Book, String, BookRepository> implements BookService {
+
+
+}
+```
+
+#### Conteoller
+
+To manually create your own controller, extend `AbstractModelController<T, ID, S>` class, with T, ID and S being
+the entity model, id class and service interface types respectively.
+
+```java
+@Controller
+@RequestMapping(value = "/api/rest/books", produces = { "application/json", "application/xml" })
+public class BookController extends AbstractModelController<Book, String, BookService> {
+
+}
+```
 
 ### Authentication and Authorization
 
