@@ -27,8 +27,8 @@ Experiments on a full stack, high level framework for lazy application hackers a
   - [Optimization](#optimization)
 - [Server Stack](#server-stack)
   - [Architecture](#architecture)
-  - [Service URLs](#service-urls)
   - [Model-Driven Tiers](#model-driven-tiers)
+    - [RESTful Service URLs](#restful-service-urls)
   - [Custom Tiers](#custom-tiers)
   - [Authentication and Authorization](#authentication-and-authorization)
   - [Persistence](#persistence)
@@ -436,7 +436,7 @@ The generated beans will follow REST conventions to expose SCRUD service endpoin
 
  Find the book having "id" as the id value and return it in the response. Throw an 404 HTTP error if no match is found.
 
-#### Search
+##### Search
 
  ```
  GET http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz
@@ -461,7 +461,7 @@ POST http://localhost:8080/calipso/books
 Create a new book using the request body and return it in the response.
 
 
-#### Update
+##### Update
 
 ```
 PUT http://localhost:8080/calipso/books/id
@@ -470,7 +470,7 @@ PUT http://localhost:8080/calipso/books/id
 Update the book matchign "id" using the request body and return the result in the response. Partial updates are easily supported, just mark your Java entity class using <code>implements PartiallyUpdateable</code> to support partial updates. No actual implementation is needed.
 
 
-#### Delete
+##### Delete
 
 ```
 DELETE http://localhost:8080/calipso/books/id
