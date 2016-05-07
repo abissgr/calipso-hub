@@ -110,13 +110,12 @@
 		<spring-data-elasticsearch-version>1.0.0.M1</spring-data-elasticsearch-version>
 
 		<!-- Spring Social -->
-		<spring-social.version>1.1.0.RELEASE</spring-social.version>
-		<spring-social-facebook-version>2.0.1.RELEASE</spring-social-facebook-version>
+		<spring-social.version>1.1.4.RELEASE</spring-social.version>
+		<spring-social-facebook-version>2.0.3.RELEASE</spring-social-facebook-version>
 		<spring-social-linkedin-version>1.0.0.RELEASE</spring-social-linkedin-version>
 		<spring-social-github-version>1.0.0.M4</spring-social-github-version>
 		<spring-social-twitter-version>1.1.0.RELEASE</spring-social-twitter-version>
 		<spring-social-google-version>1.0.0.RELEASE</spring-social-google-version>
-		<org.springframework.social.web-version>1.1.0.M4</org.springframework.social.web-version>
 
         <!-- springfox swagger -->
         <springfox.version>2.2.2</springfox.version>

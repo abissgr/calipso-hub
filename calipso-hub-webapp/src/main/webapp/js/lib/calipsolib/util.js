@@ -310,7 +310,7 @@ Calipso.cloneSpecificValue = function(val) {
 	 * @return {[type]}
 	 */
 	Calipso.socialLogin = function(e) {
-
+		console.log("Calipso.socialLogin");
 		Calipso.stopEvent(e);
 		var clicked = $(e.currentTarget);
 
@@ -1319,7 +1319,7 @@ Calipso.cloneSpecificValue = function(val) {
 			view : null,
 			viewOptions : {},
 			mergableOptions: ['key', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model',
-				'view', 'viewOptions',
+				'view', 'viewOptions',, 'childViewOptions',
 				'roleIncludes', 'roleExcludes',
 				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'overrides'],
 

@@ -38,13 +38,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(value = "/api/rest/roles", produces = { "application/json", "application/xml" })
 public class RoleController extends AbstractModelController<Role, String, RoleService> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
-
-	@Override
-	@Inject
-	@Qualifier("roleService") // somehow required for CDI to work on 64bit JDK?
-	public void setService(RoleService service) {
-		this.service = service;
-	}
     
 }

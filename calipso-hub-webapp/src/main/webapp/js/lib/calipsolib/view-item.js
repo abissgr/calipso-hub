@@ -329,8 +329,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		formTitle : "options.formTitle",
 		template : Calipso.getTemplate('md-form-view'),
 		events : {
-			"click a.btn-social-login" : "socialLogin",
-			"click a.open-modal-page" : "openModalPage",
+			"click .btn-social-login" : "socialLogin",
+			"click .open-modal-page" : "openModalPage",
 			"click button.submit" : "commit",
 			"submit form" : "commit",
 			"click button.cancel" : "cancel",
@@ -564,6 +564,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			return indexed_array;
 		},
 		socialLogin : function(e) {
+			console.log(this.getTypeName() + "#socialLogin");
 			Calipso.socialLogin(e);
 		},
 		getDraftKey : function() {

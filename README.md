@@ -553,8 +553,14 @@ Relational databases are supported by [JPA](https://en.wikipedia.org/wiki/Java_P
 [Couchbase](http://www.couchbase.com) and [Neo4j](http://neo4j.com/) are supported as well, while application instances also contain
 their own clusterable [ElasticSearch](https://www.elastic.co/) node by default.
 
+#### Database Migrations
+
+Relational database schema versioning and migration is supported using [Flyways](https://flywaydb.org/).
+
 ### Email
 
 Easy email services with i18n support and Thymeleaf templates. Build-in services include email verification, password reset etc.
 
 ### Internationalization
+
+Translations can be added in the [i18n folder](tree/master/calipso-hub-webapp/src/main/resources/i18n). File names use the [ISO_639-1 standard](https://en.wikipedia.org/wiki/ISO_639-1). To add Greek for example, copy and translate messages.properties to messages_el.properties.

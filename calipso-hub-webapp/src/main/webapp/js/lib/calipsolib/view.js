@@ -76,18 +76,30 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				$(window).scrollTop(0);
 			}
 			this.useCaseContext = options.useCaseContext;
-			this.childViewOptions = options.childViewOptions || {};
+			this.childViewOptions = _.extend(
+				this.useCaseContext.childViewOptions || {},
+				options.childViewOptions || {}
+			);
 		},
 		onShow : function() {
 			var _this = this;
 			//console.log(this.getTypeName() + ".onShow regionViewTypes: ");
 			//console.log(this.regionViewTypes);
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
-				//console.log(_this.getTypeName() + ".onShow showing region: " + regionName + ", view: " + ViewType.getTypeName());
-				_this.showChildView(regionName, new ViewType(_.extend({
-					model : _this.useCaseContext.model,
-					useCaseContext : _this.useCaseContext
-				}, _this.childViewOptions)));
+				console.log(_this.getTypeName() + ".onShow showing region: " + regionName + ", view: " + ViewType.getTypeName() + ", viewOptions");
+				console.log(_.extend(
+					{
+						model : _this.useCaseContext.model,
+						useCaseContext : _this.useCaseContext
+					},
+					_this.childViewOptions));
+				_this.showChildView(regionName, new ViewType(
+					_.extend(
+						{
+							model : _this.useCaseContext.model,
+							useCaseContext : _this.useCaseContext
+						},
+						_this.childViewOptions)));
 			});
 		},
 		getRegionManager : function() {

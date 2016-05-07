@@ -121,56 +121,57 @@ public class ProviderSignInController extends org.springframework.social.connect
 		return VIEW_NAME_REMEMBER_PAGE;
 	}
 
-	/**
-	* Renders the registration page.
-	*/
-	@RequestMapping(value = "/register", method = { RequestMethod.GET })
-	//@RequestMapping(value = "/popup/register", method = { RequestMethod.GET, RequestMethod.POST })
-	public String showRegistrationForm(WebRequest request, Model model) {
-		LOGGER.debug("showRegistrationForm, userAccountData: {}", model);
+	// SEE http://stackoverflow.com/questions/32461011/spring-social-providersigninutils-getconnection-is-returning-error-cannot-find
+//	/**
+//	* Renders the registration page.
+//	*/
+//	@RequestMapping(value = "/register", method = { RequestMethod.GET })
+//	//@RequestMapping(value = "/popup/register", method = { RequestMethod.GET, RequestMethod.POST })
+//	public String showRegistrationForm(WebRequest request, Model model) {
+//		LOGGER.debug("showRegistrationForm, userAccountData: {}", model);
+//
+//		Connection<?> connection = ProviderSignInUtils.getConnection(request);
+//
+//		RegistrationForm registration = createRegistrationDTO(connection);
+//		LOGGER.debug("Rendering registration form with information: {}", registration);
+//
+//		model.addAttribute(MODEL_NAME_REGISTRATION_DTO, registration);
+//
+//		return VIEW_NAME_REGISTRATION_PAGE;
+//	}
 
-		Connection<?> connection = ProviderSignInUtils.getConnection(request);
-
-		RegistrationForm registration = createRegistrationDTO(connection);
-		LOGGER.debug("Rendering registration form with information: {}", registration);
-
-		model.addAttribute(MODEL_NAME_REGISTRATION_DTO, registration);
-
-		return VIEW_NAME_REGISTRATION_PAGE;
-	}
-
-	/**
-	* Processes the form submissions of the registration form.
-	*/
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public String registerUserAccount(@Valid @ModelAttribute("user") RegistrationForm userAccountData, BindingResult result,
-			WebRequest request, HttpServletRequest nativeRquest, HttpServletResponse response) throws DuplicateEmailException {
-		LOGGER.debug("registerUserAccount with data: " + userAccountData);
-		if (result.hasErrors()) {
-			LOGGER.debug("Validation errors found. Rendering form view.");
-			return VIEW_NAME_REGISTRATION_PAGE;
-		}
-
-		LOGGER.debug("registerUserAccount, No validation errors found. Continuing registration process.");
-
-		ICalipsoUserDetails registered = createUserAccount(userAccountData, result);
-		LOGGER.debug("registerUserAccount, registered: " + registered);
-		
-		//If email address was already found from the database, render the form view.
-		if (registered == null) {
-			LOGGER.debug("An email address was found from the database. Rendering form view.");
-			return VIEW_NAME_REGISTRATION_PAGE;
-		}
-
-		//Logs the user in.
-		SecurityUtil.login(nativeRquest, response, registered, this.userDetailsConfig, this.userService);
-		//If the user is signing in by using a social provider, this method call stores
-		//the connection to the UserConnection table. Otherwise, this method does not
-		//do anything.
-		ProviderSignInUtils.handlePostSignUp(registered.getEmail(), request);
-
-		return "redirect:/client";
-	}
+//	/**
+//	* Processes the form submissions of the registration form.
+//	*/
+//	@RequestMapping(value = "/register", method = RequestMethod.POST)
+//	public String registerUserAccount(@Valid @ModelAttribute("user") RegistrationForm userAccountData, BindingResult result,
+//			WebRequest request, HttpServletRequest nativeRquest, HttpServletResponse response) throws DuplicateEmailException {
+//		LOGGER.debug("registerUserAccount with data: " + userAccountData);
+//		if (result.hasErrors()) {
+//			LOGGER.debug("Validation errors found. Rendering form view.");
+//			return VIEW_NAME_REGISTRATION_PAGE;
+//		}
+//
+//		LOGGER.debug("registerUserAccount, No validation errors found. Continuing registration process.");
+//
+//		ICalipsoUserDetails registered = createUserAccount(userAccountData, result);
+//		LOGGER.debug("registerUserAccount, registered: " + registered);
+//		
+//		//If email address was already found from the database, render the form view.
+//		if (registered == null) {
+//			LOGGER.debug("An email address was found from the database. Rendering form view.");
+//			return VIEW_NAME_REGISTRATION_PAGE;
+//		}
+//
+//		//Logs the user in.
+//		SecurityUtil.login(nativeRquest, response, registered, this.userDetailsConfig, this.userService);
+//		//If the user is signing in by using a social provider, this method call stores
+//		//the connection to the UserConnection table. Otherwise, this method does not
+//		//do anything.
+//		ProviderSignInUtils.handlePostSignUp(registered.getEmail(), request);
+//
+//		return "redirect:/client";
+//	}
 
 	/**
 	* Creates a new user account by calling the service method. If the email address is found

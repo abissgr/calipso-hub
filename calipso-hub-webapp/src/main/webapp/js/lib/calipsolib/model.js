@@ -496,6 +496,9 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 				description : "To login, please enter your credentials below.",
 				view : Calipso.view.UserDetailsLayout,
 				fieldIncludes : [ "email", "password" ],
+        childViewOptions : {
+          template : Calipso.getTemplate("login")
+        }
 			},
 			resetPassword : {
 				titleHtml : "<i class='fa fa-lock'></i> Reset password",
