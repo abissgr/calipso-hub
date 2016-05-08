@@ -355,12 +355,12 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			active : {
 				fieldType : "Boolean",
 			},
-			roles : {
+			/*roles : {
 				fieldType : "List",
 			//"form" : {
 			//	"listModel" : Calipso.model.RoleModel
 			//}
-			},
+      },*/
 			edit : {
 				fieldType : "Edit",
 			},

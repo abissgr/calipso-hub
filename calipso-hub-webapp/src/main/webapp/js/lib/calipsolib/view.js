@@ -71,6 +71,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		regionViewTypes : {},
 		viewEvents : {},
 		initialize : function(options) {
+			if(options && options.useCaseContext && options.useCaseContext.viewOptions){
+				var viewOptions = options.useCaseContext.viewOptions;
+				delete options.useCaseContext.viewOptions;
+				_.extend(options, viewOptions);
+			}
 			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
 			if (!this.skipSrollToTop) {
 				$(window).scrollTop(0);
@@ -86,13 +91,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			//console.log(this.getTypeName() + ".onShow regionViewTypes: ");
 			//console.log(this.regionViewTypes);
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
-				console.log(_this.getTypeName() + ".onShow showing region: " + regionName + ", view: " + ViewType.getTypeName() + ", viewOptions");
-				console.log(_.extend(
-					{
-						model : _this.useCaseContext.model,
-						useCaseContext : _this.useCaseContext
-					},
-					_this.childViewOptions));
+
 				_this.showChildView(regionName, new ViewType(
 					_.extend(
 						{

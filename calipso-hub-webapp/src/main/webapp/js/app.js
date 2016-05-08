@@ -55,7 +55,6 @@ function(
 					$a.closest(".dropdown").removeClass('open');
 				}
 			}
-
 			Backbone.history.navigate(href, true);
 		}
 	});
@@ -63,23 +62,21 @@ function(
 	//////////////////////////////////
 	// Bootstrap: enable tooltips
 	//////////////////////////////////
-	$(document).ready(function() {
+  $(document).ready(function() {
 		$(document.body).tooltip({
 			selector : "[data-toggle=tooltip]",
 			html : true
 		});
-
 	});
-    //////////////////////////////////
-    // Use POST instead of PUT/PATCH/DELETE
-    //////////////////////////////////
-    Backbone.emulateHTTP = true;
+
+  //////////////////////////////////
+  // Use POST instead of PUT/PATCH/DELETE
+  //////////////////////////////////
+  Backbone.emulateHTTP = true;
 
 	//////////////////////////////////
 	// Start the app
 	//////////////////////////////////
-
-
   var initOptions = {
     contextPath: "calipso/",
   };

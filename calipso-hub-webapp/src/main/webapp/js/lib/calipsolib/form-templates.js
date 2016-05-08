@@ -35,8 +35,8 @@ function(Calipso, BackboneFormsBootstrap) {
 	        <% if (titleHTML){ %><%= titleHTML %>\
 	        <% } else { %><%- title %><% } %>\
 	      </label>\
-	        <span class="col-xs-12  col-sm-12  col-md-9 col-lg-9" data-editor></span>\
-	        <p class="col-sm-12" class="help-block" data-error></p>\
+	      <div class="col-xs-12  col-sm-12  col-md-9 col-lg-9" data-editor></div>\
+	      <p class="col-sm-12" class="help-block" data-error></p>\
 	    </div>\
 	  '),
 		horizontal : _.template('\

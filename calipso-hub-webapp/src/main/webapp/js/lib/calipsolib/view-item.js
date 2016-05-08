@@ -99,6 +99,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			},
 		},
 		initialize : function(options) {
+			if(options && options.useCaseContext && options.useCaseContext.viewOptions){
+				var viewOptions = options.useCaseContext.viewOptions;
+				delete options.useCaseContext.viewOptions;
+				_.extend(options, viewOptions);
+			}
 			Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
 			var _this = this;
 			this.mergeOptions(options, this.mergableOptions);
@@ -318,9 +323,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		getFormTemplate : function(templateKey) {
 			return this.constructor.getFormTemplate(templateKey)
 		},
+		/*
 		getFieldTemplate : function(templateKey) {
 			return this.constructor.getFieldTemplate(templateKey)
 		},
+		*/
 		formTemplateKey : "horizontal",
 		modal : false,
 		hasDraft : false,
@@ -352,6 +359,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				this.searchResultsCollection = this.model.wrappedCollection;
 			}
 			//
+
 			if (!this.formTemplate) {
 				this.formTemplate = this.getFormTemplate(this.formTemplateKey ? this.formTemplateKey : this.model.getFormTemplateKey());
 			}
@@ -491,9 +499,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		renderForm : function(formSchema) {
 			var _self = this;
 
-			if (!formSchema) {
-				formSchema = _self.model.getFormSchema(_self.formSchemaKey);
-			}
 			var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
 			if (!formSubmitButton) {
 				if (_self.useCaseContext.key.indexOf("search") == 0) {
@@ -521,9 +526,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			var formOptions = {
 				model : _self.model,
 				schema : formSchema,
-				formSchemaKey : _self.formSchemaKey,
+				//formSchemaKey : _self.formSchemaKey,
 				template : _self.getFormTemplate(),
-				fieldTemplate : _self.getFieldTemplate(),
+				//fieldTemplate : _self.getFieldTemplate(),
 			};
 			// model driven submit button?
 			if (formSubmitButton) {
@@ -594,11 +599,13 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			//console.log("consstructor.getFormTemplate, templateKey: " + templateKey);
 			return Calipso.util.formTemplates[templateKey];
 		},
+		/*
 		getFieldTemplate : function(instance, templateKey) {
-			templateKey = /*templateKey ? templateKey :*/"horizontal";
+			templateKey = "horizontal";
 			//console.log("consstructor.getFieldTemplate, templateKey: " + templateKey);
 			return Calipso.util.formTemplates["field-" + templateKey];
 		},
+		*/
 	});
 
 	Calipso.view.GenericFormPanelView = Calipso.view.GenericFormView.extend({

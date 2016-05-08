@@ -310,7 +310,6 @@ Calipso.cloneSpecificValue = function(val) {
 	 * @return {[type]}
 	 */
 	Calipso.socialLogin = function(e) {
-		console.log("Calipso.socialLogin");
 		Calipso.stopEvent(e);
 		var clicked = $(e.currentTarget);
 
@@ -328,7 +327,8 @@ Calipso.cloneSpecificValue = function(val) {
 			throw "Clicked element does not match a social provider";
 		}
 		// target='SignIn'
-		var formHtml = "<form class='social-signin-form' action='" + Calipso.getBaseUrl() + "/signin/" + providerName + "' method='POST' role='form'>" +
+		var formHtml = "<form class='social-signin-form' action='" + Calipso.getBaseUrl() +
+			"/signin/" + providerName + "' method='POST' role='form'>" +
 		//"<input type='hidden' name='scope' value='email' />" +
 		//"<input type='hidden' name='scope' value='emailure' />" +
 		//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" +
@@ -342,10 +342,8 @@ Calipso.cloneSpecificValue = function(val) {
 	 * @param  {[String]} the desired locale
 	 */
 	Calipso.changeLocale = function(newLocale) {
-	//console.log("Calipso.changeLocale: " + newLocale);
 		if(newLocale){
 			var currentLocale = localStorage.getItem('locale');
-			//console.log("Calipso.changeLocale, currentLocale: " + currentLocale);
 			if(!currentLocale || currentLocale != newLocale){
 				var applyLocale = function(){
 					localStorage.setItem('locale', newLocale);
@@ -599,7 +597,7 @@ Calipso.cloneSpecificValue = function(val) {
 
 		Calipso.vent.on('modal:showUseCaseContext', function(options) {
 			var useCaseContext = options.useCaseContext ||
-				 Calipso.UseCaseContext.create({
+				 Calipso.UseCaseContext.createContext({
 					key : options.useCaseKey,
 					model : options.model || options.modelType.create()
 				});
@@ -1321,6 +1319,7 @@ Calipso.cloneSpecificValue = function(val) {
 			mergableOptions: ['key', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model',
 				'view', 'viewOptions',, 'childViewOptions',
 				'roleIncludes', 'roleExcludes',
+				"formTemplate", "formFieldTemplate",
 				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'overrides'],
 
 			initialize : function(options){

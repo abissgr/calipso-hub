@@ -144,7 +144,6 @@ define(
 			this.fieldTemplate = options.fieldTemplate || Calipso.util.formTemplates["field-horizontal"];
 			Backbone.Form.prototype.initialize.apply(this, arguments);
 		},
-
 		/**
 		 * Get all the field values as an object.
 		 * Use this method when passing data instead of objects.
@@ -168,9 +167,11 @@ define(
 			return values;
 		},
 		createField: function(key, schema) {
-	    if(!schema.template && this.fieldTemplate){
+
+			if(!schema.template && this.fieldTemplate){
 	   	 schema.template = this.fieldTemplate;
 	    }
+
 			return Backbone.Form.prototype.createField.apply(this, arguments);;
 		},
 		getDraft : function(){
@@ -279,7 +280,14 @@ define(
 
 		render : function() {
 			var schema = this.schema, editor = this.editor, $ = Backbone.$;
-
+			// pickup field template
+			console.log("Calipso.components.backboneform.Form.Field schema.template: " + schema.template);
+			console.log("Calipso.components.backboneform.Form.Field this.constructor.template: " + this.constructor.template);
+			/*
+			if(!schema.template && this.constructor.template){
+				this.schema.template = this.constructor.template;
+			}
+			*/
 			//Only render the editor if Hidden
 			if (schema.type.ownRender) {
 				return this.setElement(editor.render().el);
@@ -413,6 +421,27 @@ define(
 	Calipso.components.backboneform.Textarea = Calipso.components.backboneform.Text.extend({
 		tagName : "textarea"
 	});
+
+	Calipso.components.backboneform.Password = Calipso.components.backboneform.Text.extend({
+	},
+	// static members
+	{
+		template : _.template('\
+			<div class="form-js3">\
+				<label for="<%= editorId %>">\
+					<% if (titleHTML){ %><%= titleHTML %>\
+					<% } else { %><%- title %><% } %>\
+				</label>\
+				<div class="input-group" data-editor>\
+					<span class="input-group-btn">\
+						<button class="btn btn-default" type="button">show</button>\
+					</span>\
+					<div data-error></div>\
+					<div><%= help %></div>\
+				</div>\
+			</div>\
+		', null, Backbone.Form.templateSettings),
+	});
 	Calipso.components.backboneform.NonEmptyOrHidden = Calipso.components.backboneform.Text.extend({
 		render : function(){
 			console.log("RENDER value: " + this.getValue());
@@ -424,6 +453,7 @@ define(
 			}
 		}
 	});
+
 	Calipso.components.backboneform.NumberText = Calipso.components.backboneform.Text.extend({
 		getValue : function() {
 			var value = Backbone.Form.editors.Text.prototype.getValue.apply(this, arguments);

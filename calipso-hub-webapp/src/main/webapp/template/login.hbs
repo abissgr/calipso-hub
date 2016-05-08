@@ -1,73 +1,55 @@
 <div class="tmpl-hint">start login.hbs</div>
-<div class="container">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span class="glyphicon glyphicon-lock"></span> Login
-				</h3>
-			</div>
-			<div class="panel-body">
-				<form class="form-login form-horizontal" id="login">
-
-
-
-					<div class="alert alert-error" style="display: none">
-						<p>Incorrect login credentials.</p>
-					</div>
-					<p>
-						<label for="email" class="control-label">Username or email</label>
-
-						<input class="form-control input-email" required="required"
-							class="input-block-level input-email" name="email"
-							value="{{ email }}" autofocus="autofocus" />
-					</p>
-					<p>
-						<label for="password" class="control-label">Password</label> <input class="form-control input-password"
-							required="required" type="password"
-							class="input-block-level input-password" name="password"
-							value="{{ password }}" />
-					</p>
-
-					<!--
-           <p id="changePassToggle" style="font-weight: bold; cursor: pointer;">
-               <i class="ion-ios7-arrow-thin-right" style="width: 15px;"></i>
-               Change password
-           </p>
-
-           <div id="changePassSection" class="tmpl-hint">
-               <input required class="input-block-level new-password"
-                   placeholder="New password" name="newPassword" type="password"
-                   value=""> <input required
-                   class="input-block-level new-password-confirm"
-                   placeholder="Confirm new password" name="newPasswordConfirm"
-                   type="password" value="">
-
-           </div> -->
-
-                    <button class="btn btn-primary form-login-submit" type="submit">Login</button>
-                    <span class="pull-right">
-                       <small>Need an account?</small>
-                       <a href="/register" class="btn btn-success" class="register"
-                            title="Click to register">Register</a>
-                       <small>or sign-in with</small>
-                        <div class="btn-group" role="group">
-                            <a class="btn btn-default btn-social-login btn-social-login-facebook">
-                                <i class="fa fa-facebook-f"></i><!-- &#160;facebook -->
-                            </a>
-                            <a class="btn btn-default btn-social-login btn-social-login-linkedin">
-                                <i class="fa fa-linkedin"></i><!-- &#160;linkedin  -->
-                            </a>
-                            <!--a class="btn btn-default btn-social-login btn-social-login-twitter">
-                                <i class="fa fa-twitter"></i><!-- &#160;twitter -->
-                            </a-->
-                            <a class="btn btn-default btn-social-login btn-social-login-google">
-                                <i class="fa fa-google-plus"></i><!-- &#160;google+ -->
-                            </a>
-                        </div>
-                    </span>
-                    <br class="clearfix" />
-				</form>
-			</div>
-		</div>
+<div class="tmpl-hint">start md-formpanel-view</div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+      {{#if useCase.title}}
+        {{ useCase.title}}
+      {{else}}
+        {{{ useCase.titleHtml}}}
+      {{/if}}
+  </div>
+  <div class="panel-body">
+    {{#if useCase.description}}
+      <p>{{ useCase.description}}</p>
+    {{else}}
+      {{{ useCase.descriptionHtml}}}
+    {{/if}}
+    <div class="generic-form-view">
+    </div>
+<!-- 		<span class="pull-right"> -->
+<!-- 			<small>Need an account?</small> -->
+<!-- 			<a href="/register" class="btn btn-success" class="register" -->
+<!-- 						title="Click to register">Register</a> -->
+<!-- 			<small>or sign-in with</small> -->
+<!-- 				<div class="btn-group" role="group"> -->
+<!-- 						<a class="btn btn-default btn-social-login btn-social-login-facebook"> -->
+<!-- 								<i class="fa fa-facebook-f"></i>< -->
+<!-- 						</a> -->
+<!-- 						<a class="btn btn-default btn-social-login btn-social-login-linkedin"> -->
+<!-- 								<i class="fa fa-linkedin"></i> -->
+<!-- 						</a> -->
+<!-- 						<a class="btn btn-default btn-social-login btn-social-login-google"> -->
+<!-- 								<i class="fa fa-google-plus"></i>&#160;google+ -->
+<!-- 						</a> -->
+<!-- 				</div> -->
+<!-- 		</span> -->
+  </div>
+	<div class="list-group">
+	  <a href="#" class="list-group-item btn-social-login btn-social-login-facebook">
+	    <h4 class="list-group-item-heading">
+				<i class="fa fa-facebook-f"></i> Sign-in with <strong>Facebook</strong>
+			</h4>
+	  </a>
+	  <a href="#" class="list-group-item btn-social-login btn-social-login-linkedin">
+	    <h4 class="list-group-item-heading">
+				<i class="fa fa-linkedin"></i> Sign-in with <strong>Linkedin</strong>
+			</h4>
+	  </a>
+	  <a href="#" class="list-group-item btn-social-login btn-social-login-google">
+	    <h4 class="list-group-item-heading">
+				<i class="fa fa-google-plus"></i> Sign-in with <strong>Google+</strong>
+			</h4>
+	  </a>
+	</div>
 </div>
-<div class="tmpl-hint">end login.hbs</div>
+<div class="tmpl-hint">end login-view</div>

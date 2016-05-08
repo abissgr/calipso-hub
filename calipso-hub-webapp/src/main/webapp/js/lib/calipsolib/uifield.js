@@ -238,7 +238,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 
 	Calipso.fields.Password = Calipso.fields.password = Calipso.fields.pwd = Calipso.fields.Base.extend({}, {
 		"form" : {
-			type : "Password",
+			type : Calipso.components.backboneform.Password,
 			validators : [ 'required'],
 		}
 	});
@@ -271,10 +271,9 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 					type : 'password',
 					message : 'Incorrect current password'
 				};
-				//console.log("checkPassword: ");
-				//console.log(userDetails);
-				if (!userDetails.get("id"))
+				if (!userDetails.get("id")){
 					return err;
+				}
 			} ],//valida
 		}
 	});
