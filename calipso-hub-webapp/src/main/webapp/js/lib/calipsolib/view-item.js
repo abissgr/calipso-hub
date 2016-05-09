@@ -240,7 +240,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				emptyText : "No records found"
 			});
 
-			this.$('.backgrid-table-container').append(this.backgrid.render().$el);
+			var gridContainer = this.$el.find('.backgrid-table-container:first');
+			gridContainer.append(this.backgrid.render().$el);
 			// TODO: refresh stuff
 			_self.listenTo(_self.collection, "backgrid:refresh", function(){
 				var resultsInfo = _self.getResultsInfo();
@@ -264,8 +265,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				collection : _self.collection
 			});
-
-			this.$('.backgrid-table-container').append(paginator.render().el);
+			gridContainer.append('<div class="card-block backgrid-paginator-container"> </div>');
+			gridContainer.find('.backgrid-paginator-container:first').append(paginator.render().el);
 			//						//console.log("ModelDrivenCollectionGridView.onShow, collection url: "+);
 			this.onGridRendered();
 			if (this.callCollectionFetch) {

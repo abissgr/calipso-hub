@@ -2,15 +2,18 @@
 <p class="right">
 
 </p>
-<div class="panel panel-default backgrid-table-container">
+<div class="card panel-default backgrid-table-container">
   <!-- Default panel contents -->
   <div class="card-header">
     Panel heading
     <span class="badge resultsInfo">
       {{resultsInfo.pageStart}} - {{resultsInfo.pageEnd}} / {{resultsInfo.totalRecords}}
     </span>
+    <span>
+      <button class='btn btn-primary layout-showCreateFormModal'>
+        <i class="fa fa-plus-square" aria-hidden="true"></i>&nbsp;{{labels.calipso.words.new}}
+      </button>
+    </span>
   </div>
-  <div class="card-block">
-    <div class="backgrid-paginator-container"></div>
-  </div>
+</div>
 <div class="tmpl-hint">end generic-collection-grid-view.hbs</div>

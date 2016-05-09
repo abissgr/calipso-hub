@@ -70,6 +70,17 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		// regionName : viewType
 		regionViewTypes : {},
 		viewEvents : {},
+		events : {
+			"click  button.layout-showCreateFormModal" : "showCreateFormModal"
+		},
+
+		showCreateFormModal : function(e) {
+			console.log("CshowCreateFormModal: " + this.model.constructor.getTypeName());
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("layout:createModel", {
+				modelType : this.model.constructor
+			});
+		},
 		initialize : function(options) {
 			if(options && options.useCaseContext && options.useCaseContext.viewOptions){
 				var viewOptions = options.useCaseContext.viewOptions;

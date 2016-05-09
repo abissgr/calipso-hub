@@ -51,6 +51,7 @@ define({
 				"step" : "Step",
 				"yes" : "Yes",
 				"no" : "No",
+				"new" : "New",
 				"create" : "Create",
 				"update" : "Update",
 				"show" : "Show",

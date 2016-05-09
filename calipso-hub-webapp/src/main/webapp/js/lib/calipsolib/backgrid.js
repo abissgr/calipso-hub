@@ -144,7 +144,7 @@ define(
 					Calipso.vent.trigger("genericShowContent", rowModel);
 				},
 				render : function() {
-					this.$el.html("<button class='btn btn-xs btn-info' title='Edit entry'><i class='glyphicon glyphicon-edit'></i>&nbsp;Edit</button>");
+					this.$el.html("<button class='btn btn-xs btn-link' title='Edit entry'><i class='fa fa-pencil-square-o'></i></button>");
 					//this.delegateEvents();
 					return this;
 				}
