@@ -38,7 +38,7 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 
 		},
 		getRoles : function(){
-			return _.extend({}, this.userDetails.get("roles"));
+			return this.isAuthenticated() ? this.userDetails.get("roles") : [];
 		},
 		// Returns true if the user is authenticated.
 		isAuthenticated : function() {

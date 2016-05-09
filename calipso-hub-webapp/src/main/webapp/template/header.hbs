@@ -1,73 +1,63 @@
 
 <div class="container configurable-fluid">
-	<!-- Brand and toggle get grouped for better mobile display -->
-	<div class="navbar-header">
-		<button id="navbar-collapse-main-navbar-toggle" data-toggle="collapse"
-			data-target="#navbar-collapse-main" class="navbar-toggle collapsed"
-			type="button">
-			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
-			<span class="icon-bar"></span> <span class="icon-bar"></span>
-		</button>
-		<a href="/home" target="_self" class="navbar-brand">
-		  <!--img src="../img/logo{{getLocale}}.png" -->
-		  Calipso
+	<nav class="navbar navbar-light bg-faded">
+  <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#exCollapsingNavbar2">
+    &#9776;
+  </button>
+  <div class="collapse navbar-toggleable-xs" id="exCollapsingNavbar2">
+    <a class="navbar-brand" href="/home">
+			<!--img src="../img/logo{{getLocale}}.png" -->
+			Calipso
 		</a>
-	</div>
-	<!-- Collect the nav links, forms, and other content for toggling -->
-	<div id="navbar-collapse-main" class="navbar-collapse collapse">
-
-		<ul class="nav navbar-nav navbar-right">
-
-			<!-- site settings menu -->
+    <ul class="nav navbar-nav">
 			{{#ifUserInRole "ROLE_ADMIN"}}
-			<li class="dropdown"><a aria-expanded="false" role="button"
-				data-toggle="dropdown" class="dropdown-toggle triggerCollapseMenu"
-				href="#"> Site Settings <span class="caret"></span>
+			<li class="nav-item  btn-group">
+			<a class="dropdown-toggle nav-link triggerCollapseMenu" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+				Site Settings <span class="caret"></span>
 			</a>
-				<ul role="menu" class="dropdown-menu">
-					<li><a class="triggerCollapseMenu" href="/users"><i
+				<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+					<li class="dropdown-item"><a class="triggerCollapseMenu" href="/useCases/users"><i
 							class="fa fa-users fa-fw"></i>&#160;Users</a></li>
-					<li><a class="triggerCollapseMenu" href="/roles"><i
+					<li class="dropdown-item"><a class="triggerCollapseMenu" href="/useCases/roles"><i
 							class="fa fa-unlock-alt fa-fw"></i>&#160;Roles</a></li>
-					<li><a class="triggerCollapseMenu" href="/hosts"><i
+					<li class="dropdown-item"><a class="triggerCollapseMenu" href="/useCases/hosts"><i
 							class="fa fa-shopping-cart fa-fw"></i>&#160;Hosts</a></li>
-				</ul></li> {{/ifUserInRole}}
+				</ul></li>
+				{{/ifUserInRole}}
 			<!-- /site settings menu -->
-			<li class="divider"></li>
 			<!-- notifications menu -->
 			{{#ifLoggedIn}}
-			<li class="dropdown triggerCollapseMenu"
+			<li class="nav-item triggerCollapseMenu"
 				id="calipsoHeaderView-notificationsRegion"></li> {{/ifLoggedIn}}
 			<!-- /notifications menu -->
 			<!-- auth menu -->
 			{{#ifLoggedIn}}
-			<li class="dropdown"><a aria-expanded="false" role="button"
-				data-toggle="dropdown" class="dropdown-toggle triggerCollapseMenu"
-				href="#"> <i class="fa fa-user fa-fw"></i> {{firstName}}
+			<li class="nav-item  btn-group">
+			<a class="dropdown-toggle nav-link triggerCollapseMenu" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+				<i class="fa fa-user fa-fw"></i> {{firstName}}
 					{{lastName}} <span class="caret"></span>
 			</a>
-				<ul role="menu" class="dropdown-menu">
-					<li><a class="triggerCollapseMenu" href="/myProfile"><i
+				<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+					<li class="dropdown-item"><a class="triggerCollapseMenu" href="/myProfile"><i
 							class="fa fa-user fa-fw"></i> Profile</a></li>
 
-					<li><a class="triggerCollapseMenu" href="/changePassword"><i
+					<li class="dropdown-item"><a class="triggerCollapseMenu" href="/changePassword"><i
 							class="fa fa-gear fa-fw"></i> Password</a></li>
-					<li class="divider"></li>
-					<li><a class="triggerCollapseMenu" class="logout"
+					<li class="dropdown-item"><a class="triggerCollapseMenu" class="logout"
 						href="/logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
 					{{/ifLoggedIn}} {{#ifLoggedOut}}
-					<li><a class="login triggerCollapseMenu" href="/userDetails/login"> <i
+					<li class="dropdown-item"><a class="login triggerCollapseMenu" href="/useCases/userDetails/login"> <i
 							class="fa fa-sign-in fa-fw"></i> Login
 					</a></li>
 					<!--li><a class="" href="/accountApplications/new"> <i
 					class="fa fa-user-plus fa-fw"></i> Open Account
 			</a></li-->
-					<li><a class="register triggerCollapseMenu" href="/register">
+					<li class="dropdown-item"><a class="register triggerCollapseMenu" href="/register">
 							<i class="fa fa-user-plus fa-fw"></i> Open Account
 					</a></li>{{/ifLoggedOut}}
 					<!-- /auth menu -->
-				</ul>
-	</div>
-	<!-- /.navbar-collapse -->
-</div>
-<!-- /.container-fluid -->
+    </ul>
+  </div>
+</nav>

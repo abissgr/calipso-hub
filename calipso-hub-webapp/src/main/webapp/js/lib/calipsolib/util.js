@@ -50,6 +50,9 @@ define(
 		labels : labels,
 	};
 
+	// baseComponents pretty much says how we want types to be exteneded, or rather,
+	// how we want member hashes of super and subtypes to be merged instead of
+	// replaced or explicitly repeated
 	var baseComponents = {
 		view : {
 			"Layout" : Backbone.Marionette.LayoutView,
@@ -59,6 +62,9 @@ define(
 		},
 		model : {
 			"Model" : Backbone.Model
+		},
+		backboneform : {
+			"Text" : Backbone.Form.editors.Text
 		}
 	}
 	_.each(baseComponents, function(packageComponents, packageName, list){
@@ -78,11 +84,19 @@ define(
 				}
 			});
 			/**
-			* Encance the extend function to a reference to super
+			* Encance the extend function to add a reference to super and properly extend events
 			*/
 			Calipso[packageName][newClassName].extend = function(protoProps, staticProps) {
-				staticProps.superClass = this;
-				return BaseType.extend.apply(this, arguments);
+				var _this = staticProps.superClass = this;
+				var NewClass = BaseType.extend.apply(this, arguments);
+				// properly extend prototype hashes like events
+				_.each(["events", "triggers"], function(mergableProp){
+					if(_this.prototype[mergableProp]){
+						NewClass.prototype[mergableProp] = _.extend({}, _this.prototype[mergableProp], protoProps[mergableProp]);
+					}
+				});
+				// let the conditioned kiddo through
+				return NewClass;
 			};
 		});
 	});
@@ -466,28 +480,6 @@ Calipso.cloneSpecificValue = function(val) {
 	}
 
 
-
-	Calipso.isUserInAnyRole = function(inputRoles) {
-		var hasRole = false;
-		if(!_.isArray(inputRoles)){
-			inputRoles = [inputRoles];
-		}
-		// only process if the user is authenticated
-		if (Calipso.session.userDetails) {
-			var ownedRoles = Calipso.session.getRoles();
-			var inputRole;
-			for (var j = 0; j < inputRoles.length && hasRole == false; j++) {
-				inputRole = inputRoles[j];
-				for (var k = 0; k < ownedRoles.length && hasRole == false; k++) {
-					var ownedRole = ownedRoles[k];
-					if (inputRole == ownedRole.name) {
-						hasRole = true;
-					}
-				}
-			}
-		}
-		return hasRole;
-	}
 
 
 

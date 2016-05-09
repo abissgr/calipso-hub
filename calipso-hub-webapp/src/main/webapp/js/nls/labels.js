@@ -53,6 +53,8 @@ define({
 				"no" : "No",
 				"create" : "Create",
 				"update" : "Update",
+				"show" : "Show",
+				"hide" : "Hide",
 			},
 			"select2" : {
 				"placeholder" : "Type to select",

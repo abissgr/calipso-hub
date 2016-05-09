@@ -9,3 +9,14 @@
 @import url("intlTelInput.css");
 @import url("calipso.css");
 @import url("style.css");
+@media (max-width: 544px) {
+  .navbar-brand {
+    display:none;
+  }
+  .navbar-nav .nav-item {
+    float:none;
+  }
+  .navbar-nav .nav-item + .nav-item{
+    margin-left:0;
+  }
+}

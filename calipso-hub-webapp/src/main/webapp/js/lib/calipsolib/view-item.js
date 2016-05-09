@@ -366,6 +366,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 		},
 		openModalPage : function(e) {
+			console.log("openModalPage");
 			Calipso.stopEvent(e);
 			var $a = $(e.currentTarget);
 			var pageView = new Calipso.view.TemplateBasedItemView({
@@ -378,6 +379,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			});
 		},
 		commitOnEnter : function(e) {
+			console.log("commitOnEnter");
 			if (e.keyCode != 13) {
 				return;
 			} else {
@@ -407,6 +409,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			return isValid;
 		},
 		commit : function(e) {
+			console.log("commit");
 			var _this = this;
 			Calipso.stopEvent(e);
 			if (!this.isFormValid()) {
@@ -469,6 +472,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			// search entities?
 		},
 		cancel : function() {
+			console.log("cancel");
 			window.history.back();
 		},
 		onShow : function() {
@@ -534,7 +538,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			if (formSubmitButton) {
 				formOptions.submitButton = formSubmitButton;
 			}
-			this.form = new Calipso.components.backboneform.Form(formOptions);
+			this.form = new Calipso.backboneform.Form(formOptions);
 			//this.$el.append(this.form.el);
 			this.form.setElement(this.$el.find(".generic-form-view").first()).render();
 			this.$el.find('input, select').filter(':visible:enabled:first').focus();

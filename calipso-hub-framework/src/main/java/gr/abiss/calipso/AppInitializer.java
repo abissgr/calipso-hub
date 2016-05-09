@@ -105,8 +105,8 @@ public class AppInitializer {
 //			h2 = hostService.create(h2);
 //			Host h3 = new Host("calipso.abiss.gr");
 //			h3 = hostService.create(h3);
-
 //			Text t1 = new Text("test2");
+			
 //			t1.setHost(h2);
 //			t1.setSource("test2");
 //			t1.setSourceContentType(Text.MIME_MARKDOWN);

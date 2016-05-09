@@ -1,14 +1,14 @@
 <div class="tmpl-hint">start login.hbs</div>
 <div class="tmpl-hint">start md-formpanel-view</div>
 <div class="panel panel-default">
-  <div class="panel-heading">
+  <div class="card-header">
       {{#if useCase.title}}
         {{ useCase.title}}
       {{else}}
         {{{ useCase.titleHtml}}}
       {{/if}}
   </div>
-  <div class="panel-body">
+  <div class="card-block">
     {{#if useCase.description}}
       <p>{{ useCase.description}}</p>
     {{else}}
@@ -35,12 +35,12 @@
 <!-- 		</span> -->
   </div>
 	<div class="list-group">
-	  <a href="#" class="list-group-item btn-social-login btn-social-login-facebook">
+	  <a href="#" class="list-group-item list-group-item-info btn-social-login btn-social-login-facebook">
 	    <h4 class="list-group-item-heading">
 				<i class="fa fa-facebook-f"></i> Sign-in with <strong>Facebook</strong>
 			</h4>
 	  </a>
-	  <a href="#" class="list-group-item btn-social-login btn-social-login-linkedin">
+	  <a href="#" class="list-group-item list-group-item-danger btn-social-login btn-social-login-linkedin">
 	    <h4 class="list-group-item-heading">
 				<i class="fa fa-linkedin"></i> Sign-in with <strong>Linkedin</strong>
 			</h4>

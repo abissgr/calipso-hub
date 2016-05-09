@@ -29,8 +29,8 @@ define(
 
 	// inline rendering for checkbox
 	Backbone.Form.editors.Checkbox.prototype.className = '';
-	Calipso.components.backboneform = {};
-	Calipso.components.backboneform.validators = {
+	Calipso.backboneform = {};
+	Calipso.backboneform.validators = {
 		digitsOnly : function(value, formValues) {
 			if (value) {
 				var reg = /^\d+$/;
@@ -73,7 +73,7 @@ define(
 		}
 	}
 	/*
-	Calipso.components.backboneformTemplates = {
+	Calipso.backboneformTemplates = {
 			horizontal : _.template('\
 				<div class="form-group field-<%= key %>">\
 				<label class="col-sm-2 control-label" for="<%= editorId %>">\
@@ -116,7 +116,7 @@ define(
 	};
 	*/
 
-	Calipso.components.backboneform.Form = Backbone.Form.extend({
+	Calipso.backboneform.Form = Backbone.Form.extend({
 		hintRequiredFields : true,
 		capitalizeKeys : true,
 
@@ -276,13 +276,11 @@ define(
 			}, {});
 		},
 	});
-	Calipso.components.backboneform.Form.Field = Backbone.Form.Field.extend({
+	Calipso.backboneform.Form.Field = Backbone.Form.Field.extend({
 
 		render : function() {
 			var schema = this.schema, editor = this.editor, $ = Backbone.$;
 			// pickup field template
-			console.log("Calipso.components.backboneform.Form.Field schema.template: " + schema.template);
-			console.log("Calipso.components.backboneform.Form.Field this.constructor.template: " + this.constructor.template);
 			/*
 			if(!schema.template && this.constructor.template){
 				this.schema.template = this.constructor.template;
@@ -299,7 +297,7 @@ define(
 
 	});
 
-	Calipso.components.backboneform.Markup = Backbone.Form.editors.Hidden.extend({
+	Calipso.backboneform.Markup = Backbone.Form.editors.Hidden.extend({
 		tagName : "div",
 		excludeFromCommit : true,
 		events : {},
@@ -328,30 +326,30 @@ define(
 		ownRender : true
 	});
 
-	Calipso.components.backboneform.Hr = Calipso.components.backboneform.Markup.extend({
+	Calipso.backboneform.Hr = Calipso.backboneform.Markup.extend({
 		tagName : "hr",
 	});
 
-	Calipso.components.backboneform.P = Calipso.components.backboneform.Markup.extend({
+	Calipso.backboneform.P = Calipso.backboneform.Markup.extend({
 		tagName : "p",
 	}, {
 		// static
 		title : "No html or template was provided in schema"
 	});
 
-	Calipso.components.backboneform.PDanger = Calipso.components.backboneform.P.extend({
+	Calipso.backboneform.PDanger = Calipso.backboneform.P.extend({
 		className : "text-danger",
 	});
-	Calipso.components.backboneform.H3 = Calipso.components.backboneform.P.extend({
+	Calipso.backboneform.H3 = Calipso.backboneform.P.extend({
 		tagName : "h3",
 	});
-	Calipso.components.backboneform.H4 = Calipso.components.backboneform.P.extend({
+	Calipso.backboneform.H4 = Calipso.backboneform.P.extend({
 		tagName : "h4",
 	});
-	Calipso.components.backboneform.H5 = Calipso.components.backboneform.P.extend({
+	Calipso.backboneform.H5 = Calipso.backboneform.P.extend({
 		tagName : "h5",
 	});
-	Calipso.components.backboneform.ListGroup = Calipso.components.backboneform.Markup.extend({
+	Calipso.backboneform.ListGroup = Calipso.backboneform.Markup.extend({
 		tagName : "div",
 		className : "list-group",
 		initialize : function(options) {
@@ -370,7 +368,7 @@ define(
 		},
 	});
 
-	Calipso.components.backboneform.Text = Backbone.Form.editors.Text.extend({
+	Calipso.backboneform.Text = Backbone.Form.editors.Text.extend({
 		config : {},
 		initialize : function(options) {
 			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
@@ -418,14 +416,46 @@ define(
 			this.unbind();
 		},
 	});
-	Calipso.components.backboneform.Textarea = Calipso.components.backboneform.Text.extend({
+	Calipso.backboneform.Textarea = Calipso.backboneform.Text.extend({
 		tagName : "textarea"
 	});
 
-	Calipso.components.backboneform.Password = Calipso.components.backboneform.Text.extend({
+	Calipso.backboneform.Password = Calipso.backboneform.Text.extend({
+		/*
+		events : {
+			"click" : function(e){
+
+					console.log("click button");
+			}
+		},
+		*/
+		onFormAttach : function() {
+			Calipso.backboneform.Text.prototype.onFormAttach.call(this, arguments);
+			var _this = this;
+			// set the options source
+			this.$el.addClass("form-control").attr("type", "password");
+			this.$el.parent().addClass("input-group").append('\
+				<span class="input-group-btn">\
+	        <button class="btn btn-secondary pass-toggle" type="button" title="' + Calipso.util.getLabels("calipso.words.show") + '"><i class="fa fa-eye"> </i></button>\
+	      </span>');
+			this.$el.parent().find('button.pass-toggle:first').on('click', function (e) {
+				_this.passToggle(e);
+		  })
+		},
+		passToggle : function(e) {
+			if(this.$el.attr("type").toLowerCase() == "password"){
+				this.$el.attr("type", "text");
+				$(e.currentTarget).attr("title", Calipso.util.getLabels("calipso.words.hide")).html('<i class="fa fa-eye-slash"> </i>');
+			}
+			else{
+				this.$el.attr("type", "password");
+				$(e.currentTarget).attr("title", Calipso.util.getLabels("calipso.words.show")).html('<i class="fa fa-eye"> </i>');
+			}
+		},
 	},
 	// static members
 	{
+		/*
 		template : _.template('\
 			<div class="form-js3">\
 				<label for="<%= editorId %>">\
@@ -441,20 +471,21 @@ define(
 				</div>\
 			</div>\
 		', null, Backbone.Form.templateSettings),
+		*/
 	});
-	Calipso.components.backboneform.NonEmptyOrHidden = Calipso.components.backboneform.Text.extend({
+	Calipso.backboneform.NonEmptyOrHidden = Calipso.backboneform.Text.extend({
 		render : function(){
 			console.log("RENDER value: " + this.getValue());
 			if (this.getValue()) {
 				return this.setElement(editor.render().el.attr("type", "hidden"));
     	}
 			else{
-				return Calipso.components.backboneform.Text.render.apply(this, arguments);
+				return Calipso.backboneform.Text.render.apply(this, arguments);
 			}
 		}
 	});
 
-	Calipso.components.backboneform.NumberText = Calipso.components.backboneform.Text.extend({
+	Calipso.backboneform.NumberText = Calipso.backboneform.Text.extend({
 		getValue : function() {
 			var value = Backbone.Form.editors.Text.prototype.getValue.apply(this, arguments);
 			if (!(_.isUndefined(value) || _.isNull(value) || value == "")) {
@@ -465,7 +496,7 @@ define(
 		},
 	});
 
-	Calipso.components.backboneform.Radio = Backbone.Form.editors.Radio.extend({
+	Calipso.backboneform.Radio = Backbone.Form.editors.Radio.extend({
 		tagName : 'div',
 		className : "list-group",
 	}, {
@@ -481,11 +512,11 @@ define(
   ', null, Backbone.Form.templateSettings),
 	});
 
-	Calipso.components.backboneform.RadioInline = Calipso.components.backboneform.Radio.extend({
+	Calipso.backboneform.RadioInline = Calipso.backboneform.Radio.extend({
 		className : "list-group list-group-horizontal",
 	});
 
-	Calipso.components.backboneform.Checkboxes = Backbone.Form.editors.Checkboxes.extend({
+	Calipso.backboneform.Checkboxes = Backbone.Form.editors.Checkboxes.extend({
 		tagName : 'div',
 		className : "list-group",
 		/**
@@ -528,11 +559,11 @@ define(
 	//STATICS
 	});
 
-	Calipso.components.backboneform.CheckboxesInline = Calipso.components.backboneform.Checkboxes.extend({
+	Calipso.backboneform.CheckboxesInline = Calipso.backboneform.Checkboxes.extend({
 		className : "list-group list-group-horizontal",
 	});
 
-	Calipso.components.backboneform.Tel = Calipso.components.backboneform.Text.extend({
+	Calipso.backboneform.Tel = Calipso.backboneform.Text.extend({
 		errorCodes : {
 			"-99" : "DEFAULT",
 			"1" : "INVALID_COUNTRY_CODE",
@@ -565,7 +596,7 @@ define(
 					return err;
 				}
 			});
-			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
+			Calipso.backboneform.Text.prototype.initialize.call(this, options);
 
 			this.config.customPlaceholder = function(selectedCountryPlaceholder, selectedCountryData) {
 				return _this.labels.intlTelInput.eg + ' ' + selectedCountryPlaceholder;
@@ -601,14 +632,14 @@ define(
 	 *  based on typeahead/bloodhound 0.11.1, see
 	 * https://github.com/twitter/typeahead.js
 	 */
-	Calipso.components.backboneform.Typeahead = Calipso.components.backboneform.Text.extend({
+	Calipso.backboneform.Typeahead = Calipso.backboneform.Text.extend({
 		tagName : 'div',
 		//className: "form-control",
 		typeaheadSource : null,
 		minLength : 2,
 		placeholder : "",
 		initialize : function(options) {
-			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
+			Calipso.backboneform.Text.prototype.initialize.call(this, options);
 			// set the options source
 			if (this.schema && this.schema.typeaheadSource) {
 				this.typeaheadSource = this.schema.typeaheadSource;
@@ -649,9 +680,9 @@ define(
 			this.$el.typeahead("destroy");
 		},
 	});
-	Calipso.components.backboneform.TypeaheadObject = Calipso.components.backboneform.Typeahead.extend({
+	Calipso.backboneform.TypeaheadObject = Calipso.backboneform.Typeahead.extend({
 		initialize : function(options) {
-			Calipso.components.backboneform.Typeahead.prototype.initialize.call(this, options);
+			Calipso.backboneform.Typeahead.prototype.initialize.call(this, options);
 			this.$el.removeAttr("id class name type autocomplete");
 			this.$el.html('<input type="hidden" id="' + this.id + '" name="' + this.getName() + '" />' + '<input type="text" class="form-control" id="' + this.id + 'Typeahead" name="' + this.getName() + 'Typeahead" autocomplete="off" ' + this.placeholder + '/>');
 		},
@@ -687,7 +718,7 @@ define(
 			$el.typeahead("destroy");
 		},
 		setValue : function(value, name) {
-			//console.log("Calipso.components.backboneform.TypeaheadObject#setValue, value: '" + value + "', name: " + name);
+			//console.log("Calipso.backboneform.TypeaheadObject#setValue, value: '" + value + "', name: " + name);
 			var _this = this;
 			if (!value) {
 				value = null;
@@ -699,7 +730,7 @@ define(
 			}
 		},
 		getValue : function() {
-			//console.log("Calipso.components.backboneform.TypeaheadObject#getValue, value: '" + this.value + "'");
+			//console.log("Calipso.backboneform.TypeaheadObject#getValue, value: '" + this.value + "'");
 			var value = this.value;
 			var query = this.$el.find("#" + this.id + "Typeahead").typeahead('val');
 			// if empty value or input, return plain
@@ -708,7 +739,7 @@ define(
 	});
 
 	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
-	Calipso.components.backboneform.Datetimepicker = Calipso.components.backboneform.Text.extend({
+	Calipso.backboneform.Datetimepicker = Calipso.backboneform.Text.extend({
 		getConfig : function(){
 			return {
 				locale : Calipso.util.getLocale(),
@@ -716,7 +747,7 @@ define(
 			};
 		},
 		initialize : function(options) {
-			Calipso.components.backboneform.Text.prototype.initialize.call(this, options);
+			Calipso.backboneform.Text.prototype.initialize.call(this, options);
 			this.schema.config = _.defaults({}, this.schema.config, this.getConfig());
 			// set position if empty
 			if (!this.schema.config.widgetPositioning) {
@@ -740,7 +771,7 @@ define(
 			_this.$el.parent().addClass("input-group");
 			_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
 			_this.$el.parent().datetimepicker(this.schema.config);
-			//console.log("Calipso.components.backboneform.Datetimepicker#render, _this.value: " + _this.value);
+			//console.log("Calipso.backboneform.Datetimepicker#render, _this.value: " + _this.value);
 			var value = _this.schema.fromProperty ? _this.model.get(_this.schema.fromProperty) : _this.value;
 			if (value) {
 				var initValue = new Date(value);

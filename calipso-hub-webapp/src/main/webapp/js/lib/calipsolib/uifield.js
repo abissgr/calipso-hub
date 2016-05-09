@@ -120,7 +120,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 			cell : "Datetime",
 		},
 		"form" : {
-			type : Calipso.components.backboneform.Datetimepicker,
+			type : Calipso.backboneform.Datetimepicker,
 			validators : [ /*'required'*/],
 			config : {
 				locale : Calipso.util.getLocale(),
@@ -139,7 +139,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 			cell : "Date",
 		},
 		"form" : {
-			type : Calipso.components.backboneform.Datetimepicker,
+			type : Calipso.backboneform.Datetimepicker,
 			validators : [ /*'required'*/],
 			config : {
 				locale : Calipso.util.getLocale(),
@@ -158,7 +158,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 			cell : "Time",
 		},
 		"form" : {
-			type : Calipso.components.backboneform.Datetimepicker,
+			type : Calipso.backboneform.Datetimepicker,
 			validators : [ /*'required'*/],
 			config : {
 				locale : Calipso.util.getLocale(),
@@ -199,8 +199,8 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 			cell : "Text"
 		},
 		"form" : {
-			type : Calipso.components.backboneform.Tel,
-			validators : [ Calipso.components.backboneform.validators.digitsOnly ]
+			type : Calipso.backboneform.Tel,
+			validators : [ Calipso.backboneform.validators.digitsOnly ]
 		}
 	});
 
@@ -238,7 +238,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 
 	Calipso.fields.Password = Calipso.fields.password = Calipso.fields.pwd = Calipso.fields.Base.extend({}, {
 		"form" : {
-			type : Calipso.components.backboneform.Password,
+			type : Calipso.backboneform.Password,
 			validators : [ 'required'],
 		}
 	});

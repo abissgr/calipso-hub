@@ -179,9 +179,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			if (this.useCases[key] || (this.superClass && this.superClass.hasUseCase && this.superClass.hasUseCase(key))) {
 				has = true;
 			}
-
-			console.log(this.getTypeName() + "#hasUseCase key: " + key + ", has: " + has + ", useCases: ");
-			console.log(this.useCases);
 			return has;
 		},
 		getFields : function() {
