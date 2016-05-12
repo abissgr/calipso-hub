@@ -5,8 +5,11 @@
 <%@ include file="../includes/head.jsp" %>
 </head>
 <body class="full-height-column">
-    <nav id="calipsoHeaderRegion" role="navigation" class="navbar navbar-inverse navbar-fixed-top">
-        <!-- -->
+
+    <nav class="navbar navbar-dark bg-inverse full-height-row">
+        <div class="container configurable-fluid">
+            <div class="row" id="calipsoHeaderRegion"></div>
+        </div>
     </nav>
 
     <main class="full-height-row-expanded">

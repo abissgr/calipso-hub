@@ -19,10 +19,10 @@
 
 define(
 		[ "i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms',
-		'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
+		'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator',
 		/*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
 		function(labels, _, Handlebars, calipsoTemplates, moment, Backbone, PageableCollection, BackboneForms,
-			BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
+			BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridPaginator,
 /*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, jqueryColor, intlTelInput, q, chartjs) {
 
 
@@ -1353,34 +1353,32 @@ Calipso.cloneSpecificValue = function(val) {
 				});
 				return caseFields;
 			},
-			getChild : function(regionName, viewName){
+			getChild : function(regionName, ViewType){
 				var _this = this;
+				var schemaTypeOverrideKey;
 				var useCaseOptions = {};
-
-					//console.log("UseCaseContext#getChild regionName: " + regionName + ", viewName: " + viewName);
-				// base config
+				// self as base config
 				_.each(this.mergableOptions, function(mergableProp){
 					useCaseOptions[mergableProp] = _.clone(_this[mergableProp]);
 				});
+				// apply layout's default region view type
+				useCaseOptions.view = ViewType;
+				// apply ovverrides?
 				if(_this.overrides){
 					delete useCaseOptions.overrides;
-					// override keys: regionName, viewName, regionName-ViewName
-					_.each([regionName, viewName, regionName + '-' + viewName], function(overrideKey){
-						if(_this.overrides[overrideKey]){
-							//console.log("UseCaseContext#getChild overrideKey: " + overrideKey);
-							//console.log(_this.overrides[overrideKey]);
-							Calipso.deepExtend(useCaseOptions, _this.overrides[overrideKey]);
-						}
-					});
+					// apply child usecase overrides based on region name
+					Calipso.deepExtend(useCaseOptions, _this.overrides[regionName]);
+					// apply child usecase overrides based on scehame type
+					schemaTypeOverrideKey = useCaseOptions.view.getSchemaType();
+					Calipso.deepExtend(useCaseOptions, _this.overrides[schemaTypeOverrideKey]);
+					Calipso.deepExtend(useCaseOptions, _this.overrides[regionName + '-' + schemaTypeOverrideKey]);
 				}
-
-					//console.log("UseCaseContext#getChild result: " );
-					//console.log(useCaseOptions);
 				return new Calipso.UseCaseContext(useCaseOptions);
 			}
 
 		},
 		{
+			// TODO: remove and refactor to usecase resolver interface
 			createContext : function(options){
 				//console.log("UseCaseContext#create options: ");
 				//console.log(options);

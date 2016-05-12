@@ -161,7 +161,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 				}
 			},
 			search : {
-				view : Calipso.view.SearchLayout,
+				view : Calipso.view.UseCaseSearchLayout,
 			},
 
 		},
@@ -289,12 +289,12 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 				fieldIncludes : [ "firstName", "lastName", "email" ]
 			},
 			search : {
-				view : Calipso.view.SearchLayout,
+				view : Calipso.view.UseCaseSearchLayout,
 				overrides : {
-					backgridView : {
+					backgrid : {
 						fieldIncludes : [ "username", "firstName", "lastName", "edit" ]
 					},
-					formView : {
+					form : {
 						fieldIncludes : [ "username", "firstName", "lastName", "email" ],
 						fields : {
 							username : {

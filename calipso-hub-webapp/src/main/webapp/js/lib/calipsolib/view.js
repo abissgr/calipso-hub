@@ -82,47 +82,21 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			});
 		},
 		initialize : function(options) {
-			if(options && options.useCaseContext && options.useCaseContext.viewOptions){
-				var viewOptions = options.useCaseContext.viewOptions;
-				delete options.useCaseContext.viewOptions;
-				_.extend(options, viewOptions);
-			}
 			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
+			this.useCaseContext = options.useCaseContext;
 			if (!this.skipSrollToTop) {
 				$(window).scrollTop(0);
 			}
-			this.useCaseContext = options.useCaseContext;
-			this.childViewOptions = _.extend(
-				this.useCaseContext.childViewOptions || {},
-				options.childViewOptions || {}
-			);
 		},
 		onShow : function() {
 			var _this = this;
-			//console.log(this.getTypeName() + ".onShow regionViewTypes: ");
-			//console.log(this.regionViewTypes);
+			var childUseCase;
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
-
-				_this.showChildView(regionName, new ViewType(
-					_.extend(
-						{
-							model : _this.useCaseContext.model,
-							useCaseContext : _this.useCaseContext
-						},
-						_this.childViewOptions)));
+				// spawn child usecase
+				childUseCase = _this.useCaseContext.getChild(regionName, ViewType);
+				// display a preconfigured view that matches the region and usecase config
+				_this.showChildView(regionName, childUseCase.createView());
 			});
-		},
-		getRegionManager : function() {
-			var _layout = this;
-			// custom logic
-			var RegionManager = Calipso.util.RegionManager.extend({
-				getRegionPath : function() {
-					return _layout.regionPath;
-				}
-			}, {
-
-			});
-			return new RegionManager();
 		},
 		showChildView : function(regionName, view) {
 			var _this = this;
@@ -145,6 +119,18 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				});
 			});
 			Backbone.Marionette.LayoutView.prototype.showChildView.apply(this, arguments);
+		},
+		getRegionManager : function() {
+			var _layout = this;
+			// custom logic
+			var RegionManager = Calipso.util.RegionManager.extend({
+				getRegionPath : function() {
+					return _layout.regionPath;
+				}
+			}, {
+
+			});
+			return new RegionManager();
 		},
 		onModelSync : function(args) {
 			// execute next useCase by default
@@ -208,7 +194,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	Calipso.view.HeaderView = Calipso.view.Layout.extend(
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
-		className : "container",
 		template : Calipso.getTemplate('header'),
 		id : "navbar-menu",
 		className : "col-sm-12",
@@ -498,7 +483,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		getItemView : function(item) {
 			var someItemSpecificView = item.getItemViewType ? item.getItemViewType() : null;
 			if (!someItemSpecificView) {
-				someItemSpecificView = Calipso.view.GenericFormView;
+				someItemSpecificView = Calipso.view.UseCaseFormView;
 			}
 			return someItemSpecificView;
 		},
@@ -538,12 +523,12 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 	Calipso.view.BrowseLayout = Calipso.view.UseCaseLayout.extend({
-		template : Calipso.getTemplate('md-browse-layout'),
+		template : Calipso.getTemplate('UseCaseLayout'),
 		regions : {
-			contentRegion : "#calipsoModelDrivenBrowseLayout-contentRegion"
+			contentRegion : ".contentRegion"
 		},
 		regionViewTypes : {
-			contentRegion : Calipso.view.GenericFormPanelView,
+			contentRegion : Calipso.view.UseCaseFormView,
 		},
 	},
 	// static members
@@ -561,20 +546,20 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "Calipso.view.UserProfileLayout"
 	});
 
-	Calipso.view.SearchLayout = Calipso.view.UseCaseLayout.extend({
-		template : Calipso.getTemplate('md-search-layout'),
+	Calipso.view.UseCaseSearchLayout = Calipso.view.UseCaseLayout.extend({
+		template : Calipso.getTemplate('UseCaseSearchLayout'),
 		regions : {
-			formRegion : "#calipsoModelDrivenSearchLayout-sideBarRegion",
-			resultsRegion : "#calipsoModelDrivenSearchLayout-contentRegion"
+			formRegion : ".criteriaEntryRegion",
+			contentRegion : ".contentRegion"
 		},
 		regionViewTypes : {
-			formRegion : Calipso.view.GenericFormView,
-			resultsRegion : Calipso.view.ModelDrivenCollectionGridView
+			formRegion : Calipso.view.UseCaseFormView,
+			contentRegion : Calipso.view.UseCaseGridView
 		},
 	},
 	// static members
 	{
-		typeName : "Calipso.view.SearchLayout"
+		typeName : "Calipso.view.UseCaseSearchLayout"
 	});
 
 	Calipso.view.DefaulfModalLayout = Calipso.view.UseCaseLayout.extend({

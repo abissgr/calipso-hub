@@ -30,7 +30,6 @@ define(
 			Marionette.Controller.prototype.constructor.call(this, options);
 		},
 		showView : function(view){
-			console.log("Calipso.Controller#showView: " + view.getTypeName());
 			Calipso.app.mainContentRegion.show(view);
 		},
 		toHome : function() {
@@ -85,7 +84,7 @@ define(
 		 * @param  {Calipso.model.GenericModel} givenModel the model for which the layout will be shown
 		 * @param  {Calipso.view.MainLayout]} the layout type to use. If absent the method will
 		 *                                             obtain the layout type from givenModel.getLayoutType()
-		 */
+
 		// TODO: remove
 		showLayoutForModel : function(givenModel, useCaseContext, layoutOptions) {
 			// instantiate and show the layout
@@ -93,7 +92,7 @@ define(
 			//Calipso.vent.trigger("app:show", view);
 
 			this.showView(view);
-		},
+		},*/
 		/**
 		 * Get a model representing the current request.
 		 *
@@ -168,7 +167,6 @@ define(
 			*/
 		},
 		showUseCaseView : function(pathFragment, modelId, useCaseKey, httpParams) {
-			console.log("showUseCaseView pathFragment: " + pathFragment + ", modelId: " + modelId + ", useCaseKey: " + useCaseKey + ", httpParams: " + httpParams);
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if (qIndex > -1) {
@@ -189,6 +187,7 @@ define(
 				var model = this.getModelForRoute(ModelType, modelId, httpParams);
 
 				// TODO: support loading of standalone (i.e. non-model) useCase modules?
+				// TODO: refactor to usecase resolver interface
 				var useCaseContext = Calipso.UseCaseContext.createContext({
 					key : useCaseKey, model : model
 				});
@@ -214,12 +213,10 @@ define(
 				};
 				if (model.getTypeName() != "Calipso.model.UserDetailsModel"
 					&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))) {
-					console.log("renderFetchable: fetch");
 					fetchable.fetch({
 						data : fetchable.data
 					}).then(renderFetchable);
 				} else {
-					console.log("renderFetchable: dont fetch");
 					renderFetchable();
 				}
 			}

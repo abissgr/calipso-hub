@@ -52,10 +52,15 @@ define({
 				"yes" : "Yes",
 				"no" : "No",
 				"new" : "New",
+				"of" : "of",
+				"showing" : "showing",
 				"create" : "Create",
 				"update" : "Update",
 				"show" : "Show",
 				"hide" : "Hide",
+			},
+			"grid" : {
+				"emptyText" : "No records found",
 			},
 			"select2" : {
 				"placeholder" : "Type to select",

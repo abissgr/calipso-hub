@@ -18,221 +18,272 @@
  */
 
 define(
-		[ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone.paginator',
-		 'marionette',
-		 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator',
-		 'bootstrap-switch'],
-		function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
-			BackboneMarionette,
-			Backgrid, BackgridMoment, BackgridText, BackgridResponsiveGrid, BackgridPaginator,
-			BootstrapSwitch) {
+[ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone.paginator',
+ 'marionette',
+ 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator',
+ 'bootstrap-switch'],
+function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
+	BackboneMarionette,
+	Backgrid, BackgridMoment, BackgridText, BackgridPaginator,
+	BootstrapSwitch) {
 
-			// Override column defaults globally
-			Backgrid.Column.prototype.defaults.sortType = "toggle";
+	var labels = Calipso.util.getLabels();
 
-			// make backgrid tables responsive
-			var BackgridCellInitialize = Backgrid.Cell.prototype.initialize;
-			Backgrid.Cell.prototype.initialize = function() {
-				BackgridCellInitialize.apply(this, arguments);
-				this.$el.attr("data-title", this.column.get("label"));
+	/*
+	Overwrite backgrid prototype members
+	*/
+	// Override column defaults globally
+	Backgrid.Column.prototype.defaults.sortType = "toggle";
+	// make backgrid tables responsive
+	var BackgridCellInitialize = Backgrid.Cell.prototype.initialize;
+	Backgrid.Cell.prototype.initialize = function() {
+		BackgridCellInitialize.apply(this, arguments);
+		this.$el.attr("data-title", this.column.get("label"));
+	}
+
+	/*
+	Extend backgrid types
+	*/
+	Calipso.components.backgrid = {};
+
+
+	Calipso.components.backgrid.Caption = Backbone.View.extend({
+	  /** @property */
+	  tagName: "caption",
+		render: function () {
+			this.$el.empty().append(labels.calipso.words.showing + " " + this.model.pageStart + " - " + this.model.pageEnd + " " + labels.calipso.words.of + " " + this.model.totalRecords);
+			return this;
+		},
+	});
+
+
+	Calipso.components.backgrid.SmartHighlightRow = Backgrid.Row.extend({
+		initialize : function() {
+			Backgrid.Row.prototype.initialize.apply(this, arguments);
+			this.listenTo(this.model, 'change', function(model) {
+				this.$el.toggleClass('bg-warning', model.hasChanged());
+			});
+			this.listenTo(this.model, 'sync', function(model) {
+				// creating an empty element and applying our class to it to get bootstrap class bg color
+				var origBg = this.$el.css("background-color");
+				var bgcolor = $("<div>").appendTo("body").addClass("bg-success").css("background-color");
+
+				this.$el.removeClass('bg-warning');
+				this.$el.animate({
+					backgroundColor : bgcolor
+				}, {
+					queue : true,
+					duration : 1500
+				});
+				this.$el.animate({
+					backgroundColor : origBg
+				}, {
+					queue : true,
+					duration : 5000
+				});
+			});
+			this.listenTo(this.model, 'added', function(model) {
+				// creating an empty element and applying our class to it to get bootstrap class bg color
+				var origBg = this.$el.css("background-color");
+				var bgcolor = $("<div>").appendTo("body").addClass("bg-success").css("background-color");
+				this.$el.removeClass('bg-warning');
+				this.$el.animate({
+					backgroundColor : bgcolor
+				}, {
+					queue : true,
+					duration : 1500
+				});
+				this.$el.animate({
+					backgroundColor : origBg
+				}, {
+					queue : true,
+					duration : 5000
+				});
+			});
+		}
+	});
+	Calipso.components.backgrid.ViewRowCell = Backgrid.StringCell.extend(
+	/** @lends Calipso.components.backgrid.ViewRowCell.prototype */
+	{
+		className : "view-row-cell",
+		initialize : function(options) {
+			Backgrid.StringCell.prototype.initialize.apply(this, arguments);
+			this.viewRowEvent = "layout:viewModel";
+		},
+		events : {
+			"click" : "viewRow"
+		},
+		viewRow : function(e) {
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger(this.viewRowEvent, this.model);
+		},
+		render : function() {
+			this.$el.empty();
+			var model = this.model;
+			var formattedValue = this.formatter.fromRaw(model.get(this.column.get("name")), model);
+			this.$el.append($("<a>", {
+				tabIndex : -1,
+				title : formattedValue
+			}).text(formattedValue));
+			this.delegateEvents();
+			return this;
+		}
+
+	});
+
+	//
+
+	Calipso.components.backgrid.BootstrapSwitchCell = Backgrid.BooleanCell.extend(
+	/** @lends Calipso.components.backgrid.BootstrapSwitchCell.prototype */
+	{
+		render : function() {
+			Backgrid.BooleanCell.prototype.render.apply(this, arguments);
+			var _this = this;
+			setTimeout(function() {
+				_this.$el.find("input").bootstrapSwitch();
+			}, 250);
+			return this;
+		}
+	});
+
+	Calipso.components.backgrid.EditRowCell = Backgrid.Cell.extend(
+	/** @lends Calipso.components.backgrid.EditRowCell.prototype */
+	{
+		tagName : "td",
+		className : "modal-button-cell modal-button-cell-edit",
+		events : {
+			"click" : "editEntry",
+			"click button" : "editEntry",
+		},
+		editEntry : function(e) {
+			Calipso.stopEvent(e);
+			var rowModel = this.model;
+			//console.log("EditInTabCell#editEntry "+ rowModel.getTypeName()+'#'+rowModel.get("id"));
+			// console.log("editRow, rowModel: " + rowModel.constructor.name);
+			Calipso.vent.trigger("genericShowContent", rowModel);
+		},
+		render : function() {
+			this.$el.html("<button class='btn btn-xs btn-link' title='Edit entry'><i class='fa fa-pencil-square-o'></i></button>");
+			//this.delegateEvents();
+			return this;
+		}
+	});
+
+	Calipso.components.backgrid.EditRowInModalCell = Calipso.components.backgrid.EditRowCell.extend(
+	/** @lends Calipso.components.backgrid.EditRowCell.prototype */
+	{
+		editEntry : function(e) {
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("modal:showUseCaseContext", {
+				useCaseKey : "update",
+				model : this.model,
+			});
+		}
+	});
+
+	Calipso.components.backgrid.ChildStringAttributeCell = Backgrid.StringCell.extend({
+		render : function() {
+			var path = this.column.get("path");
+			if (!path) {
+				path = this.column.get("name");
 			}
+			var result = Calipso.getPathValue(this.model, path);
+			if (!(_.isUndefined(result) || _.isNull(result))) {
+				this.$el.text(result);
+			}
+			this.delegateEvents();
+			return this;
+		},
+	});
 
-			Calipso.components.backgrid = {};
-			Calipso.components.backgrid.SmartHighlightRow = Backgrid.Row.extend({
-				initialize : function() {
-					Backgrid.Row.prototype.initialize.apply(this, arguments);
-					this.listenTo(this.model, 'change', function(model) {
-						this.$el.toggleClass('bg-warning', model.hasChanged());
-					});
-					this.listenTo(this.model, 'sync', function(model) {
-						// creating an empty element and applying our class to it to get bootstrap class bg color
-						var origBg = this.$el.css("background-color");
-						var bgcolor = $("<div>").appendTo("body").addClass("bg-success").css("background-color");
+	Calipso.components.backgrid.ChildNumberAttributeCell = Backgrid.NumberCell.extend({
+		render : function() {
+			var path = this.column.get("path");
+			if (!path) {
+				path = this.column.get("name");
+			}
+			var result = Calipso.getPathValue(this.model, path);
+			if (!(_.isUndefined(result) || _.isNull(result))) {
+				this.$el.text(this.formatter.fromRaw(result));
+			}
+			this.delegateEvents();
+			return this;
+		},
+	});
 
-						this.$el.removeClass('bg-warning');
-						this.$el.animate({
-							backgroundColor : bgcolor
-						}, {
-							queue : true,
-							duration : 1500
-						});
-						this.$el.animate({
-							backgroundColor : origBg
-						}, {
-							queue : true,
-							duration : 5000
-						});
-					});
-					this.listenTo(this.model, 'added', function(model) {
-						// creating an empty element and applying our class to it to get bootstrap class bg color
-						var origBg = this.$el.css("background-color");
-						var bgcolor = $("<div>").appendTo("body").addClass("bg-success").css("background-color");
-						this.$el.removeClass('bg-warning');
-						this.$el.animate({
-							backgroundColor : bgcolor
-						}, {
-							queue : true,
-							duration : 1500
-						});
-						this.$el.animate({
-							backgroundColor : origBg
-						}, {
-							queue : true,
-							duration : 5000
-						});
-					});
+	Calipso.components.backgrid.CreateNewHeaderCell = Backgrid.HeaderCell.extend({
+
+		tagName : "th",
+		className : "renderable backgrid-create-new-header-cell",
+		events : {
+			"click" : "createNewForManualEdit"
+		},
+		initialize : function(options) {
+			Backgrid.HeaderCell.prototype.initialize.apply(this, arguments);
+		},
+		createNewForManualEdit : function(e) {
+			//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("layout:createModel", {
+				modelType : this.collection.model
+			});
+		},
+		render : function() {
+			var html = $("<button title='Create new' class='btn btn-xs btn-success'><i class='fa fa-file-text'></i>&nbsp;New</button>");
+			this.$el.html(html);
+			//this.delegateEvents();
+			return this;
+		}
+	});
+
+	Calipso.components.backgrid.ActionsIconCell = Backgrid.HeaderCell.extend({
+		className : "actions",
+		render : function() {
+			this.$el.html("<i class='fa fa-cog'></i>");
+			return this;
+		}
+	});
+	Calipso.components.backgrid.CreateNewInModalHeaderCell = Calipso.components.backgrid.CreateNewHeaderCell.extend({
+		createNewForManualEdit : function(e) {
+			//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
+			Calipso.stopEvent(e);
+			Calipso.vent.trigger("modal:showUseCaseContext", {
+				useCaseKey : "create",
+				modelType : this.collection.model,
+				childViewOptions : {
+					addToCollection : this.collection
 				}
 			});
-			Calipso.components.backgrid.ViewRowCell = Backgrid.StringCell.extend(
-			/** @lends Calipso.components.backgrid.ViewRowCell.prototype */
-			{
-				className : "view-row-cell",
-				initialize : function(options) {
-					Backgrid.StringCell.prototype.initialize.apply(this, arguments);
-					this.viewRowEvent = "layout:viewModel";
-				},
-				events : {
-					"click" : "viewRow"
-				},
-				viewRow : function(e) {
-					Calipso.stopEvent(e);
-					Calipso.vent.trigger(this.viewRowEvent, this.model);
-				},
-				render : function() {
-					this.$el.empty();
-					var model = this.model;
-					var formattedValue = this.formatter.fromRaw(model.get(this.column.get("name")), model);
-					this.$el.append($("<a>", {
-						tabIndex : -1,
-						title : formattedValue
-					}).text(formattedValue));
-					this.delegateEvents();
-					return this;
-				}
+		},
+	});
 
-			});
-
-			//
-
-			Calipso.components.backgrid.BootstrapSwitchCell = Backgrid.BooleanCell.extend(
-			/** @lends Calipso.components.backgrid.BootstrapSwitchCell.prototype */
-			{
-				render : function() {
-					Backgrid.BooleanCell.prototype.render.apply(this, arguments);
-					var _this = this;
-					setTimeout(function() {
-						_this.$el.find("input").bootstrapSwitch();
-					}, 250);
-					return this;
-				}
-			});
-
-			Calipso.components.backgrid.EditRowCell = Backgrid.Cell.extend(
-			/** @lends Calipso.components.backgrid.EditRowCell.prototype */
-			{
-				tagName : "td",
-				className : "modal-button-cell modal-button-cell-edit",
-				events : {
-					"click" : "editEntry",
-					"click button" : "editEntry",
-				},
-				editEntry : function(e) {
-					Calipso.stopEvent(e);
-					var rowModel = this.model;
-					//console.log("EditInTabCell#editEntry "+ rowModel.getTypeName()+'#'+rowModel.get("id"));
-					// console.log("editRow, rowModel: " + rowModel.constructor.name);
-					Calipso.vent.trigger("genericShowContent", rowModel);
-				},
-				render : function() {
-					this.$el.html("<button class='btn btn-xs btn-link' title='Edit entry'><i class='fa fa-pencil-square-o'></i></button>");
-					//this.delegateEvents();
-					return this;
-				}
-			});
-
-			Calipso.components.backgrid.EditRowInModalCell = Calipso.components.backgrid.EditRowCell.extend(
-			/** @lends Calipso.components.backgrid.EditRowCell.prototype */
-			{
-				editEntry : function(e) {
-					Calipso.stopEvent(e);
-					Calipso.vent.trigger("modal:showUseCaseContext", {
-						useCaseKey : "update",
-						model : this.model,
-					});
-				}
-			});
-
-			Calipso.components.backgrid.ChildStringAttributeCell = Backgrid.StringCell.extend({
-				render : function() {
-					var path = this.column.get("path");
-					if (!path) {
-						path = this.column.get("name");
-					}
-					var result = Calipso.getPathValue(this.model, path);
-					if (!(_.isUndefined(result) || _.isNull(result))) {
-						this.$el.text(result);
-					}
-					this.delegateEvents();
-					return this;
-				},
-			});
-
-			Calipso.components.backgrid.ChildNumberAttributeCell = Backgrid.NumberCell.extend({
-				render : function() {
-					var path = this.column.get("path");
-					if (!path) {
-						path = this.column.get("name");
-					}
-					var result = Calipso.getPathValue(this.model, path);
-					if (!(_.isUndefined(result) || _.isNull(result))) {
-						this.$el.text(this.formatter.fromRaw(result));
-					}
-					this.delegateEvents();
-					return this;
-				},
-			});
-
-			Calipso.components.backgrid.CreateNewHeaderCell = Backgrid.HeaderCell.extend({
-
-				tagName : "th",
-				className : "renderable backgrid-create-new-header-cell",
-				events : {
-					"click" : "createNewForManualEdit"
-				},
-				initialize : function(options) {
-					Backgrid.HeaderCell.prototype.initialize.apply(this, arguments);
-				},
-				createNewForManualEdit : function(e) {
-					//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
-					Calipso.stopEvent(e);
-					Calipso.vent.trigger("layout:createModel", {
-						modelType : this.collection.model
-					});
-				},
-				render : function() {
-					var html = $("<button title='Create new' class='btn btn-xs btn-success'><i class='fa fa-file-text'></i>&nbsp;New</button>");
-					this.$el.html(html);
-					//this.delegateEvents();
-					return this;
-				}
-			});
-
-			Calipso.components.backgrid.CreateNewInModalHeaderCell = Calipso.components.backgrid.CreateNewHeaderCell.extend({
-
-				createNewForManualEdit : function(e) {
-					//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
-					Calipso.stopEvent(e);
-
-					Calipso.vent.trigger("modal:showUseCaseContext", {
-						useCaseKey : "create",
-						modelType : this.collection.model,
-						childViewOptions : {
-							addToCollection : this.collection
-						}
-					});
-
-				},
-			});
-
+	Calipso.components.backgrid.Grid = Backgrid.Grid.extend({
+		className : "backgrid table table-striped responsive-table",
+		caption : Calipso.components.backgrid.Caption,
+		row : Calipso.components.backgrid.SmartHighlightRow,
+		emptyText :labels.calipso.grid.emptyText,
+		initialize : function(options) {
+			Backgrid.Grid.prototype.initialize.apply(this, arguments);
+			this.initResultsInfo();
+			this.caption = options.caption || this.caption;
+	    if (this.caption) {
+	      this.caption = new this.caption({model: this.resultsInfo});
+	    }
+		},
+		render : function() {
+			Backgrid.Grid.prototype.render.apply(this, arguments);
+	    if (this.caption) {
+	      this.$el.prepend(this.caption.render().$el);
+	    }
+			return this;
+		},
+		initResultsInfo : function() {
+			var resultsInfo = _.extend({}, this.collection.state);
+			var pastResults = (resultsInfo.pageSize * (resultsInfo.currentPage - resultsInfo.firstPage));
+			resultsInfo.pageStart = pastResults + 1;
+			resultsInfo.pageEnd = pastResults + this.collection.length;
+			this.resultsInfo = resultsInfo;
+		},
+	});
 
 });

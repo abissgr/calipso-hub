@@ -280,9 +280,11 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 
 	Calipso.fields.Edit = Calipso.fields.edit = Calipso.fields.Base.extend({}, {
 		"backgrid" : {
+			label : "edit",
+			editable : false,
+			sortable : false,
 			cell : Calipso.components.backgrid.EditRowInModalCell,
-			label : ""
-			//headerCell : Calipso.components.backgrid.CreateNewInModalHeaderCell
+			headerCell : Calipso.components.backgrid.ActionsIconCell
 		}
 	});
 

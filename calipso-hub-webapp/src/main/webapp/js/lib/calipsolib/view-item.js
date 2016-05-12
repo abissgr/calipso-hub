@@ -91,7 +91,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 	Calipso.view.UseCaseItemView = Calipso.view.ItemView.extend({
-		schemaType : null,
 		mergableOptions : [ 'useCaseContext', 'formOptions' ],
 		templateHelpers : {
 			viewId : function() {
@@ -99,25 +98,22 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			},
 		},
 		initialize : function(options) {
-			if(options && options.useCaseContext && options.useCaseContext.viewOptions){
-				var viewOptions = options.useCaseContext.viewOptions;
-				delete options.useCaseContext.viewOptions;
-				_.extend(options, viewOptions);
-			}
 			Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
-			var _this = this;
 			this.mergeOptions(options, this.mergableOptions);
+		},
+		getSchemaType : function(){
+			return this.constructor.getSchemaType();
 		},
 		onBeforeShow : function() {
 			//TODO: roles, masks, nested usecases
-			this.useCase = this.useCaseContext.getChild(this.regionName, this.schemaType+"View");
 			this.schema = this.buildSchema();
 		},
 		/** builds a UI-specific schema for the given fields */
 		buildSchema : function(fields) {
-			var _this = this, schemaType = this.schemaType, isArray = this.schemaType == "backgrid", schema = null;
+			var _this = this, schemaType = this.getSchemaType();
+			var isArray = schemaType == "backgrid", schema = null;
 
-			fields || (fields = this.useCase.getFields());
+			fields || (fields = this.useCaseContext.getFields());
 				//console.log(_this.getTypeName() + "#buildSchema fields: ");
 			//console.log(fields);
 			if (fields) {
@@ -159,24 +155,27 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 	}, {
 		typeName : "Calipso.view.UseCaseItemView",
+		schemaType : null,
+		getSchemaType : function(){
+			return this.schemaType;
+		},
 	});
 
-	Calipso.view.ModelDrivenCollectionGridView = Calipso.view.UseCaseItemView.extend(
+	Calipso.view.UseCaseGridView = Calipso.view.UseCaseItemView.extend(
 	/**
 	 * @param options object members:
 	 *  - collection or model.wrappedCollection
 	 *  - callCollectionFetch: whether to fetch the collection from the server
-	 * @lends Calipso.view.ModelDrivenCollectionGridView.prototype
+	 * @lends Calipso.view.UseCaseGridView.prototype
 	 * */
 	{
-		schemaType : "backgrid",
 		keyPropertyCopy : "name",
 		labelPropertyCopy : "label",
 
 		collection : null,
 		backgrid : null,
 		// Define view template
-		template : Calipso.getTemplate('md-collection-grid-view'),
+		template : Calipso.getTemplate('UseCaseGridView'),
 		events : {
 			"click button.btn-windowcontrols-destroy" : "back"
 		},
@@ -205,7 +204,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			return resultsInfo;
 		},
 		initialize : function(options) {
-			//console.log("ModelDrivenCollectionGridView.initialize, options: " + options);
+			//console.log("UseCaseGridView.initialize, options: " + options);
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
 
 			this.collection = options.collection || options.model.wrappedCollection;
@@ -216,8 +215,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			if (options.callCollectionFetch) {
 				this.callCollectionFetch = options.callCollectionFetch;
 			}
-			//console.log("ModelDrivenCollectionGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
-			//console.log("ModelDrivenCollectionGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
+			//console.log("UseCaseGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
+			//console.log("UseCaseGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
 		},
 		onGridRendered : function() {
 
@@ -232,12 +231,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			var _self = this;
 			//console.log("GRID onshow schema: ");
 			//console.log(this.schema);
-			this.backgrid = new Backgrid.Grid({
-				className : "backgrid table-striped responsive-table",
+			this.backgrid = new Calipso.components.backgrid.Grid({
 				columns : _self.schema,
-				row : Calipso.components.backgrid.SmartHighlightRow,
 				collection : _self.collection,
-				emptyText : "No records found"
 			});
 
 			var gridContainer = this.$el.find('.backgrid-table-container:first');
@@ -267,7 +263,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			});
 			gridContainer.append('<div class="card-block backgrid-paginator-container"> </div>');
 			gridContainer.find('.backgrid-paginator-container:first').append(paginator.render().el);
-			//						//console.log("ModelDrivenCollectionGridView.onShow, collection url: "+);
+			//						//console.log("UseCaseGridView.onShow, collection url: "+);
 			this.onGridRendered();
 			if (this.callCollectionFetch) {
 				var fetchOptions = {
@@ -300,22 +296,22 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			}
 			// this.collection.fetch();main info
 
-			// console.log("ModelDrivenCollectionGridView showed");
+			// console.log("UseCaseGridView showed");
 
 		},
 
 	},
 	// static members
 	{
-		typeName : "Calipso.view.ModelDrivenCollectionGridView",
+		typeName : "Calipso.view.UseCaseGridView",
+		schemaType : "backgrid",
 	});
 
 	/*
 	 * Use-case driven form view.
-	 * @fires GenericFormView#model:sync when the model is persisted successfully
+	 * @fires UseCaseFormView#model:sync when the model is persisted successfully
 	 */
-	Calipso.view.GenericFormView = Calipso.view.UseCaseItemView.extend({
-		schemaType : "form",
+	Calipso.view.UseCaseFormView = Calipso.view.UseCaseItemView.extend({
 		/**
 		 * Cals the static method of the same name. Returns a Backbone.Form template
 		 * @param  {[String]} the template key, usually one of {"horizontal", "inline", "vertical"}
@@ -335,7 +331,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		addToCollection : null,
 		// Define view template
 		formTitle : "options.formTitle",
-		template : Calipso.getTemplate('md-form-view'),
+		template : Calipso.getTemplate('UseCaseFormView'),
 		events : {
 			"click .btn-social-login" : "socialLogin",
 			"click .open-modal-page" : "openModalPage",
@@ -419,9 +415,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			// if no validation errors
 			else {
 				// Case: create/update
-
-				/*_this.useCase.key.indexOf("create") == 0 || _this.useCase.key.indexOf("update") == 0 */
-				if (_this.useCase.key.indexOf("search") != 0) {
+				if (_this.useCaseContext.key.indexOf("search") != 0) {
 					// persist changes
 
 					_this.model.save(null, {
@@ -541,7 +535,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			}
 			this.form = new Calipso.backboneform.Form(formOptions);
 			//this.$el.append(this.form.el);
-			this.form.setElement(this.$el.find(".generic-form-view").first()).render();
+			this.form.setElement(this.$el.find(".useCaseFormView-form:first").first()).render();
 			this.$el.find('input, select').filter(':visible:enabled:first').focus();
 			this.onFormRendered();
 
@@ -592,10 +586,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 	},{
 		// static members
-		typeName : "Calipso.view.GenericFormView",
+		typeName : "Calipso.view.UseCaseFormView",
+		schemaType : "form",
 		/**
 		 * Returns a Backbone.Form template
-		 * @param  {[Calipso.view.GenericFormView]} the form view instance
+		 * @param  {[Calipso.view.UseCaseFormView]} the form view instance
 		 * @param  {[String]} the template key, usually one of {"horizontal", "inline", "vertical"}
 		 * @return {[type]} the compiled template
 		 */
@@ -613,13 +608,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		*/
 	});
 
-	Calipso.view.GenericFormPanelView = Calipso.view.GenericFormView.extend({
-		template : Calipso.getTemplate('md-formpanel-view'),
-	},
-	// static members
-	{
-		typeName : "Calipso.view.GenericFormPanelView",
-	});
 
 	Calipso.view.AbstractItemView = Calipso.view.ItemView.extend({
 
@@ -736,7 +724,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		getItemView : function(item) {
 			var someItemSpecificView = item.getItemViewType ? item.getItemViewType() : null;
 			if (!someItemSpecificView) {
-				someItemSpecificView = Calipso.view.GenericFormView;
+				someItemSpecificView = Calipso.view.UseCaseFormView;
 			}
 			return someItemSpecificView;
 		},

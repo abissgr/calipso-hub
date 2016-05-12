@@ -85,7 +85,6 @@ require.config({
 		"backgrid-paginator" : 'lib/backgrid/extensions/paginator/backgrid-paginator',
 		"backgrid-moment" : 'lib/backgrid/extensions/moment/backgrid-moment-cell',
 		"backgrid-text" : 'lib/backgrid/extensions/text/backgrid-text-cell',
-		'backgrid-responsive-grid' : 'lib/backgrid/extensions/responsive-grid/responsive-grid',
 		"calipso" : 'lib/calipso',
 		"calipso-hbs" : 'lib/calipso-hbs',
 		// Mocha testing
@@ -175,10 +174,6 @@ require.config({
 			deps : [ 'backgrid' ],
 			exports : 'Backgrid.Extension.Text'
 		},
-		'backgrid-responsive-grid' : {
-			deps : [ 'jquery', 'underscore', 'backbone', 'backgrid' ],
-			exports : 'Backgrid.Extension.ResponsiveGrid'
-		},
 		'tether' : {
 			deps : [ 'jquery', 'tether-orig' ]
 		},
@@ -202,7 +197,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ "i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-responsive-grid', 'backgrid-paginator', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
+			deps : [ "i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
 			exports : 'calipso',
 		},
 
@@ -227,8 +222,8 @@ require.config({
 
 });
 
-// r.js does only reads the above config. this one is 
-// merged with the first while on the browser by requirejs. 
+// r.js does only reads the above config. this one is
+// merged with the first while on the browser by requirejs.
 require.config({
 	waitSeconds : 0,
 	config : {
