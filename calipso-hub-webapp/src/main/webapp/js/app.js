@@ -46,13 +46,10 @@ function(
 			Calipso.stopEvent(event);
 
 			if ($a.hasClass("triggerCollapseMenu")) {
+				$a.closest("li.dropdown").removeClass('open');
 				// mobile, collapse hide
 				if ($(window).width() < 544) {
 					$a.closest(".navbar-toggleable-xs").removeClass('in');
-				}
-				// desktop-ish, close dropdown
-				else{
-				$a.closest(".btn-group").removeClass('open');
 				}
 			}
 			Backbone.history.navigate(href, true);

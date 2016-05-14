@@ -91,6 +91,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		onShow : function() {
 			var _this = this;
 			var childUseCase;
+			console.log(this.getTypeName() + "#onShow");
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
 				// spawn child usecase
 				childUseCase = _this.useCaseContext.getChild(regionName, ViewType);
@@ -195,8 +196,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
 		template : Calipso.getTemplate('header'),
-		id : "navbar-menu",
-		className : "col-sm-12",
+		tagName : "nav",
+		className : "navbar navbar-dark bg-inverse",
 		events : {
 			"click a.login" : "login",
 			"click a.register" : "register",
@@ -588,7 +589,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	Calipso.view.UserDetailsLayout = Calipso.view.BrowseLayout.extend(
 	/** @lends Calipso.view.UserDetailsLayout.prototype */
 	{
-		template : Calipso.getTemplate('userDetails-layout'),
+		template : Calipso.getTemplate('UserDetailsLayout'),
 		viewEvents : {
 			"model:sync" : "onModelSync"
 		},

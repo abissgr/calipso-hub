@@ -31,6 +31,17 @@ define({
 		},
 
 		"tmpl" : {
+			"header" : {
+				"settings" : "Site Settings",
+				"users" : "Users",
+				"roles" : "Roles",
+				"hosts" : "Hosts",
+				"profile" : "Profile",
+				"password" : "Password",
+				"logout" : "Logout",
+				"login" : "Login",
+				"register" : "Quick Signup",
+			},
 			"userRegistration" : {
 				"titleNewPassword" : "New Password",
 				"titleLogin" : "User Login",

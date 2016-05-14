@@ -6,11 +6,8 @@
 </head>
 <body class="full-height-column">
 
-    <nav class="navbar navbar-dark bg-inverse full-height-row">
-        <div class="container configurable-fluid">
-            <div class="row" id="calipsoHeaderRegion"></div>
-        </div>
-    </nav>
+    <div class=" full-height-row" id="calipsoHeaderRegion">
+    </div>
 
     <main class="full-height-row-expanded">
         <div class="container configurable-fluid" id="calipsoMainContentRegion"></div>
