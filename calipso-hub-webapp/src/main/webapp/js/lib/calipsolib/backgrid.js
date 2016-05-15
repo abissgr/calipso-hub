@@ -50,19 +50,39 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 	Calipso.components.backgrid.Caption = Backbone.View.extend({
 	  /** @property */
 	  tagName: "caption",
+
+		initialize : function(options) {
+			Backbone.View.prototype.initialize.apply(this, arguments);
+      this.collection = options.collection;
+
+      var _this = this;
+			this.listenTo(this.collection, 'reset', function(model) {
+        _this.render();
+      });
+    },
+		getResultsInfo : function() {
+			var resultsInfo = _.extend({}, this.collection.state);
+			var pastResults = (resultsInfo.pageSize * (resultsInfo.currentPage - resultsInfo.firstPage));
+			resultsInfo.pageStart = pastResults + 1;
+			resultsInfo.pageEnd = pastResults + this.collection.length;
+			return resultsInfo;
+		},
 		render: function () {
-			this.$el.empty().append(labels.calipso.words.showing + " " + this.model.pageStart + " - " + this.model.pageEnd + " " + labels.calipso.words.of + " " + this.model.totalRecords);
+      var resultsInfo = this.getResultsInfo();
+			this.$el.empty().append(labels.calipso.words.showing + " " + resultsInfo.pageStart + " - " +
+      resultsInfo.pageEnd + " " + labels.calipso.words.of + " " + resultsInfo.totalRecords + " &#160;" +
+      '<button class="btn btn-primary btn-sm layout-showCreateFormModal"><i class="fa fa-plus-square fa-fw" aria-hidden="true"></i>&#160;' + labels.calipso.words.create + " " + labels.calipso.words.new + '</button>');
 			return this;
 		},
 	});
 
 
-	Calipso.components.backgrid.SmartHighlightRow = Backgrid.Row.extend({
+  Calipso.components.backgrid.SmartHighlightRow = Backgrid.Row.extend({
 		initialize : function() {
 			Backgrid.Row.prototype.initialize.apply(this, arguments);
-			this.listenTo(this.model, 'change', function(model) {
+			/*this.listenTo(this.model, 'change', function(model) {
 				this.$el.toggleClass('bg-warning', model.hasChanged());
-			});
+			});*/
 			this.listenTo(this.model, 'sync', function(model) {
 				// creating an empty element and applying our class to it to get bootstrap class bg color
 				var origBg = this.$el.css("background-color");
@@ -157,10 +177,11 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 		},
 		editEntry : function(e) {
 			Calipso.stopEvent(e);
-			var rowModel = this.model;
-			//console.log("EditInTabCell#editEntry "+ rowModel.getTypeName()+'#'+rowModel.get("id"));
-			// console.log("editRow, rowModel: " + rowModel.constructor.name);
-			Calipso.vent.trigger("genericShowContent", rowModel);
+      console.log("EditRowCell calling this.model.getUseCaseContext");
+			var useCaseContext = this.model.getUseCaseContext({
+				key : "update"
+			});
+      Calipso.app.mainContentRegion.show(useCaseContext.createView());
 		},
 		render : function() {
 			this.$el.html("<button class='btn btn-xs btn-link' title='Edit entry'><i class='fa fa-pencil-square-o'></i></button>");
@@ -174,10 +195,7 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 	{
 		editEntry : function(e) {
 			Calipso.stopEvent(e);
-			Calipso.vent.trigger("modal:showUseCaseContext", {
-				useCaseKey : "update",
-				model : this.model,
-			});
+			Calipso.vent.trigger("modal:showUseCaseContext",  this.model.getUseCaseContext({key : "update"}));
 		}
 	});
 
@@ -229,7 +247,7 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 			});
 		},
 		render : function() {
-			var html = $("<button title='Create new' class='btn btn-xs btn-success'><i class='fa fa-file-text'></i>&nbsp;New</button>");
+			var html = $("<button title='Create new' class='btn btn-xs btn-success'><i class='fa fa-file-text fa-fw'></i>&nbsp;New</button>");
 			this.$el.html(html);
 			//this.delegateEvents();
 			return this;
@@ -260,29 +278,19 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 	Calipso.components.backgrid.Grid = Backgrid.Grid.extend({
 		className : "backgrid table table-striped responsive-table",
 		caption : Calipso.components.backgrid.Caption,
-		row : Calipso.components.backgrid.SmartHighlightRow,
 		emptyText :labels.calipso.grid.emptyText,
 		initialize : function(options) {
+      var _this = this;
+      options.row || (options.row = Calipso.components.backgrid.SmartHighlightRow);
 			Backgrid.Grid.prototype.initialize.apply(this, arguments);
-			this.initResultsInfo();
 			this.caption = options.caption || this.caption;
-	    if (this.caption) {
-	      this.caption = new this.caption({model: this.resultsInfo});
-	    }
 		},
 		render : function() {
 			Backgrid.Grid.prototype.render.apply(this, arguments);
 	    if (this.caption) {
-	      this.$el.prepend(this.caption.render().$el);
+	      this.$el.prepend(new this.caption({collection: this.collection}).render().$el);
 	    }
 			return this;
-		},
-		initResultsInfo : function() {
-			var resultsInfo = _.extend({}, this.collection.state);
-			var pastResults = (resultsInfo.pageSize * (resultsInfo.currentPage - resultsInfo.firstPage));
-			resultsInfo.pageStart = pastResults + 1;
-			resultsInfo.pageEnd = pastResults + this.collection.length;
-			this.resultsInfo = resultsInfo;
 		},
 	});
 

@@ -93,58 +93,11 @@ define(
 
 			this.showView(view);
 		},*/
-		/**
-		 * Get a model representing the current request.
-		 *
-		 * For an example, consider the URL [api-root]/users/[some-id]. First,
-		 * a model class is loaded based on the URL fragment representing the
-		 * type, e.g. "users" for UserModel.
-		 *
-		 * A model instance is then created using some-id if provided or
-		 * "search" otherwise. .
-		 *
-		 * In case of "search" a collection of the given model type is
-		 * initialized but, similarly to the model instance, it is not fetched
-		 * from the server.
-		 *
-		 * @param ModelType the model type
-		 * @param {string}
-		 *           modelId the model identifier. The identifier may be either
-		 *           a primary or business key, depending on your server side
-		 *           implementation. The default property name in client side
-		 *           models is "name". You can override
-		 *           {@linkcode Calipso.model.GenericModel.getBusinessKey} to
-		 *           define another property name.
-		 * @see Calipso.model.GenericModel.getBusinessKey
-		 */
-		getModelForRoute : function(ModelType, modelId, httpParams) {
-			if(_.isString(httpParams)){
-				httpParams = Calipso.getHttpUrlParams(httpParams);
-			}
-			// Obtain a model for the view
-			var modelAttributes = _.extend({id : modelId}, httpParams);
-			var modelForRoute = ModelType.create(modelAttributes);
-			// if search model
-			if (!modelId && ModelType.getTypeName() != "Calipso.model.UserDetailsModel") {
-				var collectionOptions = {
-					model : ModelType,
-					url : Calipso.getBaseUrl() + "/api/rest/" + ModelType.getPathFragment(),
-					data : modelAttributes
-				};
-				if (httpParams) {
-					collectionOptions.data = httpParams;
-				}
-				// create a model to use as a wrapper for a collection of
-				// instances of the same type, fill it with any given search criteria
-				modelForRoute.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
-			}
-			return modelForRoute;
-		},
+
 		/**
 		 *
 		 */
 		showEntitySearch : function(pathFragment, httpParams) {
-			var httpParams = Calipso.getHttpUrlParams();
 			this.showUseCaseView(pathFragment, null, "search", httpParams);
 		},
 		showEntityView : function(pathFragment, modelId) {
@@ -167,6 +120,8 @@ define(
 			*/
 		},
 		showUseCaseView : function(pathFragment, modelId, useCaseKey, httpParams) {
+
+			httpParams = Calipso.getHttpUrlParams(httpParams);
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
 			if (qIndex > -1) {
@@ -174,43 +129,30 @@ define(
 			}
 			// build the model instance representing the current request
 
-			var ModelType = Calipso.util.getModelType(pathFragment);
+			var UseCaseFactory = Calipso.util.getUseCaseFactory(pathFragment);
 
 			// check for usecase routes for new instances
-			if(ModelType.hasUseCase(modelId)){
+			if(UseCaseFactory.hasUseCase(modelId)){
 				useCaseKey = modelId;
 				modelId = null;
 			}
 
 			// check if model type is public
-			if (ModelType.isPublic() || this._ensureLoggedIn()) {
-				var model = this.getModelForRoute(ModelType, modelId, httpParams);
-
-				// TODO: support loading of standalone (i.e. non-model) useCase modules?
-				// TODO: refactor to usecase resolver interface
-				var useCaseContext = Calipso.UseCaseContext.createContext({
-					key : useCaseKey, model : model
+			if (UseCaseFactory.isPublic() || this._ensureLoggedIn()) {
+				var useCaseContext = UseCaseFactory.getUseCaseContext({
+					key : useCaseKey, modelId : modelId, httpParams : httpParams, pathFragment : pathFragment
 				});
 
-				// fetch model(s) and show view
-				var fetchable = model.wrappedCollection ? model.wrappedCollection : model;
-
-				// TODO: move to useCases
-				// oif true, occupy the main region with the search form instead of
-				// showing the form and grid side-by-side
+				// TODO: move fetch logic to  useCase
+				var model = useCaseContext.model;
 				var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
-				// promise to fetch then render
-				// console.log("AbstractController#mainNavigationCrudRoute, pathFragment: " + pathFragment + ", model id: " + modelForRoute.get("id") + ", skipDefaultSearch: " + skipDefaultSearch);
-				var renderFetchable = function() {
 
-					//Calipso.vent.trigger("app:show", useCaseContext.createView());
-					_self.showView(useCaseContext.createView());
-					// TODO: remove/move to header view events;
-					// update page header tabs etc.
-					// this has been left over from when the associated markup was
-					// not part of some view
+				var renderFetchable = function() {
+					_self.showView(useCaseContext.createView({regionName : "/", regionPath : "/"}));
 					_self.syncMainNavigationState(model);
 				};
+				var fetchable = useCaseContext.getFetchable();
+
 				if (model.getTypeName() != "Calipso.model.UserDetailsModel"
 					&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))) {
 					fetchable.fetch({

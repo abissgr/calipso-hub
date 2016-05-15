@@ -184,24 +184,10 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			viewId : function() {
 				return Marionette.getOption(this, "id");
 			},
-			resultsInfo : function() {
-				var resultsInfo = this.model.wrappedCollection.state;
-				var pastResults = (resultsInfo.pageSize * (resultsInfo.currentPage - resultsInfo.firstPage));
-				resultsInfo.pageStart = pastResults + 1;
-				resultsInfo.pageEnd = pastResults + this.model.wrappedCollection.length;
-				return resultsInfo;
-			},
 		},
 		back : function(e) {
 			Calipso.stopEvent(e);
 			window.history.back();
-		},
-		getResultsInfo : function() {
-			var resultsInfo = this.model.wrappedCollection.state;
-			var pastResults = (resultsInfo.pageSize * (resultsInfo.currentPage - resultsInfo.firstPage));
-			resultsInfo.pageStart = pastResults + 1;
-			resultsInfo.pageEnd = pastResults + this.model.wrappedCollection.length;
-			return resultsInfo;
 		},
 		initialize : function(options) {
 			//console.log("UseCaseGridView.initialize, options: " + options);
@@ -238,32 +224,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 			var gridContainer = this.$el.find('.backgrid-table-container:first');
 			gridContainer.append(this.backgrid.render().$el);
-			// TODO: refresh stuff
-			_self.listenTo(_self.collection, "backgrid:refresh", function(){
-				var resultsInfo = _self.getResultsInfo();
-				_self.$el.find(".resultsInfo").html(
-					resultsInfo.pageStart + " - " + resultsInfo.pageEnd + " / " + resultsInfo.totalRecords);
-			});
-			var paginator = new Backgrid.Extension.Paginator({
 
-				// If you anticipate a large number of pages, you can adjust
-				// the number of page handles to show. The sliding window
-				// will automatically show the next set of page handles when
-				// you click next at the end of a window.
-				windowSize : 10, // Default is 10
-
-				// Used to multiple windowSize to yield a number of pages to slide,
-				// in the case the number is 5
-				slideScale : 0.25, // Default is 0.5
-
-				// Whether sorting should go back to the first page
-				goBackFirstOnSort : false, // Default is true
-
-				collection : _self.collection
-			});
-			gridContainer.append('<div class="card-block backgrid-paginator-container"> </div>');
-			gridContainer.find('.backgrid-paginator-container:first').append(paginator.render().el);
-			//						//console.log("UseCaseGridView.onShow, collection url: "+);
 			this.onGridRendered();
 			if (this.callCollectionFetch) {
 				var fetchOptions = {
@@ -328,12 +289,13 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		formTemplateKey : "horizontal",
 		modal : false,
 		hasDraft : false,
-		addToCollection : null,
 		// Define view template
 		formTitle : "options.formTitle",
 		template : Calipso.getTemplate('UseCaseFormView'),
 		events : {
+			// TODO: move to layouts
 			"click .btn-social-login" : "socialLogin",
+				// TODO: move to layouts
 			"click .open-modal-page" : "openModalPage",
 			"click button.submit" : "commit",
 			"submit form" : "commit",
@@ -344,17 +306,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		initialize : function(options) {
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
-			//console.log("FORM options: ");
-			//console.log(options);
 			this.mergeOptions(options, [ "modal", "addToCollection", "formTemplateKey", "formTemplate" ]);
-			//console.log("FORM modal: " + this.modal);
-			// grab a handle for the search results collection if any, from options or model
-			//TODO: remove
-			if (this.options.searchResultsCollection) {
-				this.searchResultsCollection = options.searchResultsCollection;
-			} else if (this.model.wrappedCollection) {
-				this.searchResultsCollection = this.model.wrappedCollection;
-			}
+
+			this.searchResultsCollection = this.model.wrappedCollection;
 			//
 
 			if (!this.formTemplate) {
@@ -363,7 +317,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 		},
 		openModalPage : function(e) {
-			console.log("openModalPage");
 			Calipso.stopEvent(e);
 			var $a = $(e.currentTarget);
 			var pageView = new Calipso.view.TemplateBasedItemView({
@@ -376,7 +329,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			});
 		},
 		commitOnEnter : function(e) {
-			console.log("commitOnEnter");
 			if (e.keyCode != 13) {
 				return;
 			} else {
@@ -405,8 +357,25 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 			return isValid;
 		},
+		removeDraft : function(draftKey) {
+			draftKey || (draftKey = this.getDraftKey());
+			sessionStorage.removeItem(draftKey);
+			this.hasDraft = false;
+		},
+		saveDraft : function(draftKey) {
+			draftKey || (draftKey = this.getDraftKey());
+			// keep a session draft of changes
+			var draft = this.form.getDraft();
+			delete draft.currentStepIndex;
+			sessionStorage.setItem(draftKey, JSON.stringify(draft));
+			this.hasDraft = true;
+		},
+		getDraft : function(draftKey){
+			draftKey || (draftKey = this.getDraftKey());
+			var draft = sessionStorage.getItem(draftKey);
+			return draft;
+		},
 		commit : function(e) {
-			console.log("commit");
 			var _this = this;
 			Calipso.stopEvent(e);
 			if (!this.isFormValid()) {
@@ -417,14 +386,13 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				// Case: create/update
 				if (_this.useCaseContext.key.indexOf("search") != 0) {
 					// persist changes
-
+					var draftKey = _this.getDraftKey();
+					_this.stopListening(this.form, 'change');
 					_this.model.save(null, {
 						success : function(model, response) {
-							sessionStorage.removeItem(_this.getDraftKey());
-							_this.hasDraft = false;
-							if (_this.addToCollection) {
-								_this.addToCollection.add(_this.model);
-								_this.model.trigger("added");
+							if(_this.enableDrafts){
+								_this.removeDraft();
+								_this.removeDraft(draftKey);
 							}
 							// trigger model:sync
 							_this.triggerMethod("model:sync", {
@@ -432,11 +400,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 								view : _this,
 								collection : _this.collection
 							});
-							if (_this.modal) {
-								Calipso.vent.trigger("modal:destroy");
-							} else {
-								Calipso.vent.trigger("genericFormSaved", model);
-							}
 						},
 						error : function() {
 							alert("Failed persisting changes");
@@ -452,7 +415,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 						success : function() {
 							// signal successful retreival of search results
 							// for the currently active layout to handle presentation
-							Calipso.vent.trigger("genericFormSearched", _this.model);
+							//
+							//Calipso.vent.trigger("genericFormSearched", _this.model);
 						},
 
 						// Generic error, show an alert.
@@ -514,8 +478,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			if (Calipso.session.searchData && (!_self.searchResultsCollection.data)) {
 				_self.model.set(Calipso.session.searchData);
 				_self.searchResultsCollection.data = Calipso.session.searchData;
-			} else {
-				var draft = sessionStorage.getItem(_self.getDraftKey());
+			}
+			else  if(this.enableDrafts){
+				var draft = _self.getDraft();
 				if (draft) {
 					draft = JSON.parse(draft);
 					_self.model.set(draft);
@@ -540,9 +505,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.onFormRendered();
 
 			// flag changed
-			this.listenTo(this.form, 'change', function() {
-				_self.hasDraft = true;
-			});
+			if(this.enableDrafts){
+				this.listenTo(this.form, 'change', function() {
+					_self.hasDraft = true;
+				});
+			}
 
 			// proxy model events to parent layout
 			this.listenTo(this.form, "all", function(eventName) {
@@ -576,11 +543,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		onBeforeDestroy : function(e) {
 			if (this.hasDraft) {
-				// keep a session draft of changes
-				var draft = this.form.getDraft();
-				delete draft.currentStepIndex;
-
-				sessionStorage.setItem(this.getDraftKey(), JSON.stringify(draft));
+				this.saveDraft();
 			}
 			this.form.close();
 		},

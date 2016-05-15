@@ -194,7 +194,7 @@ Calipso.cloneSpecificValue = function(val) {
 				return;
 			}
 			// reuse object references of platform components
-			else if (val.extend || _.isFunction(val)) {
+			else if (val && (val.extend || _.isFunction(val))) {
 				target[key] = val;
 				return;
 			/**
@@ -587,25 +587,11 @@ Calipso.cloneSpecificValue = function(val) {
 			Calipso.app.modalRegion.show(modalLayoutView);
 		});
 
-		Calipso.vent.on('modal:showUseCaseContext', function(options) {
-			var useCaseContext = options.useCaseContext ||
-				 Calipso.UseCaseContext.createContext({
-					key : options.useCaseKey,
-					model : options.model || options.modelType.create()
-				});
-			if (!useCaseContext) {
-				throw "A 'view' property is required on vent trigger 'modal:showInLayout'.";
-			}
-
+		Calipso.vent.on('modal:showUseCaseContext', function(useCaseContext) {
 			var layoutProperties = {
 				useCaseContext : useCaseContext,
-				childView : useCaseContext.createView({
-					viewOptions : {
-						childViewOptions : _.extend({modal : true}, options.childViewOptions || {})
-					}
-				}),
-				model : options.model,
-
+				childView : useCaseContext.createView({modal : true}),
+				model : useCaseContext.model,
 			};
 			/*if (!properties.template) {
 				layoutProperties.template = properties.template;
@@ -626,10 +612,12 @@ Calipso.cloneSpecificValue = function(val) {
 		customConfig = customConfig || {};
 		var config = {
 			contextPath : "/",
+			apiAuthPath : "/apiauth",
 			headerViewType : Calipso.view.HeaderView,
 			footerViewType : Calipso.view.FooterView,
 			sessionType : Calipso.util.Session,
-			apiAuthPath : "/apiauth",
+			// URL > Constructor map
+			useCaseFactories : {},
 		};
 		Calipso.config = _.defaults(customConfig, config);
 	}
@@ -651,14 +639,12 @@ Calipso.cloneSpecificValue = function(val) {
 			});
 
 			// set model types map
-			Calipso.modelTypesMap = {};
+			Calipso.useCaseFactoriesMap = _.extend({}, Calipso.config.useCaseFactories || {});
 			var parseModel = function(ModelType) {
 				if (ModelType.getTypeName() != "Calipso.model.Model" &&
 				ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
 				ModelType.getTypeName() != "Calipso.model.GenericModel") {
-
-					Calipso.modelTypesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
-
+					Calipso.useCaseFactoriesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
 				}
 			};
 			_(Calipso.model).each(parseModel);
@@ -782,7 +768,7 @@ Calipso.cloneSpecificValue = function(val) {
 			$el.on('show.bs.modal', showHandler);
 		},
 		onShow : function(view, region, options) {
-			view.on("destroy", this.hideModal, this);
+			//view.on("destroy", this.hideModal, this);
 			this.$el.modal('show');
 		},
 		hideModal : function() {
@@ -790,6 +776,7 @@ Calipso.cloneSpecificValue = function(val) {
 		},
 		closeModal : function() {
 			this.hideModal();
+			this.currentView.destroy();
 			this.reset();
 		}
 	});
@@ -1173,30 +1160,29 @@ Calipso.cloneSpecificValue = function(val) {
 	* Get the model type corresponding to the given
 	* business key/URI componenent
 	*/
-	Calipso.util.getModelType = function(modelTypeKey) {
+	Calipso.util.getUseCaseFactory = function(modelTypeKey) {
 		// console.log("getModelType, modelTypeKey: " + modelTypeKey);
-		// console.log(Calipso.modelTypesMap);
+		// console.log(Calipso.useCaseFactoriesMap);
 		// load model Type
-		var ModelType;
-		if (Calipso.modelTypesMap[modelTypeKey]) {
-			ModelType = Calipso.modelTypesMap[modelTypeKey];
+		var UseCaseFactory;
+		if (Calipso.useCaseFactoriesMap[modelTypeKey]) {
+			UseCaseFactory = Calipso.useCaseFactoriesMap[modelTypeKey];
 		} else {
-			var modelForRoute;
+			throw "No usecase factory found for key: " + modelTypeKey;
+			/*var modelForRoute;
 			var modelModuleId = "model/" + _.singularize(modelTypeKey);
 			if (!require.defined(modelModuleId)) {
 				require([ modelModuleId ], function(module) {
-					ModelType = module;
+					UseCaseFactory = module;
 				});
 			} else {
-				ModelType = require(modelModuleId);
+				UseCaseFactory = require(modelModuleId);
 			}
-
+			*/
 		}
-		if (!ModelType) {
-			throw "No matching model type was found for key: " + modelModuleId;
-		}
-		return ModelType;
+		return UseCaseFactory;
 	};
+
 
 	// //////////////////////////////////////
 	// Search cache
@@ -1299,6 +1285,7 @@ Calipso.cloneSpecificValue = function(val) {
 	Calipso.UseCaseContext = Marionette.Object.extend(
 		{
 			key : null,
+			model : null,
 			//schemaType : null, specfied by view instead
 			roleIncludes : null,
 			roleExcludes : null,
@@ -1308,25 +1295,46 @@ Calipso.cloneSpecificValue = function(val) {
 			fieldMasks : null,
 			view : null,
 			viewOptions : {},
-			mergableOptions: ['key', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model',
-				'view', 'viewOptions',, 'childViewOptions',
+			mergableOptions: ['key', 'pathFragment', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model', 'factory',
+				'view', 'viewOptions', 'childViewOptions',
 				'roleIncludes', 'roleExcludes',
 				"formTemplate", "formFieldTemplate",
 				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'overrides'],
-
 			initialize : function(options){
+				//console.log("UseCaseContext#initialize options: ");
+				//console.log(options);
 				Marionette.Object.prototype.initialize.apply(this, arguments);
 				this.mergeOptions(options, this.mergableOptions);
-				//console.log("UseCaseContext#initialize, key: " + this.key + ", title: " + this.title + ", description: " + this.description + ", defaultNext: " + this.defaultNext);
-
+				this.parentContext = options.parentContext;
+				this.addToCollection = options.addToCollection;
+				if(this.addToCollection){
+					var _this = this;
+					this.listenToOnce(this.model, "sync", function(){
+						console.log("usecase context, adding to collection");
+						_this.addToCollection.add(_this.model);
+						_this.model.trigger("added");
+					});
+				}
 		  },
 			createView : function(options){
 				options || (options = {});
-				var viewOptions = 	_.extend({},
-					this.viewOptions || {}, options.viewOptions || {},
-					{useCaseContext : this, model : this.model});
+				var viewOptions = 	Calipso.deepExtend({}, this.viewOptions || {}, options);
+				viewOptions.useCaseContext = this;
+				viewOptions.model = this.model;
+				viewOptions.addToCollection = this.addToCollection;
 				return new this.view(viewOptions);
 
+			},
+			getRouteUrl : function(){
+				var s = "/useCases/" +this.pathFragment;
+				if(!this.model.isNew()){
+					s += ("/" + this.model.get("id"));
+				}
+				s += ("/" + this.key);
+				return s;
+			},
+			getFetchable : function(){
+				return this.model.wrappedCollection ? this.model.wrappedCollection : this.model
 			},
 			getFields : function(){
 				// if not given, pick them up from model
@@ -1353,44 +1361,33 @@ Calipso.cloneSpecificValue = function(val) {
 				});
 				return caseFields;
 			},
-			getChild : function(regionName, ViewType){
+			getChildContext : function(regionName, ViewType){
 				var _this = this;
 				var schemaTypeOverrideKey;
-				var useCaseOptions = {};
+				var childOptions = {};
 				// self as base config
 				_.each(this.mergableOptions, function(mergableProp){
-					useCaseOptions[mergableProp] = _.clone(_this[mergableProp]);
+					if(_this[mergableProp]){
+						childOptions[mergableProp] = _this[mergableProp];
+					}
 				});
-				// apply layout's default region view type
-				useCaseOptions.view = ViewType;
+				// apply layout's default region view type if given
+				ViewType && (childOptions.view = ViewType);
 				// apply ovverrides?
 				if(_this.overrides){
-					delete useCaseOptions.overrides;
+					delete childOptions.overrides;
 					// apply child usecase overrides based on region name
-					Calipso.deepExtend(useCaseOptions, _this.overrides[regionName]);
+					Calipso.deepExtend(childOptions, _this.overrides[regionName]);
 					// apply child usecase overrides based on scehame type
-					schemaTypeOverrideKey = useCaseOptions.view.getSchemaType();
-					Calipso.deepExtend(useCaseOptions, _this.overrides[schemaTypeOverrideKey]);
-					Calipso.deepExtend(useCaseOptions, _this.overrides[regionName + '-' + schemaTypeOverrideKey]);
+					schemaTypeOverrideKey = childOptions.view.getSchemaType();
+					Calipso.deepExtend(childOptions, _this.overrides[schemaTypeOverrideKey]);
+					Calipso.deepExtend(childOptions, _this.overrides[regionName + '-' + schemaTypeOverrideKey]);
 				}
-				return new Calipso.UseCaseContext(useCaseOptions);
+				// Luke... I am your father
+				childOptions.parentContext = this;
+				return new Calipso.UseCaseContext(childOptions);
 			}
 
-		},
-		{
-			// TODO: remove and refactor to usecase resolver interface
-			createContext : function(options){
-				//console.log("UseCaseContext#create options: ");
-				//console.log(options);
-				var modelUseCase = options.model.getUseCaseContext(options.key);
-				//console.log("UseCaseContext#create modelUseCase: ");
-				//console.log(modelUseCase);
-
-				var foptions = _.extend(modelUseCase, options);
-				//console.log("UseCaseContext#create final options: ");
-				//console.log(foptions);
-				return new Calipso.UseCaseContext(foptions);
-			}
 		}
 	);
 	// plumbing for handlebars template helpers

@@ -98,6 +98,11 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		isCollectionCacheable : function() {
 			return this.constructor.isCollectionCacheable && this.constructor.isCollectionCacheable();
 		},
+
+		getUseCaseContext : function(options) {
+      options.model = this;
+			return this.constructor.getUseCaseContext(options);
+		},
 	}, {
 		// static members
 		/** (Default) 0Do not retrieve the form schema from the server */
@@ -121,7 +126,25 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			return this.public || false;
 		},
 		create : function(attrs, options) {
-			return new this(attrs, options);
+      var modelAttributes = attrs;
+      if(options && options.httpParams){
+        var params = _.isString(options.httpParams) ? Calipso.getHttpUrlParams(options.httpParams) : options.httpParams;
+        modelAttributes = _.extend(params);
+  		}
+			var model = new this(modelAttributes, options);
+      if (!modelAttributes.id && this.getTypeName() != "Calipso.model.UserDetailsModel") {
+  			var collectionOptions = {
+  				model : this,
+  				url : Calipso.getBaseUrl() + "/api/rest/" + this.getPathFragment(),
+  			};
+  			if (options.httpParams) {
+  				collectionOptions.data = options.httpParams;
+  			}
+  			// create a model to use as a wrapper for a collection of
+  			// instances of the same type, fill it with any given search criteria
+  			model.wrappedCollection = Calipso.util.cache.getCollection(collectionOptions);
+  		}
+      return model;
 		},
 		isPublic : function() {
 			return this.public;
@@ -147,17 +170,14 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		useCases : {
 			create : {
 				view : Calipso.view.BrowseLayout,
+				viewOptions : {
+					closeModalOnSync : true
+				}
 			},
 			update : {
 				view : Calipso.view.BrowseLayout,
 				viewOptions : {
-					/*
-          childViewOptions : {
-						formOptions : {
-							submitButton : "WOW"
-						}
-					}
-          */
+					closeModalOnSync : true
 				}
 			},
 			search : {
@@ -165,14 +185,23 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			},
 
 		},
-
-		getUseCaseContext : function(key) {
-			var useCaseContext = this.superClass && this.superClass.getUseCaseContext ? this.superClass.getUseCaseContext(key) : {};
-			var overrides = this.useCases[key] ? _.clone(this.useCases[key]) : {};
-			useCaseContext = Calipso.deepExtend(useCaseContext, overrides, {
-				key : key
-			});
-			return useCaseContext;
+		_getUseCaseConfig : function(key) {
+      // get superclass config
+			var useCaseConfig = this.superClass && this.superClass._getUseCaseConfig ? this.superClass._getUseCaseConfig(key) : {};
+      // apply own config
+      this.useCases && Calipso.deepExtend(useCaseConfig, this.useCases[key]);
+      return useCaseConfig;
+		},
+		getUseCaseContext : function(options) {
+			var useCaseConfig = this._getUseCaseConfig(options.key);
+      Calipso.deepExtend(useCaseConfig.viewOptions, options.viewOptions);
+      // setup a model instance if needed
+      useCaseConfig.model = options.model || this.create({id : options.modelId}, {httpParams : options.httpParams});
+      useCaseConfig.factory = this;
+      useCaseConfig.addToCollection = options.addToCollection;
+      useCaseConfig.key = options.key;
+      useCaseConfig.pathFragment = this.getPathFragment();
+      return new Calipso.UseCaseContext(useCaseConfig);
 		},
 		hasUseCase : function(key) {
 			var has = false;
@@ -540,6 +569,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			}
 		},
 		create : function(options) {
+      console.log(this.getTypeName() + "#create singleton ");
 			if (this._instance === undefined) {
 				this._instance = new this(options);
 			} else {

@@ -69,21 +69,20 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		skipSrollToTop : false,
 		// regionName : viewType
 		regionViewTypes : {},
-		viewEvents : {},
+		viewEvents : {
+			"model:sync" : "onModelSync"
+		},
 		events : {
-			"click  button.layout-showCreateFormModal" : "showCreateFormModal"
+			"click  .layout-showCreateFormModal" : "showCreateFormModal"
 		},
 
 		showCreateFormModal : function(e) {
-			console.log("CshowCreateFormModal: " + this.model.constructor.getTypeName());
 			Calipso.stopEvent(e);
-			Calipso.vent.trigger("layout:createModel", {
-				modelType : this.model.constructor
-			});
+			Calipso.vent.trigger("modal:showUseCaseContext",  this.model.constructor.getUseCaseContext({key : "create", addToCollection : this.model.wrappedCollection}));
 		},
 		initialize : function(options) {
 			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
-			this.useCaseContext = options.useCaseContext;
+			this.mergeOptions(options, ['useCaseContext', 'model', 'closeModalOnSync', 'regionPath', 'regionName']);
 			if (!this.skipSrollToTop) {
 				$(window).scrollTop(0);
 			}
@@ -91,19 +90,19 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		onShow : function() {
 			var _this = this;
 			var childUseCase;
-			console.log(this.getTypeName() + "#onShow");
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
 				// spawn child usecase
-				childUseCase = _this.useCaseContext.getChild(regionName, ViewType);
+				childUseCase = _this.useCaseContext.getChildContext(regionName, ViewType);
 				// display a preconfigured view that matches the region and usecase config
-				_this.showChildView(regionName, childUseCase.createView());
+				var viewOptions = _.extend(this.childViewOptions, {regionName : regionName, regionPath : _this.regionPath + "/" + regionName});
+				_this.showChildView(regionName, childUseCase.createView({viewOptions : viewOptions}));
 			});
 		},
 		showChildView : function(regionName, view) {
 			var _this = this;
-			view.useCaseContext == (view.useCaseContext ? view.useCaseContext : this.useCaseContext);
-			view.regionName = regionName;
-			view.regionPath = this.regionPath + "." + regionName;
+			//view.useCaseContext == (view.useCaseContext ? view.useCaseContext : this.useCaseContext);
+			//view.regionName = regionName;
+			//view.regionPath = this.regionPath + "." + regionName;
 
 			// bind to view events according to viewEvents hash
 			_.each(this.viewEvents, function(method, eventName, list) {
@@ -134,8 +133,14 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			return new RegionManager();
 		},
 		onModelSync : function(args) {
+			console.log(this.getTypeName() + "#onModelSync, this.modal: " + this.modal);
 			// execute next useCase by default
-			this.nextUseCase();
+			if(this.closeModalOnSync){
+				Calipso.vent.trigger("modal:destroy");
+			}
+			else{
+				this.nextUseCase();
+			}
 		},
 		nextUseCase : function() {
 			//console.log(this.getTypeName() + ".nextUseCase, navigating to defaultNext: " + this.useCaseContext.defaultNext);
@@ -167,6 +172,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			var _this = this;
 			if (options.childView) {
 				this.childView = options.childView;
+				this.childView.modal = true;
 			}
 		},
 		onShow : function() {
@@ -557,6 +563,20 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			formRegion : Calipso.view.UseCaseFormView,
 			contentRegion : Calipso.view.UseCaseGridView
 		},
+		initialize : function(options) {
+			Calipso.view.UseCaseLayout.prototype.initialize.apply(this, arguments);
+			var collection = options.collection || options.model.wrappedCollection;
+			var _this = this;
+			this.listenTo(collection, 'reset', function() {
+				if(_this.regionPath == "/"){
+					var q = $.param( collection.data );
+
+					Calipso.navigate(this.useCaseContext.getRouteUrl() + "?" + q, {
+						trigger: false
+					})
+				}
+			});
+		}
 	},
 	// static members
 	{
@@ -590,9 +610,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	/** @lends Calipso.view.UserDetailsLayout.prototype */
 	{
 		template : Calipso.getTemplate('UserDetailsLayout'),
-		viewEvents : {
-			"model:sync" : "onModelSync"
-		},
 		onModelSync : function(options) {
 			// if successful login
 			if (this.model.get("id")) {
@@ -620,9 +637,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			{
 
 				template : Calipso.getTemplate('userRegistration-layout'),
-				viewEvents : {
-					"model:sync" : "onModelSync"
-				},
 				initialize : function(options) {
 					Calipso.view.BrowseLayout.prototype.initialize.apply(this, arguments);
 				},

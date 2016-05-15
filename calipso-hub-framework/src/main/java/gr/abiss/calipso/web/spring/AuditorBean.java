@@ -25,6 +25,7 @@ import javax.inject.Named;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.integration.LocalUserService;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
@@ -53,7 +54,10 @@ public class AuditorBean implements AuditorAware<User> {
 	@Override
 	public User getCurrentAuditor() {
 		if(currentAuditor == null){
-			currentAuditor = (User) this.userDetailsService.getPrincipalLocalUser();
+			ICalipsoUserDetails userDetails = SecurityUtil.getPrincipal();
+			if(userDetails != null){
+				currentAuditor = new User(userDetails.getId());
+			}
 		}
 		else{
 			LOGGER.debug("getCurrentAuditor returns cached result");

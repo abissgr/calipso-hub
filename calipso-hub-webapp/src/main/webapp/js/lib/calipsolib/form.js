@@ -275,6 +275,12 @@ define(
 				return hash;
 			}, {});
 		},
+		toQueryString : function() {
+			var hash = this.toJson();
+			var q = $.param( hash );
+			console.log("toQueryString: " + q);
+			return q;
+		},
 	});
 	Calipso.backboneform.Form.Field = Backbone.Form.Field.extend({
 
