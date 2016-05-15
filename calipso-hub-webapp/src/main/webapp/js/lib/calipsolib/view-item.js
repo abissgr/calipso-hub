@@ -114,15 +114,13 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			var isArray = schemaType == "backgrid", schema = null;
 
 			fields || (fields = this.useCaseContext.getFields());
-				//console.log(_this.getTypeName() + "#buildSchema fields: ");
-			//console.log(fields);
+
 			if (fields) {
 				var schemaEntry, baseSchemaEntry, overrideSchemaEntry;
 
 				schema = isArray ? [] : {};
 				_.each(fields, function(field, key) {
-					//console.log(_this.getTypeName() + "#buildSchema key: " + key + ", field: ");
-					//console.log(field);
+
 					baseSchemaEntry = Calipso.fields[field.fieldType][schemaType];
 					overrideSchemaEntry = field[schemaType];
 					// if a schema entry exists, add it
@@ -149,8 +147,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				});
 			}
-			//console.log("UseCaseItemView#buildSchema schema: ");
-			//console.log(schema);
 			return schema;
 		},
 	}, {
@@ -190,7 +186,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			window.history.back();
 		},
 		initialize : function(options) {
-			//console.log("UseCaseGridView.initialize, options: " + options);
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
 
 			this.collection = options.collection || options.model.wrappedCollection;
@@ -201,8 +196,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			if (options.callCollectionFetch) {
 				this.callCollectionFetch = options.callCollectionFetch;
 			}
-			//console.log("UseCaseGridView.initialize, callCollectionFetch: " + this.callCollectionFetch);
-			//console.log("UseCaseGridView.initialize, collection: " + (this.collection ? this.collection.length : this.collection));
 		},
 		onGridRendered : function() {
 
@@ -215,8 +208,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		onShow : function() {
 			var _self = this;
-			//console.log("GRID onshow schema: ");
-			//console.log(this.schema);
 			this.backgrid = new Calipso.components.backgrid.Grid({
 				columns : _self.schema,
 				collection : _self.collection,
@@ -255,9 +246,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				_self.$(".loading-indicator").hide();
 				_self.$(".loading-indicator-back").hide();
 			}
-			// this.collection.fetch();main info
-
-			// console.log("UseCaseGridView showed");
 
 		},
 
@@ -274,19 +262,14 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	 */
 	Calipso.view.UseCaseFormView = Calipso.view.UseCaseItemView.extend({
 		/**
-		 * Cals the static method of the same name. Returns a Backbone.Form template
-		 * @param  {[String]} the template key, usually one of {"horizontal", "inline", "vertical"}
-		 * @return {[type]} the compiled template
+		 *
+		 * @param  {[String]} the templates key, usually one of {"horizontal", "inline", "vertical"}
+		 * @return {[type]} the compiled templates (form, field) from Calipso.util.formTemplates
 		 */
-		getFormTemplate : function(templateKey) {
-			return this.constructor.getFormTemplate(templateKey)
+		getFormTemplates : function(templatesKey) {
+			templatesKey || (templatesKey = this.formTemplatesKey || "vertical");
+			return this.constructor.getFormTemplates(templatesKey)
 		},
-		/*
-		getFieldTemplate : function(templateKey) {
-			return this.constructor.getFieldTemplate(templateKey)
-		},
-		*/
-		formTemplateKey : "horizontal",
 		modal : false,
 		hasDraft : false,
 		// Define view template
@@ -302,17 +285,21 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			"click button.cancel" : "cancel",
 			"submit" : "commitOnEnter",
 			"keypress input[type=password]" : "commitOnEnter",
-			"keypress input[type=text]" : "commitOnEnter"
+			"keypress input[type=text]" : "commitOnEnter",
+			"click .addLazyField" : "addLazyField",
+		},
+		addLazyField : function(e){
+			var fieldKey = $(e.currentTarget).data("field");
+			this.form.renderLazyField(fieldKey);
 		},
 		initialize : function(options) {
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
-			this.mergeOptions(options, [ "modal", "addToCollection", "formTemplateKey", "formTemplate" ]);
-
+			this.mergeOptions(options, [ "modal", "addToCollection",
+				"formTemplatesKey", "formTemplates", 'fieldsInitiallyShown' ]);
 			this.searchResultsCollection = this.model.wrappedCollection;
-			//
-
-			if (!this.formTemplate) {
-				this.formTemplate = this.getFormTemplate(this.formTemplateKey ? this.formTemplateKey : this.model.getFormTemplateKey());
+			// get the form/field templates
+			if (!this.formTemplates) {
+				this.formTemplates = this.getFormTemplates();
 			}
 
 		},
@@ -436,7 +423,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		onShow : function() {
 			var _self = this;
-			//console.log("_self.formSchemaKey: " + _self.formSchemaKey);
 			// get appropriate schema
 			var formSchema = this.schema;
 
@@ -452,7 +438,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 						_self.renderForm();
 					},
 					error : function(model, response, options) {
-						//console.log("Error fetching model from server");
 						alert("Error fetching model from server");
 					}
 				});
@@ -486,21 +471,23 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 					_self.model.set(draft);
 				}
 			}
-
 			var formOptions = {
 				model : _self.model,
 				schema : formSchema,
-				//formSchemaKey : _self.formSchemaKey,
-				template : _self.getFormTemplate(),
-				//fieldTemplate : _self.getFieldTemplate(),
+				formClassName : _self.formTemplates.formClassName,
+				template : _self.formTemplates.form,
+				fieldTemplate : _self.formTemplates.field,
+				fieldsetTemplate : _self.formTemplates.fieldset,
+				fieldsInitiallyShown : _self.fieldsInitiallyShown,
 			};
+
 			// model driven submit button?
 			if (formSubmitButton) {
 				formOptions.submitButton = formSubmitButton;
 			}
 			this.form = new Calipso.backboneform.Form(formOptions);
 			//this.$el.append(this.form.el);
-			this.form.setElement(this.$el.find(".useCaseFormView-form:first").first()).render();
+			this.form.setElement(this.$el.find("form:first").first()).render();
 			this.$el.find('input, select').filter(':visible:enabled:first').focus();
 			this.onFormRendered();
 
@@ -513,7 +500,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 			// proxy model events to parent layout
 			this.listenTo(this.form, "all", function(eventName) {
-				//console.log(_self.getTypeName() + " triggering event form:" + eventName);
 				_self.triggerMethod("form:" + eventName, {
 					model : _self.model,
 					view : _self,
@@ -535,7 +521,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			return indexed_array;
 		},
 		socialLogin : function(e) {
-			console.log(this.getTypeName() + "#socialLogin");
 			Calipso.socialLogin(e);
 		},
 		getDraftKey : function() {
@@ -555,20 +540,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		 * Returns a Backbone.Form template
 		 * @param  {[Calipso.view.UseCaseFormView]} the form view instance
 		 * @param  {[String]} the template key, usually one of {"horizontal", "inline", "vertical"}
-		 * @return {[type]} the compiled template
+		 * @return {[type]} the compiled templates e.g. (form : t1, field : t2)
 		 */
-		getFormTemplate : function(instance, templateKey) {
-			templateKey = /*templateKey ? templateKey :*/"horizontal";
-			//console.log("consstructor.getFormTemplate, templateKey: " + templateKey);
-			return Calipso.util.formTemplates[templateKey];
+		getFormTemplates : function(templatesKey) {
+			return Calipso.util.formTemplates[templatesKey];
 		},
-		/*
-		getFieldTemplate : function(instance, templateKey) {
-			templateKey = "horizontal";
-			//console.log("consstructor.getFieldTemplate, templateKey: " + templateKey);
-			return Calipso.util.formTemplates["field-" + templateKey];
-		},
-		*/
 	});
 
 

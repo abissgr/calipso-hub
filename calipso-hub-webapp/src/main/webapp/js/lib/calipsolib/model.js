@@ -171,17 +171,22 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			create : {
 				view : Calipso.view.BrowseLayout,
 				viewOptions : {
-					closeModalOnSync : true
+					closeModalOnSync : true,
+          formTemplatesKey : "horizontal",
 				}
 			},
 			update : {
 				view : Calipso.view.BrowseLayout,
 				viewOptions : {
-					closeModalOnSync : true
+					closeModalOnSync : true,
+          formTemplatesKey : "horizontal",
 				}
 			},
 			search : {
 				view : Calipso.view.UseCaseSearchLayout,
+				viewOptions : {
+          formTemplatesKey : "vertical",
+				}
 			},
 
 		},
@@ -319,17 +324,18 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			},
 			search : {
 				view : Calipso.view.UseCaseSearchLayout,
+        viewOptions : {
+          formTemplatesKey : "vertical",
+        },
 				overrides : {
 					backgrid : {
 						fieldIncludes : [ "username", "firstName", "lastName", "edit" ]
 					},
 					form : {
 						fieldIncludes : [ "username", "firstName", "lastName", "email" ],
-						fields : {
-							username : {
-								fieldType : "Boolean",
-							}
-						}
+						//viewOptions : {
+            //  fieldsInitiallyShown : [ "username", "email" ],
+            //},
 					},
 				}
 			},

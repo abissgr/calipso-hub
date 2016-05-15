@@ -22,81 +22,79 @@ define(
 function(Calipso, BackboneFormsBootstrap) {
 
 	Calipso.util.formTemplates = {
-	/*
-	<div class="form-group field-username">
-	<label class="control-label" for="c14_username">        Username      </label>
-	<span class="col-sm-10" data-editor=""><input id="c14_username" class="form-control" name="username" type="text"></span>            </div>
-
-
-	*/
-		"field-horizontal" : _.template('\
-	    <div class="form-group field-<%= key %>">\
-	      <label class="col-xs-12  col-sm-12  col-md-3 col-lg-3 control-label" for="<%= editorId %>">\
-	        <% if (titleHTML){ %><%= titleHTML %>\
-	        <% } else { %><%- title %><% } %>\
-	      </label>\
-	      <div class="col-xs-12  col-sm-12  col-md-9 col-lg-9" data-editor></div>\
-	      <p class="col-sm-12" class="help-block" data-error></p>\
-	    </div>\
-	  '),
-		horizontal : _.template('\
-		<form class="form-horizontal" role="form">\
-	    <div data-fieldsets></div>\
-			<% if (submitButton) { %>\
-			<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
-			<% } %>\
-	  </form>'),
-		// TODO: fix or remove each entry
-		nav : _.template('\
-		<nav class="navbar navbar-default">\
-		<form autocomplete=\"off\" class="navbar-form navbar-left" role="form">\
-		<span data-fields="*"></span>\
-		<% if (submitButton) { %>\
-		<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
-		<% } %>\
-		</form>\
-		</nav>'),
-		inline : _.template('\
-		<form autocomplete=\"off\" class="form-inline" role="form">\
-		<span data-fields="*"></span>\
-		<% if (submitButton) { %>\
-		<div class="form-group"><button type="submit" class="submit btn btn-primary"><%= submitButton %></button></div>\
-		<% } %>\
-		</form>'),
-		vertical : _.template('\
-		<form autocomplete=\"off\" role="form">\
-		<div data-fieldsets></div>\
-		<% if (submitButton) { %>\
-		<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
-		<% } %>\
-		</form>'),
-		auth : _.template('\
-		<form autocomplete=\"off\" role="form">\
-		<div data-fieldsets></div>\
-		<% if (submitButton) { %>\
-		<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
-		<span class="pull-right">\
-			<% if (submitButton.indexOf("Reg") == -1) { %>\
-		   <small>Need an account?</small>\
-		   <a title="Click to register" class="btn btn-success" href="/register">Register</a>\
-			<% } %>\
-		   <small>or sign-in with</small>\
-		    <div role="group" class="btn-group">\
-		        <a class="btn btn-default btn-social-login btn-social-login-facebook">\
-		            <i class="fa fa-facebook-f"></i><!-- &#160;facebook -->\
-		        </a>\
-		        <a class="btn btn-default btn-social-login btn-social-login-linkedin">\
-		            <i class="fa fa-linkedin"></i><!-- &#160;linkedin  -->\
-		        </a>\
-		        <!--a class="btn btn-default btn-social-login btn-social-login-twitter">\
-		            <i class="fa fa-twitter"></i><!-- &#160;twitter -->\
-		        <a class="btn btn-default btn-social-login btn-social-login-google">\
-		            <i class="fa fa-google-plus"></i><!-- &#160;google+ -->\
-		        </a>\
+		horizontal : {
+			formClassName : "form-horizontal",
+			form :  _.template('\
+			<form class="form-horizontal" role="form">\
+		    <div data-fieldsets></div>\
+				<% if (fieldsInitiallyShown) { %>\
+				<% } %>\
+				<% if (submitButton) { %>\
+				<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
+				<% } %>\
+		  </form>'),
+			field : _.template('\
+		    <div class="form-group field-<%= key %>">\
+		      <label class="col-xs-12  col-sm-12  col-md-3 col-lg-3 control-label" for="<%= editorId %>">\
+		        <% if (titleHTML){ %><%= titleHTML %>\
+		        <% } else { %><%- title %><% } %>\
+		      </label>\
+		      <div class="col-xs-12  col-sm-12  col-md-9 col-lg-9" data-editor></div>\
+		      <p class="col-sm-12" class="help-block" data-error></p>\
 		    </div>\
-		</span>\
-		<% } %>\
-		</form>'),
+		  '),
+		},
+		vertical : {
+			formClassName : "",
+			form :  _.template('\
+			<form>\
+		    <div  data-fieldsets></div>\
+				<% if (fieldsInitiallyShown) { %>\
+					<button class="btn btn-info btn-sm addLazyField" data-field="firstName">add<button>\
+				<% } %>\
+				<% if (submitButton) { %>\
+				<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
+				<% } %>\
+		  </form>'),
+			field : _.template('\
+		    <div class="form-group field-<%= key %>">\
+		      <label class="control-label" for="<%= editorId %>">\
+		        <% if (titleHTML){ %><%= titleHTML %>\
+		        <% } else { %><%- title %><% } %>\
+		      </label>\
+		      <div data-editor></div>\
+		      <p class="col-sm-12" class="help-block" data-error></p>\
+		    </div>\
+		  '),
+		},
+		inline : {
+			formClassName : "form-inline",
+			form :  _.template('\
+			<form class="form-inline">\
+		    <span data-ffieldsets></span>\
+				<% if (fieldsInitiallyShown) { %>\
+				<% } %>\
+				<% if (submitButton) { %>\
+				<span class="form-group bmd-form-group">\
+				<button type="submit" class="submit btn btn-primary btn-sm"><%= submitButton %></button>\
+				</span>\
+				<% } %>\
+		  </form>'),
+			field : _.template('\
+		    <div class="form-group field-<%= key %>">\
+		      <label class="control-label" for="<%= editorId %>">\
+		        <% if (titleHTML){ %><%= titleHTML %>\
+		        <% } else { %><%- title %><% } %>\
+		      </label>\
+		      <span data-editor></span>\
+		      <p class="col-sm-12" class="help-block" data-error></p>\
+		    </div>\
+		  '),
+			fieldset : _.template('\
+		    <span data-fields>\
+		    </span>\
+		  '),
+		},
 	};
 	return Calipso;
 });

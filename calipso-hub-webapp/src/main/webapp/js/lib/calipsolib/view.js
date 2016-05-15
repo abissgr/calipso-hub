@@ -54,7 +54,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		template : Calipso.getTemplate('homeLayout'),
 		onShow : function() {
 			var _this = this;
-			//console.log("HomeLayout#onShow");
 		}
 	},
 	// static members
@@ -100,13 +99,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		showChildView : function(regionName, view) {
 			var _this = this;
-			//view.useCaseContext == (view.useCaseContext ? view.useCaseContext : this.useCaseContext);
-			//view.regionName = regionName;
-			//view.regionPath = this.regionPath + "." + regionName;
 
 			// bind to view events according to viewEvents hash
 			_.each(this.viewEvents, function(method, eventName, list) {
-				//console.log(_this.getTypeName() + " subscribing to view event: " + eventName);
 				_this.listenTo(view, eventName, function(options) {
 					// if method is own method name
 					if (_.isString(method) && _this[method]) {
@@ -133,7 +128,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			return new RegionManager();
 		},
 		onModelSync : function(args) {
-			console.log(this.getTypeName() + "#onModelSync, this.modal: " + this.modal);
 			// execute next useCase by default
 			if(this.closeModalOnSync){
 				Calipso.vent.trigger("modal:destroy");
@@ -143,7 +137,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			}
 		},
 		nextUseCase : function() {
-			//console.log(this.getTypeName() + ".nextUseCase, navigating to defaultNext: " + this.useCaseContext.defaultNext);
 			// TODO: handle from (and reuse) layout
 			if (this.useCaseContext.defaultNext) {
 				Calipso.navigate('/' + this.model.getPathFragment() + '/' + this.useCaseContext.defaultNext, {
@@ -224,25 +217,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			Calipso.stopEvent(e);
 			Calipso.changeLocale($(e.currentTarget).data("locale"));
 		},
-		// TODO: investigate
-		//		serializeData: function(){
-		//			var _this = this;
-		//			return {
-		//				model: _this.model,
-		//				message: "serializeData works",
-		//			}
-		//		},
 		onShow : function() {
-			// TODO:find whos triggering and change
-			this.listenTo(Calipso.vent, "header:hideSidebar", function() {
-				//				this.$el.find(".navbar-static-side").hide();
-				//				$("#page-wrapper").attr("id", "page-wrapper-toggled");
-			});
-			this.listenTo(Calipso.vent, "header:showSidebar", function() {
-				//				$("#page-wrapper-toggled").attr("id", "page-wrapper");
-				//				this.$el.find(".navbar-static-side").show();
-			});
-
 			var menuModel = [ {
 				url : "users",
 				label : "Users"
@@ -255,12 +230,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				template : Calipso.getTemplate('header-menuitem')
 			});
 
-			//			var MenuCollectionView = Backbone.Marionette.CollectionView.extend({
-			//				tagName : "ul",
-			//				template : Calipso.getTemplate('header-menuitem'),
-			//				childView : MenuItemView
-			//			});
-			//			this.menuRegion.show(new MenuCollectionView(menuModel));
 			if (Calipso.util.isAuthenticated()) {
 				// load and render notifications list
 				var notifications = new Calipso.collection.PollingCollection([], {
@@ -268,7 +237,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 					model : Calipso.model.BaseNotificationModel
 				});
 
-				//console.log("HeaderView, created notifications collection: " + notifications + ", url: " + notifications.url);
 				var notificationsView = new Calipso.view.TemplateBasedCollectionView({
 					tagName : "ul",
 					className : "dropdown-menu dropdown-notifications",

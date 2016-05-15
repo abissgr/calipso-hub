@@ -60,7 +60,7 @@ define(
 					if(usersCollection.length > 0){
 						// if not the same user
 						var formModelId = Calipso.getObjectProperty(instance, "id");
-						//console.log("Validating EMAIL, current ID: " + formModelId + ", found ID: " + usersCollection.at(0).get("id"));
+
 						if(!formModelId || formModelId != usersCollection.at(0).get("id")){
 							return {
 								type : "email",
@@ -72,54 +72,46 @@ define(
 			}
 		}
 	}
-	/*
-	Calipso.backboneformTemplates = {
-			horizontal : _.template('\
-				<div class="form-group field-<%= key %>">\
-				<label class="col-sm-2 control-label" for="<%= editorId %>">\
-				  <% if (titleHTML){ %><%= titleHTML %>\
-				  <% } else { %><%- title %><% } %>\
-				</label>\
-				<div class="col-sm-10">\
-				  <span data-editor></span>\
-				  <p class="help-block" data-error></p>\
-				  <p class="help-block"><%= help %></p>\
-				</div>\
-				</div>\
-			'),
-			vertical :  _.template('\
-		    <div class="form-group field-<%= key %>">\
-		      <label class="control-label" for="<%= editorId %>">\
-		        <% if (titleHTML){ %><%= titleHTML %>\
-		        <% } else { %><%- title %><% } %>\
-		      </label>\
-		      <div class="">\
-		        <span data-editor></span>\
-		        <p class="help-block" data-error></p>\
-		        <p class="help-block"><%= help %></p>\
-		      </div>\
-		    </div>\
-		  '),
-			inline :  _.template('\
-		    <div class="form-group field-<%= key %>">\
-		      <label class="control-label" for="<%= editorId %>">\
-		        <% if (titleHTML){ %><%= titleHTML %>\
-		        <% } else { %><%- title %><% } %>\
-		      </label>\
-		      <div class="">\
-		        <span data-editor></span>\
-		        <p class="help-block" data-error></p>\
-		        <p class="help-block"><%= help %></p>\
-		      </div>\
-		    </div>\
-		  ')
-	};
-	*/
 
+	Calipso.backboneform.Fieldset = Backbone.Form.Fieldset.extend({
+
+		initialize: function(options) {
+			options || (options = {});
+			Backbone.Form.Fieldset.prototype.initialize.apply(this, arguments);
+			this.form = options.form;
+		},
+	  render: function() {
+	    var schema = this.schema,
+	        fields = this.fields,
+					form = this.form,
+	        $ = Backbone.$,
+					_this = this;
+	    //Render fieldset
+	    var $fieldset = $($.trim(this.template(_.result(this, 'templateData'))));
+	    //Render fields
+	    $fieldset.find('[data-fields]').add($fieldset).each(function(i, el) {
+	      var $container = $(el),
+	          selection = $container.attr('data-fields');
+	      if (_.isUndefined(selection)) return;
+
+				_.each(fields, function(field) {
+					if(form.fieldsInitiallyShown
+						&& $.inArray(field.key, form.fieldsInitiallyShown) < 0){
+						form.lazyFieldContainers[field.key] = $container;
+					}
+					else{
+						$container.append(field.render().el);
+					}
+	      });
+	    });
+	    this.setElement($fieldset);
+	    return this;
+	  },
+	});
 	Calipso.backboneform.Form = Backbone.Form.extend({
 		hintRequiredFields : true,
 		capitalizeKeys : true,
-
+		lazyFieldContainers : {},
 		/**
 		 * Constructor
 		 *
@@ -137,11 +129,16 @@ define(
 		 */
 		initialize : function(options) {
 			options || (options = {});
+			options.Fieldset || (options.Fieldset = Calipso.backboneform.Fieldset);
 			var hintRequiredFields = options.hintRequiredFields;
 			if (!_.isUndefined(hintRequiredFields)) {
 				this.hintRequiredFields = hintRequiredFields;
 			}
-			this.fieldTemplate = options.fieldTemplate || Calipso.util.formTemplates["field-horizontal"];
+			this.formClassName = options.formClassName;
+			this.fieldTemplate = options.fieldTemplate;
+			this.fieldsetTemplate = options.fieldsetTemplate;
+			this.fieldsInitiallyShown = options.fieldsInitiallyShown;
+
 			Backbone.Form.prototype.initialize.apply(this, arguments);
 		},
 		/**
@@ -174,6 +171,16 @@ define(
 
 			return Backbone.Form.prototype.createField.apply(this, arguments);;
 		},
+		createFieldset: function(schema) {
+	    var options = {
+      	form: this,
+	      schema: schema,
+	      fields: this.fields,
+	      legend: schema.legend || null
+	    };
+			this.fieldsetTemplate && (options.template = this.fieldsetTemplate);
+	    return new this.Fieldset(options);
+	  },
 		getDraft : function(){
 			var values = {};
 			_.each(this.fields, function(field) {
@@ -188,6 +195,26 @@ define(
 			delete values.currentStepIndex;
 			delete values.highestStepIndex;
 			return values;
+		},
+		renderLazyField : function(fieldKey){
+			var $container = this.lazyFieldContainers[fieldKey];
+			if($container){
+				$container.append(this.fields[fieldKey].render().el);
+				delete this.lazyFieldContainers[fieldKey];
+			}
+		},
+		addOrPrepareFieldsforContainer : function(fieldKeys, $container, fields){
+			var _this = this;
+			//Add them
+			_.each(fieldKeys, function(key) {
+				var field = fields[key];
+				if(_this.fieldsInitiallyShown && !$.inArray(key, _this.fieldsInitiallyShown)){
+					_this.lazyFieldContainers[key] = $container;
+				}
+				else{
+					$container.append(field.editor.render().el);
+				}
+			});
 		},
 		render : function() {
 			var self = this, fields = this.fields, $ = Backbone.$;
@@ -204,7 +231,7 @@ define(
 						self.$el.attr(this.name, this.value);
 					}
 				});
-				this.$el.html($form.html());
+				this.$el.addClass(this.formClassName).html($form.html());
 				$form = this.$el;
 			} else {
 				this.setElement($form);
@@ -217,15 +244,9 @@ define(
 
 				//Work out which fields to include
 				var keys = (selection == '*') ? self.selectedFields || _.keys(fields) : selection.split(',');
+				self.addOrPrepareFieldsforContainer(keys, $container, fields);
 
-				//Add them
-				_.each(keys, function(key) {
-					var field = fields[key];
-
-					$container.append(field.editor.render().el);
-				});
 			});
-
 			//Render standalone fields
 			$form.find('[data-fields]').add($form).each(function(i, el) {
 				var $container = $(el), selection = $container.attr('data-fields');
@@ -235,13 +256,8 @@ define(
 
 				//Work out which fields to include
 				var keys = (selection == '*') ? self.selectedFields || _.keys(fields) : selection.split(',');
+				self.addOrPrepareFieldsforContainer(keys, $container, fields);
 
-				//Add them
-				_.each(keys, function(key) {
-					var field = fields[key];
-
-					$container.append(field.render().el);
-				});
 			});
 
 			//Render fieldsets
@@ -261,6 +277,14 @@ define(
 			this.trigger("attach");
 			return this;
 		},
+	  templateData: function() {
+	    var options = this.options;
+
+	    return {
+	      submitButton: options.submitButton,
+	      fieldsInitiallyShown : options.fieldsInitiallyShown
+	    }
+	  },
 		close : function() {
 			this.trigger("close");
 			this.remove();
@@ -278,7 +302,6 @@ define(
 		toQueryString : function() {
 			var hash = this.toJson();
 			var q = $.param( hash );
-			console.log("toQueryString: " + q);
 			return q;
 		},
 	});
@@ -427,14 +450,6 @@ define(
 	});
 
 	Calipso.backboneform.Password = Calipso.backboneform.Text.extend({
-		/*
-		events : {
-			"click" : function(e){
-
-					console.log("click button");
-			}
-		},
-		*/
 		onFormAttach : function() {
 			Calipso.backboneform.Text.prototype.onFormAttach.call(this, arguments);
 			var _this = this;
@@ -481,7 +496,6 @@ define(
 	});
 	Calipso.backboneform.NonEmptyOrHidden = Calipso.backboneform.Text.extend({
 		render : function(){
-			console.log("RENDER value: " + this.getValue());
 			if (this.getValue()) {
 				return this.setElement(editor.render().el.attr("type", "hidden"));
     	}
@@ -724,7 +738,6 @@ define(
 			$el.typeahead("destroy");
 		},
 		setValue : function(value, name) {
-			//console.log("Calipso.backboneform.TypeaheadObject#setValue, value: '" + value + "', name: " + name);
 			var _this = this;
 			if (!value) {
 				value = null;
@@ -736,7 +749,6 @@ define(
 			}
 		},
 		getValue : function() {
-			//console.log("Calipso.backboneform.TypeaheadObject#getValue, value: '" + this.value + "'");
 			var value = this.value;
 			var query = this.$el.find("#" + this.id + "Typeahead").typeahead('val');
 			// if empty value or input, return plain
@@ -768,7 +780,6 @@ define(
 			}
 		},
 		callDataFunction : function(functionName, param) {
-			//console.log("callDataFunction:  " + functionName + ", param: " + param);
 			this.$el.data("DateTimePicker")[functionName](param);
 		},
 		onFormAttach : function() {
@@ -777,7 +788,6 @@ define(
 			_this.$el.parent().addClass("input-group");
 			_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
 			_this.$el.parent().datetimepicker(this.schema.config);
-			//console.log("Calipso.backboneform.Datetimepicker#render, _this.value: " + _this.value);
 			var value = _this.schema.fromProperty ? _this.model.get(_this.schema.fromProperty) : _this.value;
 			if (value) {
 				var initValue = new Date(value);
@@ -817,8 +827,6 @@ define(
 						model : options.schema.listModel,
 					});
 				}
-				console.log("SimpleTypeSelect2#initialize, options: ");
-				console.log(options);
 				Backbone.Form.editors.Select.prototype.initialize.call(this, options);
 				options = options || {};
 				if(options.schema && options.schema.config){
@@ -837,10 +845,6 @@ define(
 				}
 			},
 			setValue : function(value) {
-	//			console.log("setValue, value: ");
-	//			console.log(value);
-
-				console.log("setValue, value: " + (value?value.id:value));
 				this.$el.find('option[selected]').removeAttr('selected');
 
 				// add new selection
@@ -903,8 +907,6 @@ define(
 
 			getValue : function() {
 				var simpleValue = this.$el.val();
-	//			console.log("Backbone.Form.editors.ModelSelect2#getValue, value: ");
-	//			console.log(simpleValue);
 				var value;
 				if(simpleValue){
 
@@ -921,8 +923,6 @@ define(
 						});
 					}
 				}
-	//			console.log("getValue, simpleValue: " + simpleValue + ", model value: ");
-	//			console.log(value);
 				return value;
 			},
 		});
