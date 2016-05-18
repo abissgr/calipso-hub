@@ -135,8 +135,8 @@ public class AppInitializer {
 			for(int i = 0; i < 10; i++){
 				User u = new User();
 				u.setEmail("user"+i+"@abiss.gr");
-				u.setFirstName("First"+i);
-				u.setLastName("Last"+i);
+				u.setFirstName("Firstuser"+i);
+				u.setLastName("Lastuser"+i);
 				u.setUsername("user"+i);
 				u.setPassword("user"+i);
 				u.setLastVisit(now);

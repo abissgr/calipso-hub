@@ -58,6 +58,12 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 			validators : [ /*'required'*/],
 		}
 	});
+	Calipso.fields.SimpleSearch = Calipso.fields.Base.extend({}, {
+		"form" : {
+			type : "Text",
+			validators : [ /*'required'*/],
+		}
+	});
 	Calipso.fields.Text = Calipso.fields.text = Calipso.fields.String.extend({}, {
 		"backgrid" : {
 			editable : false,

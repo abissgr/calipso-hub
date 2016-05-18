@@ -91,7 +91,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 	Calipso.view.UseCaseItemView = Calipso.view.ItemView.extend({
-		mergableOptions : [ 'useCaseContext', 'formOptions' ],
+		mergableOptions : [ 'useCaseContext', 'fields', 'formOptions' ],
 		templateHelpers : {
 			viewId : function() {
 				return Marionette.getOption(this, "id");
@@ -109,11 +109,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.schema = this.buildSchema();
 		},
 		/** builds a UI-specific schema for the given fields */
-		buildSchema : function(fields) {
+		buildSchema : function() {
 			var _this = this, schemaType = this.getSchemaType();
 			var isArray = schemaType == "backgrid", schema = null;
 
-			fields || (fields = this.useCaseContext.getFields());
+			var fields = this.fields ||this.useCaseContext.getFields();
 
 			if (fields) {
 				var schemaEntry, baseSchemaEntry, overrideSchemaEntry;
@@ -270,6 +270,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			templatesKey || (templatesKey = this.formTemplatesKey || "vertical");
 			return this.constructor.getFormTemplates(templatesKey)
 		},
+
+		//keyPropertyCopy : "name",
+		labelPropertyCopy : "title",
 		modal : false,
 		hasDraft : false,
 		// Define view template
@@ -547,6 +550,44 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 	});
 
+	Calipso.view.SearchBoxFormView = Calipso.view.UseCaseFormView.extend({
+		buildSchema : function() {
+			var _this = this, typeAheadSources = [],
+			schema = Calipso.view.UseCaseFormView.prototype.buildSchema.apply(this, arguments);
+
+			console.log("SCHEMA: ");
+			console.log(schema);
+			// hide givne fields and use them to set the searchbox data sources
+			var label, fields = [];
+			_.each(schema, function(field, key) {
+				console.log("hiding field: " +key);
+				field.type = "Hidden";
+				label = field.title || field.titleHTML;
+				fields.push(key);
+				typeAheadSources.push({
+  					displayKey : key,
+  					name: key,
+  					source: _this.model.getTypeaheadSource({
+							query: "?properties=" + key + "&direction=ASC&" + key + "=%25wildcard%25"}),
+  					limit : 30,
+  					//templates: {
+  					//	header: '<strong class="tt-tag-heading tt-tag-heading2">' + label + '</strong>',
+  					//	empty: '<i class="tt-tag-heading tt-tag-heading2">' + label + ': none</i>'
+  					//},
+  					template : Calipso.util.formTemplates.vertical.field
+  				})
+			});
+			// add searchbox
+			schema.searchBox = {
+				type : Calipso.backboneform.SearchBox,
+				typeaheadSource : typeAheadSources,
+				fields : fields,
+			};
+			console.log("SCHEMA new: ");
+			console.log(schema);
+			return schema;
+		}
+	});
 
 	Calipso.view.AbstractItemView = Calipso.view.ItemView.extend({
 

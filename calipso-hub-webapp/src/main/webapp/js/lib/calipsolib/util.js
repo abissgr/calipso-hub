@@ -87,8 +87,11 @@ define(
 			* Encance the extend function to add a reference to super and properly extend events
 			*/
 			Calipso[packageName][newClassName].extend = function(protoProps, staticProps) {
+				staticProps || (staticProps = {});
 				var _this = staticProps.superClass = this;
-				var NewClass = BaseType.extend.apply(this, arguments);
+
+			//	return Backbone.Collection.prototype.fetch.call(this, options);
+				var NewClass = BaseType.extend.call(this, protoProps, staticProps);
 				// properly extend prototype hashes like events
 				_.each(["events", "triggers"], function(mergableProp){
 					if(_this.prototype[mergableProp]){

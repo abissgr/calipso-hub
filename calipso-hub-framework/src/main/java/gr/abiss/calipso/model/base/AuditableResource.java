@@ -63,7 +63,7 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 	private String path;
 	
 	/**
-	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
+	 * The number of URL segments in the resourc path
 	 */
 	@Column(name = "path_level", nullable = false)
 	private Short pathLevel;

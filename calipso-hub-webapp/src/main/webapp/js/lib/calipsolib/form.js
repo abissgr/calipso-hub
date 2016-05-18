@@ -73,6 +73,17 @@ define(
 		}
 	}
 
+	Calipso.backboneform.Field = Backbone.Form.Field.extend({
+		render: function() {
+			//Only render the editor if Hidden
+			if (this.schema.type.isHidden || this.schema.isHidden) {
+				return this.setElement(this.editor.render().el);
+			} else {
+				return Backbone.Form.Field.prototype.render.apply(this, arguments);
+			}
+		},
+	});
+
 	Calipso.backboneform.Fieldset = Backbone.Form.Fieldset.extend({
 
 		initialize: function(options) {
@@ -112,6 +123,7 @@ define(
 		hintRequiredFields : true,
 		capitalizeKeys : true,
 		lazyFieldContainers : {},
+		Field : Calipso.backboneform.Field,
 		/**
 		 * Constructor
 		 *
@@ -138,7 +150,13 @@ define(
 			this.fieldTemplate = options.fieldTemplate;
 			this.fieldsetTemplate = options.fieldsetTemplate;
 			this.fieldsInitiallyShown = options.fieldsInitiallyShown;
-
+			// add search mode if missing
+			if(!options.schema["_searchmode"]){
+				options.schema["_searchmode"] = {
+					type : Calipso.backboneform.SearchMode,
+					isHidden : true,
+				};
+			}
 			Backbone.Form.prototype.initialize.apply(this, arguments);
 		},
 		/**
@@ -305,96 +323,11 @@ define(
 			return q;
 		},
 	});
-	Calipso.backboneform.Form.Field = Backbone.Form.Field.extend({
-
-		render : function() {
-			var schema = this.schema, editor = this.editor, $ = Backbone.$;
-			// pickup field template
-			/*
-			if(!schema.template && this.constructor.template){
-				this.schema.template = this.constructor.template;
-			}
-			*/
-			//Only render the editor if Hidden
-			if (schema.type.ownRender) {
-				return this.setElement(editor.render().el);
-			} else {
-				return Backbone.Form.Field.prototype.render.apply(this, arguments);
-			}
-		}
-	}, {
-
-	});
-
-	Calipso.backboneform.Markup = Backbone.Form.editors.Hidden.extend({
-		tagName : "div",
-		excludeFromCommit : true,
-		events : {},
-		initialize : function(options) {
-			Backbone.Form.editors.Hidden.prototype.initialize.call(this, options);
-			var markup = this.schema.text;
-			/*if(!markup){
-				markup = this.schema.template ? this.schema.template(this) : this.constructor.html;
-			}*/
-			this.$el.removeAttr("class type");
-			this.$el.html(markup);
-
-		},
-		getTemplate : function() {
-			return this.schema.template || this.constructor.template;
-		},
-		validate : function() {
-		},
-		setValue : function() {
-		},
-		getValue : function() {
-		},
-		commit : function() {
-		}
-	}, {
-		ownRender : true
-	});
-
-	Calipso.backboneform.Hr = Calipso.backboneform.Markup.extend({
-		tagName : "hr",
-	});
-
-	Calipso.backboneform.P = Calipso.backboneform.Markup.extend({
-		tagName : "p",
-	}, {
-		// static
-		title : "No html or template was provided in schema"
-	});
-
-	Calipso.backboneform.PDanger = Calipso.backboneform.P.extend({
-		className : "text-danger",
-	});
-	Calipso.backboneform.H3 = Calipso.backboneform.P.extend({
-		tagName : "h3",
-	});
-	Calipso.backboneform.H4 = Calipso.backboneform.P.extend({
-		tagName : "h4",
-	});
-	Calipso.backboneform.H5 = Calipso.backboneform.P.extend({
-		tagName : "h5",
-	});
-	Calipso.backboneform.ListGroup = Calipso.backboneform.Markup.extend({
-		tagName : "div",
-		className : "list-group",
-		initialize : function(options) {
-			Backbone.Form.editors.Hidden.prototype.initialize.call(this, options);
-			var html = "";
-			// TODO: OR labels options
-			if (this.schema.options) {
-				for (var i = 0; i < options.schema.options.length; i++) {
-					html += '<div class="list-group-item">' + '<h5 class"list-group-item-heading"><strong>' + this.schema.options[i].heading + '</strong></h5>' + '<p class="list-group-item-tex">' + this.schema.options[i].text + '</p></div>';
-				}
-			}
-			this.$el.removeAttr("type class");
-			this.$el.addClass("list-group");
-			this.$el.html(html);
-
-		},
+	Calipso.backboneform.SearchMode = Backbone.Form.editors.Text.extend({
+		defaultValue : "AND",
+	},
+	{
+		isHidden : true,
 	});
 
 	Calipso.backboneform.Text = Backbone.Form.editors.Text.extend({
@@ -476,23 +409,6 @@ define(
 	},
 	// static members
 	{
-		/*
-		template : _.template('\
-			<div class="form-js3">\
-				<label for="<%= editorId %>">\
-					<% if (titleHTML){ %><%= titleHTML %>\
-					<% } else { %><%- title %><% } %>\
-				</label>\
-				<div class="input-group" data-editor>\
-					<span class="input-group-btn">\
-						<button class="btn btn-default" type="button">show</button>\
-					</span>\
-					<div data-error></div>\
-					<div><%= help %></div>\
-				</div>\
-			</div>\
-		', null, Backbone.Form.templateSettings),
-		*/
 	});
 	Calipso.backboneform.NonEmptyOrHidden = Calipso.backboneform.Text.extend({
 		render : function(){
@@ -734,7 +650,6 @@ define(
 		onBeforeClose : function() {
 			var _this = this;
 			var $el = _this.$el.find("#" + _this.id + "Typeahead");
-
 			$el.typeahead("destroy");
 		},
 		setValue : function(value, name) {
@@ -744,6 +659,7 @@ define(
 			}
 			this.value = value;
 			if (name) {
+				console.log("Changing name to " + name)
 				_this.$el.find("#" + this.id).attr("name", name);
 				_this.$el.find("#" + this.id).val(value && value.id ? value.id : value);
 			}
@@ -755,6 +671,49 @@ define(
 			return value && query ? value : null;
 		},
 	});
+
+	Calipso.backboneform.SearchBox = Calipso.backboneform.Typeahead.extend({
+		//excludeFromCommit : true,
+		initialize : function(options) {
+			Calipso.backboneform.Typeahead.prototype.initialize.call(this, options);
+		},
+		/**
+		 * Adds the editor to the DOM
+		 */
+		onFormAttach : function() {
+			var _this = this;
+			var $el = _this.$el.find("#" + _this.id);
+
+			$el.typeahead({
+				minLength : _this.minLength,
+				highlight : true,
+				hint : true
+			}, _this.typeaheadSource).on('typeahead:selected', function(e, suggestion, name) {
+				_this.setValue(suggestion[name]);
+			});
+			$el.bind('typeahead:change', function(e, query) {
+				_this.setValue(query);
+			});
+			if (_this.value) {
+				this.setValue(_this.value);
+			}
+			_this.form.fields["_searchmode"].setValue("OR");
+		},
+		setValue : function(value) {
+			console.log("setValue: " + value);
+			var _this = this;
+			this.value = value;
+			_this.$el.find("#" + _this.id).typeahead('val', value);
+			_.each(this.schema.fields, function(key){
+				_this.form.fields[key].setValue(value);
+			});
+
+		},
+		getValue : function() {
+			return this.value;
+		},
+	});
+
 
 	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
 	Calipso.backboneform.Datetimepicker = Calipso.backboneform.Text.extend({
@@ -802,7 +761,33 @@ define(
 		},
 	});
 
-
+	// uses  https://github.com/Eonasdan/bootstrap-datetimepicker
+	Calipso.backboneform.Datetimepicker = Calipso.backboneform.Text.extend({
+		initialize : function(options) {
+			Calipso.backboneform.Text.prototype.initialize.call(this, options);
+		},
+		callDataFunction : function(functionName, param) {
+			this.$el.data("DateTimePicker")[functionName](param);
+		},
+		onFormAttach : function() {
+			var _this = this;
+			_this.$el.attr('autocomplete', 'off');
+			_this.$el.parent().addClass("input-group");
+			_this.$el.parent().append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar\"></span></span>");
+			_this.$el.parent().datetimepicker(this.schema.config);
+			var value = _this.schema.fromProperty ? _this.model.get(_this.schema.fromProperty) : _this.value;
+			if (value) {
+				var initValue = new Date(value);
+				_this.$el.parent().data("DateTimePicker").date(initValue);
+			}
+		},
+		onBeforeClose : function() {
+			this.$el.parent().data("DateTimePicker").destroy();
+		},
+		getValue : function() {
+			return this.$el.parent().data("DateTimePicker").date();
+		},
+	});
 		/**
 		 * Select2
 		 *

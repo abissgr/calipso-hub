@@ -51,7 +51,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 
 	Calipso.view.HomeLayout = Calipso.view.Layout.extend({
-		template : Calipso.getTemplate('homeLayout'),
+		template : Calipso.getTemplate('HomeLayout'),
 		onShow : function() {
 			var _this = this;
 		}
@@ -90,11 +90,14 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			var _this = this;
 			var childUseCase;
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
-				// spawn child usecase
-				childUseCase = _this.useCaseContext.getChildContext(regionName, ViewType);
-				// display a preconfigured view that matches the region and usecase config
-				var viewOptions = _.extend(this.childViewOptions, {regionName : regionName, regionPath : _this.regionPath + "/" + regionName});
-				_this.showChildView(regionName, childUseCase.createView({viewOptions : viewOptions}));
+				// only show existing regions as they may be added contitionally
+				if(_this.getRegion(regionName)){
+						// spawn child usecase
+						childUseCase = _this.useCaseContext.getChildContext(regionName, ViewType);
+						// display a preconfigured view that matches the region and usecase config
+						var viewOptions = _.extend(this.childViewOptions, {regionName : regionName, regionPath : _this.regionPath + "/" + regionName});
+						_this.showChildView(regionName, childUseCase.createView({viewOptions : viewOptions}));
+				}
 			});
 		},
 		showChildView : function(regionName, view) {
@@ -525,26 +528,35 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		template : Calipso.getTemplate('UseCaseSearchLayout'),
 		regions : {
 			formRegion : ".criteriaEntryRegion",
+			//searchBoxRegion : ".searchBoxRegion",
 			contentRegion : ".contentRegion"
 		},
 		regionViewTypes : {
 			formRegion : Calipso.view.UseCaseFormView,
+			searchBoxRegion : Calipso.view.SearchBoxFormView,
 			contentRegion : Calipso.view.UseCaseGridView
 		},
 		initialize : function(options) {
 			Calipso.view.UseCaseLayout.prototype.initialize.apply(this, arguments);
+			// show searchbox region if appropriate
+			this.mergeOptions(options, ['fieldsSearchBox']);
+			if(this.fieldsSearchBox){
+				this.addRegions({
+					searchBoxRegion : {selector : ".searchBoxRegion"}
+				});
+			}
+			// listenTo search responces
 			var collection = options.collection || options.model.wrappedCollection;
 			var _this = this;
 			this.listenTo(collection, 'reset', function() {
 				if(_this.regionPath == "/"){
 					var q = $.param( collection.data );
-
 					Calipso.navigate(this.useCaseContext.getRouteUrl() + "?" + q, {
 						trigger: false
 					})
 				}
 			});
-		}
+		},
 	},
 	// static members
 	{

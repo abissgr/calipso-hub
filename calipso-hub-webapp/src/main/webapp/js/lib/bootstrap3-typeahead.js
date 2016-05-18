@@ -77,6 +77,11 @@
       this.$element.data('active', val);
       if(this.autoSelect || val) {
         var newVal = this.updater(val);
+        // Updater can be set to any random functions via "options" parameter in constructor above.
+        // Add null check for cases when updater returns void or undefined.
+        if (!newVal) {
+          newVal = "";
+        }
         this.$element
           .val(this.displayText(newVal) || newVal)
           .change();
@@ -102,8 +107,15 @@
           this.options.scrollHeight.call() :
           this.options.scrollHeight;
 
-      (this.$appendTo ? this.$menu.appendTo(this.$appendTo) : this.$menu.insertAfter(this.$element))
-        .css({
+      var element;
+      if (this.shown) {
+        element = this.$menu;
+      } else if (this.$appendTo) {
+        element = this.$menu.appendTo(this.$appendTo);
+      } else {
+        element = this.$menu.insertAfter(this.$element);
+      }
+      element.css({
           top: pos.top + pos.height + scrollHeight
         , left: pos.left
         })
@@ -127,7 +139,7 @@
         this.query = this.$element.val() ||  '';
       }
 
-      if (this.query.length < this.options.minLength) {
+      if (this.query.length < this.options.minLength && !this.options.showHintOnFocus) {
         return this.shown ? this.hide() : this;
       }
 
@@ -144,9 +156,6 @@
     },
 
     process: function (items) {
-   	 console.log("Typeahead#process, items: ");
-   	 console.log(items);
-   	 console.log(items.length);
       var that = this;
 
       items = $.grep(items, function (item) {
@@ -222,15 +231,43 @@
     },
 
     render: function (items) {
-   	 console.log("Typeahead#render, items: ");
-   	 console.log(items);
       var that = this;
       var self = this;
       var activeFound = false;
-      items = $(items).map(function (i, item) {
+      var data = [];
+      var _category = that.options.separator;
+
+      $.each(items, function (key,value) {
+        // inject separator
+        if (key > 0 && value[_category] !== items[key - 1][_category]){
+          data.push({
+              __type: 'divider'
+          });
+        }
+
+        // inject category header
+        if (value[_category] && (key === 0 || value[_category] !== items[key - 1][_category])){
+          data.push({
+              __type: 'category',
+              name: value[_category]
+          });
+        }
+        data.push(value);
+      });
+
+      items = $(data).map(function (i, item) {
+
+        if ((item.__type || false) == 'category'){
+            return $(that.options.headerHtml).text(item.name)[0];
+        }
+
+        if ((item.__type || false) == 'divider'){
+            return $(that.options.headerDivider)[0];
+        }
+
         var text = self.displayText(item);
         i = $(that.options.item).data('value', item);
-        i.find('a').html(that.highlighter(text));
+        i.find('a').html(that.highlighter(text, item));
         if (text == self.$element.val()) {
             i.addClass('active');
             self.$element.data('active', item);
@@ -240,7 +277,7 @@
       });
 
       if (this.autoSelect && !activeFound) {
-        items.first().addClass('active');
+        items.filter(':not(.dropdown-header)').first().addClass('active');
         this.$element.data('active', items.first().data('value'));
       }
       this.$menu.html(items);
@@ -248,7 +285,7 @@
     },
 
     displayText: function(item) {
-      return item.name || item;
+      return typeof item !== 'undefined' && typeof item.name != 'undefined' && item.name || item;
     },
 
     next: function (event) {
@@ -278,6 +315,7 @@
         .on('focus',    $.proxy(this.focus, this))
         .on('blur',     $.proxy(this.blur, this))
         .on('keypress', $.proxy(this.keypress, this))
+        .on('input',    $.proxy(this.input, this))
         .on('keyup',    $.proxy(this.keyup, this));
 
       if (this.eventSupported('keydown')) {
@@ -297,6 +335,7 @@
         .off('focus')
         .off('blur')
         .off('keypress')
+        .off('input')
         .off('keyup');
 
       if (this.eventSupported('keydown')) {
@@ -355,6 +394,11 @@
       this.move(e);
     },
 
+    input: function (e) {
+      this.lookup();
+      e.preventDefault();
+    },
+
     keyup: function (e) {
       switch(e.keyCode) {
         case 40: // down arrow
@@ -374,8 +418,6 @@
           if (!this.shown) return;
           this.hide();
           break;
-        default:
-          this.lookup();
       }
 
       e.preventDefault();
@@ -385,7 +427,7 @@
       if (!this.focused) {
         this.focused = true;
         if (this.options.showHintOnFocus) {
-          this.lookup('');
+          this.lookup();
         }
       }
     },
@@ -399,6 +441,7 @@
       e.preventDefault();
       this.select();
       this.$element.focus();
+      this.hide();
     },
 
     mouseenter: function (e) {
@@ -421,7 +464,7 @@
   var old = $.fn.typeahead;
 
   $.fn.typeahead = function (option) {
-	var arg = arguments;
+    var arg = arguments;
      if (typeof option == 'string' && option == 'getActive') {
         return this.data('active');
      }
@@ -429,10 +472,8 @@
       var $this = $(this)
         , data = $this.data('typeahead')
         , options = typeof option == 'object' && option;
-      console.log("creating new typeahead with options: ");
-      console.log(options);
       if (!data) $this.data('typeahead', (data = new Typeahead(this, options)));
-      if (typeof option == 'string') {
+      if (typeof option == 'string' && data[option]) {
         if (arg.length > 1) {
           data[option].apply(data, Array.prototype.slice.call(arg ,1));
         } else {
@@ -443,16 +484,19 @@
   };
 
   $.fn.typeahead.defaults = {
-    source: []
-  , items: 8
-  , menu: '<ul class="typeahead dropdown-menu" role="listbox"></ul>'
-  , item: '<li><a href="#" role="option"></a></li>'
-  , minLength: 1
-  , scrollHeight: 0
-  , autoSelect: true
-  , afterSelect: $.noop
-  , addItem: false
-  , delay: 0
+        source: [],
+        items: 8,
+        menu: '<ul class="typeahead dropdown-menu" role="listbox"></ul>',
+        item: '<li><a class="dropdown-item" href="#" role="option"></a></li>',
+        minLength: 1,
+        scrollHeight: 0,
+        autoSelect: true,
+        afterSelect: $.noop,
+        addItem: false,
+        delay: 0,
+        separator: 'category',
+        headerHtml: '<li class="dropdown-header"></li>',
+        headerDivider: '<li class="divider" role="separator"></li>'
   };
 
   $.fn.typeahead.Constructor = Typeahead;

@@ -98,11 +98,14 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		isCollectionCacheable : function() {
 			return this.constructor.isCollectionCacheable && this.constructor.isCollectionCacheable();
 		},
-
 		getUseCaseContext : function(options) {
       options.model = this;
 			return this.constructor.getUseCaseContext(options);
 		},
+		getTypeaheadSource : function(options) {
+			return this.constructor.getTypeaheadSource(options);
+		},
+
 	}, {
 		// static members
 		/** (Default) 0Do not retrieve the form schema from the server */
@@ -326,10 +329,11 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 				view : Calipso.view.UseCaseSearchLayout,
         viewOptions : {
           formTemplatesKey : "vertical",
+          fieldsSearchBox : ["username", "firstName", "lastName", "email"],
         },
 				overrides : {
 					backgrid : {
-						fieldIncludes : [ "username", "firstName", "lastName", "edit" ]
+						fieldIncludes : [ "username", "firstName", "lastName", "edit" ],
 					},
 					form : {
 						fieldIncludes : [ "username", "firstName", "lastName", "email" ],
