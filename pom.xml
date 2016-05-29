@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>8</version>
+		<version>9</version>
 	</parent>
 	<name>calipso-hub</name>
 	<inceptionYear>2005</inceptionYear>
@@ -96,11 +96,11 @@
 		<resthub.spring.stack.version>2.2.1-SNAPSHOT</resthub.spring.stack.version>
 
 		<!-- Spring -->
-		<spring.version>4.1.7.RELEASE</spring.version>
+		<spring.version>4.2.5.RELEASE</spring.version>
 		<spring.aspects.version>${spring.version}</spring.aspects.version>
 
 		<!-- Spring Security -->
-		<spring-security.version>4.0.1.RELEASE</spring-security.version>
+		<spring-security.version>4.1.0.RELEASE</spring-security.version>
 		<spring.security.taglibs.version>${spring-security.version}</spring.security.taglibs.version>
 		<org.springframework.security.crypto-version>${spring-security.version}</org.springframework.security.crypto-version>
 
@@ -361,16 +361,6 @@
 						<groupId>org.springframework</groupId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-taglibs</artifactId>
-                <version>${spring.security.taglibs.version}</version>
-            </dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-aspects</artifactId>
-				<version>${spring.aspects.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
@@ -700,6 +690,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
+					<version>3.0.0</version>
 					<executions>
 						<execution>
 							<id>attach-sources</id>

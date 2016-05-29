@@ -7,8 +7,8 @@
        xmlns:social="http://www.springframework.org/schema/social"
        xmlns:facebook="http://www.springframework.org/schema/social/facebook"
     xmlns:aop="http://www.springframework.org/schema/aop" 
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
 http://www.springframework.org/schema/social http://www.springframework.org/schema/social/spring-social-1.1.xsd
 http://www.springframework.org/schema/social/twitter http://www.springframework.org/schema/social/spring-social-twitter.xsd
 http://www.springframework.org/schema/social/linkedin http://www.springframework.org/schema/social/spring-social-linkedin.xsd 
