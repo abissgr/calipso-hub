@@ -371,9 +371,11 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
     	T resource = null;
     	try {
 			resource = this.service.getDomainClass().newInstance();
-			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
-				FormSchema.setToInstance(((FormSchemaAware) resource));
-			}
+			
+			// TODO: update to use cases, fields etc. format
+//			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
+//				FormSchema.setToInstance(((FormSchemaAware) resource));
+//			}
 		} catch (Exception e) {
 			throw new RuntimeException("Failed creating new resource instance", e);
 		}
