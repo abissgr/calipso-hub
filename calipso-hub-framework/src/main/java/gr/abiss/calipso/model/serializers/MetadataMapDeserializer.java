@@ -81,7 +81,9 @@ public class MetadataMapDeserializer extends JsonDeserializer<Map<String, ?>>
 				HashMap.class, String.class, String.class);
 		HashMap<String, String> stringValueMap = mapper.readValue(jp,
 				stringValueMapType);
-		LOGGER.info("deserialize stringValueMap: " + stringValueMap);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("deserialize stringValueMap: " + stringValueMap);
+		}
 		Map<String, Metadatum> metadata = new HashMap<String, Metadatum>();
 		if (!CollectionUtils.isEmpty(stringValueMap)) {
 			for (String predicate : stringValueMap.keySet()) {
@@ -96,7 +98,9 @@ public class MetadataMapDeserializer extends JsonDeserializer<Map<String, ?>>
 				}
 			}
 		}
-		LOGGER.info("deserialize returning metadata: " + metadata);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.info("deserialize returning metadata: " + metadata);
+		}
 		return metadata;
 	}
 }

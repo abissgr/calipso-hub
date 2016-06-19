@@ -60,6 +60,7 @@ import org.hibernate.annotations.Formula;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.Assert;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -346,6 +347,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		return firstName;
 	}
 
+	@JsonGetter("fullName")
 	@Override
 	public String getFullName() {
 		StringBuffer s = new StringBuffer("");

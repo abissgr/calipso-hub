@@ -48,7 +48,7 @@ public class AnyToOnePredicateFactory<T extends Serializable> implements IPredic
 	@Override
 	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
 			String[] propertyValues) {
-		if (!AbstractPersistable.class.isAssignableFrom(fieldType)) {
+		if (!Persistable.class.isAssignableFrom(fieldType)) {
 			LOGGER.warn("Non-Entity type for property '" + propertyName + "': " + fieldType.getName());
 		}
 

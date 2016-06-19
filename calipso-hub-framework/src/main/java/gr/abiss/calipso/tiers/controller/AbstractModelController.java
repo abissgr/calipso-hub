@@ -150,7 +150,9 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		
 		if(BooleanUtils.toBoolean(request.getParameter("skipCurrentPrincipalIdPredicate"))){
 			applyCurrentPrincipalIdPredicate = false;
-			LOGGER.debug("Skipping CurrentPrincipalIdPredicate");
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("Skipping CurrentPrincipalIdPredicate");
+			}
 		}
 		
 		return findPaginated(page, size, sort, direction, request.getParameterMap(), applyCurrentPrincipalIdPredicate);
@@ -164,7 +166,9 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		// add implicit criteria?
 		Map<String, String[]> parameters = null;
 		if(applyImplicitPredicates){
-			LOGGER.info("Adding implicit predicates");
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("Adding implicit predicates");
+			}
 			parameters = new HashMap<String, String[]>();
 			parameters.putAll(paramsMap);
 			CurrentPrincipalIdPredicate predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalIdPredicate.class);
@@ -175,17 +179,23 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 				if(!skipPredicate){
 					String id = principal != null ? principal.getId() : "ANONYMOUS";
 					String[] val = {id};
-					LOGGER.info("Adding implicit predicate, name: " + predicate.path() + ", value: " + id);
+					if(LOGGER.isDebugEnabled()){
+						LOGGER.debug("Adding implicit predicate, name: " + predicate.path() + ", value: " + id);
+					}
 					parameters.put(predicate.path(), val);
 				}
 				else{
-					LOGGER.info("Skipping implicit predicate, name: " + predicate.path());
+					if(LOGGER.isDebugEnabled()){
+						LOGGER.debug("Skipping implicit predicate, name: " + predicate.path());
+					}
 				}
 				
 			}
 		}
 		else{
-			LOGGER.info("Skipping implicit predicates");
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("Skipping implicit predicates");
+			}
 			parameters = paramsMap;
 		}
 		

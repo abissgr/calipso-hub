@@ -76,11 +76,15 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 		if (cookies != null) {
 			for (int i = 0; i < cookies.length; i++) {
 				Cookie cookie = cookies[i];
-				LOGGER.debug("Found cookie '" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
-						+ ", domain: " + cookie.getDomain() + ", value: " + cookie.getValue());
+				if(LOGGER.isDebugEnabled() ){
+					LOGGER.debug("Found cookie '" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
+					+ ", domain: " + cookie.getDomain() + ", value: " + cookie.getValue());
+				}
 				if (cookie.getName().equalsIgnoreCase(ssoCookieName)) {
-					LOGGER.info("Matched calipso SSO cookie'" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
-							+ ", domain: " + cookie.getDomain() + ", value: " + cookie.getValue());
+					if(LOGGER.isDebugEnabled() ){
+						LOGGER.debug("Matched calipso SSO cookie'" + cookie.getName() + "', secure:  " + cookie.getSecure() + ", comment: " + cookie.getComment()
+								+ ", domain: " + cookie.getDomain() + ", value: " + cookie.getValue());
+					}
 					authToken = cookie.getValue();
 					break;
 				}

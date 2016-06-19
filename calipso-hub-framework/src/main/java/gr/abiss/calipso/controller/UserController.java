@@ -28,8 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 //import com.wordnik.swagger.annotations.Api;
 
@@ -40,11 +43,10 @@ public class UserController extends AbstractModelController<User, String, UserSe
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-//	@Override
-//	@Inject
-//	@Qualifier("userService") // somehow required for CDI to work on 64bit JDK?
-//	public void setService(UserService service) {
-//		this.service = service;
-//	}
+	@RequestMapping(value = "byUserNameOrEmail/{userNameOrEmail}", method = RequestMethod.GET)
+	@ResponseBody
+	public User getByUserNameOrEmail(@PathVariable String userNameOrEmail) {
+		return this.service.findByUserNameOrEmail(userNameOrEmail);
+	}
     
 }

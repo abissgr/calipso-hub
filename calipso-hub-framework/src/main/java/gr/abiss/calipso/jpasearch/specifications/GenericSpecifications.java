@@ -303,8 +303,9 @@ public class GenericSpecifications {
 	 * @return
 	 */
 	public static Specification matchAll(final Class clazz, final Map<String, String[]> searchTerms) {
-		
-		LOGGER.info("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
+		}
 		return new Specification<Persistable>() {
 			@Override
 			public Predicate toPredicate(Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -322,7 +323,9 @@ public class GenericSpecifications {
 	 */
 	public static Specification matchAll(final Class clazz, final Restriction searchTerms) {
 
-		LOGGER.info("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
+		}
 		return new Specification<Persistable>() {
 			@Override
 			public Predicate toPredicate(Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
