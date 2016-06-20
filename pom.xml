@@ -41,32 +41,12 @@
 
 	<modules>
 		<module>calipso-hub-utilities</module>
+		<module>calipso-hub-test</module>
 		<module>calipso-hub-framework</module>
 		<module>calipso-hub-webapp</module>
 	</modules>
 
 	<profiles>
-		<profile>
-			<id>ci</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<build.profile.filters>HOWTO.txt</build.profile.filters>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>dev</id>
-			<activation>
-				<file>
-					<exists>${basedir}/dev.properties</exists>
-				</file>
-			</activation>
-			<properties>
-				<build.profile.filters>dev.properties</build.profile.filters>
-			</properties>
-		</profile>
 		<profile>
 			<id>release</id>
 			<build>
@@ -88,8 +68,16 @@
 		</profile>
 	</profiles>
 	<properties>
-		<project.parent.basedir>${project.basedir}</project.parent.basedir>
 		<java-version>1.8</java-version>
+		<encoding>UTF-8</encoding>
+		<!-- use UTF-8 for everything -->
+		<project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+		
+		<project.parent.basedir>${project.basedir}</project.parent.basedir>
+		
+		<build.profile.filters>dev.properties</build.profile.filters>
+		
 		<maven-compiler-plugin.failOnError>true</maven-compiler-plugin.failOnError>
 
 		<!-- Resthub -->
@@ -151,11 +139,6 @@
 		<dependencies>
 
 			<!-- MODULES -->
-			<dependency>
-				<groupId>gr.abiss.calipso</groupId>
-				<artifactId>calipso-hub-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>gr.abiss.calipso</groupId>
 				<artifactId>calipso-hub-framework</artifactId>
@@ -402,9 +385,6 @@
 				<version>${spring-data-commons-version}</version>
 			</dependency>
 
-
-
-
 			<dependency>
 				<groupId>org.elasticsearch</groupId>
 				<artifactId>elasticsearch-transport-wares</artifactId>
@@ -567,7 +547,43 @@
 	            <artifactId>javassist</artifactId>
 	            <version>3.18.1-GA</version>
 	        </dependency>
+			<!-- Testing dependencies -->
+			<dependency>
+				<groupId>io.rest-assured</groupId>
+				<artifactId>rest-assured</artifactId>
+				<version>3.0.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${spring.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-test</artifactId>
+				<version>${spring-security.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.resthub</groupId>
+				<artifactId>resthub-test</artifactId>
+				<version>${resthub.spring.stack.version}</version>
+				<scope>test</scope>
+			</dependency>
 			
+			<dependency>
+				<groupId>gr.abiss.calipso</groupId>
+				<artifactId>calipso-hub-test</artifactId>
+				<version>${project.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 
 	</dependencyManagement>
@@ -577,7 +593,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
 				<configuration>
 					<bottom>Copyright 2005 - 2014 ${pom.organization.name}. All Rights
 						Reserved | Dependency:
@@ -590,9 +605,9 @@
 					</docletArtifact>
 
 					<useStandardDocletOptions>true</useStandardDocletOptions>
-					<charset>UTF-8</charset>
+					<charset>${encoding}</charset>
 					<encoding>UTF-8</encoding>
-					<docencoding>UTF-8</docencoding>
+					<docencoding>${encoding}</docencoding>
 					<breakiterator>true</breakiterator>
 					<version>true</version>
 					<author>true</author>
@@ -657,7 +672,7 @@
 					<version>3.1</version>
 					<configuration>
 						<failOnError>${maven-compiler-plugin.failOnError}</failOnError>
-						<encoding>UTF-8</encoding>
+						<encoding>${encoding}</encoding>
 						<source>${java-version}</source>
 						<target>${java-version}</target>
 					</configuration>
@@ -667,7 +682,7 @@
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.6</version>
 					<configuration>
-						<encoding>UTF-8</encoding>
+						<encoding>${encoding}</encoding>
 					</configuration>
 				</plugin>
 				<plugin>

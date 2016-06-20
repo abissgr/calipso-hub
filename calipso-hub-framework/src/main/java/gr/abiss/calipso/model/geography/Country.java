@@ -18,6 +18,7 @@
 package gr.abiss.calipso.model.geography;
 
 import gr.abiss.calipso.model.base.AbstractAssignedidPersistable;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -33,6 +34,7 @@ import javax.persistence.Table;
  * Class to represent a country, including ISO 3166-1 alpha-2 code, name, languages, 
  * capital and currency, native name, calling codes. 
  */
+@ModelResource(path = "countries")
 @Entity
 @Table(name = "country")
 @AttributeOverrides({

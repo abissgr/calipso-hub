@@ -1,7 +1,7 @@
 ({
 	include: ['main'],
    baseUrl: "../../js",
-   out: '../../../../../target/requirejs-optimized/js/main.js',
+   out: '../../../../requirejs/optimized/js/main.js',
     mainConfigFile: "../main.js",
 
     wrapShim:               true,

@@ -4,6 +4,9 @@ if (!window.console) {
 	console.log = function() {
 	};
 }
+if (!window.Tether) {
+	window.Tether = function(){};
+}
 //establish a locale
 function initLocale() {
 	// get "remembered" locale if exists
@@ -61,8 +64,8 @@ require.config({
 		'pubsub' : 'lib/resthub/pubsub',
 		'bootstrap' : 'lib/bootstrap',
 		// tmp fix until bootstrap devs fix their module deps
-		'tether-orig' : 'lib/tether',
-		'tether' : 'lib/tetherWrapper',
+		'tether-orig' : 'lib/tether-orig',
+		'tether' : 'lib/tether',
 		'backbone-validation-orig' : 'lib/backbone-validation',
 		'backbone-bootstrap-modal' : 'lib/backbone-bootstrap-modal',
 		'backbone-forms' : 'lib/backbone-forms',
@@ -174,9 +177,9 @@ require.config({
 			deps : [ 'backgrid' ],
 			exports : 'Backgrid.Extension.Text'
 		},
-		'tether' : {
-			deps : [ 'jquery', 'tether-orig' ]
-		},
+//		'tether' : {
+//			deps : [ 'tether-orig' ]
+//		},
 		'bootstrap' : {
 			deps : [ 'jquery', 'tether' ]
 		},

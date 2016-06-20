@@ -121,6 +121,18 @@ public class AppInitializer {
 //			t3.setSource("test3");
 //			t3.setSourceContentType(Text.MIME_MARKDOWN);
 //			textService.create(t3);
+
+			User system = new User();
+			system.setEmail("system@abiss.gr");
+			system.setFirstName("System");
+			system.setLastName("User");
+			system.setUsername("system");
+			system.setPassword("admin");
+			system.setLastVisit(now);
+			system.setActive(false);
+			system.setInactivationDate(now);
+			system.setInactivationReason("System user cannot login");
+			system = userService.createActive(system);
 			
 			User u0 = new User();
 			u0.setEmail("info@abiss.gr");
@@ -130,6 +142,7 @@ public class AppInitializer {
 			u0.setPassword("admin");
 			u0.setLastVisit(now);
 			u0.addRole(adminRole);
+			u0.setCreatedBy(system);
 			u0 = userService.createActive(u0);
 
 			for(int i = 0; i < 10; i++){
@@ -140,6 +153,7 @@ public class AppInitializer {
 				u.setUsername("user"+i);
 				u.setPassword("user"+i);
 				u.setLastVisit(now);
+				u.setCreatedBy(system);
 				u = userService.createActive(u);
 
 				// notify the admin for each user creation to test notifications

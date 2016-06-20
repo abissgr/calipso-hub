@@ -35,18 +35,7 @@
 			</resource>
 		</resources>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
+			
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
@@ -221,6 +210,13 @@
 		<dependency>
 			<groupId>gr.abiss.calipso</groupId>
 			<artifactId>calipso-hub-framework</artifactId>
+		</dependency>
+		
+		
+		<dependency>
+			<groupId>gr.abiss.calipso</groupId>
+			<artifactId>calipso-hub-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		
 		
