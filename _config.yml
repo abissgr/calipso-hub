@@ -35,19 +35,19 @@ analytics:
 
 # github buttons
 githubButton:
-  user: mistic100
-  repo: jekyll-bootstrap-doc
+  user: manosbatsis
+  repo: calipso-hub
 
 # twitter buttons
 twitter:
-  enabled: true
+  enabled: false
   via:
   hash:
   account:
 
 # facebook buttons
 facebook:
-  enabled: true
+  enabled: false
   profileUrl:
 
 
