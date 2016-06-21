@@ -1,1 +1,0 @@
-Images for the developer tutorial go here.

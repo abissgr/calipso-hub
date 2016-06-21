@@ -1,6 +1,9 @@
-/dev.properties
 /.project
+/.classpath
 /.settings
-/calipso-hub.sublime-project
-/calipso-hub.sublime-workspace
-/target/
+/_site/
+/.sass-cache/
+/.jekyll-metadata
+Gemfile.lock
+/dist/bootstrap
+/dist/jquery

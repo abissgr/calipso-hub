@@ -1,0 +1,60 @@
+# name of the software
+name: "Calipso Hub"
+# current version of the software
+version: 2.0-SNAPSHOT
+# url of the download button
+downloadUrl: https://github.com/abissgr/calipso-hub
+# licence of the software
+license: GNU AGPLv3
+licenseUrl: https://opensource.org/licenses/AGPL-3.0
+# github base URL
+baseurl: "/calipso-hub"
+
+# list of additional links on the right of the top menu
+headerLinks:
+  - title: GitHub
+    url: https://github.com/abissgr/calipso-hub
+
+# list if additional links on the footer
+footerLinks:
+  - title: GitHub
+    url: https://github.com/abissgr/calipso-hub
+  - title: Issues
+    url: https://github.com/abissgr/calipso-hub/issues?state=open
+
+# header
+header:
+  color1: "#080331"
+  color2: "#673051"
+  trianglify: true
+
+# google analytics
+analytics:
+  account:
+  domain:
+
+# github buttons
+githubButton:
+  user: mistic100
+  repo: jekyll-bootstrap-doc
+
+# twitter buttons
+twitter:
+  enabled: true
+  via:
+  hash:
+  account:
+
+# facebook buttons
+facebook:
+  enabled: true
+  profileUrl:
+
+
+exclude: ['README.md', 'LICENSE', 'bower.json', 'Gemfile.lock', 'Gemfile']
+
+gems:
+  - jekyll-mentions
+  - jemoji
+  - jekyll-redirect-from
+  - jekyll-sitemap
