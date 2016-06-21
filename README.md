@@ -1,4 +1,4 @@
-
+Calipso Hub [![Build Status](https://travis-ci.org/abissgr/calipso-hub.svg?branch=master)](https://travis-ci.org/abissgr/calipso-hub)
 
 
 Experiments on a full stack, high level framework for lazy application hackers and scalable developer teams.
