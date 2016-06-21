@@ -71,13 +71,13 @@ public class Book extends AbstractAuditable<User> {
 	
 	<h2 id="restful-service-urls-fetch">Fetch</h>
 	<pre>
-		<code> GET http://localhost:8080/calipso/books/id </code>
+<code>GET http://localhost:8080/calipso/books/id </code>
 	</pre>
 	<p>Find the book having "id" as the id value and return it in the response. Throw an 404 HTTP error if no match is found.</p>
 	
 	<h2 id="restful-service-urls-search">Search</h>
 	<pre>
-		<code> GET http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz </code>
+<code>GET http://localhost:8080/calipso/books?foo=bar&foo.subFoo=baz </code>
 	</pre>
 	<p>Get a paginated collection of all books matching the given criteria. No actual java implementation is required for your entity models, their properties are dynamically mapped to the HTTP parameters by the default. additionally, the following predefined parameters are supported:</p>
 	<table class="table table-striped">
