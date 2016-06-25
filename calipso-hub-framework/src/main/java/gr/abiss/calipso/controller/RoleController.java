@@ -21,6 +21,7 @@ package gr.abiss.calipso.controller;
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import io.swagger.annotations.Api;
 
 import javax.inject.Inject;
 
@@ -30,12 +31,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-//import com.wordnik.swagger.annotations.Api;
-
-
-//@Api(value = "Roles")
 @Controller
 @RequestMapping(value = "/api/rest/roles", produces = { "application/json", "application/xml" })
+@Api(value = "Roles")
 public class RoleController extends AbstractModelController<Role, String, RoleService> {
 
     

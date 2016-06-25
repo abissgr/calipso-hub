@@ -18,26 +18,20 @@
  */
 package gr.abiss.calipso.controller;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.service.UserService;
-import gr.abiss.calipso.tiers.controller.AbstractModelController;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-//import com.wordnik.swagger.annotations.Api;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import io.swagger.annotations.Api;
 
 
-//@Api(value = "Users")
+@Api(value = "Users")
 @RequestMapping(value = "/api/rest/users", produces = { "application/json", "application/xml" })
 public class UserController extends AbstractModelController<User, String, UserService> {
 

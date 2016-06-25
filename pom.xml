@@ -120,6 +120,7 @@
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<joda-time.version>2.8.1</joda-time.version>
 		<org.jadira.usertype.core.version>3.2.0.GA</org.jadira.usertype.core.version>
+		<jackson-core.version>2.7.5</jackson-core.version>
 		<jackson-datatype-joda.version>2.4.0</jackson-datatype-joda.version>
 		<urlrewritefilter.version>4.0.3</urlrewritefilter.version>
 		<flyway-core.version>3.2.1</flyway-core.version>
@@ -154,7 +155,27 @@
 				<artifactId>calipso-hub-web</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-
+			<!-- jackson/fasterxml -->
+			<dependency>
+			    <groupId>com.fasterxml.jackson.core</groupId>
+			    <artifactId>jackson-core</artifactId>
+			    <version>${jackson-core.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>com.fasterxml.jackson.core</groupId>
+			    <artifactId>jackson-databind</artifactId>
+			    <version>${jackson-core.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>com.fasterxml.jackson.core</groupId>
+			    <artifactId>jackson-annotations</artifactId>
+			    <version>${jackson-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml</groupId>
+				<artifactId>classmate</artifactId>
+				<version>1.2.0</version>
+			</dependency>
 			<!-- RESTHUB -->
 			<dependency>
 				<groupId>org.resthub</groupId>
@@ -543,6 +564,17 @@
 			    <version>${springfox.version}</version>
 			</dependency>
 			<dependency>
+			    <groupId>io.springfox</groupId>
+			    <artifactId>springfox-bean-validators</artifactId>
+			    <version>${springfox.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>io.springfox</groupId>
+			    <artifactId>springfox-swagger-ui</artifactId>
+			    <version>${springfox.version}</version>
+			</dependency>
+			
+			<dependency>
 	            <groupId>org.javassist</groupId>
 	            <artifactId>javassist</artifactId>
 	            <version>3.18.1-GA</version>
@@ -726,18 +758,6 @@
 	</build>
 
 	<repositories>
-        <!-- For springfox/swagger -->
-<!--         <repository> -->
-<!--             <id>jcenter-snapshots</id> -->
-<!--             <name>jcenter</name> -->
-<!--             <url>https://jcenter.bintray.com/</url> -->
-<!--             <releases> -->
-<!--                 <enabled>true</enabled> -->
-<!--             </releases> -->
-<!--             <snapshots> -->
-<!--                 <enabled>false</enabled> -->
-<!--             </snapshots> -->
-<!--         </repository> -->
 		<repository>
 			<id>sonatype-release</id>
 			<url>https://oss.sonatype.org/content/repositories/releases</url>

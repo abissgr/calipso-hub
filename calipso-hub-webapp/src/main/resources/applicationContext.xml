@@ -179,4 +179,13 @@
 	<bean id="appInitializer" class="gr.abiss.calipso.AppInitializer">
     </bean>
     
+    <!-- Springfox/Swagger config -->
+     <!-- Enables swgger ui-->
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
+<!--     <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/> -->
+    <mvc:resources mapping="/webjars/**" location="/webjars/"/>
+
+    <!-- Include a swagger configuration-->
+	<bean name="applicationSwaggerConfig" class="gr.abiss.calipso.web.spring.ApplicationSwaggerConfig"/>
+    
 </beans>
