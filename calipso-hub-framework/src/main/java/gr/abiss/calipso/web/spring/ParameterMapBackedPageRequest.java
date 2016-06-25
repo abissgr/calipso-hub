@@ -18,7 +18,7 @@
 /**
  * 
  */
-package gr.abiss.calipso.jpasearch.data;
+package gr.abiss.calipso.web.spring;
 
 import java.util.Map;
 

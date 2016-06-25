@@ -19,7 +19,6 @@
 package gr.abiss.calipso.tiers.service;
 
 
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 

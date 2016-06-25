@@ -27,7 +27,7 @@ import java.util.List;
  * the provided AbstractAuditableRateable entity and RateableRepository.
  * 
  * @see gr.abiss.calipso.model.entities.AbstractAuditableRateable
- * @see gr.abiss.calipso.jpasearch.repository.RateableRepository
+ * @see gr.abiss.calipso.repository.RateableRepository
  */
 public interface Rateable<R extends AbstractRating> {
 

@@ -230,7 +230,7 @@ see also "1.3.2 Adding custom behavior to all repositories" [2].
 3) Have your repository interfaces extend BaseRepository:
 
 ```java
-    import gr.abiss.calipso.jpasearch.repository.BaseRepository;
+    import gr.abiss.calipso.uischema.repository.BaseRepository;
 
     public interface UserRepository extends BaseRepository<User, String> {
     // ...
@@ -240,7 +240,7 @@ see also "1.3.2 Adding custom behavior to all repositories" [2].
 4) Have your service interfaces extend GenericService instead of RESTHub's CrudService:
 
 ```java
-    import gr.abiss.calipso.jpasearch.service.GenericService;
+    import gr.abiss.calipso.tiers.service.GenericService;
 
     public interface UserService extends GenericService<User, String> {
     }
@@ -249,7 +249,7 @@ see also "1.3.2 Adding custom behavior to all repositories" [2].
 5) Similarly, have your service implementations extend GenericServiceImpl:
 
 ```java
-    import gr.abiss.calipso.jpasearch.service.impl.GenericServiceImpl;
+    import gr.abiss.calipso.uischema.service.impl.GenericServiceImpl;
 
     @Named("userService")
     public class UserServiceImpl extends GenericServiceImpl<User, String, UserRepository> implements UserService {
@@ -297,7 +297,7 @@ form schemata at
 
 	http://localhost:8080/api/[entity, e.g. user]/form-schema?mode=[one of create, update, search]
 
-The form schemas produced are annotation-based (see gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry) 
+The form schemas produced are annotation-based (see gr.abiss.calipso.uischema.annotation.FormSchemaEntry) 
 and follow the format described at [https://github.com/powmedia/backbone-forms].
 
 [calipso-hub]:../

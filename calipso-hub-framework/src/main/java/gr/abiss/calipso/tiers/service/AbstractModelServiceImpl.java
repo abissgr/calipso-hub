@@ -18,10 +18,10 @@
  */
 package gr.abiss.calipso.tiers.service;
 
-import gr.abiss.calipso.jpasearch.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
+import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;

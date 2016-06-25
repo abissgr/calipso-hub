@@ -114,9 +114,9 @@
       <attribute value="jar:file:/home/manos/.m2/repository/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.7/jcl-over-slf4j-1.7.7.jar" sourcepath="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.7/jcl-over-slf4j-1.7.7-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.1/jcl-over-slf4j-1.7.1.jar" sourcepath="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.1/jcl-over-slf4j-1.7.1-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.7/jcl-over-slf4j-1.7.7-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.1/jcl-over-slf4j-1.7.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-validator/5.1.2.Final/hibernate-validator-5.1.2.Final.jar" sourcepath="M2_REPO/org/hibernate/hibernate-validator/5.1.2.Final/hibernate-validator-5.1.2.Final-sources.jar">
@@ -673,7 +673,6 @@
       <attribute value="jar:file:/home/manos/.m2/repository/junit/junit/4.12/junit-4.12-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/resthub/resthub-test/2.2.1-SNAPSHOT/resthub-test-2.2.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/resthub/resthub-test/2.2.1-SNAPSHOT/resthub-test-2.2.1-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/testng/testng/6.8.8/testng-6.8.8.jar" sourcepath="M2_REPO/org/testng/testng/6.8.8/testng-6.8.8-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/testng/testng/6.8.8/testng-6.8.8-javadoc.jar!/" name="javadoc_location"/>
@@ -683,81 +682,6 @@
   <classpathentry kind="var" path="M2_REPO/com/beust/jcommander/1.27/jcommander-1.27.jar" sourcepath="M2_REPO/com/beust/jcommander/1.27/jcommander-1.27-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/com/beust/jcommander/1.27/jcommander-1.27-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/easytesting/fest-assert-core/2.0M10/fest-assert-core-2.0M10.jar" sourcepath="M2_REPO/org/easytesting/fest-assert-core/2.0M10/fest-assert-core-2.0M10-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/easytesting/fest-assert-core/2.0M10/fest-assert-core-2.0M10-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/easytesting/fest-util/1.2.5/fest-util-1.2.5.jar" sourcepath="M2_REPO/org/easytesting/fest-util/1.2.5/fest-util-1.2.5-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/easytesting/fest-util/1.2.5/fest-util-1.2.5-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/mockito/mockito-core/1.9.5/mockito-core-1.9.5.jar" sourcepath="M2_REPO/org/mockito/mockito-core/1.9.5/mockito-core-1.9.5-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/mockito/mockito-core/1.9.5/mockito-core-1.9.5-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/objenesis/objenesis/1.0/objenesis-1.0.jar" sourcepath="M2_REPO/org/objenesis/objenesis/1.0/objenesis-1.0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/objenesis/objenesis/1.0/objenesis-1.0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/test-jetty-servlet/8.1.15.v20140411/test-jetty-servlet-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/test-jetty-servlet/8.1.15.v20140411/test-jetty-servlet-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/test-jetty-servlet/8.1.15.v20140411/test-jetty-servlet-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-webapp/8.1.15.v20140411/jetty-webapp-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-webapp/8.1.15.v20140411/jetty-webapp-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-webapp/8.1.15.v20140411/jetty-webapp-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-xml/8.1.15.v20140411/jetty-xml-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-xml/8.1.15.v20140411/jetty-xml-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-xml/8.1.15.v20140411/jetty-xml-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-util/8.1.15.v20140411/jetty-util-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-util/8.1.15.v20140411/jetty-util-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-util/8.1.15.v20140411/jetty-util-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-servlet/8.1.15.v20140411/jetty-servlet-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-servlet/8.1.15.v20140411/jetty-servlet-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-servlet/8.1.15.v20140411/jetty-servlet-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-security/8.1.15.v20140411/jetty-security-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-security/8.1.15.v20140411/jetty-security-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-security/8.1.15.v20140411/jetty-security-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-server/8.1.15.v20140411/jetty-server-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-server/8.1.15.v20140411/jetty-server-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-server/8.1.15.v20140411/jetty-server-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016.jar" sourcepath="M2_REPO/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-continuation/8.1.15.v20140411/jetty-continuation-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-continuation/8.1.15.v20140411/jetty-continuation-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-continuation/8.1.15.v20140411/jetty-continuation-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-http/8.1.15.v20140411/jetty-http-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-http/8.1.15.v20140411/jetty-http-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-http/8.1.15.v20140411/jetty-http-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-io/8.1.15.v20140411/jetty-io-8.1.15.v20140411.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-io/8.1.15.v20140411/jetty-io-8.1.15.v20140411-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-io/8.1.15.v20140411/jetty-io-8.1.15.v20140411-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
 </classpath>

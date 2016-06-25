@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.service.impl;
+package gr.abiss.calipso.tiers.service.impl;
 
 import gr.abiss.calipso.model.acl.AclClass;
 import gr.abiss.calipso.model.acl.AclObject;
@@ -27,11 +27,11 @@ import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
 import gr.abiss.calipso.model.types.TimeUnit;
-import gr.abiss.calipso.jpasearch.service.GenericService;
 import gr.abiss.calipso.repository.acl.AclClassRepository;
 import gr.abiss.calipso.repository.acl.AclObjectIdentityRepository;
 import gr.abiss.calipso.repository.acl.AclSidRepository;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
+import gr.abiss.calipso.tiers.service.GenericService;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 

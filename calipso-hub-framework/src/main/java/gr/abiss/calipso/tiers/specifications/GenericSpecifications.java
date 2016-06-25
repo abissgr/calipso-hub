@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.specifications;
+package gr.abiss.calipso.tiers.specifications;
 
-import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.lang.reflect.Field;
@@ -110,7 +111,7 @@ public class GenericSpecifications {
 		if (clazz.isEnum()) {
 			return new EnumStringPredicateFactory(clazz);
 		} else if (Persistable.class.isAssignableFrom(clazz)) {
-			if (field.isAnnotationPresent(CurrentPrincipalIdPredicate.class)) {
+			if (field.isAnnotationPresent(CurrentPrincipal.class)) {
 				return currentPrincipalPredicateFactory;
 			} else {
 				return anyToOnePredicateFactory;

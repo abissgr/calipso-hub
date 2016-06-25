@@ -15,22 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.specifications;
+package gr.abiss.calipso.tiers.specifications;
+
+import java.util.Date;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Persistable;
+import org.springframework.util.NumberUtils;
 
-public class BooleanPredicateFactory implements IPredicateFactory<Boolean> {
+public class DatePredicateFactory implements IPredicateFactory<Date> {
 
-	public BooleanPredicateFactory() {
+	public DatePredicateFactory() {
 	}
 
 	/**
-	 * @see gr.abiss.calipso.jpasearch.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
+	 * @see gr.abiss.calipso.uischema.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
 	 *      javax.persistence.criteria.CriteriaBuilder, java.lang.String,
 	 *      java.lang.Class, java.lang.String[])
 	 */
@@ -38,18 +40,19 @@ public class BooleanPredicateFactory implements IPredicateFactory<Boolean> {
 	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
 			String[] propertyValues) {
 		Predicate predicate = null;
-		if (!Boolean.class.isAssignableFrom(fieldType)) {
+		if (!Date.class.isAssignableFrom(fieldType)) {
 			throw new IllegalArgumentException(fieldType
-					+ " is not a subclass of Boolean for field: "
-					+ propertyName);
+					+ " is not a subclass of java.util.Date for field: " + propertyName);
 		}
 
-		Boolean b = BooleanUtils.toBooleanObject(propertyValues[0]);
-		if (b == null) {
-			b = Boolean.FALSE;
+		if (propertyValues.length == 1) {
+			Date date = new Date(NumberUtils.parseNumber(propertyValues[0], Long.class));
+			predicate = cb.equal(root.<Date> get(propertyName), date);
+		} else if (propertyValues.length == 2) {
+			Date from = new Date(NumberUtils.parseNumber(propertyValues[0], Long.class));
+			Date to = new Date(NumberUtils.parseNumber(propertyValues[1], Long.class));
+			predicate = cb.between(root.<Date> get(propertyName), from, to);
 		}
-
-		predicate = cb.equal(root.<Boolean> get(propertyName), b);
 		return predicate;
 	}
 }

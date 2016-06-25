@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.json.serializer;
+package gr.abiss.calipso.uischema.serializer;
 
-import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
-import gr.abiss.calipso.jpasearch.model.FormSchema;
+import gr.abiss.calipso.uischema.annotation.FormSchemas;
+import gr.abiss.calipso.uischema.model.FormSchema;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
@@ -128,14 +128,14 @@ public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 						FormSchemas formSchemasAnnotation = null;
 						if (field.isAnnotationPresent(FormSchemas.class)) {
 							formSchemasAnnotation = field.getAnnotation(FormSchemas.class);
-							gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry[] formSchemas = formSchemasAnnotation.value();
+							gr.abiss.calipso.uischema.annotation.FormSchemaEntry[] formSchemas = formSchemasAnnotation.value();
 							LOGGER.info("getFormFieldConfig, formSchemas: "+formSchemas);
 							if(formSchemas != null){
 								for(int i=0; i < formSchemas.length; i++){
 									if(i > 0){
 										formConfig.append(comma);
 									}
-									gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry formSchemaAnnotation = formSchemas[i];
+									gr.abiss.calipso.uischema.annotation.FormSchemaEntry formSchemaAnnotation = formSchemas[i];
 									LOGGER.info("getFormFieldConfig, formSchemaAnnotation: "+formSchemaAnnotation);
 									appendFormFieldSchema(formConfig,formSchemaAnnotation.state(),formSchemaAnnotation.json());
 								}
@@ -143,7 +143,7 @@ public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 							//formConfig = formSchemasAnnotation.json();
 						}
 						else{
-							appendFormFieldSchema(formConfig,gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry.STATE_DEFAULT, gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry.TYPE_STRING);
+							appendFormFieldSchema(formConfig,gr.abiss.calipso.uischema.annotation.FormSchemaEntry.STATE_DEFAULT, gr.abiss.calipso.uischema.annotation.FormSchemaEntry.TYPE_STRING);
 						}
 						break;
 					}

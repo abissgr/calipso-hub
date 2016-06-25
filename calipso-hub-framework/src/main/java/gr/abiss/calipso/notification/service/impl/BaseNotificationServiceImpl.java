@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.notification.model.BaseNotification;
 import gr.abiss.calipso.notification.service.BaseNotificationService;
@@ -30,6 +29,7 @@ import gr.abiss.calipso.notification.repository.BaseNotificationRepository;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
 import javax.inject.Inject;
 import javax.inject.Named;

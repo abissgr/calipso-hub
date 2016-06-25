@@ -1,4 +1,4 @@
-package gr.abiss.calipso.jpasearch.annotation;
+package gr.abiss.calipso.tiers.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,13 +10,15 @@ import javax.persistence.CascadeType;
 import gr.abiss.calipso.model.Role;
 
 /**
- * Used to enforce a criterion based on the current session userDetails, i.e. the loggedin in user
- * @author manos
- *
+ * Used to enforce a criterion based on the current session userDetails, 
+ * i.e. the loggedin in user. Enforced at service/specification level. For enforcing 
+ * at controller level see CurrentPrincipalField.
+ * 
+ * @see gr.abiss.calipso.tiers.annotation.CurrentPrincipalField
  */
 @Target(value = ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ApplyCurrentPrincipal {
+public @interface CurrentPrincipal {
 
     /**
      * (Optional) The names of roles to exclude from the 

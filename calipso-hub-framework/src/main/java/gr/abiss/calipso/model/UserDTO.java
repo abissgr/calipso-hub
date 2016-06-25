@@ -18,8 +18,6 @@
  */
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.jpasearch.annotation.FormSchemaEntry;
-import gr.abiss.calipso.jpasearch.annotation.FormSchemas;
 import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
@@ -27,6 +25,8 @@ import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import gr.abiss.calipso.uischema.annotation.FormSchemaEntry;
+import gr.abiss.calipso.uischema.annotation.FormSchemas;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.MD5Utils;
 

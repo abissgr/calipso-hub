@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * If you are extending this class  you might want to check out 
  * the provided RateableRepository.
  * 
- * @see gr.abiss.calipso.jpasearch.repository.RateableRepository
+ * @see gr.abiss.calipso.repository.RateableRepository
  */
 @MappedSuperclass
 public abstract class AbstractAuditableRateable<U extends AbstractSystemUuidPersistable, R extends AbstractRating> 

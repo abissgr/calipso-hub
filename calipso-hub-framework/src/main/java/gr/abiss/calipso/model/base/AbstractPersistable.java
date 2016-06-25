@@ -19,10 +19,10 @@ package gr.abiss.calipso.model.base;
 
 import java.io.Serializable;
 
-import gr.abiss.calipso.jpasearch.model.FormSchema;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AuditableResource;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
+import gr.abiss.calipso.uischema.model.FormSchema;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;

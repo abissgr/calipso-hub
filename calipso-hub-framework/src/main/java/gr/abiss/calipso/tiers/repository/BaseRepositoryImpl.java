@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.repository;
+package gr.abiss.calipso.tiers.repository;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,12 +39,11 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
-import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
-import gr.abiss.calipso.tiers.repository.ModelRepository;
+import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
+import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
 public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		SimpleJpaRepository<T, ID> implements ModelRepository<T, ID> {

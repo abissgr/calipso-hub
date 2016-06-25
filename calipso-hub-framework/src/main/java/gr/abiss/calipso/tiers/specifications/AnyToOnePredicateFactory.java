@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.specifications;
+package gr.abiss.calipso.tiers.specifications;
 
 import java.io.Serializable;
 
@@ -32,23 +32,23 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 /**
  * A predicates for many2one members implementing org.springframework.data.domain.Persistable
  */
-public class AnyToOnePropertyPredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
+public class AnyToOnePredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePropertyPredicateFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePredicateFactory.class);
 
-	public AnyToOnePropertyPredicateFactory() {
+	public AnyToOnePredicateFactory() {
 	}
 
 
 	/**
-	 * @see gr.abiss.calipso.jpasearch.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
+	 * @see gr.abiss.calipso.uischema.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
 	 *      javax.persistence.criteria.CriteriaBuilder, java.lang.String,
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
 	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
 			String[] propertyValues) {
-		if (!AbstractPersistable.class.isAssignableFrom(fieldType)) {
+		if (!Persistable.class.isAssignableFrom(fieldType)) {
 			LOGGER.warn("Non-Entity type for property '" + propertyName + "': " + fieldType.getName());
 		}
 

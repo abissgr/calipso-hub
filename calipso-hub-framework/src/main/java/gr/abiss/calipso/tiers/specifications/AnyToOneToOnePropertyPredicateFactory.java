@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.specifications;
+package gr.abiss.calipso.tiers.specifications;
 
 import java.io.Serializable;
 
@@ -41,7 +41,7 @@ public class AnyToOneToOnePropertyPredicateFactory<T extends Serializable> imple
 
 
 	/**
-	 * @see gr.abiss.calipso.jpasearch.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
+	 * @see gr.abiss.calipso.uischema.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
 	 *      javax.persistence.criteria.CriteriaBuilder, java.lang.String,
 	 *      java.lang.Class, java.lang.String[])
 	 */

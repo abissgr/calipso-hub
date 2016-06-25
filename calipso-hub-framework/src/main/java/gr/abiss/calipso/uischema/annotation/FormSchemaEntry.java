@@ -1,4 +1,4 @@
-package gr.abiss.calipso.jpasearch.annotation;
+package gr.abiss.calipso.uischema.annotation;
 
 public @interface FormSchemaEntry {
 	public static final String TYPE_STRING = " { \"type\": \"Text\" }";

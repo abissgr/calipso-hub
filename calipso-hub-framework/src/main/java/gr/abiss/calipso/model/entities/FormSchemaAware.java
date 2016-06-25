@@ -1,6 +1,6 @@
 package gr.abiss.calipso.model.entities;
 
-import gr.abiss.calipso.jpasearch.model.FormSchema;
+import gr.abiss.calipso.uischema.model.FormSchema;
 
 /**
  * An interface to mark form-schema-aware entities. Form schemas are used to drive 

@@ -2,10 +2,10 @@ package gr.abiss.calipso.notification.model;
 
 import java.util.Date;
 
-import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * Base notification class, corresponds to a Log Table that aggregates basic information for all 
  * notifications.  
  */
-@CurrentPrincipalIdPredicate( path = "recepient", ignoreforRoles = {"ROLE_ADMIN", "ROLE_SITE_OPERATOR"} )
+@CurrentPrincipalField( value = "recepient", ignoreforRoles = {"ROLE_ADMIN", "ROLE_SITE_OPERATOR"} )
 @Entity
 //@ApiModel
 @Table(name = "base_notification")

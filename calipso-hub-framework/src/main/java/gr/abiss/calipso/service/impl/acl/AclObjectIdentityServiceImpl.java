@@ -1,9 +1,9 @@
 package gr.abiss.calipso.service.impl.acl;
 
-import gr.abiss.calipso.jpasearch.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.model.acl.AclObjectIdentity;
 import gr.abiss.calipso.repository.acl.AclObjectIdentityRepository;
 import gr.abiss.calipso.service.acl.AclObjectIdentityService;
+import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;

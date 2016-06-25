@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.annotation;
+package gr.abiss.calipso.uischema.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

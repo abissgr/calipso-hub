@@ -74,19 +74,19 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import gr.abiss.calipso.jpasearch.annotation.ApplyCurrentPrincipal;
-import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
-import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
-import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.service.cms.BinaryFileService;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 import gr.abiss.calipso.tiers.service.ModelService;
+import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.utils.ConfigurationFactory;
+import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
 public abstract class AbstractModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
@@ -142,7 +142,7 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		if(BooleanUtils.toBoolean(request.getParameter("skipCurrentPrincipalIdPredicate"))){
 			applyCurrentPrincipalIdPredicate = false;
 			if(LOGGER.isDebugEnabled()){
-				LOGGER.debug("Skipping CurrentPrincipalIdPredicate");
+				LOGGER.debug("Skipping CurrentPrincipalField");
 			}
 		}
 		
@@ -162,7 +162,7 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 			}
 			parameters = new HashMap<String, String[]>();
 			parameters.putAll(paramsMap);
-			CurrentPrincipalIdPredicate predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalIdPredicate.class);
+			CurrentPrincipalField predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalField.class);
 			if(predicate != null){
 				ICalipsoUserDetails principal = this.service.getPrincipal();
 				String[] excludeRoles = predicate.ignoreforRoles();
@@ -171,14 +171,9 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 					String id = principal != null ? principal.getId() : "ANONYMOUS";
 					String[] val = {id};
 					if(LOGGER.isDebugEnabled()){
-						LOGGER.debug("Adding implicit predicate, name: " + predicate.path() + ", value: " + id);
+						LOGGER.debug("Adding implicit predicate, name: " + predicate.value() + ", value: " + id);
 					}
-					parameters.put(predicate.path(), val);
-				}
-				else{
-					if(LOGGER.isDebugEnabled()){
-						LOGGER.debug("Skipping implicit predicate, name: " + predicate.path());
-					}
+					parameters.put(predicate.value(), val);
 				}
 				
 			}
@@ -248,13 +243,13 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 
 
 	protected void applyCurrentPrincipal(T resource) {
-		Field[] fields = FieldUtils.getFieldsWithAnnotation(this.service.getDomainClass(), ApplyCurrentPrincipal.class);
-		//ApplyPrincipalUse predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalIdPredicate.class);
+		Field[] fields = FieldUtils.getFieldsWithAnnotation(this.service.getDomainClass(), CurrentPrincipal.class);
+		//ApplyPrincipalUse predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalField.class);
 		if(fields.length > 0){
 			ICalipsoUserDetails principal = this.service.getPrincipal();
 			for(int i = 0; i < fields.length; i++){
 				Field field = fields[i];
-				ApplyCurrentPrincipal applyRule = field.getAnnotation(ApplyCurrentPrincipal.class);
+				CurrentPrincipal applyRule = field.getAnnotation(CurrentPrincipal.class);
 				
 				// if property is not already set
 				try {
@@ -269,16 +264,10 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 								LOGGER.info("Applying principal to field: " + field.getName() + ", value: " + id);
 								PropertyUtils.setProperty(resource, field.getName(), user);
 							}
-							else{
-								LOGGER.warn("User is anonymous, cannot apply principal to field: " + field.getName());
-							}
-						}
-						else{
-							LOGGER.info("Skipping setting principal to field: " + field.getName());
 						}
 					}
 				} catch (Exception e) {
-					throw new RuntimeException("Failed to apply ApplyCurrentPrincipal annotation", e);
+					throw new RuntimeException("Failed to apply CurrentPrincipal annotation", e);
 				}
 				
 			}

@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.model;
+package gr.abiss.calipso.uischema.model;
 
-import gr.abiss.calipso.jpasearch.json.serializer.FormSchemaSerializer;
 import gr.abiss.calipso.model.entities.FormSchemaAware;
+import gr.abiss.calipso.uischema.serializer.FormSchemaSerializer;
 
 import org.springframework.data.domain.Persistable;
 

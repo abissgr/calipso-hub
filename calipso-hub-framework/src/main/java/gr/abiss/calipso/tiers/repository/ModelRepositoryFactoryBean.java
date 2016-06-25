@@ -17,7 +17,6 @@
  */
 package gr.abiss.calipso.tiers.repository;
 
-import gr.abiss.calipso.jpasearch.repository.BaseRepositoryImpl;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 
 import java.io.Serializable;

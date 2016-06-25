@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.specifications;
+package gr.abiss.calipso.tiers.specifications;
 
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
@@ -34,10 +34,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * A predicate that automatically enforces the current principal (i.e. loggedin user) id
- * as the parent of a many2one. The predicate is used  by {@link gr.abiss.calipso.jpasearch.specifications.GenericSpecifications} for entity attributes using the 
- * {@link gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate}.
- * @see gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate
- * @see gr.abiss.calipso.jpasearch.specifications.GenericSpecifications
+ * as the parent of a many2one. The predicate is used  by {@link gr.abiss.calipso.tiers.specifications.GenericSpecifications} for entity attributes using the 
+ * {@link gr.abiss.calipso.tiers.annotation.CurrentPrincipalField}.
+ * @see gr.abiss.calipso.tiers.annotation.CurrentPrincipalField
+ * @see gr.abiss.calipso.tiers.specifications.GenericSpecifications
  */
 public class CurrentPrincipalPredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
 
@@ -48,7 +48,7 @@ public class CurrentPrincipalPredicateFactory<T extends Serializable> implements
 
 
 	/**
-	 * @see gr.abiss.calipso.jpasearch.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
+	 * @see gr.abiss.calipso.uischema.jpa.search.specifications.IPredicateFactory#addPredicate(javax.persistence.criteria.Root,
 	 *      javax.persistence.criteria.CriteriaBuilder, java.lang.String,
 	 *      java.lang.Class, java.lang.String[])
 	 */

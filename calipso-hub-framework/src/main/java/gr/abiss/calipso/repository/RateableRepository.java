@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.abiss.calipso.jpasearch.repository;
+package gr.abiss.calipso.repository;
 
 import gr.abiss.calipso.model.interfaces.Rateable;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
