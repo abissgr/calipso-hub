@@ -18,26 +18,6 @@
 package gr.abiss.calipso.tiers.controller;
 
 
-import gr.abiss.calipso.jpasearch.annotation.ApplyCurrentPrincipal;
-import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
-import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
-import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
-import gr.abiss.calipso.jpasearch.model.FormSchema;
-import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
-import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-import gr.abiss.calipso.model.base.PartiallyUpdateable;
-import gr.abiss.calipso.model.cms.BinaryFile;
-import gr.abiss.calipso.model.dto.MetadatumDTO;
-import gr.abiss.calipso.model.dto.ReportDataSet;
-import gr.abiss.calipso.model.entities.FormSchemaAware;
-import gr.abiss.calipso.model.types.TimeUnit;
-import gr.abiss.calipso.service.cms.BinaryFileService;
-import gr.abiss.calipso.tiers.service.ModelService;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.utils.ConfigurationFactory;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,8 +28,6 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,7 +44,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.imgscalr.Scalr;
 import org.resthub.common.exception.NotFoundException;
@@ -96,6 +73,20 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.fasterxml.jackson.annotation.JsonView;
+
+import gr.abiss.calipso.jpasearch.annotation.ApplyCurrentPrincipal;
+import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
+import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import gr.abiss.calipso.model.base.PartiallyUpdateable;
+import gr.abiss.calipso.model.cms.BinaryFile;
+import gr.abiss.calipso.model.dto.MetadatumDTO;
+import gr.abiss.calipso.service.cms.BinaryFileService;
+import gr.abiss.calipso.tiers.service.ModelService;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 
 public abstract class AbstractModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
@@ -409,28 +400,6 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		super.delete(id);
 	}
 
-
-
-	/**
-	 * Find all resources matching the given criteria and return a paginated
-	 * collection<br/>
-	 * REST webservice published : GET
-	 * /search?page=0&size=20&properties=sortPropertyName&direction=asc
-	 * 
-	 * @param restriction
-	 *            the structured query as a Restriction instance
-	 * @return OK http status code if the request has been correctly processed,
-	 *         with the a paginated collection of all resource enclosed in the
-	 *         body.
-	 */
-	@RequestMapping(value = "query", produces = { "application/json" }, method = RequestMethod.POST)
-	@ResponseBody
-	@Deprecated
-	//@ApiOperation(value = "deprecated: find paginated with restrictions", httpMethod = "POST")
-	public Page<T> findPaginatedWithRestrictions(
-			@RequestBody Restriction restriction) {
-		return this.service.findAll(new RestrictionBackedPageRequest(restriction));
-	}
 //    
 //	// TODO: refactor to OPTIONS on base path?
 //	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)

@@ -20,7 +20,13 @@ package gr.abiss.calipso.jpasearch.specifications;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+// TODO: this is half-done. To make sense, this needs to allow for different tests than simple equality
 class NestedJunctions {
+	private static final Logger LOGGER = LoggerFactory.getLogger(NestedJunctions.class);
+	
 	private final Map<String, Map<String, String[]>> andJunctions = new HashMap<String, Map<String, String[]>>();
 	private final Map<String, Map<String, String[]>> orJunctions = new HashMap<String, Map<String, String[]>>();
 
@@ -43,7 +49,7 @@ class NestedJunctions {
 			String path, String[] values) {
 		String[] junctionKeyAndPropName = path.split(":");
 		if (junctionKeyAndPropName.length != 2) {
-			GenericSpecifications.LOGGER.warn("Ignoring invalid path for nested/junctioned param: "
+			LOGGER.warn("Ignoring invalid path for nested/junctioned param: "
 					+ path);
 		} else {
 			Map<String, String[]> groupedPrams = junctions

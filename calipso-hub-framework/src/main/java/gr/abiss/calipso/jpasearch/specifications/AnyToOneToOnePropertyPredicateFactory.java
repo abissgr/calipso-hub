@@ -53,13 +53,13 @@ public class AnyToOneToOnePropertyPredicateFactory<T extends Serializable> imple
 		Predicate predicate = null;
 		String[] pathSteps = propertyName.split("\\.");
 		if (propertyValues.length > 0) {
-			Path<AbstractPersistable> basePath = root.<AbstractPersistable> get(pathSteps[0]);
+			Path<Persistable> basePath = root.<Persistable> get(pathSteps[0]);
 			for(int i = 1; i < pathSteps.length; i++){
-				basePath = basePath.<AbstractPersistable> get(pathSteps[i]);
+				basePath = basePath.<Persistable> get(pathSteps[i]);
 				LOGGER.info("getPredicate, adding path step: " + pathSteps[i] + ", new basePath: " + basePath);
 			}
-			Path<T> parentId = basePath.<T> get("id");
-			predicate = cb.equal(parentId, propertyValues[0]);
+			//Path<T> parentId = basePath.<T> get("id");
+			predicate = cb.equal(basePath, propertyValues[0]);
 		}
 		return predicate;
 	}

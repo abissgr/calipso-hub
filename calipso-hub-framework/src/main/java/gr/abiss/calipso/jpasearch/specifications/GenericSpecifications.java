@@ -18,7 +18,6 @@
 package gr.abiss.calipso.jpasearch.specifications;
 
 import gr.abiss.calipso.jpasearch.annotation.CurrentPrincipalIdPredicate;
-import gr.abiss.calipso.jpasearch.model.structuredquery.Restriction;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 import java.lang.reflect.Field;
@@ -187,52 +186,11 @@ public class GenericSpecifications {
 		return simpleSearchTerms;
 	}
 
+	//TODO: why only enum and string?
 	protected static boolean isAcceptableSimpleSearchFieldClass(Field tmpField) {
 		return tmpField.getClass().isEnum() || tmpField.getType().equals(String.class);
 	}
 
-	protected static Predicate getRootPredicate(final Class clazz, final Map<String, String[]> searchTerms,
-			Root<Persistable> root, CriteriaBuilder cb, boolean skipSimpleSearch) {
-		LinkedList<Predicate> predicates = new LinkedList<Predicate>();
-		Predicate predicate;
-				
-		parseSearchTerms(clazz, searchTerms, root, cb, predicates);
-		if(!skipSimpleSearch){
-			// handle "_all", i.e. simple search
-			if(searchTerms.containsKey(SIMPLE_SEARCH_PARAM_NAME) && predicates.size() == 0){
-				Map<String, String[]> simpleSearchTerms = getSimpleSearchTerms(clazz, searchTerms.get(SIMPLE_SEARCH_PARAM_NAME));
-				parseSearchTerms(clazz, simpleSearchTerms, root, cb, predicates);
-			}
-		}
-		if (searchTerms.containsKey(SEARCH_MODE) && searchTerms.get(SEARCH_MODE)[0].equalsIgnoreCase(OR)
-				// A disjunction of zero predicates is false
-				&& predicates.size() > 0) {
-			predicate = cb.or(predicates.toArray(new Predicate[predicates.size()]));
-		} else {
-			predicate = cb.and(predicates.toArray(new Predicate[predicates.size()]));
-		}
-		return predicate;
-	}
-
-	protected static void parseSearchTerms(final Class clazz, final Map<String, String[]> searchTerms,
-			Root<Persistable> root, CriteriaBuilder cb, LinkedList<Predicate> predicates) {
-		if (!CollectionUtils.isEmpty(searchTerms)) {
-			Set<String> propertyNames = searchTerms.keySet();
-			// put aside nested AND/OR param groups
-			NestedJunctions junctions = new NestedJunctions();
-			for (String propertyName : propertyNames) {
-				String[] values = searchTerms.get(propertyName);
-				if (!junctions.addIfNestedJunction(propertyName, values)) {
-					addPredicate(clazz, root, cb, predicates, values, propertyName);
-				}
-			}
-			// add nested AND/OR param groups
-			Map<String, Map<String, String[]>> andJunctions = junctions.getAndJunctions();
-			addJunctionedParams(clazz, root, cb, predicates, andJunctions, AND);
-			Map<String, Map<String, String[]>> orJunctions = junctions.getOrJunctions();
-			addJunctionedParams(clazz, root, cb, predicates, orJunctions, OR);
-		}
-	}
 
 	protected static void addJunctionedParams(final Class clazz, Root<Persistable> root, CriteriaBuilder cb,
 			LinkedList<Predicate> predicates, Map<String, Map<String, String[]>> andJunctions, String mode) {
@@ -240,7 +198,8 @@ public class GenericSpecifications {
 			String[] searchMode = { mode };
 			for (Map<String, String[]> params : andJunctions.values()) {
 				params.put(SEARCH_MODE, searchMode);
-				Predicate nestedPredicate = getRootPredicate(clazz, params, root, cb, true);
+				// TODO
+				Predicate nestedPredicate = buildRootPredicate(clazz, params, root, cb/*, true*/);
 				if (nestedPredicate != null) {
 					predicates.add(nestedPredicate);
 				}
@@ -248,90 +207,118 @@ public class GenericSpecifications {
 		}
 	}
 
-	@Deprecated
-	protected static Predicate getPredicate(final Class clazz, final Restriction searchTerms, Root<Persistable> root,
-			CriteriaBuilder cb) {
-		LinkedList<Predicate> predicates = new LinkedList<Predicate>();
-		Predicate predicate;
-		// process child restrictions
-		if (!CollectionUtils.isEmpty(searchTerms.getRestrictions())) {
-			for (Restriction restriction : searchTerms.getRestrictions()) {
-				predicates.add(getPredicate(clazz, restriction, root, cb));
+
+	/**
+	 * Dynamically create a specification for the given class and search
+	 * parameters. This is the entry point for query specifications construction.
+	 * @param clazz the entity type to query for
+	 * @param searchTerms the search terms to match
+	 * @return the result specification
+	 */
+	@SuppressWarnings("rawtypes")
+	public static Specification<Persistable> matchAll(final Class clazz, final Map<String, String[]> searchTerms) {
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
+		}
+		return new Specification<Persistable>() {
+			@Override
+			public Predicate toPredicate(@SuppressWarnings("rawtypes") Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				return GenericSpecifications.buildRootPredicate(clazz, searchTerms, root, cb);
 			}
-		}
-		// process main restriction
-		if (StringUtils.isNotBlank(searchTerms.getField())) {
-			String propertyName = searchTerms.getField();
-			addPredicate(clazz, root, cb, predicates,
-					searchTerms.getValues().toArray(new String[searchTerms.getValues().size()]), propertyName);
-		}
-		if (searchTerms.getJunction().equals(Restriction.Junction.OR)) {
+		};
+	}
+
+	/**
+	 * Get the root predicate, either a conjunction or disjunction
+	 * @param clazz the entity type to query for
+	 * @param searchTerms the search terms to match
+	 * @param root the criteria root
+	 * @param cb the criteria builder
+	 * @return the resulting predicate
+	 */
+	protected static Predicate buildRootPredicate(final Class clazz, final Map<String, String[]> searchTerms,
+			Root<Persistable> root, CriteriaBuilder cb) {
+		
+		// build a list of criteria/predicates
+		LinkedList<Predicate> predicates = buildSearchPredicates(clazz, searchTerms, root, cb);
+		
+		// wrap list in AND/OR junction
+		Predicate predicate;
+		if (searchTerms.containsKey(SEARCH_MODE) && searchTerms.get(SEARCH_MODE)[0].equalsIgnoreCase(OR)
+				// A disjunction of zero predicates is false so...
+				&& predicates.size() > 0) {
 			predicate = cb.or(predicates.toArray(new Predicate[predicates.size()]));
 		} else {
 			predicate = cb.and(predicates.toArray(new Predicate[predicates.size()]));
 		}
+		
+		// return the resulting junction
 		return predicate;
 	}
+	
+	/**
+	 * Build the list of predicates corresponding to the given search terms
+	 * @param clazz the entity type to query for
+	 * @param searchTerms the search terms to match
+	 * @param root the criteria root
+	 * @param cb the criteria builder
+	 * @return the list of predicates corresponding to the search terms
+	 */
+	protected static LinkedList<Predicate> buildSearchPredicates(final Class clazz, final Map<String, String[]> searchTerms,
+			Root<Persistable> root, CriteriaBuilder cb) {
+		
+		LinkedList<Predicate> predicates = new LinkedList<Predicate>();
+		
+		if (!CollectionUtils.isEmpty(searchTerms)) {
+			Set<String> propertyNames = searchTerms.keySet();
+			// storage for nested junctions
+			NestedJunctions junctions = new NestedJunctions();
+			for (String propertyName : propertyNames) {
+				String[] values = searchTerms.get(propertyName);
+				// store if nested junction or add a predicate
+				if (!junctions.addIfNestedJunction(propertyName, values)) {
+					addPredicate(clazz, root, cb, predicates, values, propertyName);
+				}
+			}
+			// add stored junctions
+			Map<String, Map<String, String[]>> andJunctions = junctions.getAndJunctions();
+			addJunctionedParams(clazz, root, cb, predicates, andJunctions, AND);
+			Map<String, Map<String, String[]>> orJunctions = junctions.getOrJunctions();
+			addJunctionedParams(clazz, root, cb, predicates, orJunctions, OR);
+		}
+		// return the list of predicates
+		return predicates;
+	}
+	
 
+	/**
+	 * Add a predicate to the given list if valid
+	 * @param clazz the entity type to query for
+	 * @param root the criteria root
+	 * @param cb the criteria builder
+	 * @param predicates the list to add the predicate into
+	 * @param propertyValues the predicate values
+	 * @param propertyName the predicate name
+	 */
 	protected static void addPredicate(final Class clazz, Root<Persistable> root, CriteriaBuilder cb,
 			LinkedList<Predicate> predicates, String[] propertyValues, String propertyName) {
 		// dot notation only supports toOne.toOne.id
 		if (propertyName.contains(".")) {
-			// LOGGER.info("addPredicate, property name is a path: " +
-			// propertyName);
+			 LOGGER.info("addPredicate, property name is a path: " +
+			 propertyName);
 			predicates.add(anyToOneToOnePredicateFactory.getPredicate(root, cb, propertyName, null, propertyValues));
 		} else {// normal single step predicate
 			Field field = GenericSpecifications.getField(clazz, propertyName);
 			if (field != null) {
-				// LOGGER.info("addPredicate, property: " + propertyName);
+				LOGGER.info("addPredicate, property: " + propertyName);
 				Class fieldType = field.getType();
 				IPredicateFactory predicateFactory = getPredicateFactoryForClass(field);
-				// LOGGER.info("addPredicate, predicateFactory: " +
-				// predicateFactory);
+				LOGGER.info("addPredicate, predicateFactory: " +
+				predicateFactory);
 				if (predicateFactory != null) {
 					predicates.add(predicateFactory.getPredicate(root, cb, propertyName, fieldType, propertyValues));
 				}
 			}
 		}
-	}
-
-	/**
-	 * Dynamically create a specification for the given class and search
-	 * parameters.
-	 * 
-	 * @param searchTerm
-	 * @return
-	 */
-	public static Specification matchAll(final Class clazz, final Map<String, String[]> searchTerms) {
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
-		}
-		return new Specification<Persistable>() {
-			@Override
-			public Predicate toPredicate(Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				return GenericSpecifications.getRootPredicate(clazz, searchTerms, root, cb, false);
-			}
-
-		};
-	}
-
-	/**
-	 * Dynamically create a specification for the given class and restriction
-	 * 
-	 * @param searchTerm
-	 * @return
-	 */
-	public static Specification matchAll(final Class clazz, final Restriction searchTerms) {
-
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("matchAll, entity: " + clazz.getSimpleName() + ", searchTerms: " + searchTerms);
-		}
-		return new Specification<Persistable>() {
-			@Override
-			public Predicate toPredicate(Root<Persistable> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				return GenericSpecifications.getPredicate(clazz, searchTerms, root, cb);
-			}
-
-		};
 	}
 }

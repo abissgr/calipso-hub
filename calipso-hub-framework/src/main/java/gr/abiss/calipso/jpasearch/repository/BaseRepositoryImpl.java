@@ -17,45 +17,34 @@
  */
 package gr.abiss.calipso.jpasearch.repository;
 
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-import gr.abiss.calipso.model.cms.BinaryFile;
-import gr.abiss.calipso.model.dto.ReportDataSet;
-import gr.abiss.calipso.model.interfaces.MetadataSubject;
-import gr.abiss.calipso.model.interfaces.Metadatum;
-import gr.abiss.calipso.model.types.AggregateFunction;
-import gr.abiss.calipso.model.types.TimeUnit;
-import gr.abiss.calipso.tiers.repository.ModelRepository;
-import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
-import gr.abiss.calipso.jpasearch.data.RestrictionBackedPageRequest;
-import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
-import javax.persistence.criteria.SetJoin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+
+import gr.abiss.calipso.jpasearch.data.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.jpasearch.specifications.GenericSpecifications;
+import gr.abiss.calipso.model.cms.BinaryFile;
+import gr.abiss.calipso.model.interfaces.MetadataSubject;
+import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		SimpleJpaRepository<T, ID> implements ModelRepository<T, ID> {
@@ -230,19 +219,15 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		return entity;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Page<T> findAll(Pageable pageable) {
+		// if 
 		if (pageable instanceof ParameterMapBackedPageRequest) {
-			Specification<T> spec = GenericSpecifications.matchAll(
+			@SuppressWarnings("unchecked")
+			Specification<T> spec = (Specification<T>) GenericSpecifications.matchAll(
 					getDomainClass(),
 					((ParameterMapBackedPageRequest) pageable)
 							.getParameterMap());
-			return super.findAll(spec, pageable);
-		} else if (pageable instanceof RestrictionBackedPageRequest) {
-			Specification<T> spec = GenericSpecifications.matchAll(
-					getDomainClass(),
-					((RestrictionBackedPageRequest) pageable).getRestriction());
 			return super.findAll(spec, pageable);
 		} else {
 			return super.findAll(pageable);
