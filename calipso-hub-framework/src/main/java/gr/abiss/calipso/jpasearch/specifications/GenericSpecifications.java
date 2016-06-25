@@ -100,6 +100,11 @@ public class GenericSpecifications {
 		}
 	}
 
+	/**
+	 * Get an appropriate predicate factory for the given field class
+	 * @param field
+	 * @return
+	 */
 	private static IPredicateFactory<?> getPredicateFactoryForClass(Field field) {
 		Class clazz = field.getType();
 		if (clazz.isEnum()) {
@@ -115,6 +120,12 @@ public class GenericSpecifications {
 		}
 	}
 
+	/**
+	 * Get a (cached) field for the given class' member name
+	 * @param clazz
+	 * @param fieldName the member name
+	 * @return
+	 */
 	public static Field getField(Class<?> clazz, String fieldName) {
 		Field field = null;
 		if (!IGNORED_FIELD_NAMES.contains(fieldName)) {
@@ -151,62 +162,6 @@ public class GenericSpecifications {
 		return field;
 	}
 	
-	// TODO: add annotation config
-	public static Map<String, String[]> getSimpleSearchTerms(Class<?> clazz, String[] values) {
-		Map<String, String[]> simpleSearchTerms = new HashMap<String, String[]>();
-		Class<?> tmpClass = clazz;
-		
-		// try the cache first
-		List<Field> simpleSearchFieldList = SIMPLE_SEARCH_FIELDs_CACHE.get(clazz);
-		if(simpleSearchFieldList == null){
-			simpleSearchFieldList = new LinkedList<Field>();
-			while (tmpClass != null) {
-				for (Field tmpField : tmpClass.getDeclaredFields()) {
-					String fieldName = tmpField.getName();
-					// if string and not excluded
-					if(isAcceptableSimpleSearchFieldClass(tmpField)
-							&& !tmpField.isAnnotationPresent(Transient.class)
-							&& !tmpField.isAnnotationPresent(JsonIgnore.class)){
-
-						simpleSearchTerms.put(fieldName, values);
-						simpleSearchFieldList.add(tmpField);
-					}
-				}
-				tmpClass = tmpClass.getSuperclass();
-			}
-			// update the cache
-			SIMPLE_SEARCH_FIELDs_CACHE.put(clazz, simpleSearchFieldList);
-		}
-		else{
-			// use the caches field list
-			for (Field tmpField : simpleSearchFieldList) {
-				simpleSearchTerms.put(tmpField.getName(), values);
-			}
-		}
-		return simpleSearchTerms;
-	}
-
-	//TODO: why only enum and string?
-	protected static boolean isAcceptableSimpleSearchFieldClass(Field tmpField) {
-		return tmpField.getClass().isEnum() || tmpField.getType().equals(String.class);
-	}
-
-
-	protected static void addJunctionedParams(final Class clazz, Root<Persistable> root, CriteriaBuilder cb,
-			LinkedList<Predicate> predicates, Map<String, Map<String, String[]>> andJunctions, String mode) {
-		if (!CollectionUtils.isEmpty(andJunctions)) {
-			String[] searchMode = { mode };
-			for (Map<String, String[]> params : andJunctions.values()) {
-				params.put(SEARCH_MODE, searchMode);
-				// TODO
-				Predicate nestedPredicate = buildRootPredicate(clazz, params, root, cb/*, true*/);
-				if (nestedPredicate != null) {
-					predicates.add(nestedPredicate);
-				}
-			}
-		}
-	}
-
 
 	/**
 	 * Dynamically create a specification for the given class and search
@@ -282,9 +237,9 @@ public class GenericSpecifications {
 			}
 			// add stored junctions
 			Map<String, Map<String, String[]>> andJunctions = junctions.getAndJunctions();
-			addJunctionedParams(clazz, root, cb, predicates, andJunctions, AND);
+			addNestedJunctionPredicates(clazz, root, cb, predicates, andJunctions, AND);
 			Map<String, Map<String, String[]>> orJunctions = junctions.getOrJunctions();
-			addJunctionedParams(clazz, root, cb, predicates, orJunctions, OR);
+			addNestedJunctionPredicates(clazz, root, cb, predicates, orJunctions, OR);
 		}
 		// return the list of predicates
 		return predicates;
@@ -304,19 +259,30 @@ public class GenericSpecifications {
 			LinkedList<Predicate> predicates, String[] propertyValues, String propertyName) {
 		// dot notation only supports toOne.toOne.id
 		if (propertyName.contains(".")) {
-			 LOGGER.info("addPredicate, property name is a path: " +
-			 propertyName);
 			predicates.add(anyToOneToOnePredicateFactory.getPredicate(root, cb, propertyName, null, propertyValues));
 		} else {// normal single step predicate
 			Field field = GenericSpecifications.getField(clazz, propertyName);
 			if (field != null) {
-				LOGGER.info("addPredicate, property: " + propertyName);
 				Class fieldType = field.getType();
 				IPredicateFactory predicateFactory = getPredicateFactoryForClass(field);
-				LOGGER.info("addPredicate, predicateFactory: " +
-				predicateFactory);
 				if (predicateFactory != null) {
 					predicates.add(predicateFactory.getPredicate(root, cb, propertyName, fieldType, propertyValues));
+				}
+			}
+		}
+	}
+	
+	//TODO refactor nested junctions and add operators
+	protected static void addNestedJunctionPredicates(final Class clazz, Root<Persistable> root, CriteriaBuilder cb,
+			LinkedList<Predicate> predicates, Map<String, Map<String, String[]>> andJunctions, String mode) {
+		if (!CollectionUtils.isEmpty(andJunctions)) {
+			String[] searchMode = { mode };
+			for (Map<String, String[]> params : andJunctions.values()) {
+				params.put(SEARCH_MODE, searchMode);
+				// TODO
+				Predicate nestedPredicate = buildRootPredicate(clazz, params, root, cb/*, true*/);
+				if (nestedPredicate != null) {
+					predicates.add(nestedPredicate);
 				}
 			}
 		}
