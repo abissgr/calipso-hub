@@ -8,10 +8,58 @@ isHome: true
 	<h1 id="overview" class="page-header">Overview</h1>
 	<p>Experiments on a full stack, high level framework for lazy application hackers and scalable developer teams.</p>
 </section>
-
+<section class="bs-docs-section">
+	<h1 id="build-and-run" class="page-header">Quick Build and Run</h1>
+	<p>Follow the steps bellow to build.</p>
+	<p>a) Clone the repository:</p>
+	{% highlight bash %} git clone https://github.com/abissgr/calipso-hub.git {% endhighlight %}
+	<p>b) Copy HOWTO.txt to dev.properties:</p>
+	{% highlight bash %} cp HOWTO.txt dev.properties {% endhighlight %}
+	<p>
+		c) Build and install (
+		<code>-U</code>
+		forces the download of updated snapshot dependencies):
+	</p>
+	{% highlight bash %} mvn -U clean install {% endhighlight %}
+	<p>d) run embedded Jetty container:</p>
+	{% highlight bash %}
+cd calipso-hub-webapp
+mvn jetty:run
+	{% endhighlight %}
+	<p>
+		e) Browse the app: <a href="http://localhost:8080/calipso/client">http://localhost:8080/calipso/client</a>
+	</p>
+	<p>
+		If you are using chrome, ensure you have enabled <a href="http://www.alphadevx.com/a/454-Google-Chrome-and-localhost-cookies">cookies for localhost</a>.
+	</p>
+	<h2 id="optimize_profile">Optimize Profile</h2>
+	<p>
+		If have [node](https://nodejs.org) installed, you can use the
+		<code>optimize</code>
+		profile and
+		<code>jetty:run-war</code>
+		to optimize client-side code:
+	</p>
+	{% highlight bash %}
+cd calipso-hub-webapp
+mvn -P optimize clean jetty:run-war
+ {% endhighlight %}
+ <h2 id="ci_profile">Integration Testing Profile</h2>
+	<p>
+		To run integration tests simply activate the
+		<code>ci</code>
+		profile:
+	</p>
+	{% highlight bash %}
+mvn -P ci clean install
+	{% endhighlight %}
+	<p>
+		See also <a href="#tests">Tests</a>.
+	</p>
+</section>
 <section class="bs-docs-section">
 	<h1 id="documentation" class="page-header">Documentation</h1>
-	
+
 	<div class="list-group">
 		<a href="checkout_and_build.html" class="list-group-item">
 			<h4 class="list-group-item-heading">Installation</h4>
