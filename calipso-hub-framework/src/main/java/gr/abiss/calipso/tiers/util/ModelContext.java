@@ -18,31 +18,26 @@
  */
 package gr.abiss.calipso.tiers.util;
 
-import org.hibernate.annotations.ManyToAny;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.core.GenericCollectionTypeResolver;
-import org.springframework.data.domain.Persistable;
-import org.springframework.hateoas.Identifiable;
-import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
-
-import gr.abiss.calipso.tiers.annotation.ModelRelatedResource;
-import gr.abiss.calipso.tiers.annotation.ModelResource;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import org.hibernate.annotations.ManyToAny;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.core.GenericCollectionTypeResolver;
+import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
+
+import gr.abiss.calipso.tiers.annotation.ModelRelatedResource;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
 
 /**
  * Adapter-ish context class for classes with {@link javax.persistence.ModelResource} 
