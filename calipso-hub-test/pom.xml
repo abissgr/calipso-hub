@@ -76,6 +76,12 @@
 			<groupId>org.resthub</groupId>
 			<artifactId>resthub-test</artifactId>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-maven-plugin</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 	</dependencies>
