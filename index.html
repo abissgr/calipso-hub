@@ -27,7 +27,9 @@ cd calipso-hub-webapp
 mvn jetty:run
 	{% endhighlight %}
 	<p>
-		e) Browse the app: <a href="http://localhost:8080/calipso/client">http://localhost:8080/calipso/client</a>
+		e) Browse the app client: <a href="http://localhost:8080/calipso/client">http://localhost:8080/calipso/client</a> 
+		or the API reference: <a href="http://localhost:8080/calipso/apidoc">http://localhost:8080/calipso/apidoc</a>. 
+		See also the <a href="#api-reference">Swagger API Reference</a> section bellow.
 	</p>
 	<p>
 		If you are using chrome, ensure you have enabled <a href="http://www.alphadevx.com/a/454-Google-Chrome-and-localhost-cookies">cookies for localhost</a>.
@@ -75,7 +77,15 @@ mvn -P ci clean install
 		</a>
 	</div>
 </section>
-
+<section class="bs-docs-section">
+	<h1 id="api-reference" class="page-header">Swagger API Reference</h1>
+	<p>
+		The webapp provides automatically-generated API documentation based on 
+		<a href="http://swagger.io/">Swagger</a> and created by <a href="http://springfox.github.io/springfox/">Springfox</a>. To access 
+		the documentation run the app and point your browser to <a href="http://localhost:8080/calipso/apidoc">http://localhost:8080/calipso/apidoc</a>.
+	</p>
+	<img src="{{ site.baseurl }}/assets/images/swagger-ui.png" class="img-responsive" alt="Responsive image">
+</section>
 <section class="bs-docs-section">
 	<h1 id="license" class="page-header">License</h1>
 	<p>
