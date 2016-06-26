@@ -4,6 +4,8 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a configuration based on calipso.defaults.properties and calipso.properties
@@ -11,6 +13,11 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  *
  */
 public class ConfigurationFactory {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationFactory.class);
+	
+	public static final String APP_NAME = "calipso.appName";
+	public static final String APP_VERSION = "calipso.appVersion";
 	public static final String BASE_URL = "calipso.baseurl";
 	public static final String SCRIPT_MAIN = "scriptMain";
 	
@@ -19,12 +26,15 @@ public class ConfigurationFactory {
 	private static CompositeConfiguration config = new CompositeConfiguration();
 	
 	static {
-		try {
-			config.addConfiguration(new PropertiesConfiguration("calipso.properties"));
-			config.addConfiguration(new PropertiesConfiguration("calipso.defaults.properties"));
-		} catch (ConfigurationException e) {
-			throw new RuntimeException("Failed to load configuration", e);
+		String[] propertyFiles = {"calipso.properties", "calipso.defaults.properties"};
+		for(String propFile : propertyFiles){
+			try {
+				config.addConfiguration(new PropertiesConfiguration(propFile));
+			} catch (ConfigurationException e) {
+				LOGGER.warn("Failed to load configuration " + propFile);
+			}
 		}
+		
 	}
 
 	public static Configuration getConfiguration() {

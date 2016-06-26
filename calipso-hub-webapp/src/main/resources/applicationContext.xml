@@ -118,11 +118,11 @@
 	<task:annotation-driven executor="asyncExecutor" />
 
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    	<property name="ignoreResourceNotFound" value="true"/>
         <property name="locations">
             <list>
                 <value>classpath:calipso.defaults.properties</value>
                 <value>classpath:calipso.properties</value>
-                <!-- value>classpath:swagger.properties</value-->
             </list>
         </property> 
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
