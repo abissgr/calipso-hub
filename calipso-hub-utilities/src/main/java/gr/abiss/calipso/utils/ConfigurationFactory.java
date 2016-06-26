@@ -1,5 +1,7 @@
 package gr.abiss.calipso.utils;
 
+import java.net.URL;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -30,8 +32,15 @@ public class ConfigurationFactory {
 		for(String propFile : propertyFiles){
 			try {
 				config.addConfiguration(new PropertiesConfiguration(propFile));
+				if(LOGGER.isDebugEnabled()){
+					LOGGER.warn("Loaded configuration from " + propFile);
+				}
 			} catch (ConfigurationException e) {
-				LOGGER.warn("Failed to load configuration " + propFile);
+				if(LOGGER.isDebugEnabled()){
+					LOGGER.warn("Failed to load configuration from " + propFile, e);
+				}else{
+					LOGGER.warn("Failed to load configuration from " + propFile);
+				}
 			}
 		}
 		

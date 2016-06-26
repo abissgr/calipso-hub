@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Swagger UI</title>
+  <title>${appName}: Swagger UI</title>
   <link rel="icon" type="image/png" href="webjars/springfox-swagger-ui/images/favicon-32x32.png" sizes="32x32"/>
   <link rel="icon" type="image/png" href="webjars/springfox-swagger-ui/images/favicon-16x16.png" sizes="16x16"/>
   <link href='${basePath}/webjars/springfox-swagger-ui/css/typography.css' media='screen' rel='stylesheet' type='text/css'/>
@@ -158,7 +158,7 @@
 <body class="swagger-section">
 <div id='header'>
   <div class="swagger-ui-wrap">
-    <a id="logo" href="${basePath}">Calipso</a>
+    <a id="logo" href="${basePath}">${appName}</a>
 
     <form id='api_selector'>
       <div class='input'>

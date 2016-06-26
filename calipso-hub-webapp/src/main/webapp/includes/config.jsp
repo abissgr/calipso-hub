@@ -7,7 +7,13 @@
 
 	String basePath = configuration.getString(
 	        gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
-	
+	String appName = configuration.getString(
+	        gr.abiss.calipso.utils.ConfigurationFactory.APP_NAME);
+	String appVersion = configuration.getString(
+	        gr.abiss.calipso.utils.ConfigurationFactory.APP_VERSION);
+
     pageContext.setAttribute("basePath", basePath);
+    pageContext.setAttribute("appName", appName);
+    pageContext.setAttribute("appVersion", appVersion);
     
 %>
