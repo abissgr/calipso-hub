@@ -22,7 +22,7 @@ isHome: false
 	</p>
 	{% highlight java %} 
 @Entity
-@ModelResource(path = "books")
+@ModelResource(path = "books", apiName = "Books", apiDescription = "Operations about books")
 @Table(name = "book")
 public class Book extends AbstractAuditable<User> {
   //...
