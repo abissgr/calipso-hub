@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping(value = "/api/rest/roles", produces = { "application/json", "application/xml" })
-@Api(value = "Roles")
+@Api(tags = "Roles", description = "Operations about user roles")
 public class RoleController extends AbstractModelController<Role, String, RoleService> {
 
     

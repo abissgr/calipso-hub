@@ -17,42 +17,32 @@
  */
 package gr.abiss.calipso.userDetails.controller;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import gr.abiss.calipso.service.UserService;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.codec.Base64;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.resthub.web.controller.RestController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Page;
-import org.springframework.security.crypto.codec.Base64;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-//import com.mangofactory.swagger.annotations.ApiIgnore;
-//import com.wordnik.swagger.annotations.Api;
-
-//@Controller
-//@Api(value = "Logged-in user details")
-//@ApiIgnore
+@Api(tags = "Auth", description = "Authentication operations")
 @RequestMapping(value = "/apiauth/userDetails", produces = {"application/json", "application/xml" })
 public class UserDetailsController {
 
@@ -82,6 +72,8 @@ public class UserDetailsController {
 	
 	//
 	@RequestMapping(method = RequestMethod.POST)
+	@ApiOperation(value = "Login", 
+		notes = "Login using a JSON object with email/password properties.") 
 	@ResponseBody
 	public ICalipsoUserDetails create(@RequestBody ICalipsoUserDetails resource) {
 
@@ -105,6 +97,8 @@ public class UserDetailsController {
 		return resource;
 	}
 
+	@ApiOperation(value = "Remember", 
+		notes = "Login remembered user") 
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public ICalipsoUserDetails remember() {
@@ -146,9 +140,8 @@ public class UserDetailsController {
 
 	}
 
-	/**
-	 * Log out the user
-	 */
+	@ApiOperation(value = "Logout", 
+			notes = "Logout and forget user") 
 	@RequestMapping(method = RequestMethod.DELETE)
 	@ResponseBody
 	public ICalipsoUserDetails delete() {

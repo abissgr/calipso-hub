@@ -27,13 +27,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.service.UserService;
-import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
 import io.swagger.annotations.Api;
 
 
-@Api(value = "Users")
+@Api(tags = "Users", description = "User management operations")
 @RequestMapping(value = "/api/rest/users", produces = { "application/json", "application/xml" })
-public class UserController extends AbstractModelController<User, String, UserService> {
+public class UserController extends AbstractNoDeleteModelController<User, String, UserService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 

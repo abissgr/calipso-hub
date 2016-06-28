@@ -21,6 +21,7 @@ package gr.abiss.calipso.controller.cms;
 import gr.abiss.calipso.model.cms.Text;
 import gr.abiss.calipso.service.cms.TextService;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import io.swagger.annotations.Api;
 
 import javax.inject.Inject;
 
@@ -32,7 +33,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
-@Controller
+//@Controller
+@Api(hidden = true, tags = "Text resources", description = "Operations about text resources")
 @RequestMapping(value = "/api/rest/texts", produces = { "application/json", "application/xml" })
 public class TextController extends AbstractModelController<Text, String, TextService> {
 

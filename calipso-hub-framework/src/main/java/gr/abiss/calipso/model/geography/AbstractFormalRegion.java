@@ -17,6 +17,8 @@
  */package gr.abiss.calipso.model.geography;
 
 import gr.abiss.calipso.model.base.AbstractAssignedidPersistable;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
+import io.swagger.annotations.ApiModel;
 
 import java.io.UnsupportedEncodingException;
 
@@ -41,6 +43,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+@ModelResource(path = "countries")
+@ApiModel(value = "Region", description = "A model representing a geographcal region.")
 public abstract class AbstractFormalRegion<P extends AbstractFormalRegion> 
 	extends AbstractAssignedidPersistable<String> {
 

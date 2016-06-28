@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -79,14 +80,18 @@ import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
+import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.service.cms.BinaryFileService;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
+import gr.abiss.calipso.uischema.model.FormSchema;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 public abstract class AbstractModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
@@ -131,7 +136,7 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	//@ApiOperation(value = "find (paginated)", notes = "Find all resources matching the given criteria and return a paginated collection", httpMethod = "GET") 
+	@ApiOperation(value = "Search for resources (paginated).", notes = "Find all resources matching the given criteria and return a paginated collection. Besides the predefinedpaging properties (page, size, properties, direction) all serialized member names of the resource are supported as search parameters/criteria.") 
 	public Page<T> findPaginated(
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
@@ -232,9 +237,8 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    //@ApiOperation(value = "create", notes = "Create a new resource", httpMethod = "POST")
+    @ApiOperation(value = "Create a new resource")
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
-	////@ApiResponse(code = 201, message = "created")
 	public T create(@RequestBody T resource) {
 		applyCurrentPrincipal(resource);
 		return super.create(resource);
@@ -300,9 +304,8 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@Override
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
     @ResponseBody
-    //@ApiOperation(value = "update", notes = "Update a resource", httpMethod = "PUT")
+    @ApiOperation(value = "Update a resource")
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
-	//@ApiResponse(code = 200, message = "OK")
 	public T update(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id, @RequestBody T resource) {
 		applyCurrentPrincipal(resource);
 		// handle partial updates
@@ -323,13 +326,10 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@Override
 	@RequestMapping(method = RequestMethod.GET, params="page=no", produces="application/json")
     @ResponseBody
-    //@ApiOperation(value = "find all", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)", httpMethod = "GET")
-	//@ApiResponse(code = 200, message = "OK")
+    @ApiOperation(value = "Get the full collection of resources (no paging or criteria)", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)")
 	public Iterable<T> findAll() {
 		return super.findAll();
 	}
-
-
 
 	/**
      * Find a resource by its identifier, include it's schema in the response if available
@@ -338,15 +338,30 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
      * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
      * @throws NotFoundException
      */
+	@Override
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
-    //@ApiOperation(value = "find by id", notes = "Find a resource by it's identifier", httpMethod = "GET")
+    @ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
-	public T findById(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id) {
-    	T resource = null;
-    	
+	public T findById(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
     	return super.findById(id);
+	}
+	
+	/**
+     * Find the set of resources matching the given identifiers.
+     *
+     * @param id The identifier of the resouce to find
+     * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
+     * @throws NotFoundException
+     */
+	@Override
+    @RequestMapping(params = "ids", method = RequestMethod.GET)
+    //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
+    @ResponseBody
+    @ApiOperation(value = "Search by ids", notes = "Find the set of resources matching the given identifiers.")
+    public Iterable<T> findByIds(@RequestParam(value = "ids[]") Set<ID> ids) {
+		return super.findByIds(ids);
 	}
 
 	/**
@@ -356,16 +371,16 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
     @RequestMapping(value = "new", method = RequestMethod.GET)
     //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
-    //@ApiOperation(value = "obtain new unpersisted instance", notes = "Instantiates and returns a new reszource object", httpMethod = "GET")
+    @ApiOperation(value = "Obtain new transient instance, including UI metadata", notes = "Instantiates and returns a new reszource object")
 	public T getSchemaWrapperInstance() {
     	T resource = null;
     	try {
 			resource = this.service.getDomainClass().newInstance();
 			
 			// TODO: update to use cases, fields etc. format
-//			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
-//				FormSchema.setToInstance(((FormSchemaAware) resource));
-//			}
+			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
+				FormSchema.setToInstance(((FormSchemaAware) resource));
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Failed creating new resource instance", e);
 		}
@@ -381,14 +396,21 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
      * @param id The identifier of the resource to delete
      * @throws NotFoundException
      */
+	@Override
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    //@ApiOperation(value = "delete", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
-	public void delete(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id) {
-		// TODO Auto-generated method stub
+	@ApiOperation(value = "Delete a resource", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
+	public void delete(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id) {
 		super.delete(id);
 	}
 
+	@Override
+    @RequestMapping(method = RequestMethod.DELETE)
+	@ApiOperation(value = "Delete all resources")
+	public void delete() {
+		super.delete();
+	}
+	
 //    
 //	// TODO: refactor to OPTIONS on base path?
 //	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
@@ -446,25 +468,24 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 //	    return mappings;
 //	}
 
-	// @Secured("ROLE_ADMIN")
 	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
 	@ResponseBody
-    //@ApiOperation(value = "add metadatum", notes = "Add or updated a resource metadatum", httpMethod = "GET")
+    @ApiOperation(value = "Add metadatum", notes = "Add or updated a resource metadatum")
 	public void addMetadatum(@PathVariable ID subjectId,
 			@RequestBody MetadatumDTO dto) {
 		service.addMetadatum(subjectId, dto);
 	}
 
-	// @Secured("ROLE_ADMIN")
 	@RequestMapping(value = "{subjectId}/metadata/{predicate}", method = RequestMethod.DELETE)
 	@ResponseBody
-    //@ApiOperation(value = "remove metadatum", notes = "Remove a resource metadatum if it exists", httpMethod = "DELETE")
+    @ApiOperation(value = "Remove metadatum", notes = "Remove a resource metadatum if it exists")
 	public void removeMetadatum(@PathVariable ID subjectId,
 			@PathVariable String predicate) {
 		service.removeMetadatum(subjectId, predicate);
 	}
 	
     @RequestMapping(value = "{subjectId}/uploads/{propertyName}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get file uploads by property")
     public @ResponseBody List<BinaryFile> getUploadsByProperty(@PathVariable ID subjectId, @PathVariable String propertyName) {
         LOGGER.info("uploadGet called");
         List<BinaryFile> uploads = null;
@@ -478,6 +499,7 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
     }
 
     @RequestMapping(value = "{subjectId}/uploads/{propertyName}/thumbs/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get file thumb/preview image of a file upload	")
     public void thumbnail(HttpServletResponse response, @PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
 		Configuration config = ConfigurationFactory.getConfiguration();
 		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
@@ -493,6 +515,7 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
         }
     }
 
+    @ApiOperation(value = "Get an uploaded file")
     @RequestMapping(value = "{subjectId}/uploads/{propertyName}/files/{id}", method = RequestMethod.GET)
     public void getFile(HttpServletResponse response, @PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
 		Configuration config = ConfigurationFactory.getConfiguration();
@@ -511,7 +534,8 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
     
 
     
-    
+
+    @ApiOperation(value = "Delete an uploaded file")
     @RequestMapping(value = "{subjectId}/uploads/{propertyName}/{id}", method = RequestMethod.DELETE)
     public @ResponseBody List deleteById(@PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
 		Configuration config = ConfigurationFactory.getConfiguration();
@@ -528,9 +552,9 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
         results.add(success);
         return results;
     }
-    
-    @RequestMapping(value = "{subjectId}/uploads/{propertyName}", method = {RequestMethod.POST, RequestMethod.PUT}, 
-    		consumes = {}, produces = { "application/json", "application/xml" })
+
+    @ApiOperation(value = "Add a file uploads to property")
+    @RequestMapping(value = "{subjectId}/uploads/{propertyName}", method = {RequestMethod.POST, RequestMethod.PUT}, consumes = {})
     public @ResponseBody BinaryFile  addUploadsToProperty( @PathVariable ID subjectId, @PathVariable String propertyName, MultipartHttpServletRequest request, HttpServletResponse response) {
         LOGGER.info("uploadPost called");
 

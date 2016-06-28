@@ -28,6 +28,7 @@ import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
 import gr.abiss.calipso.userDetails.util.SocialMediaService;
 import gr.abiss.calipso.utils.ConfigurationFactory;
+import io.swagger.annotations.Api;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +66,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 
 //@Controller
+@Api(tags = "OAuth", description = "Service provider connection operations")
 @SessionAttributes("user")
 @RequestMapping("/signin")
 public class ProviderSignInController extends org.springframework.social.connect.web.ProviderSignInController {

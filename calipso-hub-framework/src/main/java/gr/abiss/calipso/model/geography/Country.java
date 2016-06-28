@@ -19,6 +19,7 @@ package gr.abiss.calipso.model.geography;
 
 import gr.abiss.calipso.model.base.AbstractAssignedidPersistable;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -29,47 +30,47 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-
 /**
- * Class to represent a country, including ISO 3166-1 alpha-2 code, name, languages, 
- * capital and currency, native name, calling codes. 
+ * Class to represent a country, including ISO 3166-1 alpha-2 code, name,
+ * languages, capital and currency, native name, calling codes.
  */
-@ModelResource(path = "countries")
 @Entity
 @Table(name = "country")
-@AttributeOverrides({
-    @AttributeOverride(name="id", column=@Column(unique = true, nullable = false, length = 2)),
-    @AttributeOverride(name="name", column=@Column(unique = true, nullable = false, length = 50)),
+@AttributeOverrides({ 
+	@AttributeOverride(name = "id", column = @Column(unique = true, nullable = false, length = 2)),
+	@AttributeOverride(name = "name", column = @Column(unique = true, nullable = false, length = 50)), 
 })
+@ModelResource(path = "countries", apiName = "Countries", apiDescription = "Operations about countries")
+@ApiModel(value = "Country", description = "A model representing a country, meaning a region that is identified as a distinct entity in political geography.")
 public class Country extends AbstractFormalRegion<Continent> {
 
 	private static final long serialVersionUID = 3723330183409907891L;
-	
+
 	@Column(unique = true, nullable = true, length = 50)
 	private String nativeName;
-	
+
 	@Column(unique = false, nullable = true, length = 15)
 	private String callingCode;
-	
+
 	@Column(unique = false, nullable = true, length = 50)
 	private String capital;
-	
+
 	@Column(unique = false, nullable = true, length = 30)
 	private String currency;
-	
+
 	@Column(unique = false, nullable = true, length = 30)
 	private String languages;
 
 	public Country() {
 		super();
 	}
-	
+
 	public Country(String id) {
 		this.setId(id);
 	}
-	
-	public Country(String id, String name, String nativeName, String callingCode, Continent continent, 
-			String capital, String currency, String languages) {
+
+	public Country(String id, String name, String nativeName, String callingCode, Continent continent, String capital,
+			String currency, String languages) {
 		super(id, name, continent);
 		this.nativeName = nativeName;
 		this.callingCode = callingCode;
@@ -117,5 +118,5 @@ public class Country extends AbstractFormalRegion<Continent> {
 	public void setLanguages(String languages) {
 		this.languages = languages;
 	}
-	
+
 }

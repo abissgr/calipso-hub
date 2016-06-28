@@ -21,13 +21,16 @@ package gr.abiss.calipso.tiers.util;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ManyToAny;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,10 @@ public final class ModelContext {
     private Class<?> serviceImplType;
     private AbstractBeanDefinition repositoryDefinition, serviceDefinition, controllerDefinition;
 
+	private Map<String, Object> apiAnnotationMembers;
+
+	private ModelResource modelResource;
+
 	public List<Class<?>> getGenericTypes() {
 		List<Class<?>> genericTypes = new LinkedList<Class<?>>();
 		genericTypes.add(this.getModelType());
@@ -67,12 +74,16 @@ public final class ModelContext {
 		return genericTypes;
 	}
 	
-    public ModelContext(ModelResource resource, Class<?> domainClass){
+    public ModelContext(ModelResource modelResource, Class<?> domainClass){
     	Assert.notNull(domainClass, "A domain class is required");
-        this.name = getPath(domainClass);
-        this.path = "/" + name;
 
         this.modelType = (Class<?>) domainClass;
+        this.modelResource = modelResource;
+        
+        this.name = getPath(domainClass);
+        this.apiAnnotationMembers = getApiAnnotationMembers(domainClass);
+        this.path = "/" + name;
+        
         this.generatedClassNamePrefix = domainClass.getSimpleName().replace("Model", "").replace("Entity", "");
         this.parentClass = null;
         this.parentProperty = null;
@@ -83,6 +94,7 @@ public final class ModelContext {
 	
     public ModelContext(ModelRelatedResource resource, Class<?> domainClass){
         this.name = getPath(domainClass);
+        this.apiAnnotationMembers = getApiAnnotationMembers(domainClass);
 
         String parentProperty = resource.parentProperty();
         this.parentClass = (Class<?>) ReflectionUtils.findField(domainClass, parentProperty).getType();
@@ -131,6 +143,9 @@ public final class ModelContext {
     };
 
     
+    public Class getControllerSuperClass(){
+    	return this.modelResource.controllerSuperClass();
+    }
     
     public Class<?> getServiceInterfaceType() {
 		return serviceInterfaceType;
@@ -216,6 +231,40 @@ public final class ModelContext {
         return result;
     }
 
+    public static Map<String, Object> getApiAnnotationMembers(Class<?> domainClass){
+        ModelResource resource = domainClass.getAnnotation(ModelResource.class);
+        Map<String, Object> apiAnnotationMembers = new HashMap<String, Object>();
+        if( resource != null ){
+        	// get tags (grouping key, try API name)
+            if(StringUtils.isNotBlank(resource.apiName())){
+            	String[] tags = {resource.apiName()};
+            	apiAnnotationMembers.put("tags", tags);
+            }
+            // or path
+            else if(StringUtils.isNotBlank(resource.path())){
+
+            	String[] tags = {resource.path()};
+            	apiAnnotationMembers.put("tags", tags);
+            }
+            // or simple name
+            else{
+            	String[] tags = {StringUtils.join(
+           		     StringUtils.splitByCharacterTypeCamelCase(domainClass.getSimpleName()),
+           		     ' '
+           		)};
+            	apiAnnotationMembers.put("tags", tags);
+            }
+            // add description
+            if(StringUtils.isNotBlank(resource.apiDescription())){
+            	apiAnnotationMembers.put("description", resource.apiDescription());
+            }
+        }else{
+            throw new IllegalStateException("Not an entity");
+        }
+
+        return apiAnnotationMembers.size() > 0 ? apiAnnotationMembers : null;
+    }
+
 	public Class<?> getModelIdType() {
 		return modelIdType;
 	}
@@ -230,6 +279,10 @@ public final class ModelContext {
 
 	public String getPath() {
 		return path;
+	}
+
+	public Map<String, Object> getApiAnnotationMembers() {
+		return apiAnnotationMembers;
 	}
 
 	public String getParentProperty() {

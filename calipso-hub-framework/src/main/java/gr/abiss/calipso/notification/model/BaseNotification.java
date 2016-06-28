@@ -6,6 +6,8 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,9 +34,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @CurrentPrincipalField( value = "recepient", ignoreforRoles = {"ROLE_ADMIN", "ROLE_SITE_OPERATOR"} )
 @Entity
-//@ApiModel
 @Table(name = "base_notification")
 @Inheritance(strategy = InheritanceType.JOINED)
+@ModelResource(path = "baseNotifications", apiName = "Notifications", apiDescription = "Operations about notifications")
+@ApiModel(value = "Notifications", description = "A model representing a notification addressed to a user.")
 public class BaseNotification extends AbstractSystemUuidPersistable {
 
 	

@@ -19,7 +19,14 @@
 package gr.abiss.calipso.tiers.annotation;
 
 import java.io.Serializable;
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
+import gr.abiss.calipso.tiers.controller.ModelController;
 
 
 //Make the annotation available at runtime:
@@ -28,10 +35,75 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Documented
 /**
- * Marks a Model ato generate SCRUD tiers for
+ * <p>Marks a Model as candidate for tiers code generation (Controller, Service, Repository)</p>
+ * 
+ *  <p>For example:</p>
+ *  
+ *  <pre class="code">
+ * &#064;ModelResource(
+ * 		path = "countries", 
+ * 		apiName = "Countries", 
+ * 		apiDescription = "Operations about countries", 
+ * 		controllerSuperClass = AbstractModelController.class
+ * 	)
+ * </pre>
+ * 
+ *  <p>Will generate the following controller:</p>
+ *  
+ *  <pre class="code">
+ * 
+ * import org.slf4j.Logger;
+ * import org.slf4j.LoggerFactory;
+ * import org.springframework.stereotype.Controller;
+ * import org.springframework.web.bind.annotation.RequestMapping;
+ * 
+ * import gr.abiss.calipso.model.geography.Country;
+ * import gr.abiss.calipso.service.geography.CountryService;
+ * import gr.abiss.calipso.tiers.controller.AbstractModelController;
+ * import io.swagger.annotations.Api;
+ * 
+ * &#064;Controller
+ * &#064;Api(tags = "Countries", description = "Operations about countries")
+ * &#064;RequestMapping(
+ *  value = "/api/rest/countries", 
+ * 	produces = { "application/json", "application/xml" }
+ * )
+ * public class CountryController extends AbstractModelController<Country, String, CountryService> {
+ * 
+ * 		private static final Logger LOGGER = LoggerFactory.getLogger(CountryController.class);
+ * 
+ * }
+ * </pre>
+ * 
+ * 
+ * 
+ * 
  */
 public @interface ModelResource {
 
     Class<? extends Serializable> idClass() default String.class;
+    /**
+     * The superclass for the generated controller. must implement 
+     * {@link gr.abiss.calipso.tiers.controller.ModelController}. The default 
+     * is {@link gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController}.
+     */
+    @SuppressWarnings("rawtypes")
+	Class<? extends ModelController> controllerSuperClass() default AbstractNoDeleteModelController.class;
+
+    /**
+     * The request mapping path for the generated controller
+     */
     String path() default "";
+    /**
+     * 
+     * The API (grouping) name for the generated controller. Used for swagger documentation.
+     */
+    String apiName() default "";
+    /**
+     * 
+     * The API description for the generated controller. Used for swagger documentation.
+     */
+    String apiDescription() default "";
+    
+    
 }

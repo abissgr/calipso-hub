@@ -18,24 +18,20 @@
  */
 package gr.abiss.calipso.controller.geography;
 
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.service.geography.CountryService;
-import gr.abiss.calipso.tiers.controller.AbstractModelController;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-//import com.wordnik.swagger.annotations.Api;
-
+import gr.abiss.calipso.model.geography.Country;
+import gr.abiss.calipso.service.geography.CountryService;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import io.swagger.annotations.Api;
 
 @Controller
-//@Api(value = "Countries")
-@RequestMapping(value = "/api/rest/countries", produces = { "application/json", "application/xml" })
+@Api(tags = "Countries", description = "Operations about countries")
+@RequestMapping(value = "/api/rest/countries", 
+	produces = { "application/json", "application/xml" })
 public class CountryController extends AbstractModelController<Country, String, CountryService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CountryController.class);

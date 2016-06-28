@@ -21,6 +21,7 @@ package gr.abiss.calipso.notification.controller;
 import gr.abiss.calipso.notification.model.BaseNotification;
 import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import io.swagger.annotations.Api;
 
 import javax.inject.Inject;
 
@@ -30,21 +31,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-//import com.wordnik.swagger.annotations.Api;
-
-
 @Controller
-//@Api(value = "Notifications")
+@Api(tags = "Notifications", description = "Operations about notifications")
 @RequestMapping(value = "/api/rest/baseNotifications", produces = { "application/json", "application/xml" })
 public class BaseNotificationController extends AbstractModelController<BaseNotification, String, BaseNotificationService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseNotificationController.class);
-
-	@Override
-	@Inject
-	@Qualifier("baseNotificationService") // somehow required for CDI to work on 64bit JDK?
-	public void setService(BaseNotificationService service) {
-		this.service = service;
-	}
 	
 }
