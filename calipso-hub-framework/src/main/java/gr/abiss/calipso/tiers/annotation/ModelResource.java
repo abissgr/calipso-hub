@@ -93,7 +93,7 @@ public @interface ModelResource {
     /**
      * The request mapping path for the generated controller
      */
-    String path() default "";
+    String path();
     /**
      * 
      * The API (grouping) name for the generated controller. Used for swagger documentation.

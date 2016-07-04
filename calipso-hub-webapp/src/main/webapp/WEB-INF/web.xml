@@ -70,7 +70,6 @@
 	 	<servlet-name>dispatcher</servlet-name>
  		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-		
 	</servlet>
 	 <servlet>
 	 	<servlet-name>h2console</servlet-name>

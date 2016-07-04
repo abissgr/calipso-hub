@@ -17,15 +17,18 @@
  */
 package gr.abiss.calipso.uischema.serializer;
 
+import gr.abiss.calipso.tiers.annotation.ModelResource;
 import gr.abiss.calipso.uischema.annotation.FormSchemas;
-import gr.abiss.calipso.uischema.model.FormSchema;
+import gr.abiss.calipso.uischema.model.UiSchema;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.lang3.StringUtils;
@@ -37,17 +40,64 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-//import org.apache.commons.beanutils.PropertyUtilsBean;
 
-public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
+public class UiSchemaSerializer extends JsonSerializer<UiSchema> {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FormSchemaSerializer.class);
+			.getLogger(UiSchemaSerializer.class);
 
 	private static final char quote = '\"';
 	private static final char space = ' ';
 	private static final char colon = ':';
 	private static final char comma = ',';
+	
+	private static Map<String, String> fieldTypes = new HashMap<String, String>();
+	static{
+//			  "fields" : {
+//			    "aliases" : {
+//			      "fieldType" : "Set"
+//			    },
+//			    "createdDate" : {
+//			      "fieldType" : "DateTime"
+//			    },
+//			    "createdBy" : {
+//			      "fieldType" : "User"
+//			    },
+//			    "lastModifiedDate" : {
+//			      "fieldType" : "DateTime"
+//			    },
+//			    "domain" : {
+//			      "fieldType" : "String"
+//			    },
+//			    "formSchema" : {
+//			      "fieldType" : "FormSchema"
+//			    },
+//			    "lastModifiedBy" : {
+//			      "fieldType" : "User"
+//			    },
+//			    "name" : {
+//			      "fieldType" : "String"
+//			    },
+//			    "id" : {
+//			      "fieldType" : "String"
+//			    }
+//			  }
+//			}
+		fieldTypes.put("String", "String");
+		
+		fieldTypes.put("Short", "Number");
+		fieldTypes.put("Integer", "Number");
+
+		fieldTypes.put("Float", "Decimal");
+		fieldTypes.put("BigDecimal", "Decimal");
+		fieldTypes.put("Double", "Decimal");
+		
+		fieldTypes.put("DateTime", "Datetime");
+		fieldTypes.put("Datetime", "Datetime");
+		fieldTypes.put("Date", "Date");
+	}
+	
+	// datatypes
 
 	private static final HashMap<String, String> CONFIG_CACHE = new HashMap<String, String>();
 
@@ -56,12 +106,10 @@ public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 		ignoredFieldNames.add("new");
 		ignoredFieldNames.add("class");
 		ignoredFieldNames.add("metadataDomainClass");
-		
-		
 	}
 	
 	@Override
-	public void serialize(FormSchema schema, JsonGenerator jgen,
+	public void serialize(UiSchema schema, JsonGenerator jgen,
 			SerializerProvider provider) throws IOException,
 			JsonGenerationException {
 		try{
@@ -70,8 +118,29 @@ public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 			if (null == domainClass) {
 				throw new RuntimeException("formSchema has no domain class set");
 			} else {
+				// start json
 				jgen.writeStartObject();
-			    
+				
+				// write superclass hint
+				ModelResource superResource = (ModelResource) domainClass.getSuperclass().getAnnotation(ModelResource.class);
+				if(superResource != null){
+					jgen.writeFieldName("superPathFragment");
+					jgen.writeString(superResource.path());
+				}
+
+				// write pathFragment
+				ModelResource modelResource = (ModelResource) domainClass.getAnnotation(ModelResource.class);
+				jgen.writeFieldName("pathFragment");
+				jgen.writeString(modelResource.path());
+				
+				// write simple class name
+				jgen.writeFieldName("simpleClassName");
+				jgen.writeString(domainClass.getSimpleName());
+				
+				
+				// start fields
+				jgen.writeFieldName("fields");
+				jgen.writeStartObject();
 			    
 				PropertyDescriptor[] descriptors = new PropertyUtilsBean()
 						.getPropertyDescriptors(domainClass);
@@ -81,36 +150,38 @@ public class FormSchemaSerializer extends JsonSerializer<FormSchema> {
 					PropertyDescriptor descriptor = descriptors[i];
 					String name = descriptor.getName();
 					if(!ignoredFieldNames.contains(name)){
-						jgen.writeFieldName(name);
-						jgen.writeStartObject();
-					    
-//						
-						String fieldValue = getFormFieldConfig(domainClass, name);
+						String fieldValue = this.getDataType(domainClass, descriptor, name);
 						if(StringUtils.isNotBlank(fieldValue)){
-							jgen.writeRaw(fieldValue);
+							jgen.writeFieldName(name);
+							jgen.writeStartObject();
+							jgen.writeFieldName("fieldType");
+							jgen.writeString(fieldValue);
+						    jgen.writeEndObject();
 						}
-						
-						
-					    jgen.writeEndObject();
 					}
 					
 					
 					
 				    
 				}
-
+				// end fields
+				jgen.writeEndObject();
+				// end json
 			    jgen.writeEndObject();
 				
 			}
 		
 		}
 		catch(Exception e){
-			LOGGER.error("Failed serializing form schema", e);
+			new RuntimeException("Failed serializing form schema", e);
 		}
 	}
 
-	private static String getFormFieldConfig(Class domainClass,
-			String fieldName) {
+	private String getDataType(Class domainClass, PropertyDescriptor descriptor, String name) {
+		return fieldTypes.get(descriptor.getPropertyType().getSimpleName());
+	}
+
+	private static String getFormFieldConfig(Class domainClass, PropertyDescriptor descriptor, String fieldName) {
 		String formSchemaJson = null;
 		Field field = null;
 		StringBuffer formConfig = new StringBuffer();

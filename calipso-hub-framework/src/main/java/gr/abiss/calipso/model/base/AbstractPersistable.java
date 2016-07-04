@@ -19,41 +19,25 @@ package gr.abiss.calipso.model.base;
 
 import java.io.Serializable;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.base.AuditableResource;
-import gr.abiss.calipso.model.entities.FormSchemaAware;
-import gr.abiss.calipso.uischema.model.FormSchema;
-
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.Persistable;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import gr.abiss.calipso.model.User;
 
 /**
  * Abstract base class for all persistent entities.
  * @param <ID> The id Serializable
  */
 @MappedSuperclass
-public abstract class AbstractPersistable<ID extends Serializable> implements FormSchemaAware, Persistable<ID> {
+public abstract class AbstractPersistable<ID extends Serializable> implements Persistable<ID> {
 
 	private static final long serialVersionUID = -6009587976502456848L;
 
-	public static interface FormSchemaAwareView {}
     public static interface ItemView {}
     public static interface CollectionView {}
-	
-	
-	@JsonView(FormSchemaAwareView.class)
-	@Transient
-	private FormSchema formSchema;
 
 	public AbstractPersistable() {
 		super();
@@ -80,14 +64,6 @@ public abstract class AbstractPersistable<ID extends Serializable> implements Fo
 	 * @param id the id to set
 	 */
 	public abstract void setId(ID id);
-
-	public FormSchema getFormSchema() {
-		return formSchema;
-	}
-
-	public void setFormSchema(FormSchema formSchema) {
-		this.formSchema = formSchema;
-	}
 
 	/** 
 	 * @see java.lang.Object#equals(java.lang.Object)

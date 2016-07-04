@@ -35,7 +35,6 @@ import io.swagger.annotations.ApiOperation;
 /**
  * Base class for read-only model controllers, i.e. with no support for HTTP PUT or DELETE.
  */
-@RequestMapping(produces = { "application/json", "application/xml" })
 public abstract class AbstractReadOnlyModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends AbstractNoDeleteModelController<T, ID, S> {
 

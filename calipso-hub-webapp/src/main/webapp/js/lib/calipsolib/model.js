@@ -38,6 +38,9 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		initialize : function() {
 			Calipso.model.Model.prototype.initialize.apply(this, arguments);
 		},
+    toString : function() {
+      return this.get(this.constructor.nameProperty) || this.get("name") || this.get("id");
+    },
 		/**
 		 * Returns the URL for this model, giving precedence  to the collection URL if the model belongs to one,
 		 * or a URL based on the model path fragment otherwise.
@@ -122,7 +125,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		label : "GenericModel",
 		showInMenu : false,
 		public : false,
-		businessKey : "name",
+		nameProperty : "name",
 		baseFragment : '/api/rest/',
 		typeaheadSources : {},
 		isPublic : function() {
@@ -138,7 +141,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
       if (!modelAttributes.id && this.getTypeName() != "Calipso.model.UserDetailsModel") {
   			var collectionOptions = {
   				model : this,
-  				url : Calipso.getBaseUrl() + "/api/rest/" + this.getPathFragment(),
+  				url : Calipso.getBaseUrl() + this.baseFragment + this.getPathFragment(),
   			};
   			if (options.httpParams) {
   				collectionOptions.data = options.httpParams;
@@ -245,7 +248,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			var sourceKey = config.pathFragment + config.wildcard + config.query;
 			// if not lready created
 			if (!_this.typeaheadSources[sourceKey]) {
-				var sourceUrl = Calipso.getBaseUrl() + "/api/rest/" + config.pathFragment + config.query;
+				var sourceUrl = Calipso.getBaseUrl() + baseFragment + config.pathFragment + config.query;
 				//console.log(_this.getTypeName() + "#getTypeaheadSource creating new source for url " + sourceUrl);
 				var bloodhound = new Bloodhound({
 					remote : {
@@ -274,35 +277,36 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 	// Role model
 	// ---------------------------------------
-	Calipso.model.RoleModel = Calipso.Model.extend(
-	/** @lends Calipso.model.RoleModel.prototype */
-	{
-		toString : function() {
-			return this.get("name");
-		}
-	//urlRoot : "/api/rest/users"
-	}, {
-		// static members
-		label : "Role",
-		pathFragment : "roles",
-		typeName : "Calipso.model.RoleModel",
-		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
 
-		fields : {
-			name : {
-				fieldType : "String",
-				backgrid : {
-					cell : Calipso.components.backgrid.ViewRowCell,
-				}
-			},
-			description : {
-				fieldType : "String",
-			},
-			edit : {
-				fieldType : "Edit",
-			},
-		},
-	});
+  Calipso.model.RoleModel = Calipso.Model.extend(
+  /** @lends Calipso.model.RoleModel.prototype */
+  {
+    toString : function() {
+      return this.get("name");
+    }
+  }, {
+    // static members
+    label : "Role",
+    pathFragment : "roles",
+    typeName : "Calipso.model.RoleModel",
+    formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
+
+    fields : {
+      name : {
+        fieldType : "String",
+        backgrid : {
+          cell : Calipso.components.backgrid.ViewRowCell,
+        }
+      },
+      description : {
+        fieldType : "String",
+      },
+      edit : {
+        fieldType : "Edit",
+      },
+    },
+  });
+
 
 	Calipso.model.UserModel = Calipso.Model.extend(
 	/** @lends Calipso.model.UserModel.prototype */
@@ -404,6 +408,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 	});
 
+/*
 	Calipso.model.HostModel = Calipso.Model.extend({},
 	// static members
 	{
@@ -422,6 +427,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			},
 		},
 	});
+  */
 
 
 	//////////////////////////////////////////////////

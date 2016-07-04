@@ -128,40 +128,43 @@ define(
 				modelId = modelId.substring(0, qIndex);
 			}
 			// build the model instance representing the current request
+			console.log("SHOW USECASE VIEW");
+			$.when(Calipso.util.getUseCaseFactory(pathFragment)).done(
+				function(UseCaseFactory){
+					// check for usecase routes for new instances
+					if(UseCaseFactory.hasUseCase(modelId)){
+						useCaseKey = modelId;
+						modelId = null;
+					}
 
-			var UseCaseFactory = Calipso.util.getUseCaseFactory(pathFragment);
+					// check if model type is public
+					if (UseCaseFactory.isPublic() || _self._ensureLoggedIn()) {
+						var useCaseContext = UseCaseFactory.getUseCaseContext({
+							key : useCaseKey, modelId : modelId, httpParams : httpParams, pathFragment : pathFragment
+						});
 
-			// check for usecase routes for new instances
-			if(UseCaseFactory.hasUseCase(modelId)){
-				useCaseKey = modelId;
-				modelId = null;
-			}
+						// TODO: move fetch logic to  useCase
+						var model = useCaseContext.model;
+						var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
 
-			// check if model type is public
-			if (UseCaseFactory.isPublic() || this._ensureLoggedIn()) {
-				var useCaseContext = UseCaseFactory.getUseCaseContext({
-					key : useCaseKey, modelId : modelId, httpParams : httpParams, pathFragment : pathFragment
-				});
+						var renderFetchable = function() {
+							_self.showView(useCaseContext.createView({regionName : "/", regionPath : "/"}));
+							_self.syncMainNavigationState(model);
+						};
+						var fetchable = useCaseContext.getFetchable();
 
-				// TODO: move fetch logic to  useCase
-				var model = useCaseContext.model;
-				var skipDefaultSearch = model.skipDefaultSearch && model.wrappedCollection && model.wrappedCollection.hasCriteria();
-
-				var renderFetchable = function() {
-					_self.showView(useCaseContext.createView({regionName : "/", regionPath : "/"}));
-					_self.syncMainNavigationState(model);
-				};
-				var fetchable = useCaseContext.getFetchable();
-
-				if (model.getTypeName() != "Calipso.model.UserDetailsModel"
-					&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))) {
-					fetchable.fetch({
-						data : fetchable.data
-					}).then(renderFetchable);
-				} else {
-					renderFetchable();
+						if (model.getTypeName() != "Calipso.model.UserDetailsModel"
+							&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))) {
+							fetchable.fetch({
+								data : fetchable.data
+							}).then(renderFetchable);
+						} else {
+							renderFetchable();
+						}
+					}
 				}
-			}
+			);
+
 		},
 		notFoundRoute : function() {
 			this.showView(new Calipso.view.NotFoundView());

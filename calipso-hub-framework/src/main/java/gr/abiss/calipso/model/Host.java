@@ -23,6 +23,7 @@ import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.MD5Utils;
 
@@ -53,8 +54,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  */
+@ModelResource(path = "hosts", controllerSuperClass = AbstractModelController.class, 
+	apiName = "Hosts", apiDescription = "Operations about hosts")
 @Entity
-@ModelResource(path = "hosts", apiName = "Hosts", apiDescription = "Operations about hosts")
 @Table(name = "host")
 public class Host extends AbstractAuditable<User> {
 

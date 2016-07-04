@@ -40,7 +40,7 @@
 <!--         <level value="debug" /> -->
 <!--     </logger> -->
     <logger name="gr.abiss">
-        <level value="debug" />
+        <level value="warn" />
     </logger>
     <root level="@build.log.rootlevel@">
         <appender-ref ref="STDOUT" />

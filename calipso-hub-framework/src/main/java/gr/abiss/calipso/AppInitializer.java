@@ -33,6 +33,9 @@ import gr.abiss.calipso.repository.geography.CountryRepository;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.service.cms.TextService;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.model.UserDetails;
+import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 
 import java.util.Date;
@@ -44,20 +47,18 @@ import org.apache.commons.configuration.Configuration;
 import org.resthub.common.util.PostInitialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 
 //@Named("sampleInitializer")
 public class AppInitializer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppInitializer.class);
-			
+
 	@Inject
 	@Named("userService")
 	private UserService userService;
-
-//	@Inject
-//	@Named("hostService")
-//	private HostService hostService;
 	
 	@Inject
 	@Named("textService")
@@ -127,12 +128,16 @@ public class AppInitializer {
 			system.setFirstName("System");
 			system.setLastName("User");
 			system.setUsername("system");
-			system.setPassword("admin");
+			system.setPassword("system");
 			system.setLastVisit(now);
 			system.setActive(false);
 			system.setInactivationDate(now);
 			system.setInactivationReason("System user cannot login");
 			system = userService.createActive(system);
+			
+			// login
+			SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+					system, system.getPassword(), system.getRoles()));
 			
 			User u0 = new User();
 			u0.setEmail("info@abiss.gr");

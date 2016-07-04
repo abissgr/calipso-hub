@@ -119,7 +119,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 			validators : [ /*'required'*/],
 		}
 	});
-	Calipso.fields.Datetime = Calipso.fields.datetime = Calipso.fields.Integer.extend({}, {
+	Calipso.fields.Datetime = Calipso.fields.DateTime = Calipso.fields.datetime = Calipso.fields.Integer.extend({}, {
 		"backgrid" : {
 			editable : false,
 			sortable : false,

@@ -80,13 +80,12 @@ import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
-import gr.abiss.calipso.model.entities.FormSchemaAware;
 import gr.abiss.calipso.service.cms.BinaryFileService;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
-import gr.abiss.calipso.uischema.model.FormSchema;
+import gr.abiss.calipso.uischema.model.UiSchema;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
@@ -340,7 +339,6 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
      */
 	@Override
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
     @ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
@@ -357,7 +355,6 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
      */
 	@Override
     @RequestMapping(params = "ids", method = RequestMethod.GET)
-    //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
     @ApiOperation(value = "Search by ids", notes = "Find the set of resources matching the given identifiers.")
     public Iterable<T> findByIds(@RequestParam(value = "ids[]") Set<ID> ids) {
@@ -369,18 +366,17 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
      * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
      */
     @RequestMapping(value = "new", method = RequestMethod.GET)
-    //@ResponseView(AbstractPersistable.FormSchemaAwareView.class)
     @ResponseBody
     @ApiOperation(value = "Obtain new transient instance, including UI metadata", notes = "Instantiates and returns a new reszource object")
 	public T getSchemaWrapperInstance() {
     	T resource = null;
     	try {
 			resource = this.service.getDomainClass().newInstance();
-			
-			// TODO: update to use cases, fields etc. format
-			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
-				FormSchema.setToInstance(((FormSchemaAware) resource));
-			}
+//			
+//			// TODO: update to use cases, fields etc. format
+//			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
+//				FormSchema.setToInstance(((FormSchemaAware) resource));
+//			}
 		} catch (Exception e) {
 			throw new RuntimeException("Failed creating new resource instance", e);
 		}
@@ -411,61 +407,19 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		super.delete();
 	}
 	
-//    
-//	// TODO: refactor to OPTIONS on base path?
-//	@RequestMapping(value = "form-schema", produces = { "application/json" }, method = RequestMethod.GET)
+//	@RequestMapping(value = "uischema", produces = { "application/json" }, method = RequestMethod.GET)
 //	@ResponseBody
-//    //@ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "GET")
-//	public FormSchema getSchema(
-//			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
-//		mode = mode.toUpperCase();
-//		try {
-//			Class domainClass = ((GenericService<Persistable<ID>, ID>) this.service).getDomainClass();
-//			if(FormSchemaAware.class.isAssignableFrom(domainClass)){
-//				FormSchema.setToInstance(((FormSchemaAware) resource));
-//			}
-//			FormSchema schema = new FormSchema();
-//			schema.setDomainClass(
-//					();
-//			schema.setAction(mode);
-//			return schema;
-//		} catch (Exception e) {
-//			throw new NotFoundException();
-//		}
+//    @ApiOperation(value = "Get UI schema", notes = "Get the UI achema for the controller entity type, including fields, use-cases etc.")
+//	public UiSchema getSchema() {
+//		UiSchema schema = new UiSchema(this.service.getDomainClass());
+//		return schema;
 //	}
-
+//	
 //	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
 //	@ResponseBody
-//    //@ApiOperation(value = "get form schema", notes = "Get a form achema for the controller entity type", httpMethod = "OPTIONS")
-//	public FormSchema getSchemas(
-//			@RequestParam(value = "mode", required = false, defaultValue = "search") String mode) {
-//		return this.getSchema(mode);
-//	}
-
-//	@RequestMapping(value = "apidoc", produces = { "application/json" }, method = {
-//			RequestMethod.GET, RequestMethod.OPTIONS })
-//	@ResponseBody
-//	public List<RestMapping> getRequestMappings() {
-//		List<RestMapping> mappings = new LinkedList<RestMapping>();
-//	    Map<RequestMappingInfo, HandlerMethod> handlerMethods =
-//	                              this.requestMappingHandlerMapping.	getHandlerMethods();
-//
-//	    for(Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()) {
-//	        RequestMappingInfo mapping = item.getKey();
-//	        HandlerMethod method = item.getValue();
-//	        mappings.add(new RestMapping(mapping, method));
-//
-//	        for (String urlPattern : mapping.getPatternsCondition().getPatterns()) {
-//	            System.out.println(
-//	                 method.getBeanType().getName() + "#" + method.getMethod().getName() +
-//	                 " <-- " + urlPattern);
-//
-//	            if (urlPattern.equals("some specific url")) {
-//	               //add to list of matching METHODS
-//	            }
-//	        }
-//	    }       
-//	    return mappings;
+//	@ApiOperation(value = "Get UI schema", notes = "Get the UI achema for the controller entity type, including fields, use-cases etc.")
+//	public UiSchema getSchemas() {
+//		return this.getSchema();
 //	}
 
 	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)

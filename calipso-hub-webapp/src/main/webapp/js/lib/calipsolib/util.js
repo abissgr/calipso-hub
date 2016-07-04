@@ -1164,26 +1164,22 @@ Calipso.cloneSpecificValue = function(val) {
 	* business key/URI componenent
 	*/
 	Calipso.util.getUseCaseFactory = function(modelTypeKey) {
-		// console.log("getModelType, modelTypeKey: " + modelTypeKey);
-		// console.log(Calipso.useCaseFactoriesMap);
-		// load model Type
-		var UseCaseFactory;
-		if (Calipso.useCaseFactoriesMap[modelTypeKey]) {
-			UseCaseFactory = Calipso.useCaseFactoriesMap[modelTypeKey];
-		} else {
-			throw "No usecase factory found for key: " + modelTypeKey;
-			/*var modelForRoute;
-			var modelModuleId = "model/" + _.singularize(modelTypeKey);
-			if (!require.defined(modelModuleId)) {
-				require([ modelModuleId ], function(module) {
-					UseCaseFactory = module;
-				});
-			} else {
-				UseCaseFactory = require(modelModuleId);
-			}
-			*/
+		console.log("getModelType, modelTypeKey: " + modelTypeKey);
+		var d = $.Deferred();
+		if(Calipso.useCaseFactoriesMap[modelTypeKey]){
+			d.resolve(Calipso.useCaseFactoriesMap[modelTypeKey]);
 		}
-		return UseCaseFactory;
+		else{
+			$.get( Calipso.getBaseUrl() + '/api/rest/' + modelTypeKey + "/uischema").
+				done(function(staticMembers){
+					console.log("UISCHEMA: " + staticMembers);
+					staticMembers.pathFragment = modelTypeKey;
+					Calipso.useCaseFactoriesMap[modelTypeKey] = Calipso.Model.extend({},staticMembers);
+					d.resolve(Calipso.useCaseFactoriesMap[modelTypeKey]);
+		    }).
+				fail(d.reject);
+		};
+		return d;
 	};
 
 

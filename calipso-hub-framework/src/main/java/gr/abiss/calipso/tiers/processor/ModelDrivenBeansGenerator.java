@@ -67,6 +67,7 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * TGenerates <code>Repository</code>, <code>Service</code> and
@@ -185,13 +186,17 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 			// grab the generic types
 			List<Class<?>> genericTypes = modelContext.getGenericTypes();
 			genericTypes.add(modelContext.getServiceInterfaceType());
-
 			CreateClassCommand createControllerCmd = new CreateClassCommand(newBeanPackage + newBeanClassName,
 					modelContext.getControllerSuperClass());
 			createControllerCmd.setGenericTypes(genericTypes);
-
+			LOGGER.info("Creating class " + newBeanClassName + 
+					", super: " + modelContext.getControllerSuperClass().getName() + 
+					", genericTypes: " + genericTypes);
+			
 			// add @Controller stereotype annotation
-			createControllerCmd.addTypeAnnotation(Controller.class, null);
+			Map<String, Object> controllerMembers = new HashMap<String, Object>();
+			controllerMembers.put("value", newBeanRegistryName);
+			createControllerCmd.addTypeAnnotation(RestController.class, controllerMembers);
 
 			// set swagger Api annotation
 			Map<String, Object> apiMembers = modelContext.getApiAnnotationMembers();
@@ -201,12 +206,14 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 
 			// set request mapping annotation
 			Map<String, Object> members = new HashMap<String, Object>();
-			String[] path = { "/api/rest" + modelContext.getPath() };
-			members.put("value", path);
+			String[] path = {"/api/rest" + modelContext.getPath()};
+			members.put("path", path);
 			String[] types = { "application/json", "application/xml" };
 			members.put("produces", types);
 			//members.put("consumes", types);
 			createControllerCmd.addTypeAnnotation(RequestMapping.class, members);
+			LOGGER.info("Adding request mapping " + members);
+			
 
 			// create and register controller class
 			Class<?> controllerClass = JavassistUtil.createClass(createControllerCmd);
@@ -214,7 +221,9 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 			// add service dependency
 			String serviceDependency = StringUtils.uncapitalise(modelContext.getGeneratedClassNamePrefix()) + "Service";
 			AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(controllerClass)
-					.addDependsOn(serviceDependency).setAutowireMode(Autowire.BY_TYPE.value()).getBeanDefinition();
+					.addDependsOn(serviceDependency).setAutowireMode(Autowire.BY_NAME.value()).getBeanDefinition();
+
+			LOGGER.info("Registering bean " + newBeanRegistryName);
 			registry.registerBeanDefinition(newBeanRegistryName, beanDefinition);
 
 		}

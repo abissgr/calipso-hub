@@ -1,30 +1,19 @@
 package gr.abiss.calipso.model.cms;
 
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.entities.AbstractAuditable;
-
-import java.io.Serializable;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.Formula;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.entities.AbstractAuditable;
 
 /**
  *
@@ -98,7 +87,7 @@ public class BinaryFile extends AbstractAuditable<User> {
 				+ ", getLastModifiedBy()=" + getLastModifiedBy()
 				+ ", getLastModifiedDate()=" + getLastModifiedDate()
 				+ ", getId()=" + getId() + ", isNew()=" + isNew()
-				+ ", getFormSchema()=" + getFormSchema() + ", hashCode()="
+				+ ", hashCode()="
 				+ hashCode() + ", getClass()=" + getClass() + "]";
 	}
 
