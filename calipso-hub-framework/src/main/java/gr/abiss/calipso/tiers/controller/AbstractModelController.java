@@ -407,20 +407,20 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		super.delete();
 	}
 	
-//	@RequestMapping(value = "uischema", produces = { "application/json" }, method = RequestMethod.GET)
-//	@ResponseBody
-//    @ApiOperation(value = "Get UI schema", notes = "Get the UI achema for the controller entity type, including fields, use-cases etc.")
-//	public UiSchema getSchema() {
-//		UiSchema schema = new UiSchema(this.service.getDomainClass());
-//		return schema;
-//	}
-//	
-//	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
-//	@ResponseBody
-//	@ApiOperation(value = "Get UI schema", notes = "Get the UI achema for the controller entity type, including fields, use-cases etc.")
-//	public UiSchema getSchemas() {
-//		return this.getSchema();
-//	}
+	@RequestMapping(value = "uischema", produces = { "application/json" }, method = RequestMethod.GET)
+	@ResponseBody
+    @ApiOperation(value = "Get UI schema", notes = "Get the UI achema for the controller entity type, including fields, use-cases etc.")
+	public UiSchema getSchema() {
+		UiSchema schema = new UiSchema(this.service.getDomainClass());
+		return schema;
+	}
+	
+	@RequestMapping(produces = { "application/json" }, method = RequestMethod.OPTIONS)
+	@ResponseBody
+	@ApiOperation(value = "Get UI schema", notes = "Get the UI achema for the controller entity type, including fields, use-cases etc.")
+	public UiSchema getSchemas() {
+		return this.getSchema();
+	}
 
 	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
 	@ResponseBody
