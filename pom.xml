@@ -123,7 +123,6 @@
 		<org.jadira.usertype.core.version>3.2.0.GA</org.jadira.usertype.core.version>
 		<!-- 2.8.0.rc2 -->
 		<jackson-core.version>2.6.7</jackson-core.version>
-		<jackson-datatype-joda.version>2.4.0</jackson-datatype-joda.version>
 		<urlrewritefilter.version>4.0.3</urlrewritefilter.version>
 		<flyway-core.version>3.2.1</flyway-core.version>
 		<servlet-api.version>3.0.1</servlet-api.version>
@@ -520,11 +519,6 @@
 				<groupId>org.jadira.usertype</groupId>
 				<artifactId>usertype.core</artifactId>
 				<version>${org.jadira.usertype.core.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-joda</artifactId>
-				<version>${jackson-datatype-joda.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.owasp</groupId>

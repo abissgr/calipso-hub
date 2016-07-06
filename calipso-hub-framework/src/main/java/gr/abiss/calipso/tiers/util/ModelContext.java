@@ -56,7 +56,7 @@ public final class ModelContext {
     private Class<?> modelIdType;
     
     private final Class<?> parentClass;
-    private final String name, path, parentProperty, generatedClassNamePrefix;
+    private final String name, path, parentProperty, generatedClassNamePrefix, beansBasePackage;
 
     private Class<?> repositoryType;
     private Class<?> serviceInterfaceType;
@@ -76,7 +76,8 @@ public final class ModelContext {
 	
     public ModelContext(ModelResource modelResource, Class<?> domainClass){
     	Assert.notNull(domainClass, "A domain class is required");
-
+    	String packageName = domainClass.getPackage().getName();
+    	this.beansBasePackage = packageName.endsWith(".model") ? packageName.substring(0, packageName.indexOf(".model")) : packageName;
         this.modelType = (Class<?>) domainClass;
         this.modelResource = modelResource;
         
@@ -93,6 +94,9 @@ public final class ModelContext {
     }
 	
     public ModelContext(ModelRelatedResource resource, Class<?> domainClass){
+    	String packageName = domainClass.getPackage().getName();
+    	this.beansBasePackage = packageName.endsWith(".model") ? packageName.substring(0, packageName.indexOf(".model")) : packageName;
+        
         this.name = getPath(domainClass);
         this.apiAnnotationMembers = getApiAnnotationMembers(domainClass);
 
@@ -311,8 +315,10 @@ public final class ModelContext {
 
 	public void setControllerDefinition(AbstractBeanDefinition controllerDefinition) {
 		this.controllerDefinition = controllerDefinition;
+	}
+
+	public String getBeansBasePackage() {
+		return beansBasePackage;
 	};
-    
-    
 
 }

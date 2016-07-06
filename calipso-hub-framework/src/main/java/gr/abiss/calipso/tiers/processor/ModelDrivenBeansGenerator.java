@@ -70,7 +70,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * TGenerates <code>Repository</code>, <code>Service</code> and
+ * Generates <code>Repository</code>, <code>Service</code> and
  * <code>Controller</code> tiers for entity beans are annotated with
  * {@link javax.persistence.ModelResource} or
  * {@link gr.abiss.calipso.tiers.annotation.ModelRelatedResource}.
@@ -79,26 +79,10 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModelDrivenBeansGenerator.class);
 
-	private final String basePackage;
-	private final String beansBasePackage;
-	private final String controllerBasePackage;
-	private final String serviceBasePackage;
-	private final String repositoryBasePackage;
-
 	private Map<Class<?>, ModelContext> entityModelContextsMap = new HashMap<Class<?>, ModelContext>();
 
 	public ModelDrivenBeansGenerator() {
-		this("gr.abiss.calipso.model");
-	}
 
-	public ModelDrivenBeansGenerator(String basePackage) {
-		super();
-		this.basePackage = basePackage;
-		this.beansBasePackage = basePackage.endsWith(".model") ? basePackage.substring(0, basePackage.indexOf(".model"))
-				: basePackage;
-		this.serviceBasePackage = beansBasePackage + ".service";
-		this.repositoryBasePackage = beansBasePackage + ".repository";
-		this.controllerBasePackage = beansBasePackage + ".controller";
 	}
 
 	/**
@@ -115,14 +99,16 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 	 */
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+
 		try {
-			findModels();
+			findModels("**.calipso.model");
 			findExistingBeans(registry);
 			createBeans(registry);
 			LOGGER.info("Completed generation");
 		} catch (Exception e) {
 			throw new FatalBeanException("Failed generating ApiResources", e);
 		}
+	
 
 	}
 
@@ -181,7 +167,7 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 			String newBeanNameSuffix = "Controller";
 			String newBeanClassName = modelContext.getGeneratedClassNamePrefix() + newBeanNameSuffix;
 			String newBeanRegistryName = StringUtils.uncapitalize(newBeanClassName);
-			String newBeanPackage = this.controllerBasePackage + '.';
+			String newBeanPackage = modelContext.getBeansBasePackage() + ".controller";
 
 			// grab the generic types
 			List<Class<?>> genericTypes = modelContext.getGenericTypes();
@@ -235,7 +221,8 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 
 			String newBeanClassName = modelContext.getGeneratedClassNamePrefix() + "Service";
 			String newBeanRegistryName = StringUtils.uncapitalize(newBeanClassName);
-			String newBeanPackage = this.serviceBasePackage + '.';
+
+			String newBeanPackage = modelContext.getBeansBasePackage() + ".service";
 			// grab the generic types
 			List<Class<?>> genericTypes = modelContext.getGenericTypes();
 
@@ -289,7 +276,8 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 			throws NotFoundException, CannotCompileException {
 		if (modelContext.getRepositoryDefinition() == null) {
 			Class<?> repoSUperInterface = ModelRepository.class;
-			String newBeanPackage = this.repositoryBasePackage + '.';
+
+			String newBeanPackage = modelContext.getBeansBasePackage() + ".repository";
 
 			// grab the generic types
 			List<Class<?>> genericTypes = modelContext.getGenericTypes();
@@ -398,7 +386,7 @@ public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProc
 	}
 
 	// @Override
-	protected void findModels() throws Exception {
+	protected void findModels(String basePackage) throws Exception {
 		Set<BeanDefinition> entityBeanDefs = EntityUtil.findAnnotatedClasses(basePackage);
 		for (BeanDefinition beanDef : entityBeanDefs) {
 			Class<?> entity = ClassUtils.getClass(beanDef.getBeanClassName());

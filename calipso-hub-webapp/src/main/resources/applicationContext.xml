@@ -19,6 +19,18 @@
         http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
         
+    <!-- read external properties config -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    	<property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:calipso.defaults.properties</value>
+                <value>classpath:calipso.properties</value>
+            </list>
+        </property> 
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
+    
     <!-- Generate controllers, services and repositories for entities with @ModelResource -->
     <bean id="entityPostProcessor" class="gr.abiss.calipso.tiers.processor.ModelDrivenBeansGenerator" />
     
@@ -37,6 +49,7 @@
         <property name="modulesToInstall" ref="jacksonModules"/>
     </bean>
     
+    <!-- jackson config -->
     <bean id="xmlObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
         <property name="featuresToDisable">
             <array>
@@ -51,14 +64,6 @@
         <property name="modulesToInstall" ref="jacksonModules"/>
         <property name="objectMapper" ref="xmlMapper" />
     </bean>
-    
-    <bean id="userDetailsConfig"
-        class="gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig">
-        <constructor-arg value="calipso-sso" />
-        <constructor-arg value="${calipso.domain}" />
-        <constructor-arg value="/" />
-    </bean>
-    
     <bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
     <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
 	    <property name="converters">
@@ -66,6 +71,15 @@
 	        <bean class="gr.abiss.calipso.model.serializers.CustomEnumConverterFactory" />
 	    </property>
 	</bean>
+    
+    <!-- auth config -->
+    <bean id="userDetailsConfig"
+        class="gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig">
+        <constructor-arg value="calipso-sso" />
+        <constructor-arg value="${calipso.domain}" />
+        <constructor-arg value="/" />
+    </bean>
+    
     
     <!-- extend resthub JPA config databaseProperties -->
     <bean id="jpaProperties" parent="resthubCoreJpaProperties">
@@ -82,10 +96,10 @@
 	<jpa:auditing auditor-aware-ref="auditorBean"/>
 	
 	<context:component-scan base-package="
-    	gr.abiss.calipso, 
+    	**.calipso, 
     	org.resthub" />
 	<jpa:repositories base-package="
-    	gr.abiss.calipso, 
+    	**.calipso, 
     	org.resthub"
 		factory-class="gr.abiss.calipso.tiers.repository.ModelRepositoryFactoryBean" />
 
@@ -118,16 +132,6 @@
 	<!-- Configuration for the Runtime -->
 	<task:annotation-driven executor="asyncExecutor" />
 
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    	<property name="ignoreResourceNotFound" value="true"/>
-        <property name="locations">
-            <list>
-                <value>classpath:calipso.defaults.properties</value>
-                <value>classpath:calipso.properties</value>
-            </list>
-        </property> 
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-    </bean>
 
 	<!--mvc:annotation-driven/ -->
 
