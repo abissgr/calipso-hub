@@ -1,26 +1,20 @@
 /**
- * Copyright (c) 2007 - 2013 www.Abiss.gr
+ * calipso-hub-framework - A full stack, high level framework for lazy application hackers.
+ * Copyright © 2005 Manos Batsis (manosbatsis gmail)
  *
- * This file is part of Calipso, a software platform by www.Abiss.gr.
- *
- * Calipso is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Calipso is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
- * 
- * Members of this class were taken from the ccrdfjavalib project:
- * http://sourceforge.net/projects/ccrdfjavalib/
- * The code was (C) 2004  Peter Magic and licensed under the NU Lesser General Public License: 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package gr.abiss.calipso.model.license;
 
 import gr.abiss.calipso.model.cms.Resource;

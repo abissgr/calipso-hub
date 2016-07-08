@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 - 2013 www.Abiss.gr
+ * Copyright (c) 2007 - 2016 Manos Batsis
  *
  * This file is part of Calipso, a software platform by www.Abiss.gr.
  *

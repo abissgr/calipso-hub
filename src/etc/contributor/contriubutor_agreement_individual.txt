@@ -1,9 +1,9 @@
 
-                            Geekoloigue Ltd
+                           Manos Batsis
 Individual Contributor License Agreement 
 (the "Agreement")
 
-Thank you for your interest in Geekoloigue Ltd (the "Company"). 
+Thank you for your interest in Manos Batsis (the "Company"). 
 In order to clarify the intellectual property license
 granted with Contributions from any person or entity, the Company
 must have a Contributor License Agreement ("CLA") on file that has
@@ -16,7 +16,7 @@ If you have not already done so, please complete and sign, then scan
 and email a pdf file of this Agreement to manosbatsis at gmail dot com
 
 If necessary, send an original signed Agreement to:
-Geekoloigue Ltd.
+Manos Batsis, Geekologue Ltd.
 Bulgaria 22A Acad. Methodi Popov Str., 1113 Sofia, Bulgaria
 
 Please read this document carefully before signing and keep a copy 
