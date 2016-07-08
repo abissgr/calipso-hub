@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
   <name>calipso-hub-test</name>
-  <comment>Sonatype helps open source projects to set up Maven repositories on https://oss.sonatype.org/. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <comment>A full stack, high level framework for lazy application hackers. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
     <project>calipso-hub-utilities</project>
   </projects>

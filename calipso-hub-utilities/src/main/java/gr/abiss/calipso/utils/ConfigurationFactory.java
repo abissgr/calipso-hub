@@ -42,6 +42,12 @@ public class ConfigurationFactory {
 	
 	public static final String INIT_DATA = "calipso.initData";
 	public static final String FILES_DIR = "calipso.files.dir";
+	
+
+	public static final String CONTACT_NAME = "calipso.contact.name";
+	public static final String CONTACT_URL = "calipso.contact.url";
+	public static final String CONTACT_EMAIL = "calipso.contact.email";
+	
 	private static CompositeConfiguration config = new CompositeConfiguration();
 	
 	static {

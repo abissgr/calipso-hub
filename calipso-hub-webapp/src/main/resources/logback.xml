@@ -27,21 +27,18 @@
         </encoder>
     </appender>
 
-    <logger name="org.hibernate">
-        <level value="ERROR" />
-    </logger>
-    <logger name="org.hibernate.SQL">
-        <level value="ERROR" />
-    </logger>
-    <logger name="org.hibernate.type">
-        <level value="ERROR" />
-    </logger>
-    <logger name="org.springframework">
-        <level value="debug" />
-    </logger>
-    <logger name="gr.abiss">
-        <level value="warn" />
-    </logger>
+<!--     <logger name="org.hibernate"> -->
+<!--         <level value="ERROR" /> -->
+<!--     </logger> -->
+<!--     <logger name="org.hibernate.SQL"> -->
+<!--         <level value="ERROR" /> -->
+<!--     </logger> -->
+<!--     <logger name="org.hibernate.type"> -->
+<!--         <level value="ERROR" /> -->
+<!--     </logger> -->
+<!--     <logger name="gr.abiss"> -->
+<!--         <level value="warn" /> -->
+<!--     </logger> -->
     <root level="@build.log.rootlevel@">
         <appender-ref ref="STDOUT" />
     </root>

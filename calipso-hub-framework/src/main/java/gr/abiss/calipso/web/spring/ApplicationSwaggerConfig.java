@@ -25,6 +25,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.UiConfiguration;
@@ -57,9 +58,16 @@ public class ApplicationSwaggerConfig {
 		org.apache.commons.configuration.Configuration config = ConfigurationFactory.getConfiguration();
 		String appName = config.getString(ConfigurationFactory.APP_NAME);
 		String appVersion = config.getString(ConfigurationFactory.APP_VERSION);
+		String contactName = config.getString(ConfigurationFactory.CONTACT_NAME);
+		String contactUrl = config.getString(ConfigurationFactory.CONTACT_URL);
+		String contactEmail = config.getString(ConfigurationFactory.CONTACT_EMAIL);
+		
+		
+		
+		Contact contact = new Contact(contactName, contactUrl, contactEmail);
 		return new ApiInfo(appName + " API Reference " + appVersion,
 				"Automatically-generated documentation based on [Swagger](http://swagger.io/) and created by [Springfox](http://springfox.github.io/springfox/).",
-				appVersion, "urn:tos", "", "API License: GNU Affero General Public License v3",
+				appVersion, "urn:tos", contact, "API License: GNU Affero General Public License v3",
 				"https://www.gnu.org/licenses/agpl-3.0.html");
 	}
 }
