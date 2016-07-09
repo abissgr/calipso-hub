@@ -302,6 +302,35 @@
 							</execution>
 						</executions>
 					</plugin>
+				    <plugin>
+				        <groupId>org.asciidoctor</groupId>
+				        <artifactId>asciidoctor-maven-plugin</artifactId>
+				        <version>1.5.3</version>
+				        <executions>
+					        <execution>
+					            <id>output-html</id>
+								<phase>post-integration-test</phase>
+					            <goals>
+					                <goal>process-asciidoc</goal>
+					            </goals>
+					        </execution>
+					    </executions>
+					    <configuration>
+					    	<sourceDirectory>target/swagger2asciidoc</sourceDirectory>
+					    	<outputDirectory>target/swagger2html</outputDirectory>
+					    	<backend>html5</backend>
+    						<sourceHighlighter>coderay</sourceHighlighter>
+<!-- 					        <doctype>book</doctype> -->
+					        <attributes>
+					        	<toc>left</toc>
+					        	<sectnums>true</sectnums>
+<!-- 					            <stylesheet>my-theme.css</stylesheet> -->
+					            <project-version>${project.version}</project-version>
+					            <endpoint-url>${build.calipso.baseurl}</endpoint-url>
+								<sourcedir>${project.build.sourceDirectory}</sourcedir>
+					        </attributes>
+					    </configuration>
+				    </plugin>
 				</plugins>
 			</build>
 		</profile>
