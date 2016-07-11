@@ -48,6 +48,10 @@ public class ConfigurationFactory {
 	public static final String CONTACT_URL = "calipso.contact.url";
 	public static final String CONTACT_EMAIL = "calipso.contact.email";
 	
+
+	public static final String LICENSE_NAME = "calipso.license.name";
+	public static final String LICENSE_URL = "calipso.license.url";
+	
 	private static CompositeConfiguration config = new CompositeConfiguration();
 	
 	static {

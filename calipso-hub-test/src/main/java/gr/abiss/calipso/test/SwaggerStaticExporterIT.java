@@ -73,7 +73,7 @@ public class SwaggerStaticExporterIT extends AbstractControllerIT {
 		Swagger2MarkupConverter.from(json)
 		        .withConfig(configMarkdown)
 		        .build()
-		        .toFolder(outputDirectory);
+		        .toFile(outputDirectory.resolve("index"+markupLanguage.getFileNameExtensions().get(0)));
 	}
 
 }

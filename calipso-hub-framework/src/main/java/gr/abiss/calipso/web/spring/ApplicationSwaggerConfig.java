@@ -36,10 +36,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 public class ApplicationSwaggerConfig {
 	
-//	@Bean
-//	public Docket customImplementation() {
-//		return new Docket(DocumentationType.SPRING_WEB).apiInfo(apiInfo());
-//	}
+
 	@Bean
 	public Docket customImplementation() {
 	    return new Docket(DocumentationType.SWAGGER_2)
@@ -56,18 +53,22 @@ public class ApplicationSwaggerConfig {
 	
 	private ApiInfo apiInfo() {
 		org.apache.commons.configuration.Configuration config = ConfigurationFactory.getConfiguration();
-		String appName = config.getString(ConfigurationFactory.APP_NAME);
-		String appVersion = config.getString(ConfigurationFactory.APP_VERSION);
-		String contactName = config.getString(ConfigurationFactory.CONTACT_NAME);
-		String contactUrl = config.getString(ConfigurationFactory.CONTACT_URL);
-		String contactEmail = config.getString(ConfigurationFactory.CONTACT_EMAIL);
 		
+		String appName = config.getString(ConfigurationFactory.APP_NAME, null);
+		String appVersion = config.getString(ConfigurationFactory.APP_VERSION, null);
+		
+		String contactName = config.getString(ConfigurationFactory.CONTACT_NAME, null);
+		String contactUrl = config.getString(ConfigurationFactory.CONTACT_URL);
+		String contactEmail = config.getString(ConfigurationFactory.CONTACT_EMAIL, null);
+
+		String licenseName = config.getString(ConfigurationFactory.LICENSE_NAME, null);
+		String licenseUrl = config.getString(ConfigurationFactory.LICENSE_URL, null);
 		
 		
 		Contact contact = new Contact(contactName, contactUrl, contactEmail);
 		return new ApiInfo(appName + " API Reference " + appVersion,
 				"Automatically-generated documentation based on [Swagger](http://swagger.io/) and created by [Springfox](http://springfox.github.io/springfox/).",
-				appVersion, "urn:tos", contact, "API License: GNU Affero General Public License v3",
-				"https://www.gnu.org/licenses/agpl-3.0.html");
+				appVersion, "urn:tos", contact, licenseName,
+				licenseUrl);
 	}
 }
