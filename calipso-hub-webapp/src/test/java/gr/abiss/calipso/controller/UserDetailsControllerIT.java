@@ -42,7 +42,7 @@ public class UserDetailsControllerIT extends AbstractControllerIT {
 
 	@Test(description = "Test logging in with correct credentials")
 	public void testCorrectLogin() throws Exception {
-		this.getLoginToken("admin", "admin");
+		this.getLoggedinContext("admin", "admin");
 	}
 
 }

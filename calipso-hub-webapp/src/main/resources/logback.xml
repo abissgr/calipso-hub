@@ -36,9 +36,9 @@
 <!--     <logger name="org.hibernate.type"> -->
 <!--         <level value="ERROR" /> -->
 <!--     </logger> -->
-<!--     <logger name="gr.abiss"> -->
-<!--         <level value="warn" /> -->
-<!--     </logger> -->
+    <logger name="gr.abiss">
+        <level value="debug" />
+    </logger>
     <root level="@build.log.rootlevel@">
         <appender-ref ref="STDOUT" />
     </root>

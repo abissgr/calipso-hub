@@ -97,8 +97,8 @@ public class AbstractControllerIT {
 	 * @param password
 	 * @return
 	 */
-	protected String getLoginToken(String username, String password) {
-		
+	protected Loggedincontext getLoggedinContext(String username, String password) {
+		Loggedincontext lctx = new Loggedincontext();
 		// create a login request body
 		Map<String, String>  loginSubmission = new HashMap<String, String>();
 		loginSubmission.put("username", username);
@@ -116,23 +116,23 @@ public class AbstractControllerIT {
 				statusCode(200).
 				content("id", notNullValue());
 		
-		// Get result cookie
-		return rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME);
-	}
-
-	protected RequestSpecification getLoggedinRequestSpec(String username, String password) {
-		
-		// login and retreive the token
-		String ssoToken = this.getLoginToken(username, password);
+		// Get result cookie and user id
+		lctx.ssoToken = rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME);
+		lctx.userId = rs.jsonPath().getString("id");
 		
 		// extend the global spec we have already set to add the SSO token
 		RequestSpecification requestSpec = new RequestSpecBuilder()
 			.addRequestSpecification(RestAssured.requestSpecification)
-			.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, ssoToken)
+			.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, lctx.ssoToken)
 			.build();
+		lctx.requestSpec = requestSpec;
 		
-		return requestSpec;
+		return lctx;
 	}
-	
-	
+
+	public static class Loggedincontext{
+		public String userId;
+		public String ssoToken;
+		public RequestSpecification requestSpec;
+	}
 }
