@@ -249,8 +249,9 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		return new ToStringBuilder(this)
 			.appendSuper(super.toString())
 			.append("username", this.getUsername())
+			.append("firstName", this.getFirstName())
+			.append("lastName", this.getLastName())
 			.append("email", this.getEmail())
-			.append("password", this.getPassword())
 			.append("new", this.isNew())
 			.append("roles", this.getRoles())
 			.toString();

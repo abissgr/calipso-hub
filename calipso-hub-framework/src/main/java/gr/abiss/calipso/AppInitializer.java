@@ -37,6 +37,10 @@ import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -148,20 +152,21 @@ public class AppInitializer {
 			u0.addRole(adminRole);
 			u0.setCreatedBy(system);
 			u0 = userService.createActive(u0);
-
-			for(int i = 0; i < 10; i++){
+			
+			for(String fullName : this.getTenNames()){
+				String userName = fullName.toLowerCase().replace(" ", "");
 				User u = new User();
-				u.setEmail("user"+i+"@abiss.gr");
-				u.setFirstName("Firstuser"+i);
-				u.setLastName("Lastuser"+i);
-				u.setUsername("user"+i);
-				u.setPassword("user"+i);
+				u.setEmail(userName+"@abiss.gr");
+				u.setFirstName(fullName.substring(0, fullName.indexOf(" ")));
+				u.setLastName(fullName.substring(fullName.indexOf(" ")+1));
+				u.setUsername(userName);
+				u.setPassword(userName);
 				u.setLastVisit(now);
 				u.setCreatedBy(system);
 				u = userService.createActive(u);
-
 				// notify the admin for each user creation to test notifications
-				baseNotificationService.create(new BaseNotification(u, u0, null, now, (i % 2 == 0) ? true : false));
+				baseNotificationService.create(new BaseNotification(u, u0, null, now, false));
+				LOGGER.info("Created user: "+u);
 			}
 			
 			LOGGER.info("Admin has " + this.baseNotificationService.countUnseen(u0) + " notifications");
@@ -431,5 +436,19 @@ public class AppInitializer {
 		  countryRepository.save(new Country("ZM", "Zambia", "Zambia", "260", AF, "Lusaka", "ZMK", "en"));
 		  countryRepository.save(new Country("ZW", "Zimbabwe", "Zimbabwe", "263", AF, "Harare", "ZWL", "en,sn,nd"));
 
+	}
+	
+
+	private String[] getTenNames() {
+		try {
+			URL namey = new URL("http://namey.muffinlabs.com/name.json?count=10&with_surname=true");
+			URLConnection yc = namey.openConnection();
+			BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+			String[] names = in.readLine().replace("[", "").replace("]", "").replace("\"", "").split(",");
+			return names;
+		} catch (Exception e) {
+			String[] names = {"Linda Hernandez","David Ellis","Nancy Morgan","Elizabeth White","Richard Collins","David Sanchez","Michael Cox","Karen Moore","John Gray","Carol Garcia"};
+			return names;
+		}
 	}
 }

@@ -17,18 +17,12 @@
  */
 package gr.abiss.calipso.userDetails.model;
 
-import gr.abiss.calipso.model.interfaces.Metadatum;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
-import gr.abiss.calipso.model.serializers.SkipPropertyDeserializer;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -37,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.social.security.SocialUserDetails;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -45,6 +38,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 //import com.wordnik.swagger.annotations.ApiModel;
+
+import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.serializers.SkipPropertyDeserializer;
+import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import gr.abiss.calipso.userDetails.integration.LocalUser;
 
 
 //@ApiModel
@@ -168,6 +166,10 @@ public class UserDetails implements  ICalipsoUserDetails{
 	 */
 	public UserDetails() {
 
+	}
+	public UserDetails(LoginSubmission loginSubmission) {
+		this();
+		BeanUtils.copyProperties(loginSubmission, this);
 	}
 
 	@Override

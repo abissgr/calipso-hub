@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.model.LoginSubmission;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
@@ -75,26 +76,27 @@ public class UserDetailsController {
 	@ApiOperation(value = "Login", 
 		notes = "Login using a JSON object with email/password properties.") 
 	@ResponseBody
-	public ICalipsoUserDetails create(@RequestBody ICalipsoUserDetails resource) {
-
+	public ICalipsoUserDetails create(@RequestBody LoginSubmission resource) {
+		ICalipsoUserDetails userDetails = new UserDetails(resource);
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("create");
+			LOGGER.debug("create, loginSubmission: " + resource);
+			LOGGER.debug("create, userDetails: " + userDetails);
 		}
 		if(resource.getEmailOrUsername() != null){
 			// change password
 			if(resource.getResetPasswordToken() != null){
-				resource = this.resetPasswordAndLogin(resource);
+				userDetails = this.resetPasswordAndLogin(userDetails);
 			}
 			// if login
 			else if(resource.getPassword() != null){
-				resource = this.login(resource, true);
+				userDetails = this.login(userDetails, true);
 			}
 			// forgot password
 			else{
 				this.service.handlePasswordResetRequest(resource.getEmailOrUsername());
 			}
 		}
-		return resource;
+		return userDetails;
 	}
 
 	@ApiOperation(value = "Remember", 
@@ -136,7 +138,7 @@ public class UserDetailsController {
 				}
 			}
 		}
-		return this.create(resource);
+		return this.login(resource, true);
 
 	}
 
@@ -151,7 +153,7 @@ public class UserDetailsController {
 	}
 	
 
-	public ICalipsoUserDetails resetPasswordAndLogin(@RequestBody ICalipsoUserDetails userDetails) {
+	protected ICalipsoUserDetails resetPasswordAndLogin(ICalipsoUserDetails userDetails) {
 
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("resetPasswordAndLogin");

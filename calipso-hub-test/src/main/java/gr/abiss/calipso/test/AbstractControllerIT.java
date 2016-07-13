@@ -21,14 +21,24 @@ import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
 import static org.hamcrest.Matchers.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
+import gr.abiss.calipso.utils.Constants;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 /**
  * Base class for rest-assured based controller integration testing
@@ -37,19 +47,92 @@ import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
 public class AbstractControllerIT {
 
 	protected static final String JSON_UTF8 = "application/json; charset=UTF-8";
-	// configure the underlying Jackson object mapper as needed
-	static {
+
+	@BeforeClass
+	public static void setup() {
+
+		// configure our object mapper
 		RestAssured.config = RestAssuredConfig.config().objectMapperConfig(
-				new ObjectMapperConfig().jackson2ObjectMapperFactory(new Jackson2ObjectMapperFactory() {
-					@Override
-					public ObjectMapper create(Class aClass, String s) {
-						ObjectMapper objectMapper = new ObjectMapper();
-						// support joda classes<->JSON
-						objectMapper.registerModule(new JodaModule());
-						// ignore unknown properties
-						objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-						return objectMapper;
-					}
-				}));
+			new ObjectMapperConfig().jackson2ObjectMapperFactory(new Jackson2ObjectMapperFactory() {
+				@Override
+				public ObjectMapper create(Class aClass, String s) {
+					ObjectMapper objectMapper = new ObjectMapper();
+					// support joda classes<->JSON
+					objectMapper.registerModule(new JodaModule());
+					// ignore unknown properties
+					objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+					return objectMapper;
+				}
+			}));
+
+		RestAssured.requestSpecification = new RequestSpecBuilder()
+			.setAccept(JSON_UTF8)
+			.setContentType(JSON_UTF8)
+			.build();
+		
+//		String port = System.getProperty("server.port");
+//		if (port == null) {
+//			RestAssured.port = Integer.valueOf(8080);
+//		} else {
+//			RestAssured.port = Integer.valueOf(port);
+//		}
+//
+//		String basePath = System.getProperty("server.base");
+//		if (basePath == null) {
+//			basePath = "/rest-garage-sample/";
+//		}
+//		RestAssured.basePath = basePath;
+//
+//		String baseHost = System.getProperty("server.host");
+//		if (baseHost == null) {
+//			baseHost = "http://localhost";
+//		}
+//		RestAssured.baseURI = baseHost;
+
 	}
+
+	/** 
+	 * Login using the given credentials and return the Single Sign-On token
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	protected String getLoginToken(String username, String password) {
+		
+		// create a login request body
+		Map<String, String>  loginSubmission = new HashMap<String, String>();
+		loginSubmission.put("username", username);
+		loginSubmission.put("password", password);
+		
+		// attempt login and test for a proper result
+		Response rs = given().//log().all().
+		 	body(loginSubmission).
+		 when().
+			post("/calipso/apiauth/userDetails");
+		
+		// validate login
+		rs.then().//log().all().
+			assertThat().
+				statusCode(200).
+				content("id", notNullValue());
+		
+		// Get result cookie
+		return rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME);
+	}
+
+	protected RequestSpecification getLoggedinRequestSpec(String username, String password) {
+		
+		// login and retreive the token
+		String ssoToken = this.getLoginToken(username, password);
+		
+		// extend the global spec we have already set to add the SSO token
+		RequestSpecification requestSpec = new RequestSpecBuilder()
+			.addRequestSpecification(RestAssured.requestSpecification)
+			.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, ssoToken)
+			.build();
+		
+		return requestSpec;
+	}
+	
+	
 }
