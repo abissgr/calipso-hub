@@ -46,6 +46,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -175,6 +176,9 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@JoinTable(name = "user_roles", joinColumns = { @JoinColumn(name = "role_id") }, inverseJoinColumns = { @JoinColumn(name = "user_id") })
 	private List<Role> roles = new ArrayList<Role>(0);
 
+    @OneToMany(mappedBy="requestSender")
+	private List<Friendship> friendships;
+    
 	public User() {
 	}
 

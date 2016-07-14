@@ -417,9 +417,9 @@
       <attribute value="jar:file:/home/manos/.m2/repository/io/springfox/springfox-core/2.5.0/springfox-core-2.5.0-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/15.0/guava-15.0.jar" sourcepath="M2_REPO/com/google/guava/guava/15.0/guava-15.0-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/17.0/guava-17.0.jar" sourcepath="M2_REPO/com/google/guava/guava/17.0/guava-17.0-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/com/google/guava/guava/15.0/guava-15.0-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/manos/.m2/repository/com/google/guava/guava/17.0/guava-17.0-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/springframework/plugin/spring-plugin-core/1.2.0.RELEASE/spring-plugin-core-1.2.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/plugin/spring-plugin-core/1.2.0.RELEASE/spring-plugin-core-1.2.0.RELEASE-sources.jar">
@@ -762,9 +762,14 @@
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-configuration2/2.0/commons-configuration2-2.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/google/collections/google-collections/1.0/google-collections-1.0.jar" sourcepath="M2_REPO/com/google/collections/google-collections/1.0/google-collections-1.0-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/org/asciidoctor/asciidoctorj/1.5.4/asciidoctorj-1.5.4.jar" sourcepath="M2_REPO/org/asciidoctor/asciidoctorj/1.5.4/asciidoctorj-1.5.4-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/com/google/collections/google-collections/1.0/google-collections-1.0-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/asciidoctor/asciidoctorj/1.5.4/asciidoctorj-1.5.4-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/jruby/jruby-complete/1.7.21/jruby-complete-1.7.21.jar" sourcepath="M2_REPO/org/jruby/jruby-complete/1.7.21/jruby-complete-1.7.21-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/jruby/jruby-complete/1.7.21/jruby-complete-1.7.21-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
 </classpath>
