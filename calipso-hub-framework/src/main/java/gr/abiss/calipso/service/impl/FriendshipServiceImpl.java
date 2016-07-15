@@ -73,9 +73,6 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		// create
 		friendship = super.create(friendship);
 
-		LOGGER.info("created, UserDetails: " + userDetails.getUsername());
-		LOGGER.info("created, Sender: " + friendship.getRequestSender().getUsername());
-		LOGGER.info("created, Recepient: " + friendship.getRequestRecipient().getUsername());
 		// create inverse if accepted
 		this.createInverseIfAccepted(friendship);
 		
@@ -95,9 +92,6 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		// and persisted friendship entry to update.
 		Friendship persistedFriendship = this.findById(resource.getId());
 
-		LOGGER.info("update, UserDetails: " + userDetails.getUsername());
-		LOGGER.info("update, Sender: " + persistedFriendship.getRequestSender().getUsername());
-		LOGGER.info("update, Recepient: " + persistedFriendship.getRequestRecipient().getUsername());
 		// If not admin then
 		if(!userDetails.isAdmin()){
 			// validate recipient in persisted entry
@@ -157,7 +151,6 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();
 		// if not admin
-		LOGGER.info("FIND ALL, userDetails: " + userDetails);
 		if(!userDetails.isAdmin()){
 			// make sure only a users inbox or outbox are returned
 			Map<String, String[]> params = ((ParameterMapBackedPageRequest) pageRequest).getParameterMap();
