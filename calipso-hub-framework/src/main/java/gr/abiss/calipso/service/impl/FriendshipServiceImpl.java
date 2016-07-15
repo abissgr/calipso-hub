@@ -40,18 +40,35 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();
 		
-		// if not admin, make sure principal is making the request and status is "invited"
-		if(userDetails == null || !userDetails.isAdmin()){
-			if(!userDetails.getId().equals(friendship.getRequestSender())){
-				throw new IllegalArgumentException("Invalid friendship sender");
+		// if not admin, then
+		if(!userDetails.isAdmin()){
+			
+			// make sure the right sender is set if not empty
+			if(friendship.getRequestSender() != null){
+				// if not owned sender
+				if(!userDetails.getId().equals(friendship.getRequestSender())){
+					throw new IllegalArgumentException("Invalid friendship sender");
+				}
 			}
-			if(!friendship.getStatus().equals(FriendshipStatus.PENDING)){
-				throw new IllegalArgumentException("Invalid friendship status");
+			else{
+				// otherwise set as the current user
+				friendship.setRequestSender(new User(userDetails.getId()));
+			}
+			
+			// check status if any
+			if(friendship.getStatus() != null){
+				if(!friendship.getStatus().equals(FriendshipStatus.PENDING)){
+					throw new IllegalArgumentException("Invalid friendship status");
+				}
+			}
+			// set automatically otherwise
+			else{
+				friendship.setStatus(FriendshipStatus.PENDING);
 			}
 		}
 		
 		// make sure the friendship does not already exist
-		if(this.repository.existsAny(friendship.getRequestSender(), friendship.getRequestRecepient())){
+		if(this.repository.existsAny(friendship.getRequestSender(), friendship.getRequestRecipient())){
 			throw new IllegalArgumentException("Friendship already exists");
 		}
 		
@@ -68,28 +85,35 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public Friendship update(Friendship friendship) {
-		// get current principal
+	public Friendship update(Friendship resource) {
+		// Get current principal,
 		ICalipsoUserDetails userDetails = this.getPrincipal();
+		// new status,
+		FriendshipStatus newStatus = resource.getStatus();
+		// and persisted friendship entry to update.
+		Friendship persistedFriendship = this.findById(resource.getId());
 		
-		// if not admin, make sure principal is making the request and status is "invited"
+		// If not admin then
 		if(!userDetails.isAdmin()){
-			if(!userDetails.getId().equals(friendship.getRequestRecepient())){
-				throw new IllegalArgumentException("Invalid friendship recepient");
+			// validate recipient in persisted entry
+			if(!userDetails.getId().equals(persistedFriendship.getRequestRecipient())){ 
+				throw new IllegalArgumentException("No entry found for recipient");
 			}
 		}
-		// only accepted/rejected statuses allowed
-		FriendshipStatus status = friendship.getStatus();
-		if(!status.equals(FriendshipStatus.ACCEPTED) && !status.equals(FriendshipStatus.REJECTED)){
+		
+		// Only accepted/rejected allowed as new status value
+		if(!newStatus.equals(FriendshipStatus.ACCEPTED) && !newStatus.equals(FriendshipStatus.REJECTED)){
 			throw new IllegalArgumentException("Invalid friendship status");
 		}
 		
-		// create
-		friendship = super.update(friendship);
-		// create inverse if accepted
-		this.createInverseIfAccepted(friendship);
+		// Update with new status
+		persistedFriendship.setStatus(newStatus);
+		persistedFriendship = super.update(persistedFriendship);
 		
-		return friendship;
+		// create inverse if accepted
+		this.createInverseIfAccepted(persistedFriendship);
+		
+		return persistedFriendship;
 	}
 
 	/**
@@ -98,13 +122,13 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	@Override
 	@Transactional(readOnly = false)
 	public void delete(Friendship resource) {
-		this.repository.delete(resource.getRequestSender().getId(), resource.getRequestRecepient().getId());
+		this.repository.delete(resource.getRequestSender().getId(), resource.getRequestRecipient().getId());
 	}
 
 	private Friendship createInverseIfAccepted(Friendship friendship) {
 		Friendship inverse = null;
 		if(friendship.getStatus().equals(FriendshipStatus.ACCEPTED)){
-			inverse = new Friendship(friendship.getRequestRecepient(), friendship.getRequestSender());
+			inverse = new Friendship(friendship.getRequestRecipient(), friendship.getRequestSender());
 			inverse.setStatus(FriendshipStatus.INVERSE);
 			super.create(inverse);
 		}

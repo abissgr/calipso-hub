@@ -29,6 +29,7 @@ import gr.abiss.calipso.uischema.annotation.FormSchemas;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.MD5Utils;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +75,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject, PartiallyUpdateable {
 
 	private static final long serialVersionUID = -7942906897981646998L;
-
+	
+	@ApiModelProperty(hidden = true)
 	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
 	private String searchName;
 	
@@ -89,7 +91,8 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	
 	@Column(name = "user_name", unique = true, nullable = false)
 	private String username;
-
+	
+	@ApiModelProperty(hidden = true)
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	@Column(name = "user_password")
 	private String password;

@@ -24,27 +24,27 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 	 * @param otherUserId
 	 */
     @Modifying
-    @Query(value="DELETE FROM friendship WHERE (request_sender = ?1 and request_recepient = ?2) "
-    		+ " or (request_sender = ?2 and request_recepient = ?1)", nativeQuery=true)
+    @Query(value="DELETE FROM friendship WHERE (request_sender = ?1 and request_recipient = ?2) "
+    		+ " or (request_sender = ?2 and request_recipient = ?1)", nativeQuery=true)
     void delete(String oneUserId, String otherUserId);
     
     @Query("select f from Friendship f where f.requestSender.id = ?#{principal.id} "
     		+ "and status <> gr.abiss.calipso.model.types.FriendshipStatus.INVERSE")
     List<Friendship> findSentByCurrentUser();
 
-    @Query("select f from Friendship f where f.requestRecepient.id = ?#{principal.id} "
+    @Query("select f from Friendship f where f.requestRecipient.id = ?#{principal.id} "
     		+ "and status <> gr.abiss.calipso.model.types.FriendshipStatus.INVERSE")
     List<Friendship> findReceivedByCurrentUser();
 
 
     @Query("select case when count(f) > 0 then true else false end from Friendship f where "
-    		+ "f.requestSender = ?1 and f.requestRecepient = ?2 "
+    		+ "f.requestSender = ?1 and f.requestRecipient = ?2 "
     		+ " and (status <> gr.abiss.calipso.model.types.FriendshipStatus.ACCEPTED "
     		+ "		or status <> gr.abiss.calipso.model.types.FriendshipStatus.INVERSE)")
     Boolean existsEstablished(User one, User other);
     
     @Query("select case when count(f) > 0 then true else false end from Friendship f where "
-    		+ " (f.requestSender = ?1 and f.requestRecepient = ?2) "
-    		+ "	or (f.requestSender = ?2 and f.requestRecepient = ?1) ")
+    		+ " (f.requestSender = ?1 and f.requestRecipient = ?2) "
+    		+ "	or (f.requestSender = ?2 and f.requestRecipient = ?1) ")
     Boolean existsAny(User one, User other);
 }

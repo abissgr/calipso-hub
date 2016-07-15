@@ -1,5 +1,7 @@
 package gr.abiss.calipso.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,6 +12,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.entities.AbstractAuditable;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
@@ -36,8 +39,8 @@ public class Friendship extends AbstractAuditable<User> {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "request_recepient", nullable=false)
-	private User requestRecepient;
+	@JoinColumn(name = "request_recipient", nullable=false)
+	private User requestRecipient;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -47,9 +50,9 @@ public class Friendship extends AbstractAuditable<User> {
 	public Friendship() {
 	}
 
-	public Friendship(User requestSender, User requestRecepient) {
+	public Friendship(User requestSender, User requestRecipient) {
 		this.requestSender = requestSender;
-		this.requestRecepient = requestRecepient;
+		this.requestRecipient = requestRecipient;
 	}
 
 	public User getRequestSender() {
@@ -60,12 +63,12 @@ public class Friendship extends AbstractAuditable<User> {
 		this.requestSender = requestSender;
 	}
 
-	public User getRequestRecepient() {
-		return requestRecepient;
+	public User getRequestRecipient() {
+		return requestRecipient;
 	}
 
-	public void setRequestRecepient(User requestRecepient) {
-		this.requestRecepient = requestRecepient;
+	public void setRequestRecipient(User requestRecipient) {
+		this.requestRecipient = requestRecipient;
 	}
 
 	public FriendshipStatus getStatus() {
@@ -77,17 +80,23 @@ public class Friendship extends AbstractAuditable<User> {
 	}
 
 	public static class Builder {
+		private String id;
 		private User requestSender;
-		private User requestRecepient;
+		private User requestRecipient;
 		private FriendshipStatus status;
 
+		public Builder id(String id) {
+			this.id = id;
+			return this;
+		}
+		
 		public Builder requestSender(User requestSender) {
 			this.requestSender = requestSender;
 			return this;
 		}
 
-		public Builder requestRecepient(User requestRecepient) {
-			this.requestRecepient = requestRecepient;
+		public Builder requestRecipient(User requestRecipient) {
+			this.requestRecipient = requestRecipient;
 			return this;
 		}
 
@@ -102,8 +111,11 @@ public class Friendship extends AbstractAuditable<User> {
 	}
 
 	private Friendship(Builder builder) {
+		this.setId(builder.id);
 		this.requestSender = builder.requestSender;
-		this.requestRecepient = builder.requestRecepient;
+		this.requestRecipient = builder.requestRecipient;
 		this.status = builder.status;
 	}
+
+
 }

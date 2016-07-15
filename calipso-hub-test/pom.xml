@@ -47,7 +47,7 @@
 		
 		<dependency>
 			<groupId>gr.abiss.calipso</groupId>
-			<artifactId>calipso-hub-utilities</artifactId>
+			<artifactId>calipso-hub-framework</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         

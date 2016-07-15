@@ -31,12 +31,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
+import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.utils.Constants;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
+import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -64,7 +66,7 @@ public class AbstractControllerIT {
 					return objectMapper;
 				}
 			}));
-
+		RestAssured.defaultParser = Parser.JSON;
 		RestAssured.requestSpecification = new RequestSpecBuilder()
 			.setAccept(JSON_UTF8)
 			.setContentType(JSON_UTF8)
@@ -128,6 +130,10 @@ public class AbstractControllerIT {
 		lctx.requestSpec = requestSpec;
 		
 		return lctx;
+	}
+	
+	protected User getUserByUsernameOrEmail(String userNameOrEmail) {
+		return get("/calipso/api/rest/users/byUserNameOrEmail/{userNameOrEmail}", userNameOrEmail).as(User.class);
 	}
 
 	public static class Loggedincontext{

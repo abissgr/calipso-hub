@@ -19,6 +19,7 @@ package gr.abiss.calipso.model.entities;
 
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.serializers.DateTimeToUnixTimestampSerializer;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
@@ -54,22 +55,26 @@ public abstract class AbstractAuditable<U extends AbstractSystemUuidPersistable>
 
 	private static final long serialVersionUID = 8809874829822002089L;
 	
+	@ApiModelProperty(hidden = true)
 	@CreatedBy
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "created_by", referencedColumnName = "id", nullable = true)
 	private U createdBy;
-
+	
+	@ApiModelProperty(hidden = true)
 	@CreatedDate
 //	@Temporal(TemporalType.TIMESTAMP)
 	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
 	private DateTime createdDate;
 
+	@ApiModelProperty(hidden = true)
 	@LastModifiedBy
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "updated_by", referencedColumnName = "id", nullable = true)
 	// TODO: not null
 	private U lastModifiedBy;
 
+	@ApiModelProperty(hidden = true)
 	@LastModifiedDate
 //	@Temporal(TemporalType.TIMESTAMP)
 //	@JsonSerialize(using = DateTimeToUnixTimestampSerializer.class)
