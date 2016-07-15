@@ -1,8 +1,14 @@
 package gr.abiss.calipso.service.impl;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import gr.abiss.calipso.model.Friendship;
@@ -13,24 +19,16 @@ import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.FriendshipService;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
 
 @Named("friendshipService")
 @Transactional(readOnly = true)
 public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, String, FriendshipRepository> implements FriendshipService {
 
-	protected UserRepository userRepository;
 
-	@Inject
-	public void setUserRepository(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
+	private static final Logger LOGGER = LoggerFactory.getLogger(FriendshipServiceImpl.class);
 	
-//	@Override
-//	public Friendship findOneByFriends(User one, User other) {
-//		return this.repository.findOneByFriends(one, other).orElse(null);
-//	}
-
 	/**
 	 * Create a friendship request
 	 */
@@ -45,16 +43,16 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 			
 			// make sure the right sender is set if not empty
 			if(friendship.getRequestSender() != null){
-				// if not owned sender
-				if(!userDetails.getId().equals(friendship.getRequestSender())){
+				// ensure sender is the current user
+				if(!userDetails.getId().equals(friendship.getRequestSender().getId())){
 					throw new IllegalArgumentException("Invalid friendship sender");
 				}
 			}
 			else{
 				// otherwise set as the current user
-				friendship.setRequestSender(new User(userDetails.getId()));
+				friendship.setRequestSender(new User.Builder().id(userDetails.getId()).username(userDetails.getUsername()).build());
 			}
-			
+
 			// check status if any
 			if(friendship.getStatus() != null){
 				if(!friendship.getStatus().equals(FriendshipStatus.PENDING)){
@@ -74,6 +72,10 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		
 		// create
 		friendship = super.create(friendship);
+
+		LOGGER.info("created, UserDetails: " + userDetails.getUsername());
+		LOGGER.info("created, Sender: " + friendship.getRequestSender().getUsername());
+		LOGGER.info("created, Recepient: " + friendship.getRequestRecipient().getUsername());
 		// create inverse if accepted
 		this.createInverseIfAccepted(friendship);
 		
@@ -92,11 +94,14 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		FriendshipStatus newStatus = resource.getStatus();
 		// and persisted friendship entry to update.
 		Friendship persistedFriendship = this.findById(resource.getId());
-		
+
+		LOGGER.info("update, UserDetails: " + userDetails.getUsername());
+		LOGGER.info("update, Sender: " + persistedFriendship.getRequestSender().getUsername());
+		LOGGER.info("update, Recepient: " + persistedFriendship.getRequestRecipient().getUsername());
 		// If not admin then
 		if(!userDetails.isAdmin()){
 			// validate recipient in persisted entry
-			if(!userDetails.getId().equals(persistedFriendship.getRequestRecipient())){ 
+			if(!userDetails.getId().equals(persistedFriendship.getRequestRecipient().getId())){ 
 				throw new IllegalArgumentException("No entry found for recipient");
 			}
 		}
@@ -122,6 +127,18 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	@Override
 	@Transactional(readOnly = false)
 	public void delete(Friendship resource) {
+		// get current principal
+		ICalipsoUserDetails userDetails = this.getPrincipal();
+		// if not admin
+		if(!userDetails.isAdmin()){
+			Friendship friendship = this.repository.findOne(resource.getId());
+			// make sure a participant deletes 
+			if(!userDetails.getId().equals(friendship.getRequestSender().getId()) 
+					&& !userDetails.getId().equals(friendship.getRequestRecipient().getId()) ){
+				throw new IllegalArgumentException("No entry found");
+			}
+		}
+		// delete friendship and it's inverse
 		this.repository.delete(resource.getRequestSender().getId(), resource.getRequestRecipient().getId());
 	}
 
@@ -134,6 +151,42 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		}
 		return inverse;
 	}
+
+	@Override
+	public Page<Friendship> findAll(Pageable pageRequest) {
+		// get current principal
+		ICalipsoUserDetails userDetails = this.getPrincipal();
+		// if not admin
+		LOGGER.info("FIND ALL, userDetails: " + userDetails);
+		if(!userDetails.isAdmin()){
+			// make sure only a users inbox or outbox are returned
+			Map<String, String[]> params = ((ParameterMapBackedPageRequest) pageRequest).getParameterMap();
+			boolean hasPermission = false;
+			String[] attrsToCheck = {"requestSender", "requestRecipient"};
+			String validUserId = userDetails.getId();
+			// by checking sender 
+			for(String attrToCheck : attrsToCheck){
+				String[] values = params.get(attrToCheck);
+				if(values != null){
+					// check if valid
+					if(values.length == 1 && validUserId.equals(values[0])){
+						hasPermission = true;
+					}
+					// remove otherwise
+					else{
+						params.remove(attrToCheck);
+					}
+				}
+			}
+			
+			if(!hasPermission){
+				throw new IllegalArgumentException("No entries found"); 
+			}
+			
+		}
+		return super.findAll(pageRequest);
+	}
+	
 	
 	
 

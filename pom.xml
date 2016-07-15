@@ -257,6 +257,11 @@
 				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>spring-expression</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context</artifactId>
 				<version>${spring.version}</version>
@@ -371,6 +376,11 @@
 						<groupId>org.springframework</groupId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+	            <groupId>org.springframework.security</groupId>
+	            <artifactId>spring-security-data</artifactId>
+				<version>${spring-security.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>

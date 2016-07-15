@@ -72,26 +72,27 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @ApiModel(description = "Human users")
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> implements LocalUser, ReportDataSetSubject, PartiallyUpdateable {
+public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
+		implements LocalUser, ReportDataSetSubject, PartiallyUpdateable {
 
 	private static final long serialVersionUID = -7942906897981646998L;
-	
+
 	@ApiModelProperty(hidden = true)
 	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
 	private String searchName;
-	
+
 	@Formula("concat(first_name, ' ', last_name )")
 	private String name;
-	
+
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
-	
+
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
-	
+
 	@Column(name = "user_name", unique = true, nullable = false)
 	private String username;
-	
+
 	@ApiModelProperty(hidden = true)
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	@Column(name = "user_password")
@@ -99,7 +100,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	@Transient
 	List<String> changedAttributes = null;
-	
+
 	@Transient
 	@JsonIgnore
 	Locale localeObject = null;
@@ -107,14 +108,14 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@JsonIgnore
 	@Column(name = "reset_password_token")
 	private String resetPasswordToken;
-	
+
 	@JsonIgnore
 	@Column(name = "reset_password_token_date")
 	private Date resetPasswordTokenCreated;
 
 	@Column(name = "password_changed")
 	private Date lastPassWordChangeDate;
-	
+
 	@Column(name = "email", unique = true, nullable = false)
 	private String email;
 
@@ -126,13 +127,13 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 	@Column(nullable = true)
 	private String telephone;
-	
+
 	@Column(nullable = true)
 	private String cellphone;
 
 	@Column(nullable = true)
 	private String address;
-	
+
 	@Column(nullable = true)
 	private String postCode;
 
@@ -141,9 +142,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	private Country country;
 
 	@Column(name = "birthday")
-	@FormSchemas({
-		@FormSchemaEntry(json = FormSchemaEntry.TYPE_DATE)
-	})
+	@FormSchemas({ @FormSchemaEntry(json = FormSchemaEntry.TYPE_DATE) })
 	private Date birthDay;
 
 	@Column(name = "last_visit")
@@ -170,18 +169,19 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@Transient
 	private String redirectUrl;
 
-//	@OneToOne(optional = true, fetch=FetchType.LAZY)
-//	@MapsId
-//	private LocalRegionMailingAddress mailingAddress;
-	
+	//	@OneToOne(optional = true, fetch=FetchType.LAZY)
+	//	@MapsId
+	//	private LocalRegionMailingAddress mailingAddress;
+
 	//@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "user_roles", joinColumns = { @JoinColumn(name = "role_id") }, inverseJoinColumns = { @JoinColumn(name = "user_id") })
+	@JoinTable(name = "user_roles", joinColumns = { @JoinColumn(name = "role_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "user_id") })
 	private List<Role> roles = new ArrayList<Role>(0);
 
-    @OneToMany(mappedBy="requestSender")
+	@OneToMany(mappedBy = "requestSender")
 	private List<Friendship> friendships;
-    
+
 	public User() {
 	}
 
@@ -193,24 +193,24 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		this.email = dto.getEmail();
 		this.emailHash = dto.getEmailHash();
 	}
-	
+
 	public User(String id) {
 		this.setId(id);
 	}
-	
+
 	public Locale getLocaleObject() {
-		if(this.localeObject == null){
+		if (this.localeObject == null) {
 			this.localeObject = new Locale(this.getLocale() != null ? this.getLocale() : "en");
 		}
 		return localeObject;
 	}
 
-	public boolean hasRole(String roleName){
+	public boolean hasRole(String roleName) {
 		Assert.notNull(roleName, "Role name cannot be null");
 		boolean hasIt = false;
-		if(CollectionUtils.isNotEmpty(this.roles)){
-			for(Role role : roles){
-				if(roleName.equalsIgnoreCase(role.getName())){
+		if (CollectionUtils.isNotEmpty(this.roles)) {
+			for (Role role : roles) {
+				if (roleName.equalsIgnoreCase(role.getName())) {
 					hasIt = true;
 					break;
 				}
@@ -218,12 +218,13 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		}
 		return hasIt;
 	}
+
 	/**
 	 * {@inheritDoc}}
 	 * @see gr.abiss.calipso.model.interfaces.ReportDataSetSubject#getLabel()
 	 */
 	@Override
-	public String getLabel(){
+	public String getLabel() {
 		return this.getName();
 	}
 
@@ -246,22 +247,17 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		}
 		User other = (User) obj;
 		EqualsBuilder builder = new EqualsBuilder();
-        builder.append(getId(), other.getId());
-        builder.append(getName(), other.getName());
-        return builder.isEquals();
+		builder.append(getId(), other.getId());
+		builder.append(getName(), other.getName());
+		return builder.isEquals();
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this)
-			.appendSuper(super.toString())
-			.append("username", this.getUsername())
-			.append("firstName", this.getFirstName())
-			.append("lastName", this.getLastName())
-			.append("email", this.getEmail())
-			.append("new", this.isNew())
-			.append("roles", this.getRoles())
-			.toString();
+		return new ToStringBuilder(this).appendSuper(super.toString()).append("username", this.getUsername())
+				.append("firstName", this.getFirstName()).append("lastName", this.getLastName())
+				.append("email", this.getEmail()).append("new", this.isNew()).append("roles", this.getRoles())
+				.toString();
 	}
 
 	/**
@@ -275,7 +271,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	public void setRedirectUrl(String redirectUrl) {
 		this.redirectUrl = redirectUrl;
 	}
-
 
 	/**
 	 * Called by Hibernate <code>@PrePersist</code> and <code>@PreUpdate</code>
@@ -296,22 +291,19 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 
 			// if usernames are not exposed the email has been used to set its value
 			// in that case it must follow the email value change
-			if(this.getUsername() == null || this.getUsername().contains("@")){
+			if (this.getUsername() == null || this.getUsername().contains("@")) {
 				this.setUsername(this.getEmail());
 			}
 		}
-		
+
 		// clear or set the token creation date  if needed
-		if(this.getResetPasswordToken() == null){
+		if (this.getResetPasswordToken() == null) {
 			this.setResetPasswordTokenCreated(null);
-		}
-		else if(this.getResetPasswordTokenCreated() == null){
+		} else if (this.getResetPasswordTokenCreated() == null) {
 			this.setResetPasswordTokenCreated(new Date());
 		}
 
 	}
-	
-	
 
 	public String getSearchName() {
 		return searchName;
@@ -359,13 +351,13 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 	@Override
 	public String getFullName() {
 		StringBuffer s = new StringBuffer("");
-		if(StringUtils.isNotBlank(this.getFirstName())){
+		if (StringUtils.isNotBlank(this.getFirstName())) {
 			s.append(this.getFirstName());
-			if(StringUtils.isNotBlank(this.getLastName())){
+			if (StringUtils.isNotBlank(this.getLastName())) {
 				s.append(' ');
 			}
 		}
-		if(StringUtils.isNotBlank(this.getLastName())){
+		if (StringUtils.isNotBlank(this.getLastName())) {
 			s.append(this.getLastName());
 		}
 		return s.toString();
@@ -581,4 +573,223 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User> 
 		this.roles = roles;
 	}
 
+	public static class Builder {
+		private String id;
+		private String name;
+		private String firstName;
+		private String lastName;
+		private String username;
+		private String password;
+		private List<String> changedAttributes;
+		private Locale localeObject;
+		private String resetPasswordToken;
+		private Date resetPasswordTokenCreated;
+		private Date lastPassWordChangeDate;
+		private String email;
+		private String emailHash;
+		private String avatarUrl;
+		private String telephone;
+		private String cellphone;
+		private String address;
+		private String postCode;
+		private Country country;
+		private Date birthDay;
+		private Date lastVisit;
+		private Date lastLogin;
+		private Short loginAttempts;
+		private Boolean active;
+		private String inactivationReason;
+		private Date inactivationDate;
+		private String locale;
+		private String redirectUrl;
+		private List<Role> roles;
+		private List<Friendship> friendships;
+
+		public Builder id(String id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder firstName(String firstName) {
+			this.firstName = firstName;
+			return this;
+		}
+
+		public Builder lastName(String lastName) {
+			this.lastName = lastName;
+			return this;
+		}
+
+		public Builder username(String username) {
+			this.username = username;
+			return this;
+		}
+
+		public Builder password(String password) {
+			this.password = password;
+			return this;
+		}
+
+		public Builder changedAttributes(List<String> changedAttributes) {
+			this.changedAttributes = changedAttributes;
+			return this;
+		}
+
+		public Builder localeObject(Locale localeObject) {
+			this.localeObject = localeObject;
+			return this;
+		}
+
+		public Builder resetPasswordToken(String resetPasswordToken) {
+			this.resetPasswordToken = resetPasswordToken;
+			return this;
+		}
+
+		public Builder resetPasswordTokenCreated(Date resetPasswordTokenCreated) {
+			this.resetPasswordTokenCreated = resetPasswordTokenCreated;
+			return this;
+		}
+
+		public Builder lastPassWordChangeDate(Date lastPassWordChangeDate) {
+			this.lastPassWordChangeDate = lastPassWordChangeDate;
+			return this;
+		}
+
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
+
+		public Builder emailHash(String emailHash) {
+			this.emailHash = emailHash;
+			return this;
+		}
+
+		public Builder avatarUrl(String avatarUrl) {
+			this.avatarUrl = avatarUrl;
+			return this;
+		}
+
+		public Builder telephone(String telephone) {
+			this.telephone = telephone;
+			return this;
+		}
+
+		public Builder cellphone(String cellphone) {
+			this.cellphone = cellphone;
+			return this;
+		}
+
+		public Builder address(String address) {
+			this.address = address;
+			return this;
+		}
+
+		public Builder postCode(String postCode) {
+			this.postCode = postCode;
+			return this;
+		}
+
+		public Builder country(Country country) {
+			this.country = country;
+			return this;
+		}
+
+		public Builder birthDay(Date birthDay) {
+			this.birthDay = birthDay;
+			return this;
+		}
+
+		public Builder lastVisit(Date lastVisit) {
+			this.lastVisit = lastVisit;
+			return this;
+		}
+
+		public Builder lastLogin(Date lastLogin) {
+			this.lastLogin = lastLogin;
+			return this;
+		}
+
+		public Builder loginAttempts(Short loginAttempts) {
+			this.loginAttempts = loginAttempts;
+			return this;
+		}
+
+		public Builder active(Boolean active) {
+			this.active = active;
+			return this;
+		}
+
+		public Builder inactivationReason(String inactivationReason) {
+			this.inactivationReason = inactivationReason;
+			return this;
+		}
+
+		public Builder inactivationDate(Date inactivationDate) {
+			this.inactivationDate = inactivationDate;
+			return this;
+		}
+
+		public Builder locale(String locale) {
+			this.locale = locale;
+			return this;
+		}
+
+		public Builder redirectUrl(String redirectUrl) {
+			this.redirectUrl = redirectUrl;
+			return this;
+		}
+
+		public Builder roles(List<Role> roles) {
+			this.roles = roles;
+			return this;
+		}
+
+		public Builder friendships(List<Friendship> friendships) {
+			this.friendships = friendships;
+			return this;
+		}
+
+		public User build() {
+			return new User(this);
+		}
+	}
+
+	private User(Builder builder) {
+		this.setId(builder.id);
+		this.name = builder.name;
+		this.firstName = builder.firstName;
+		this.lastName = builder.lastName;
+		this.username = builder.username;
+		this.password = builder.password;
+		this.changedAttributes = builder.changedAttributes;
+		this.localeObject = builder.localeObject;
+		this.resetPasswordToken = builder.resetPasswordToken;
+		this.resetPasswordTokenCreated = builder.resetPasswordTokenCreated;
+		this.lastPassWordChangeDate = builder.lastPassWordChangeDate;
+		this.email = builder.email;
+		this.emailHash = builder.emailHash;
+		this.avatarUrl = builder.avatarUrl;
+		this.telephone = builder.telephone;
+		this.cellphone = builder.cellphone;
+		this.address = builder.address;
+		this.postCode = builder.postCode;
+		this.country = builder.country;
+		this.birthDay = builder.birthDay;
+		this.lastVisit = builder.lastVisit;
+		this.lastLogin = builder.lastLogin;
+		this.loginAttempts = builder.loginAttempts;
+		this.active = builder.active;
+		this.inactivationReason = builder.inactivationReason;
+		this.inactivationDate = builder.inactivationDate;
+		this.locale = builder.locale;
+		this.redirectUrl = builder.redirectUrl;
+		this.roles = builder.roles;
+		this.friendships = builder.friendships;
+	}
 }

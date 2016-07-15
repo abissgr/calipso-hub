@@ -80,7 +80,8 @@
         <constructor-arg value="/" />
     </bean>
     
-    
+    <!--  By defining this object as a Bean, Spring Security is exposed as SpEL expressions for creating Sp	ring Data queries.  -->
+    <bean class="org.springframework.security.data.repository.query.SecurityEvaluationContextExtension" />
     <!-- extend resthub JPA config databaseProperties -->
     <bean id="jpaProperties" parent="resthubCoreJpaProperties">
 	    <property name="sourceMap">

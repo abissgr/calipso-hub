@@ -66,7 +66,10 @@ public class AbstractControllerIT {
 					return objectMapper;
 				}
 			}));
+		// parse JSON by default
 		RestAssured.defaultParser = Parser.JSON;
+		// log request/response in errors
+		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 		RestAssured.requestSpecification = new RequestSpecBuilder()
 			.setAccept(JSON_UTF8)
 			.setContentType(JSON_UTF8)
