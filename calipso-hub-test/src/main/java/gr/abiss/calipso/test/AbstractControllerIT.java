@@ -24,6 +24,9 @@ import static org.hamcrest.Matchers.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -32,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.Constants;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -48,6 +52,8 @@ import io.restassured.specification.RequestSpecification;
 @SuppressWarnings("unused")
 public class AbstractControllerIT {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractControllerIT.class);
+			
 	protected static final String JSON_UTF8 = "application/json; charset=UTF-8";
 
 	@BeforeClass
@@ -75,13 +81,11 @@ public class AbstractControllerIT {
 			.setContentType(JSON_UTF8)
 			.build();
 		
-//		String port = System.getProperty("server.port");
-//		if (port == null) {
-//			RestAssured.port = Integer.valueOf(8080);
-//		} else {
-//			RestAssured.port = Integer.valueOf(port);
-//		}
-//
+		// pickup from the command line if given for the jetty-maven-plugin
+		String port = System.getProperty("jetty.http.port");
+		RestAssured.port = port != null ? Integer.parseInt(port) :8080;
+		
+		LOGGER.info("RestAssured.port: " + RestAssured.port);
 //		String basePath = System.getProperty("server.base");
 //		if (basePath == null) {
 //			basePath = "/rest-garage-sample/";
