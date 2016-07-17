@@ -17,6 +17,7 @@ import gr.abiss.calipso.model.entities.AbstractAuditable;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * A model representing a directional connection between two users. 
@@ -32,16 +33,19 @@ import io.swagger.annotations.ApiModel;
 public class Friendship extends AbstractAuditable<User> {
 	private static final long serialVersionUID = 1L;
 
+	@ApiModelProperty(required = true, example = "{id: '[id]'}")
 	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "request_sender", nullable=false)
 	private User requestSender;
 
+	@ApiModelProperty(required = true, example = "{id: '[id]'}")
 	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "request_recipient", nullable=false)
 	private User requestRecipient;
 
+	@ApiModelProperty(required = true, example = "{id: \"ACCEPTED\"}")
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable=false)
