@@ -67,7 +67,6 @@ public abstract class AbstractNoDeleteModelController<T extends Persistable<ID>,
 		throw new NotImplementedClientException("Method is unsupported.");
 	}
 
-	@Override
 	@ApiOperation(hidden = true, value = "Delete an uploaded file")
     @RequestMapping(value = "{subjectId}/uploads/{propertyName}/{id}", method = RequestMethod.DELETE)
     public @ResponseBody List deleteById(@PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {

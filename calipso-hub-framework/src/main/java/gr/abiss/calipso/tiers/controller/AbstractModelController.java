@@ -18,43 +18,26 @@
 package gr.abiss.calipso.tiers.controller;
 
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.imgscalr.Scalr;
 import org.resthub.common.exception.NotFoundException;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
@@ -69,25 +52,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-import gr.abiss.calipso.model.base.PartiallyUpdateable;
-import gr.abiss.calipso.model.cms.BinaryFile;
-import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.service.cms.BinaryFileService;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 import gr.abiss.calipso.tiers.service.ModelService;
-import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
+import gr.abiss.calipso.tiers.util.EntityUtil;
 import gr.abiss.calipso.uischema.model.UiSchema;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -102,21 +78,11 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@Autowired
 	protected HttpServletRequest request;
 
-	@Autowired
-	private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
 	@Override
 	@Inject
 	public void setService(S service) {
 		this.service = service;
 	}
-	
-	@Inject
-	@Qualifier("binaryFileService")
-	public void setService(BinaryFileService binaryFileService) {
-		this.binaryFileService = binaryFileService;
-	}
-	
 
 	/**
 	 * Find all resources matching the given criteria and return a paginated
@@ -135,7 +101,9 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "Search for resources (paginated).", notes = "Find all resources matching the given criteria and return a paginated collection. Besides the predefinedpaging properties (page, size, properties, direction) all serialized member names of the resource are supported as search parameters/criteria.") 
+	@ApiOperation(value = "Search for resources (paginated).", notes = "Find all resources matching the given criteria and return a paginated collection."
+			+ " Besides the predefined paging properties (page, size, properties, direction) all serialized member names "
+			+ "of the resource are supported as search criteria in the form of HTTP URL parameters.") 
 	public Page<T> findPaginated(
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
@@ -278,25 +246,24 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 			
 		}
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@RequestMapping(value = "{id}", method = RequestMethod.PATCH)
+    @ResponseBody
+    @ApiOperation(value = "Partially update a resource", notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
+	public T updatePartial(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id, @RequestBody T resource) {
+		// make sure entity is set to support partial updates
+		T persisted = this.service.findById(id);
+		// copy non-null properties to persisted
+		BeanUtils.copyProperties(resource, persisted, EntityUtil.getNullPropertyNames(resource));
+		resource = persisted;
+		// FW to normal update
+		return this.update(id, resource);
+	}
 	
-	protected void copyBeanProperties(
-		    final Object source,
-		    final Object target,
-		    final Iterable<String> properties){
-
-		    final BeanWrapper src = new BeanWrapperImpl(source);
-		    final BeanWrapper trg = new BeanWrapperImpl(target);
-
-		    for(final String propertyName : properties){
-		        trg.setPropertyValue(
-		            propertyName,
-		            src.getPropertyValue(propertyName)
-		        );
-		    }
-
-		}
-
-
     /**
      * {@inheritDoc}
      */
@@ -307,15 +274,6 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
 	public T update(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id, @RequestBody T resource) {
 		applyCurrentPrincipal(resource);
-		// handle partial updates
-		if(PartiallyUpdateable.class.isAssignableFrom(resource.getClass())){
-			List<String> changedAttributes = ((PartiallyUpdateable) resource ).getChangedAttributes();
-			if(CollectionUtils.isNotEmpty(changedAttributes)){
-				T persisted = this.service.findById(id);
-				this.copyBeanProperties(resource, persisted, changedAttributes);
-				resource = persisted;
-			}
-		}
 		return super.update(id, resource);
 	}
 
@@ -361,30 +319,6 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		return super.findByIds(ids);
 	}
 
-	/**
-     * Obtain a newly created resource instance.
-     * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
-     */
-    @RequestMapping(value = "new", method = RequestMethod.GET)
-    @ResponseBody
-    @ApiOperation(value = "Obtain new transient instance, including UI metadata", notes = "Instantiates and returns a new reszource object")
-	public T getSchemaWrapperInstance() {
-    	T resource = null;
-    	try {
-			resource = this.service.getDomainClass().newInstance();
-//			
-//			// TODO: update to use cases, fields etc. format
-//			if(FormSchemaAware.class.isAssignableFrom(resource.getClass())){
-//				FormSchema.setToInstance(((FormSchemaAware) resource));
-//			}
-		} catch (Exception e) {
-			throw new RuntimeException("Failed creating new resource instance", e);
-		}
-    	return resource;
-	}
-
-
-
     /**
      * Delete a resource by its identifier. 
      * Return No Content http status code if the request has been correctly processed
@@ -422,177 +356,5 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		return this.getSchema();
 	}
 
-	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
-	@ResponseBody
-    @ApiOperation(value = "Add metadatum", notes = "Add or updated a resource metadatum")
-	public void addMetadatum(@PathVariable ID subjectId,
-			@RequestBody MetadatumDTO dto) {
-		service.addMetadatum(subjectId, dto);
-	}
 
-	@RequestMapping(value = "{subjectId}/metadata/{predicate}", method = RequestMethod.DELETE)
-	@ResponseBody
-    @ApiOperation(value = "Remove metadatum", notes = "Remove a resource metadatum if it exists")
-	public void removeMetadatum(@PathVariable ID subjectId,
-			@PathVariable String predicate) {
-		service.removeMetadatum(subjectId, predicate);
-	}
-	
-    @RequestMapping(value = "{subjectId}/uploads/{propertyName}", method = RequestMethod.GET)
-    @ApiOperation(value = "Get file uploads by property")
-    public @ResponseBody List<BinaryFile> getUploadsByProperty(@PathVariable ID subjectId, @PathVariable String propertyName) {
-        LOGGER.info("uploadGet called");
-        List<BinaryFile> uploads = null;
-        // attach file
-        Field fileField = GenericSpecifications.getField(this.service.getDomainClass(), propertyName);
-        Class clazz = fileField.getType();
-        if(BinaryFile.class.isAssignableFrom(clazz)){
-        	uploads = this.service.getUploadsForProperty(subjectId, propertyName);
-        }
-        return uploads;
-    }
-
-    @RequestMapping(value = "{subjectId}/uploads/{propertyName}/thumbs/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "Get file thumb/preview image of a file upload	")
-    public void thumbnail(HttpServletResponse response, @PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
-		Configuration config = ConfigurationFactory.getConfiguration();
-		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
-        BinaryFile file = binaryFileService.findById(id);
-        File fileFile = new File(fileUploadDirectory + file.getParentPath() + "/"+file.getThumbnailFilename());
-        response.setContentType(file.getContentType());
-        response.setContentLength(file.getThumbnailSize().intValue());
-        try {
-            InputStream is = new FileInputStream(fileFile);
-            IOUtils.copy(is, response.getOutputStream());
-        } catch(IOException e) {
-            LOGGER.error("Could not show thumbnail "+id, e);
-        }
-    }
-
-    @ApiOperation(value = "Get an uploaded file")
-    @RequestMapping(value = "{subjectId}/uploads/{propertyName}/files/{id}", method = RequestMethod.GET)
-    public void getFile(HttpServletResponse response, @PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
-		Configuration config = ConfigurationFactory.getConfiguration();
-		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
-        BinaryFile file = binaryFileService.findById(id);
-        File fileFile = new File(fileUploadDirectory + file.getParentPath() + "/"+file.getNewFilename());
-        response.setContentType(file.getContentType());
-        response.setContentLength(file.getSize().intValue());
-        try {
-            InputStream is = new FileInputStream(fileFile);
-            IOUtils.copy(is, response.getOutputStream());
-        } catch(IOException e) {
-            LOGGER.error("Could not show picture "+id, e);
-        }
-    }
-    
-
-    
-
-    @ApiOperation(value = "Delete an uploaded file")
-    @RequestMapping(value = "{subjectId}/uploads/{propertyName}/{id}", method = RequestMethod.DELETE)
-    public @ResponseBody List deleteById(@PathVariable String subjectId, @PathVariable String propertyName, @PathVariable String id) {
-		Configuration config = ConfigurationFactory.getConfiguration();
-		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
-        BinaryFile file = binaryFileService.findById(id);
-        File fileFile = new File(fileUploadDirectory+"/"+file.getNewFilename());
-        fileFile.delete();
-        File thumbnailFile = new File(fileUploadDirectory+"/"+file.getThumbnailFilename());
-        thumbnailFile.delete();
-        binaryFileService.delete(file);
-        List<Map<String, Object>> results = new ArrayList();
-        Map<String, Object> success = new HashMap();
-        success.put("success", true);
-        results.add(success);
-        return results;
-    }
-
-    @ApiOperation(value = "Add a file uploads to property")
-    @RequestMapping(value = "{subjectId}/uploads/{propertyName}", method = {RequestMethod.POST, RequestMethod.PUT}, consumes = {})
-    public @ResponseBody BinaryFile  addUploadsToProperty( @PathVariable ID subjectId, @PathVariable String propertyName, MultipartHttpServletRequest request, HttpServletResponse response) {
-        LOGGER.info("uploadPost called");
-
-		Configuration config = ConfigurationFactory.getConfiguration();
-		String fileUploadDirectory = config.getString(ConfigurationFactory.FILES_DIR);
-		String baseUrl = config.getString("calipso.baseurl");
-		
-        Iterator<String> itr = request.getFileNames();
-        MultipartFile mpf;
-        BinaryFile bf = new BinaryFile();
-        try{
-        	 if (itr.hasNext()){
-	        
-	        
-	            mpf = request.getFile(itr.next());
-	            LOGGER.info("Uploading {}", mpf.getOriginalFilename());
-	            
-	
-	            bf.setName(mpf.getOriginalFilename());
-	            bf.setFileNameExtention(mpf.getOriginalFilename().substring(mpf.getOriginalFilename().lastIndexOf(".")+1));
-	            
-	            bf.setContentType(mpf.getContentType());
-	            bf.setSize(mpf.getSize());
-	            
-	            // request targets specific path?
-	            StringBuffer uploadsPath = new StringBuffer('/')
-	            	.append(this.service.getDomainClass().getDeclaredField("PATH_FRAGMENT").get(String.class))
-	            	.append('/')
-	            	.append(subjectId)
-	            	.append("/uploads/")
-	            	.append(propertyName);
-	            bf.setParentPath(uploadsPath.toString());
-	            LOGGER.info("Saving image entity with path: " + bf.getParentPath());
-	            bf = binaryFileService.create(bf);
-	
-	            LOGGER.info("file name: {}", bf.getNewFilename());
-	            bf = binaryFileService.findById(bf.getId());
-	            LOGGER.info("file name: {}", bf.getNewFilename());
-	
-	            File storageDirectory = new File(fileUploadDirectory + bf.getParentPath());
-	
-	            if(!storageDirectory.exists()){
-	            	storageDirectory.mkdirs();
-	            }
-	
-	            LOGGER.info("storageDirectory: {}", storageDirectory.getAbsolutePath());
-	            LOGGER.info("file name: {}", bf.getNewFilename());
-	            
-
-                File newFile = new File(storageDirectory, bf.getNewFilename());
-                newFile.createNewFile();
-                LOGGER.info("newFile path: {}", newFile.getAbsolutePath());
-                Files.copy(mpf.getInputStream(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-                BufferedImage thumbnail = Scalr.resize(ImageIO.read(newFile), 290);
-                File thumbnailFile = new File(storageDirectory, bf.getThumbnailFilename());
-                ImageIO.write(thumbnail, "png", thumbnailFile);
-                bf.setThumbnailSize(thumbnailFile.length());
-                
-                bf = binaryFileService.update(bf);
-                
-                // attach file
-                // TODO: add/update to collection
-                Field fileField = GenericSpecifications.getField(this.service.getDomainClass(), propertyName);
-                Class clazz = fileField.getType();
-                if(BinaryFile.class.isAssignableFrom(clazz)){
-                	T target = this.service.findById(subjectId);
-                	BeanUtils.setProperty(target, propertyName, bf);
-                	this.service.update(target);
-                }
-                
-                bf.setUrl(baseUrl+"/api/rest/" + bf.getParentPath() + "/files/" + bf.getId());
-                bf.setThumbnailUrl(baseUrl+"/api/rest/" + bf.getParentPath() + "/thumbs/" + bf.getId());
-                bf.setDeleteUrl(baseUrl+"/api/rest/" + bf.getParentPath() + "/" + bf.getId());
-                bf.setDeleteType("DELETE");
-                bf.addInitialPreview("<img src=\"" + bf.getThumbnailUrl() + "\" class=\"file-preview-image\" />");
-                
-            } 
-
-        }catch(Exception e) {
-            LOGGER.error("Could not upload file(s) ", e);
-		}
-
-        return bf;
-    }
-    
 }

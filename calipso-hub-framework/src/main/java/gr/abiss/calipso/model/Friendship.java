@@ -1,7 +1,5 @@
 package gr.abiss.calipso.model;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,7 +10,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.base.PartiallyUpdateable;
 import gr.abiss.calipso.model.entities.AbstractAuditable;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.tiers.annotation.ModelResource;

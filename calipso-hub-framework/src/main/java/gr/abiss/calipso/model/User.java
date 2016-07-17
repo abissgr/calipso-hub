@@ -17,7 +17,7 @@
  */
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.model.base.PartiallyUpdateable;
+// TODO:
 import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.geography.Country;
@@ -73,7 +73,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
-		implements LocalUser, ReportDataSetSubject, PartiallyUpdateable {
+		implements LocalUser, ReportDataSetSubject {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 

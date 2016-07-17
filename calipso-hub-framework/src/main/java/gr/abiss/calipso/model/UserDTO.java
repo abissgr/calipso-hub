@@ -17,48 +17,11 @@
  */
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.model.base.PartiallyUpdateable;
-import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
-import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
-import gr.abiss.calipso.model.metadata.UserMetadatum;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
-import gr.abiss.calipso.uischema.annotation.FormSchemaEntry;
-import gr.abiss.calipso.uischema.annotation.FormSchemas;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.utils.MD5Utils;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.annotations.Formula;
-import org.springframework.security.core.GrantedAuthority;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 public class UserDTO implements Serializable {

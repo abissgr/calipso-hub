@@ -33,7 +33,7 @@ import gr.abiss.calipso.tiers.service.ModelService;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * Base class for read-only model controllers, i.e. with no support for HTTP PUT or DELETE.
+ * Base class for read-only model controllers, i.e. with no support for HTTP PUT, PATCH or DELETE.
  */
 public abstract class AbstractReadOnlyModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends AbstractNoDeleteModelController<T, ID, S> {
@@ -54,6 +54,14 @@ public abstract class AbstractReadOnlyModelController<T extends Persistable<ID>,
 	@ResponseBody
 	@ApiOperation(hidden = true, value = "Update a resource (unsupported)")
 	public T update(ID id, T resource) {
+		throw new NotImplementedClientException("Method is unsupported.");
+	}
+
+	@Override
+	@RequestMapping(value = "{id}", method = RequestMethod.PATCH)
+	@ResponseBody
+	@ApiOperation(hidden = true, value = "Perform a partial update (unsupported)")
+	public T updatePartial(ID id, T resource) {
 		throw new NotImplementedClientException("Method is unsupported.");
 	}
 
