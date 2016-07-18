@@ -57,35 +57,19 @@ public class AbstractControllerIT {
 	protected static final String JSON_UTF8 = "application/json; charset=UTF-8";
 
 	@BeforeClass
-	public static void setup() {
-
-		// configure our object mapper
-		RestAssured.config = RestAssuredConfig.config().objectMapperConfig(
-			new ObjectMapperConfig().jackson2ObjectMapperFactory(new Jackson2ObjectMapperFactory() {
-				@Override
-				public ObjectMapper create(Class aClass, String s) {
-					ObjectMapper objectMapper = new ObjectMapper();
-					// support joda classes<->JSON
-					objectMapper.registerModule(new JodaModule());
-					// ignore unknown properties
-					objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-					return objectMapper;
-				}
-			}));
+	public void setup() {
+		
 		// parse JSON by default
 		RestAssured.defaultParser = Parser.JSON;
 		// log request/response in errors
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-		RestAssured.requestSpecification = new RequestSpecBuilder()
-			.setAccept(JSON_UTF8)
-			.setContentType(JSON_UTF8)
-			.build();
+		
 		
 		// pickup from the command line if given for the jetty-maven-plugin
 		String port = System.getProperty("jetty.http.port");
 		RestAssured.port = port != null ? Integer.parseInt(port) :8080;
 		
-		LOGGER.info("RestAssured.port: " + RestAssured.port);
+		// TODO:
 //		String basePath = System.getProperty("server.base");
 //		if (basePath == null) {
 //			basePath = "/rest-garage-sample/";
@@ -97,7 +81,30 @@ public class AbstractControllerIT {
 //			baseHost = "http://localhost";
 //		}
 //		RestAssured.baseURI = baseHost;
+		
+		// configure our object mapper
+		RestAssured.config = RestAssuredConfig.config().objectMapperConfig(
+			// config object mapper
+			new ObjectMapperConfig().jackson2ObjectMapperFactory(new Jackson2ObjectMapperFactory() {
+				@Override
+				public ObjectMapper create(Class aClass, String s) {
+					ObjectMapper objectMapper = new ObjectMapper();
+					// support joda classes<->JSON
+					objectMapper.registerModule(new JodaModule());
+					// ignore unknown properties
+					objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+					return objectMapper;
+				}
+			}));
+		
 
+		// Only initialize the RequestSpecification AFTER configuring the static configuration
+		// see https://github.com/rest-assured/rest-assured/issues/370#issuecomment-123192038
+		RestAssured.requestSpecification = new RequestSpecBuilder()
+			.setAccept(JSON_UTF8)
+			.setContentType(JSON_UTF8)
+//			.setPort(RestAssured.port)
+			.build();
 	}
 
 	/** 
@@ -114,13 +121,13 @@ public class AbstractControllerIT {
 		loginSubmission.put("password", password);
 		
 		// attempt login and test for a proper result
-		Response rs = given().//log().all().
+		Response rs = given().spec(this.getRequestSpec(null)).log().all().
 		 	body(loginSubmission).
 		 when().
 			post("/calipso/apiauth/userDetails");
 		
 		// validate login
-		rs.then().//log().all().
+		rs.then().log().all().
 			assertThat().
 				statusCode(200).
 				content("id", notNullValue());
@@ -129,14 +136,19 @@ public class AbstractControllerIT {
 		lctx.ssoToken = rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME);
 		lctx.userId = rs.jsonPath().getString("id");
 		
-		// extend the global spec we have already set to add the SSO token
-		RequestSpecification requestSpec = new RequestSpecBuilder()
-			.addRequestSpecification(RestAssured.requestSpecification)
-			.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, lctx.ssoToken)
-			.build();
+		RequestSpecification requestSpec = getRequestSpec(lctx.ssoToken);
 		lctx.requestSpec = requestSpec;
 		
 		return lctx;
+	}
+
+	protected RequestSpecification getRequestSpec(String ssoToken) {
+		// extend the global spec we have already set to add the SSO token
+		RequestSpecification requestSpec = new RequestSpecBuilder()
+			.addRequestSpecification(RestAssured.requestSpecification)
+			.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, ssoToken)
+			.build();
+		return requestSpec;
 	}
 	
 	protected User getUserByUsernameOrEmail(String userNameOrEmail) {
