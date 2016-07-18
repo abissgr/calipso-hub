@@ -129,10 +129,12 @@ public class Book extends AbstractAuditable<User> {
 	</pre>
 	<p>
 	Update the book matchign "id" using the request body and return the result in the response. 
-	Partial updates are easily supported, just mark your Java entity class using
-	<code>implements PartiallyUpdateable</code>
-	to support partial updates. No actual implementation is needed.
-	</p>
+	<h2 id="restful-service-urls-update">Partial Update</h>
+	<pre>
+		<code>PATCH http://localhost:8080/calipso/books/id </code>
+	</pre>
+	<p>
+	Update the book matchign "id" using non-null attributes of the request body and return the result in the response. 
 	
 	<h2 id="restful-service-urls-delete">Delete</h>
 	<pre>
