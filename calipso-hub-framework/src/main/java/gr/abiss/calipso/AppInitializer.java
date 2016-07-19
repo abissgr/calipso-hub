@@ -28,6 +28,7 @@ import gr.abiss.calipso.notification.model.NotificationType;
 import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.repository.geography.ContinentRepository;
 import gr.abiss.calipso.repository.geography.CountryRepository;
+import gr.abiss.calipso.service.EmailService;
 //import gr.abiss.calipso.service.HostService;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
@@ -47,6 +48,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.resthub.common.util.PostInitialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +71,10 @@ public class AppInitializer {
 	@Inject
 	@Named("roleService")
 	private RoleService roleService;
+	
+	@Inject
+	@Named("emailService")
+	private EmailService emailService;
 
 	@Inject
 	@Named("baseNotificationService")
@@ -174,6 +180,16 @@ public class AppInitializer {
 			LOGGER.info("Admin has " + this.baseNotificationService.countUnseen(u0) + " notifications");
 
 		}
+		
+		// send test email?
+		if(config.getBoolean(ConfigurationFactory.TEST_EMAIL_ENABLE, false)){
+			String testEmailUsername = config.getString(ConfigurationFactory.TEST_EMAIL_USER, "system");
+			if(StringUtils.isNotBlank(testEmailUsername)){
+				User u = this.userService.findByUserNameOrEmail(testEmailUsername);
+				this.emailService.sendTest(u);
+			}
+		}
+		
 
 	}
 

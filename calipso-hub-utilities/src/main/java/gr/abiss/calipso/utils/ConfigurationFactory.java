@@ -51,6 +51,9 @@ public class ConfigurationFactory {
 
 	public static final String LICENSE_NAME = "calipso.license.name";
 	public static final String LICENSE_URL = "calipso.license.url";
+
+	public static final String TEST_EMAIL_ENABLE = "mail.test.enable";
+	public static final String TEST_EMAIL_USER = "mail.test.user";
 	
 	private static CompositeConfiguration config = new CompositeConfiguration();
 	

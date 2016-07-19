@@ -32,6 +32,7 @@ define(
 			'_=_' : 'toHome',
 			'#_=_' : 'toHome',
 			'home' : 'home',
+			'register' : 'register',
 			'logout' : 'logout',
 			'myProfile' : 'myProfile',
 

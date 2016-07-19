@@ -2,9 +2,7 @@
 <projectDescription>
   <name>calipso-hub-test</name>
   <comment>A full stack, high level framework for lazy application hackers. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
-  <projects>
-    <project>calipso-hub-utilities</project>
-  </projects>
+  <projects/>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>

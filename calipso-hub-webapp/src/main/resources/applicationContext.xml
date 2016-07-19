@@ -147,18 +147,7 @@
 		<property name="useCodeAsDefaultMessage" value="true" />
 	</bean>
 
-	<!-- Email Sender -->
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="host" value="${mail.server.host}" />
-		<property name="port" value="${mail.server.port}" />
-		<property name="protocol" value="${mail.server.protocol}" />
-		<!--property name="username" value="${mail.server.username}" /> <property 
-			name="password" value="${mail.server.password}" / -->
-		<property name="javaMailProperties">
-			<util:properties location="classpath:javamail.properties" />
-		</property>
-	</bean>
-	
+
 	<!-- JSP views setup -->
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -169,6 +158,7 @@
 	</bean>
 
 	<!-- imports -->
+	<import resource="applicationContext-email.xml" />
 	<import resource="applicationContext-security.xml" />
     <import resource="applicationContext-scheduler.xml" />
     <!-- import resource="applicationContext-acl.xml" /-->

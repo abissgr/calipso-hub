@@ -87,7 +87,6 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		User user = null;
 		try {
 			user = this.repository.findByCredentials(userNameOrEmail, password);
-			LOGGER.error("findByCredentials: matched user: "+user);
 			if (user != null) {
 				if (!CollectionUtils.isEmpty(metadata)) {
 					List<Metadatum> saved = this.repository.addMetadata(user.getId(), metadata);

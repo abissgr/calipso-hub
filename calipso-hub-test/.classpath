@@ -24,9 +24,11 @@
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/servlet/jstl/1.1.2/jstl-1.1.2.jar" sourcepath="M2_REPO/javax/servlet/jstl/1.1.2/jstl-1.1.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/mail/mailapi/1.4.3/mailapi-1.4.3.jar" sourcepath="M2_REPO/javax/mail/mailapi/1.4.3/mailapi-1.4.3-sources.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="src" path="/calipso-hub-utilities"/>
+  <classpathentry kind="var" path="M2_REPO/gr/abiss/calipso/calipso-hub-framework/2.0-SNAPSHOT/calipso-hub-framework-2.0-SNAPSHOT.jar" sourcepath="M2_REPO/gr/abiss/calipso/calipso-hub-framework/2.0-SNAPSHOT/calipso-hub-framework-2.0-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/gr/abiss/calipso/calipso-hub-utilities/2.0-SNAPSHOT/calipso-hub-utilities-2.0-SNAPSHOT.jar" sourcepath="M2_REPO/gr/abiss/calipso/calipso-hub-utilities/2.0-SNAPSHOT/calipso-hub-utilities-2.0-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar" sourcepath="M2_REPO/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4-javadoc.jar!/" name="javadoc_location"/>
@@ -37,9 +39,9 @@
       <attribute value="jar:file:/home/manos/.m2/repository/commons-beanutils/commons-beanutils/1.9.1/commons-beanutils-1.9.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/manos/.m2/repository/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar" sourcepath="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar">
@@ -110,9 +112,9 @@
       <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/data/spring-data-commons/1.10.1.RELEASE/spring-data-commons-1.10.1.RELEASE-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.18/slf4j-api-1.7.18.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.7.18/slf4j-api-1.7.18-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/slf4j/slf4j-api/1.7.18/slf4j-api-1.7.18-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.1/jcl-over-slf4j-1.7.1.jar" sourcepath="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.1/jcl-over-slf4j-1.7.1-sources.jar">
@@ -315,6 +317,11 @@
   <classpathentry kind="var" path="M2_REPO/org/springframework/security/spring-security-acl/4.1.0.RELEASE/spring-security-acl-4.1.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/security/spring-security-acl/4.1.0.RELEASE/spring-security-acl-4.1.0.RELEASE-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/security/spring-security-acl/4.1.0.RELEASE/spring-security-acl-4.1.0.RELEASE-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/security/spring-security-data/4.1.0.RELEASE/spring-security-data-4.1.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/security/spring-security-data/4.1.0.RELEASE/spring-security-data-4.1.0.RELEASE-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/security/spring-security-data/4.1.0.RELEASE/spring-security-data-4.1.0.RELEASE-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache/2.7.4/ehcache-2.7.4.jar" sourcepath="M2_REPO/net/sf/ehcache/ehcache/2.7.4/ehcache-2.7.4-sources.jar">
@@ -604,6 +611,7 @@
       <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/spring-test/4.2.6.RELEASE/spring-test-4.2.6.RELEASE-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2.jar" sourcepath="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/io/rest-assured/rest-assured/3.0.0/rest-assured-3.0.0.jar" sourcepath="M2_REPO/io/rest-assured/rest-assured/3.0.0/rest-assured-3.0.0-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/io/rest-assured/rest-assured/3.0.0/rest-assured-3.0.0-javadoc.jar!/" name="javadoc_location"/>
