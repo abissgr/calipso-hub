@@ -272,7 +272,7 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
     @ResponseBody
     @ApiOperation(value = "Update a resource")
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
-	public T update(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id, @RequestBody T resource) {
+	public T update(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id, @RequestBody T resource) {
 		applyCurrentPrincipal(resource);
 		return super.update(id, resource);
 	}

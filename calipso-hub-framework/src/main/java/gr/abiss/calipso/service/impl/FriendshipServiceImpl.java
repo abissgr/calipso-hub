@@ -151,7 +151,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();
 		// if not admin
-		if(!userDetails.isAdmin()){
+		if(userDetails != null && !userDetails.isAdmin()){
 			// make sure only a users inbox or outbox are returned
 			Map<String, String[]> params = ((ParameterMapBackedPageRequest) pageRequest).getParameterMap();
 			boolean hasPermission = false;
