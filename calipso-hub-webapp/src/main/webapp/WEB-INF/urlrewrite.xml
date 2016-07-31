@@ -16,10 +16,10 @@
     </rule>
     
     <!-- TODO: remove -->
-    <rule>
-        <from>^/api/(.*)$</from>
-        <set type="request" name="Accept">application/json</set>
-    </rule>
+<!--     <rule> -->
+<!--         <from>^/api/(.*)$</from> -->
+<!--         <set type="content-type">application/json</set> -->
+<!--     </rule> -->
     
     <!-- client is single page app -->
     <rule>

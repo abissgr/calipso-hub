@@ -161,6 +161,7 @@
 	<import resource="applicationContext-email.xml" />
 	<import resource="applicationContext-security.xml" />
     <import resource="applicationContext-scheduler.xml" />
+    <import resource="applicationContext-fs.xml" />
     <!-- import resource="applicationContext-acl.xml" /-->
 	<import resource="applicationContext-social.xml" />
 	<!--import resource="applicationContext-swagger.xml" /-->

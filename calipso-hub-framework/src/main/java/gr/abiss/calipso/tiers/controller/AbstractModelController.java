@@ -72,8 +72,6 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelController.class);
- 
-	private BinaryFileService binaryFileService;
 	
 	@Autowired
 	protected HttpServletRequest request;
@@ -82,6 +80,15 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@Inject
 	public void setService(S service) {
 		this.service = service;
+	}
+	
+
+	/**
+	 * @see gr.abiss.calipso.tiers.controller.ModelController#getService()
+	 */
+	@Override
+	public S getService(){
+		return this.service;
 	}
 
 	/**

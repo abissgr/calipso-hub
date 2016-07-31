@@ -60,7 +60,7 @@ public class AbstractControllerIT {
 	public void setup() {
 
 		// parse JSON by default
-		RestAssured.defaultParser = Parser.JSON;
+//		RestAssured.defaultParser = Parser.JSON;
 		// log request/response in errors
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
@@ -100,9 +100,9 @@ public class AbstractControllerIT {
 		// configuration
 		// see
 		// https://github.com/rest-assured/rest-assured/issues/370#issuecomment-123192038
-		RestAssured.requestSpecification = new RequestSpecBuilder().setAccept(JSON_UTF8).setContentType(JSON_UTF8)
+//		RestAssured.requestSpecification = new RequestSpecBuilder()
 				// .setPort(RestAssured.port)
-				.build();
+//				.build();
 	}
 
 	/**
@@ -120,7 +120,10 @@ public class AbstractControllerIT {
 		loginSubmission.put("password", password);
 
 		// attempt login and test for a proper result
-		Response rs = given().body(loginSubmission).when().post("/calipso/apiauth/userDetails");
+		Response rs = given()
+				.accept(JSON_UTF8)
+				.contentType(JSON_UTF8)
+				.body(loginSubmission).when().post("/calipso/apiauth/userDetails");
 
 		// validate login
 		rs.then().assertThat().statusCode(200).content("id", notNullValue());
@@ -138,7 +141,7 @@ public class AbstractControllerIT {
 	protected RequestSpecification getRequestSpec(String ssoToken) {
 		// extend the global spec we have already set to add the SSO token
 		RequestSpecification requestSpec = new RequestSpecBuilder()
-				.addRequestSpecification(RestAssured.requestSpecification)
+				.setAccept(JSON_UTF8).setContentType(JSON_UTF8)
 				.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, ssoToken).build();
 		return requestSpec;
 	}

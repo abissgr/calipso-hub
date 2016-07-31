@@ -15,17 +15,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.tiers.controller;
+package gr.abiss.calipso.service;
 
-import gr.abiss.calipso.tiers.service.ModelService;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.Serializable;
+public interface FilePersistenceService {
 
-import org.slf4j.Logger;
-import org.springframework.data.domain.Persistable;
 
-public interface ModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>> {
-	
-	public S getService();
+	/**
+	 * The method saves the given multipart file to the path specified, ignoring the original file name.
+	 * @param multipartFile
+	 * @param path
+	 * @return the UR: for the saved file
+	 */
+	public String saveFile(MultipartFile multipartFile, String path);
 	
 }

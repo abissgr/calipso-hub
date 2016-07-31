@@ -16,5 +16,11 @@
         http://www.springframework.org/schema/tx        http://www.springframework.org/schema/tx/spring-tx.xs
         http://www.springframework.org/schema/mvc       http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd">
+        
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- setting maximum upload size -->
+		<property name="maxUploadSize" value="100000000" />
+<!-- 		"maxUploadSize", "maxInMemorySize" and "defaultEncoding" -->
+	</bean>
 
 </beans>

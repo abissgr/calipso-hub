@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestRequestNormalizerFilter.class);
 	private static final String X_HTTP_METHOD_OVERRIDE = "X-HTTP-Method-Override";
+	private static final String JSON_UTF8 = "application/json; charset=UTF-8";
 
 	/** Default method parameter: {@code _method} */
 	public static final String DEFAULT_METHOD_PARAM = "_method";
@@ -70,13 +71,12 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request,
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		
-		String requestMethodOverride = getMethodOverride(httpRequest);
-		String authToken = getSecurityToken(httpRequest);
-
+		String requestMethodOverride = getMethodOverride(request);
+		String authToken = getSecurityToken(request);
+		response.setContentType(JSON_UTF8);
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("doFilterInternal, path: " + httpRequest.getContextPath() + ", method override: " + requestMethodOverride  + ", authToken: " + authToken );
+			LOGGER.debug("doFilterInternal, path: " + request.getContextPath() + ", method override: " + requestMethodOverride  + ", authToken: " + authToken );
 		}
 		if (!StringUtils.isEmpty(requestMethodOverride) || !StringUtils.isEmpty(authToken) ) {
 			HttpServletRequest wrapper = new RestRequestNormalizerRequestWrapper(request, requestMethodOverride, authToken);
@@ -84,6 +84,7 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 		} else {
 			filterChain.doFilter(request, response);
 		}
+		
 	}
 	
 	protected String getSecurityToken(HttpServletRequest httpRequest) {

@@ -82,3 +82,8 @@ build.linkedin.consumerKey=
 build.linkedin.consumerSecret=
 build.google.consumerKey=
 build.google.consumerSecret=
+
+# AWS S3
+build.aws_access_key_id=
+build.aws_secret_access_key=
+build.aws_namecard_bucket=

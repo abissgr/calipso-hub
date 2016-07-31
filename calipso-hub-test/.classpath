@@ -27,8 +27,8 @@
   <classpathentry kind="var" path="M2_REPO/javax/servlet/jstl/1.1.2/jstl-1.1.2.jar" sourcepath="M2_REPO/javax/servlet/jstl/1.1.2/jstl-1.1.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/mail/mailapi/1.4.3/mailapi-1.4.3.jar" sourcepath="M2_REPO/javax/mail/mailapi/1.4.3/mailapi-1.4.3-sources.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="var" path="M2_REPO/gr/abiss/calipso/calipso-hub-framework/2.0-SNAPSHOT/calipso-hub-framework-2.0-SNAPSHOT.jar" sourcepath="M2_REPO/gr/abiss/calipso/calipso-hub-framework/2.0-SNAPSHOT/calipso-hub-framework-2.0-SNAPSHOT-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/gr/abiss/calipso/calipso-hub-utilities/2.0-SNAPSHOT/calipso-hub-utilities-2.0-SNAPSHOT.jar" sourcepath="M2_REPO/gr/abiss/calipso/calipso-hub-utilities/2.0-SNAPSHOT/calipso-hub-utilities-2.0-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="src" path="/calipso-hub-framework"/>
+  <classpathentry kind="src" path="/calipso-hub-utilities"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar" sourcepath="M2_REPO/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4-javadoc.jar!/" name="javadoc_location"/>
@@ -609,6 +609,26 @@
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/4.2.6.RELEASE/spring-test-4.2.6.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-test/4.2.6.RELEASE/spring-test-4.2.6.RELEASE-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/spring-test/4.2.6.RELEASE/spring-test-4.2.6.RELEASE-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-s3/1.11.21/aws-java-sdk-s3-1.11.21.jar" sourcepath="M2_REPO/com/amazonaws/aws-java-sdk-s3/1.11.21/aws-java-sdk-s3-1.11.21-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/com/amazonaws/aws-java-sdk-s3/1.11.21/aws-java-sdk-s3-1.11.21-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-kms/1.11.21/aws-java-sdk-kms-1.11.21.jar" sourcepath="M2_REPO/com/amazonaws/aws-java-sdk-kms/1.11.21/aws-java-sdk-kms-1.11.21-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/com/amazonaws/aws-java-sdk-kms/1.11.21/aws-java-sdk-kms-1.11.21-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk-core/1.11.21/aws-java-sdk-core-1.11.21.jar" sourcepath="M2_REPO/com/amazonaws/aws-java-sdk-core/1.11.21/aws-java-sdk-core-1.11.21-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/com/amazonaws/aws-java-sdk-core/1.11.21/aws-java-sdk-core-1.11.21-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/dataformat/jackson-dataformat-cbor/2.6.6/jackson-dataformat-cbor-2.6.6.jar" sourcepath="M2_REPO/com/fasterxml/jackson/dataformat/jackson-dataformat-cbor/2.6.6/jackson-dataformat-cbor-2.6.6-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-cbor/2.6.6/jackson-dataformat-cbor-2.6.6-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2.jar" sourcepath="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2-sources.jar"/>
