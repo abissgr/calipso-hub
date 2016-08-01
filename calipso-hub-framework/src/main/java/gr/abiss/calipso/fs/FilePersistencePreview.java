@@ -15,19 +15,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.service;
+package gr.abiss.calipso.fs;
 
-import org.springframework.web.multipart.MultipartFile;
+import java.lang.annotation.Repeatable;
 
-public interface FilePersistenceService {
+/**
+ * Configure thumbs or other preview generation
+ */
+@Repeatable(FilePersistencePreviews.class)
+public @interface FilePersistencePreview
+{
 
+    /**
+     *  Maximum width in pixels (images only)
+     */
+    int maxWidth();
+    /**
+     *  Maximum width in pixels (images only)
+     */
+    int maxHeight();
+    /**
+     * (Optional) Preserve ration when scaling (images only)
+     */
+    boolean preserveRatio() default true;
+   
 
-	/**
-	 * The method saves the given multipart file to the path specified, ignoring the original file name.
-	 * @param multipartFile
-	 * @param path
-	 * @return the UR: for the saved file
-	 */
-	public String saveFile(MultipartFile multipartFile, String path);
-	
 }

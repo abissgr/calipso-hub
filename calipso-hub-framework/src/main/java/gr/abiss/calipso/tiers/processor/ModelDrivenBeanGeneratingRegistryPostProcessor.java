@@ -74,13 +74,13 @@ import org.springframework.web.bind.annotation.RestController;
  * {@link javax.persistence.ModelResource} or
  * {@link gr.abiss.calipso.tiers.annotation.ModelRelatedResource}.
  */
-public class ModelDrivenBeansGenerator implements BeanDefinitionRegistryPostProcessor {
+public class ModelDrivenBeanGeneratingRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ModelDrivenBeansGenerator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModelDrivenBeanGeneratingRegistryPostProcessor.class);
 
 	private Map<Class<?>, ModelContext> entityModelContextsMap = new HashMap<Class<?>, ModelContext>();
 
-	public ModelDrivenBeansGenerator() {
+	public ModelDrivenBeanGeneratingRegistryPostProcessor() {
 
 	}
 

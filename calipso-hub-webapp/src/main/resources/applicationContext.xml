@@ -31,8 +31,12 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
     
+    <!-- Setup default file storage adapter -->
+    <bean class="gr.abiss.calipso.fs.FilePersistenceConfigPostProcessor">
+    </bean>
+    
     <!-- Generate controllers, services and repositories for entities with @ModelResource -->
-    <bean id="entityPostProcessor" class="gr.abiss.calipso.tiers.processor.ModelDrivenBeansGenerator" />
+    <bean id="entityPostProcessor" class="gr.abiss.calipso.tiers.processor.ModelDrivenBeanGeneratingRegistryPostProcessor" />
     
     <!-- override resthub's MapperFeature.DEFAULT_VIEW_INCLUSION config -->
     <bean id="jsonObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
@@ -161,7 +165,6 @@
 	<import resource="applicationContext-email.xml" />
 	<import resource="applicationContext-security.xml" />
     <import resource="applicationContext-scheduler.xml" />
-    <import resource="applicationContext-fs.xml" />
     <!-- import resource="applicationContext-acl.xml" /-->
 	<import resource="applicationContext-social.xml" />
 	<!--import resource="applicationContext-swagger.xml" /-->

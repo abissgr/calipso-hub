@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.service.impl;
+package gr.abiss.calipso.fs;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
 
 import javax.annotation.PostConstruct;
 
@@ -33,55 +35,63 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
-import gr.abiss.calipso.service.FilePersistenceService;
+/**
+ * An implementation of {@link FilePersistenceService} that uses Amazon S3 for
+ * file storage. Configuration properties from dev.properties:
+ * 
+ * build.aws_access_key_id=
+ * build.aws_secret_access_key=
+ * build.aws_namecard_bucket=:
+ * 
+ * from bean config: awsAccessKey, awsSecretAccessKey, nameCardBucket
+ * 
+ */
+public class S3FilePersistenceServiceImpl implements FilePersistenceService {
 
-@Service
-public class AwsS3FilePersistenceService implements FilePersistenceService {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AwsS3FilePersistenceService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(S3FilePersistenceServiceImpl.class);
 
 	@Value("${aws_namecard_bucket}")
 	private String nameCardBucket;
 
-	@Value("${aws_access_key}")
+	@Value("${aws_access_key_id}")
 	private String awsAccessKey;
 
 	@Value("${aws_secret_access_key}")
 	private String awsSecretAccessKey;
-	
+
 	private AmazonS3Client s3Client;
 
 	@PostConstruct
-	public void postConstruct(){
-		// create S3 credentials 
+	public void postConstruct() {
+		// create S3 credentials
 		BasicAWSCredentials credentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
 		// setup client
 		this.s3Client = new AmazonS3Client(credentials);
+		LOGGER.debug("Created S3 client");
 	}
 
+	
 	/**
-	 * Upload the given multipart file to the bucket and set rights to public.
-	 * {@inheritDoc}}
-	 * @see gr.abiss.calipso.service.FilePersistenceService#saveFile(org.springframework.web.multipart.MultipartFile, java.lang.String)
+	 * Save file in S3
+	 * @see gr.abiss.calipso.fs.FilePersistenceService#saveFile(java.io.InputStream, long, java.lang.String, java.lang.String)
 	 */
-	public String saveFile(MultipartFile multipartFile, String filename) {
-		String url = null;
-		try {
-			// create metadata
-			ObjectMetadata meta =  new ObjectMetadata();
-			meta.setContentLength(multipartFile.getSize());
-			meta.setContentType(multipartFile.getContentType());
+	@Override
+	public String saveFile(InputStream in, long contentLength, String contentType, String path) {
+		String url;
+		// create metadata
+		ObjectMetadata meta = new ObjectMetadata();
+		meta.setContentLength(contentLength);
+		meta.setContentType(contentType);
 
-			LOGGER.warn("saveFile: " + multipartFile.getOriginalFilename() + ", as: " + filename + ", size: " + multipartFile.getSize() + ", contentType: " + multipartFile.getContentType());
-			// save to bucket
-			s3Client.putObject(new PutObjectRequest(nameCardBucket, filename, multipartFile.getInputStream(),  meta).withCannedAcl(CannedAccessControlList.PublicRead));
-			
-			// set the URL to return
-			url = s3Client.getUrl(nameCardBucket, filename).toString();
-		} catch (IOException e) {
-			throw new RuntimeException("Failed persisting file", e);
+		// save to bucket
+		s3Client.putObject(new PutObjectRequest(nameCardBucket, path, in, meta)
+				.withCannedAcl(CannedAccessControlList.PublicRead));
+		if(LOGGER.isDebugEnabled()){
+
+			LOGGER.warn("File saved: " + path  + ", size: " + contentLength + ", contentType: " + contentType);
 		}
-		
+		// set the URL to return
+		url = s3Client.getUrl(nameCardBucket, path).toString();
 		return url;
 	}
 

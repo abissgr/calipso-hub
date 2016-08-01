@@ -34,7 +34,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import gr.abiss.calipso.service.FilePersistenceService;
+import gr.abiss.calipso.fs.FilePersistence;
+import gr.abiss.calipso.fs.FilePersistenceService;
 import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
 import io.swagger.annotations.ApiOperation;
@@ -42,7 +43,7 @@ import io.swagger.annotations.ApiOperation;
 /**
  * Adds file uploading capabilities to ModelControllers.
  * To use, simply add <code> implements IFilesModelController<MyEntity, MyId, MyService></code>
- * to your controller, inject a {@link gr.abiss.calipso.service.FilePersistenceService} and make it accessible 
+ * to your controller, inject a {@link gr.abiss.calipso.fs.FilePersistenceService} and make it accessible 
  * by implementing {@link #getFilePersistenceService()}. No other coding is needed.
  */
 public interface IFilesModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>> 
@@ -72,12 +73,12 @@ public interface IFilesModelController<T extends Persistable<ID>, ID extends Ser
 
 				// verify the property exists
 				Field fileField = GenericSpecifications.getField(this.getService().getDomainClass(), propertyName);
-				if (fileField == null || !fileField.getType().equals(String.class)) {
-					throw new IllegalArgumentException("Invalid file property: " + propertyName);
+				if (fileField == null || !fileField.isAnnotationPresent(FilePersistence.class)) {
+					throw new IllegalArgumentException("No FilePersistence annotation found for member: " + propertyName);
 				}
 
 				// store the file and update the property URL
-				String url = this.getFilePersistenceService().saveFile(request.getFile(propertyName), basePath + propertyName);
+				String url = this.getFilePersistenceService().saveFile(fileField, request.getFile(propertyName), basePath + propertyName);
 				BeanUtils.setProperty(entity, propertyName, url);
 
 			}
