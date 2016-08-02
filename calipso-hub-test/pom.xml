@@ -62,6 +62,13 @@
 			<artifactId>junit</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.0</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -88,6 +95,14 @@
 			<artifactId>asciidoctorj</artifactId>
 			<version>1.5.4</version>
 		</dependency>
+		<dependency>
+		     <groupId>org.glassfish.tyrus.bundles</groupId>
+		     <artifactId>tyrus-standalone-client</artifactId>
+		     <version>1.9</version>
+			<scope>compile</scope>
+		</dependency>
+	
+		
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.resthub</groupId> -->
 <!-- 			<artifactId>resthub-test</artifactId> -->

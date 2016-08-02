@@ -17,32 +17,38 @@
  */
 package gr.abiss.calipso.test;
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
+import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.notNullValue;
+
+import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
-import org.apache.commons.configuration.Configuration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.Constants;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
-import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -56,6 +62,9 @@ public class AbstractControllerIT {
 
 	protected static final String JSON_UTF8 = "application/json; charset=UTF-8";
 
+    protected BlockingQueue<String> blockingQueue;
+    protected WebSocketStompClient stompClient;
+    
 	@BeforeClass
 	public void setup() {
 
@@ -96,13 +105,10 @@ public class AbstractControllerIT {
 					}
 				}));
 
-		// Only initialize the RequestSpecification AFTER configuring the static
-		// configuration
-		// see
-		// https://github.com/rest-assured/rest-assured/issues/370#issuecomment-123192038
-//		RestAssured.requestSpecification = new RequestSpecBuilder()
-				// .setPort(RestAssured.port)
-//				.build();
+		// Setup socket support
+		// ----------------------------------
+        this.blockingQueue = new LinkedBlockingDeque<>();
+        this.stompClient = new WebSocketStompClient(new SockJsClient(asList(new WebSocketTransport(new StandardWebSocketClient()))));
 	}
 
 	/**
