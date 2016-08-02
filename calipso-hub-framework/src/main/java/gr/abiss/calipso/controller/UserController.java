@@ -17,33 +17,45 @@
  */
 package gr.abiss.calipso.controller;
 
-import java.util.List;
+import javax.inject.Inject;
 
-import org.resthub.web.exception.NotImplementedClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
+import gr.abiss.calipso.fs.FilePersistenceService;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
+import gr.abiss.calipso.tiers.controller.IFilesModelController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 
 @Api(tags = "Users", description = "User management operations")
 @RequestMapping(value = "/api/rest/users", produces = { "application/json", "application/xml" })
-public class UserController extends AbstractNoDeleteModelController<User, String, UserService> {
+public class UserController extends AbstractNoDeleteModelController<User, String, UserService>  implements IFilesModelController<User, String, UserService>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
+	FilePersistenceService filePersistenceService;
+
+	@Inject
+	@Qualifier(FilePersistenceService.BEAN_ID)
+	public void setFilePersistenceService(FilePersistenceService filePersistenceService) {
+		this.filePersistenceService = filePersistenceService;
+	}
+
+	@Override
+	public FilePersistenceService getFilePersistenceService() {
+		return this.filePersistenceService;
+	}
 
 	@RequestMapping(value = "byUserNameOrEmail/{userNameOrEmail}", method = RequestMethod.GET)
 	@ResponseBody

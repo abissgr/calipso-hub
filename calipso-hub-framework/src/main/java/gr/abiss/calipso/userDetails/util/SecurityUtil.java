@@ -148,6 +148,7 @@ public class SecurityUtil {
 			cookie.setMaxAge(0);
 		}
 		response.addCookie(cookie);
+		response.addHeader("X-Calipso-Token", cookieValue);
 	}
 
 	public static ICalipsoUserDetails getPrincipal() {

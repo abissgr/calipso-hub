@@ -17,6 +17,8 @@
  */
 package gr.abiss.calipso.model;
 
+import gr.abiss.calipso.fs.FilePersistence;
+import gr.abiss.calipso.fs.FilePersistencePreview;
 // TODO:
 import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
@@ -24,13 +26,16 @@ import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import gr.abiss.calipso.model.serializers.UserAvatarUrlSerializer;
 import gr.abiss.calipso.uischema.annotation.FormSchemaEntry;
 import gr.abiss.calipso.uischema.annotation.FormSchemas;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.MD5Utils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -76,6 +81,8 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 		implements LocalUser, ReportDataSetSubject {
 
 	private static final long serialVersionUID = -7942906897981646998L;
+	private static final String DEFAULT_AVATAR_URL = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.BASE_URL) + "/img/blank-profile.jpg";
+	
 
 	@ApiModelProperty(hidden = true)
 	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
@@ -122,8 +129,17 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 	@Column(name = "email_hash", nullable = false)
 	private String emailHash;
 
+	@FilePersistence(maxWidth = 130, maxHeight = 130)
+	@FilePersistencePreview(maxWidth = 100, maxHeight = 100)
+	@FilePersistencePreview(maxWidth = 50, maxHeight = 50)
 	@Column(name = "avatar_url")
 	private String avatarUrl;
+
+	@FilePersistence(maxWidth = 1920, maxHeight = 1080)
+	@FilePersistencePreview(maxWidth = 1280, maxHeight = 720)
+	@FilePersistencePreview(maxWidth = 720, maxHeight = 480)
+	@Column(name = "banner_url")
+	private String bannerUrl;
 
 	@Column(nullable = true)
 	private String telephone;
@@ -302,6 +318,16 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 		} else if (this.getResetPasswordTokenCreated() == null) {
 			this.setResetPasswordTokenCreated(new Date());
 		}
+		
+		// fallback to gravatar 
+		if(StringUtils.isBlank(this.getAvatarUrl())){
+			String grvUrl = new StringBuffer("https://www.gravatar.com/avatar/")
+					.append(this.getEmailHash())
+					.append("?d=")
+					.append(URLEncoder.encode(DEFAULT_AVATAR_URL, "UTF-8"))
+					.toString();
+			this.setAvatarUrl(grvUrl);
+		}
 
 	}
 
@@ -448,6 +474,14 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 
 	public void setAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
+	}
+
+	public String getBannerUrl() {
+		return bannerUrl;
+	}
+
+	public void setBannerUrl(String bannerUrl) {
+		this.bannerUrl = bannerUrl;
 	}
 
 	public String getTelephone() {
