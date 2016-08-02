@@ -17,24 +17,7 @@
  */
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.fs.FilePersistence;
-import gr.abiss.calipso.fs.FilePersistencePreview;
-// TODO:
-import gr.abiss.calipso.model.contactDetails.LocalRegionMailingAddress;
-import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
-import gr.abiss.calipso.model.metadata.UserMetadatum;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
-import gr.abiss.calipso.model.serializers.UserAvatarUrlSerializer;
-import gr.abiss.calipso.uischema.annotation.FormSchemaEntry;
-import gr.abiss.calipso.uischema.annotation.FormSchemas;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.utils.ConfigurationFactory;
-import gr.abiss.calipso.utils.MD5Utils;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,9 +34,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -62,14 +43,33 @@ import javax.persistence.Transient;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+
+import gr.abiss.calipso.fs.FilePersistence;
+import gr.abiss.calipso.fs.FilePersistencePreview;
+import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
+import gr.abiss.calipso.model.geography.Country;
+import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
+import gr.abiss.calipso.model.metadata.UserMetadatum;
+import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import gr.abiss.calipso.uischema.annotation.FormSchemaEntry;
+import gr.abiss.calipso.uischema.annotation.FormSchemas;
+import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.utils.Constants;
+import gr.abiss.calipso.utils.MD5Utils;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  */
@@ -80,9 +80,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 		implements LocalUser, ReportDataSetSubject {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 	private static final long serialVersionUID = -7942906897981646998L;
-	private static final String DEFAULT_AVATAR_URL = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.BASE_URL) + "/img/blank-profile.jpg";
-	
 
 	@ApiModelProperty(hidden = true)
 	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
@@ -321,12 +320,16 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 		
 		// fallback to gravatar 
 		if(StringUtils.isBlank(this.getAvatarUrl())){
-			String grvUrl = new StringBuffer("https://www.gravatar.com/avatar/")
-					.append(this.getEmailHash())
-					.append("?d=")
-					.append(URLEncoder.encode(DEFAULT_AVATAR_URL, "UTF-8"))
-					.toString();
-			this.setAvatarUrl(grvUrl);
+			try {
+
+				this.setAvatarUrl(new StringBuffer(Constants.GRAVATAR_BASE_IMG_URL)
+						.append(this.getEmailHash())
+						.append("?d=")
+						.append(URLEncoder.encode(Constants.DEFAULT_AVATAR_URL, CharEncoding.UTF_8))
+						.toString());
+			} catch (UnsupportedEncodingException e) {
+				LOGGER.error("Failed encoding avatar url");
+			}
 		}
 
 	}
