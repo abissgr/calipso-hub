@@ -86,12 +86,11 @@ public class S3FilePersistenceServiceImpl implements FilePersistenceService {
 		// save to bucket
 		s3Client.putObject(new PutObjectRequest(nameCardBucket, path, in, meta)
 				.withCannedAcl(CannedAccessControlList.PublicRead));
-		if(LOGGER.isDebugEnabled()){
-
-			LOGGER.warn("File saved: " + path  + ", size: " + contentLength + ", contentType: " + contentType);
-		}
 		// set the URL to return
 		url = s3Client.getUrl(nameCardBucket, path).toString();
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("File saved: " + path  + ", size: " + contentLength + ", contentType: " + contentType);
+		}
 		return url;
 	}
 
