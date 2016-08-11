@@ -35,18 +35,8 @@ public class SwaggerStaticExporterIT extends AbstractControllerIT {
 			// get swagger document
 			String json = get("/calipso/v2/api-docs").asString();
 
-			// create markdown
-			this.makeDocs(json, Paths.get("target/swagger2md"), MarkupLanguage.MARKDOWN); 
 			// create confluence
-			this.makeDocs(json, Paths.get("target/swagger2confluence"), MarkupLanguage.CONFLUENCE_MARKUP); 
-			// create confluence
-			this.makeDocs(json, Paths.get("target/swagger2asciidoc"), MarkupLanguage.ASCIIDOC); 
-			
-			// asciidoc to HTML
-//			Asciidoctor asciidoctor = create();
-//			String[] result = asciidoctor.convertDirectory(
-//				    new AsciiDocDirectoryWalker("target/swagger2asciidoc"),
-//				    new HashMap<String, Object>());
+			this.makeDocs(json, Paths.get("target/swagger2asciidoc"), MarkupLanguage.ASCIIDOC);
 			
 		}
 		catch(Exception e){

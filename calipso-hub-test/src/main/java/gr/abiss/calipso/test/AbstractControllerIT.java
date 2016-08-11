@@ -21,28 +21,47 @@ import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.util.concurrent.ListenableFuture;
+
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingDeque;
 
-
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.socket.WebSocketHttpHeaders;
+import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
+import org.springframework.web.socket.sockjs.frame.Jackson2SockJsMessageCodec;
 import org.testng.annotations.BeforeClass;
 
+import com.amazonaws.util.Base64;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.Constants;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -62,14 +81,17 @@ public class AbstractControllerIT {
 
 	protected static final String JSON_UTF8 = "application/json; charset=UTF-8";
 
-    protected BlockingQueue<String> blockingQueue;
-    protected WebSocketStompClient stompClient;
-    
+	protected static final Configuration CONFIG = ConfigurationFactory.getConfiguration();
+
+	protected static Configuration getConfig() {
+		return CONFIG;
+	}
+
 	@BeforeClass
 	public void setup() {
 
 		// parse JSON by default
-//		RestAssured.defaultParser = Parser.JSON;
+		// RestAssured.defaultParser = Parser.JSON;
 		// log request/response in errors
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
@@ -105,11 +127,8 @@ public class AbstractControllerIT {
 					}
 				}));
 
-		// Setup socket support
-		// ----------------------------------
-        this.blockingQueue = new LinkedBlockingDeque<>();
-        this.stompClient = new WebSocketStompClient(new SockJsClient(asList(new WebSocketTransport(new StandardWebSocketClient()))));
 	}
+
 
 	/**
 	 * Login using the given credentials and return the Single Sign-On token
@@ -126,10 +145,8 @@ public class AbstractControllerIT {
 		loginSubmission.put("password", password);
 
 		// attempt login and test for a proper result
-		Response rs = given()
-				.accept(JSON_UTF8)
-				.contentType(JSON_UTF8)
-				.body(loginSubmission).when().post("/calipso/apiauth/userDetails");
+		Response rs = given().accept(JSON_UTF8).contentType(JSON_UTF8).body(loginSubmission).when()
+				.post("/calipso/apiauth/userDetails");
 
 		// validate login
 		rs.then().assertThat().statusCode(200).content("id", notNullValue());
@@ -146,8 +163,7 @@ public class AbstractControllerIT {
 
 	protected RequestSpecification getRequestSpec(String ssoToken) {
 		// extend the global spec we have already set to add the SSO token
-		RequestSpecification requestSpec = new RequestSpecBuilder()
-				.setAccept(JSON_UTF8).setContentType(JSON_UTF8)
+		RequestSpecification requestSpec = new RequestSpecBuilder().setAccept(JSON_UTF8).setContentType(JSON_UTF8)
 				.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, ssoToken).build();
 		return requestSpec;
 	}
@@ -161,4 +177,5 @@ public class AbstractControllerIT {
 		public String ssoToken;
 		public RequestSpecification requestSpec;
 	}
+
 }

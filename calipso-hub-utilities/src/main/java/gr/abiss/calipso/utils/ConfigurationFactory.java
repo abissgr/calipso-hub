@@ -38,6 +38,7 @@ public class ConfigurationFactory {
 	public static final String APP_NAME = "calipso.appName";
 	public static final String APP_VERSION = "calipso.appVersion";
 	public static final String BASE_URL = "calipso.baseurl";
+	public static final String DOMAIN = "calipso.domain";
 	public static final String SCRIPT_MAIN = "scriptMain";
 	
 	public static final String INIT_DATA = "calipso.initData";
