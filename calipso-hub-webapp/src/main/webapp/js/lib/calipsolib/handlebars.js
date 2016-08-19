@@ -119,6 +119,10 @@ function(Calipso, _, Handlebars, moment) {
 		return loggedOut ? options.fn(this) : options.inverse(this);
 	});
 
+	Handlebars.registerHelper("configProperty", function(propertyName) {
+		return Calipso.getConfigProperty(propertyName);
+	});
+	
 	/**
 	 * Translates the given value or value.id by looking for a match
 	 * in the labels or labels.options for that path

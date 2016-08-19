@@ -85,28 +85,37 @@ define(
 
 			// add view defaults
 			console.log("add view defaults? packageName: " + packageName + ", newClassName: " + newClassName);
+
+
 			if(packageName == "view" && newClassName == "Layout"){
-				extendOptions.events = {
-					// TODO: move to layouts
-					"click .btn-social-login" : "socialLogin",
+				extendOptions.templateHelpers = {
+					viewId : function() {
+						return Marionette.getOption(this, "id");
+					},
+				};
+				if(newClassName == "Layout"){
+					extendOptions.events = {
 						// TODO: move to layouts
-					"click .open-modal-page" : "openModalPage"
-				};
-				extendOptions.openModalPage = function(e) {
-					Calipso.stopEvent(e);
-					var $a = $(e.currentTarget);
-					var pageView = new Calipso.view.TemplateBasedItemView({
-						template : Calipso.getTemplate($a.data("page")),
-						tagName : "div"
-					});
-					Calipso.vent.trigger('modal:showInLayout', {
-						view : pageView,
-						title : $a.data("title")
-					});
-				};
-				extendOptions.socialLogin = function(e) {
-					Calipso.socialLogin(e);
-				};
+						"click .btn-social-login" : "socialLogin",
+							// TODO: move to layouts
+						"click .open-modal-page" : "openModalPage"
+					};
+					extendOptions.openModalPage = function(e) {
+						Calipso.stopEvent(e);
+						var $a = $(e.currentTarget);
+						var pageView = new Calipso.view.TemplateBasedItemView({
+							template : Calipso.getTemplate($a.data("page")),
+							tagName : "div"
+						});
+						Calipso.vent.trigger('modal:showInLayout', {
+							view : pageView,
+							title : $a.data("title")
+						});
+					};
+					extendOptions.socialLogin = function(e) {
+						Calipso.socialLogin(e);
+					};
+				}
 			}
 
 			Calipso[packageName][newClassName] = BaseType.extend(extendOptions, extendStaticOptions);
@@ -642,6 +651,8 @@ Calipso.cloneSpecificValue = function(val) {
 		// set Calipso.config object
 		customConfig = customConfig || {};
 		var config = {
+			appName : "Calipso",
+			footer : "Copyright 2016 Geekologue",
 			contextPath : "/",
 			apiAuthPath : "/apiauth",
 			headerViewType : Calipso.view.HeaderView,

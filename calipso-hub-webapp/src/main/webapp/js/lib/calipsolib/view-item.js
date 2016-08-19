@@ -569,14 +569,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 	Calipso.view.AbstractItemView = Calipso.view.ItemView.extend({
-
-		templateHelpers : {
-			viewId : function() {
-				return Marionette.getOption(this, "id");
-			},
-		},
 		initialize : function(options) {
-
 			if (!options || !options.id) {
 				this.id = _.uniqueId(this.getTypeName() + "_");
 				$(this.el).attr('id', this.id);
