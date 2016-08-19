@@ -68,19 +68,48 @@ define(
 	_.each(baseComponents, function(packageComponents, packageName, list){
 		Calipso[packageName] || (Calipso[packageName] = {});
 		_.each(packageComponents, function(BaseType, newClassName, list){
-			Calipso[packageName][newClassName] = BaseType.extend({
+			var extendOptions = {
 				initialize : function(models, options) {
 					BaseType.prototype.initialize.apply(this, arguments);
 				},
 				getTypeName : function() {
 					return this.constructor.getTypeName();
 				}
-			}, {
+			};
+			var extendStaticOptions = {
 				typeName : "Calipso." + packageName + "." + newClassName,
 				getTypeName : function() {
 					return this.typeName;
 				}
-			});
+			};
+
+			// add view defaults
+			console.log("add view defaults? packageName: " + packageName + ", newClassName: " + newClassName);
+			if(packageName == "view" && newClassName == "Layout"){
+				extendOptions.events = {
+					// TODO: move to layouts
+					"click .btn-social-login" : "socialLogin",
+						// TODO: move to layouts
+					"click .open-modal-page" : "openModalPage"
+				};
+				extendOptions.openModalPage = function(e) {
+					Calipso.stopEvent(e);
+					var $a = $(e.currentTarget);
+					var pageView = new Calipso.view.TemplateBasedItemView({
+						template : Calipso.getTemplate($a.data("page")),
+						tagName : "div"
+					});
+					Calipso.vent.trigger('modal:showInLayout', {
+						view : pageView,
+						title : $a.data("title")
+					});
+				};
+				extendOptions.socialLogin = function(e) {
+					Calipso.socialLogin(e);
+				};
+			}
+
+			Calipso[packageName][newClassName] = BaseType.extend(extendOptions, extendStaticOptions);
 			/**
 			* Encance the extend function to add a reference to super and properly extend events
 			*/
@@ -101,6 +130,7 @@ define(
 			};
 		});
 	});
+
 	// default locale is set in
 	moment.locale(Calipso.util.getLocale());
 
@@ -343,7 +373,7 @@ Calipso.cloneSpecificValue = function(val) {
 		}
 		// target='SignIn'
 		var formHtml = "<form class='social-signin-form' action='" + Calipso.getBaseUrl() +
-			"/signin/" + providerName + "' method='POST' role='form'>" +
+			"/api-oauth/signin/" + providerName + "' method='POST' role='form'>" +
 		//"<input type='hidden' name='scope' value='email' />" +
 		//"<input type='hidden' name='scope' value='emailure' />" +
 		//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" +

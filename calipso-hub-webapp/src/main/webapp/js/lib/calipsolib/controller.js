@@ -73,8 +73,9 @@ define(
 			//window.parent.destroy();
 		},
 		register : function() {
-			this.showLayoutForModel(new Calipso.model.UserRegistrationModel());
-
+			Calipso.navigate("useCases/users/register", {
+				trigger : true
+			});
 		},
 		/**
 		 * Instantiate and show a layout for the given model

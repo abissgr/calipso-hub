@@ -68,7 +68,7 @@ import org.springframework.web.servlet.view.RedirectView;
 //@Controller
 @Api(tags = "OAuth", description = "Service provider connection operations")
 @SessionAttributes("user")
-@RequestMapping("/signin")
+@RequestMapping("/api-oauth/signin")
 public class ProviderSignInController extends org.springframework.social.connect.web.ProviderSignInController {
 
 	public static final String TOP_WINDOW_DOMAIN = "topWindowDomain";

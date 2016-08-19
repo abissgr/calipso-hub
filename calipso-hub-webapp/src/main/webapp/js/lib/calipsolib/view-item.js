@@ -277,10 +277,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		formTitle : "options.formTitle",
 		template : Calipso.getTemplate('UseCaseFormView'),
 		events : {
-			// TODO: move to layouts
-			"click .btn-social-login" : "socialLogin",
-				// TODO: move to layouts
-			"click .open-modal-page" : "openModalPage",
 			"click button.submit" : "commit",
 			"submit form" : "commit",
 			"click button.cancel" : "cancel",
@@ -303,18 +299,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				this.formTemplates = this.getFormTemplates();
 			}
 
-		},
-		openModalPage : function(e) {
-			Calipso.stopEvent(e);
-			var $a = $(e.currentTarget);
-			var pageView = new Calipso.view.TemplateBasedItemView({
-				template : Calipso.getTemplate($a.data("page")),
-				tagName : "div"
-			});
-			Calipso.vent.trigger('modal:showInLayout', {
-				view : pageView,
-				title : $a.data("title")
-			});
 		},
 		commitOnEnter : function(e) {
 			if (e.keyCode != 13) {
@@ -520,9 +504,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			});
 
 			return indexed_array;
-		},
-		socialLogin : function(e) {
-			Calipso.socialLogin(e);
 		},
 		getDraftKey : function() {
 			return this.model.getPathFragment() + '/' + this.model.get("id") + '/' + this.formSchemaKey;

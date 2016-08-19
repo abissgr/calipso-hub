@@ -246,8 +246,8 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			var sourceKey = config.pathFragment + config.wildcard + config.query;
 			// if not lready created
 			if (!_this.typeaheadSources[sourceKey]) {
-				var sourceUrl = Calipso.getBaseUrl() + baseFragment + config.pathFragment + config.query;
-				//console.log(_this.getTypeName() + "#getTypeaheadSource creating new source for url " + sourceUrl);
+				var sourceUrl = Calipso.getBaseUrl() + this.baseFragment + config.pathFragment + config.query;
+				console.log(_this.getTypeName() + "#getTypeaheadSource creating new source for url " + sourceUrl);
 				var bloodhound = new Bloodhound({
 					remote : {
 						url : sourceUrl,
@@ -323,7 +323,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
       view : {
 				view : Calipso.view.UserProfileLayout,
 			},
-			create : {
+			register : {
 				view : Calipso.view.UserRegistrationLayout,
 				fieldIncludes : [ "firstName", "lastName", "email" ]
 			},
