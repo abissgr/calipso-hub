@@ -147,7 +147,7 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 				window.location.reload();
 			}
 			else{
-			console.log("Calipso.session#onLogin, navigating to fw: " + fw);
+				console.log("Calipso.session#onLogin, navigating to fw: " + fw);
 				Calipso.navigate(fw, {
 					trigger : true
 				});
@@ -164,14 +164,14 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 			// Backbone.methodOverride = true;
 			this.userDetails.fetch({
 				//async : false,
+				reset : true,
 				url : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails",
 
 				success : function(model, response, options) {
 					//console.log("Calipso.session remmbered");
 					//_self.trigger("remmber", model, options );
-
-						console.log("Calipso.session.start, session loaded, starting app");
-						Calipso.app.start(startOptions);
+					console.log("Calipso.session.start, session loaded, starting app");
+					//Calipso.app.start(startOptions);
 				}
 
 			});

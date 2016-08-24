@@ -60,10 +60,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 	Calipso.view.UseCaseLayout = Calipso.view.Layout.extend({
-		taName : "div",
-		useCaseContext : null,
-		// TODO:
-		skipSrollToTop : false,
 		// regionName : viewType
 		regionViewTypes : {},
 		viewEvents : {
@@ -79,15 +75,12 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		initialize : function(options) {
 			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
-			this.mergeOptions(options, ['useCaseContext', 'model', 'closeModalOnSync', 'regionPath', 'regionName']);
-			if (!this.skipSrollToTop) {
-				$(window).scrollTop(0);
-			}
 		},
 		onShow : function() {
 			var _this = this;
 			var childUseCase;
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
+				console.log(_this.getTypeName()+"#onShow preparing view of type: " + ViewType.getTypeName() + " for region: " + regionName);
 				// only show existing regions as they may be added contitionally
 				if(_this.getRegion(regionName)){
 						// spawn child usecase
@@ -214,6 +207,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		//						regionClass : Calipso.view.HeaderNotificationsRegion
 		//					}
 		},
+
+		initialize : function(options) {
+			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
+			this.mergeOptions(options);
+		},
 		changeLocale : function(e) {
 			Calipso.stopEvent(e);
 			Calipso.changeLocale($(e.currentTarget).data("locale"));
@@ -257,18 +255,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			Calipso.stopEvent(e);
 			Calipso.vent.trigger("session:destroy");
 		},
-		register : function(e) {
-			Calipso.stopEvent(e);
-			Calipso.navigate("register", {
-				trigger : true
-			});
-		},
-		login : function(e) {
-			Calipso.stopEvent(e);
-			Calipso.navigate("userDetails/login", {
-				trigger : true
-			});
-		}
 	}, {
 		typeName : "Calipso.view.HeaderView"
 	});
@@ -584,10 +570,17 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "Calipso.view.DefaulfModalLayout"
 	});
 
-	Calipso.view.UserDetailsLayout = Calipso.view.BrowseLayout.extend(
+	Calipso.view.SmallPageLayout = Calipso.view.BrowseLayout.extend({
+		template : Calipso.getTemplate('SmallPageLayout'),
+	});
+
+	Calipso.view.UserDetailsLayout = Calipso.view.SmallPageLayout.extend(
 	/** @lends Calipso.view.UserDetailsLayout.prototype */
 	{
-		template : Calipso.getTemplate('UserDetailsLayout'),
+		initialize : function(options) {
+			Calipso.view.SmallPageLayout.prototype.initialize.apply(this, arguments);
+			this.model.set(Calipso.getHttpUrlParams());
+		},
 		onModelSync : function(options) {
 			// if successful login
 			if (this.model.get("id")) {
@@ -600,7 +593,18 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			}
 			// else just follow useCase.defaultNext configuration
 			else {
-				Calipso.view.UseCaseLayout.prototype.onModelSync.apply(this, arguments);
+				if (this.useCaseContext.defaultNext) {
+					var url = '/' + this.model.getPathFragment() + '/' + this.useCaseContext.defaultNext;
+					var email = this.model.get("email") || Calipso.getHttpUrlParams()["email"];
+					if(email){
+						url += ("?email=" + email);
+					}
+					Calipso.navigate(url, {
+						trigger : true
+					})
+				} else {
+					throw "Use case does not define a defaultNext";
+				}
 			}
 		},
 	},
@@ -609,22 +613,16 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "Calipso.view.UserDetailsLayout"
 	});
 
-
-			Calipso.view.UserRegistrationLayout = Calipso.view.BrowseLayout.extend(
-			/** @lends Calipso.view.UserRegistrationLayout.prototype */
-			{
-
-				template : Calipso.getTemplate('userRegistration-layout'),
-				initialize : function(options) {
-					Calipso.view.BrowseLayout.prototype.initialize.apply(this, arguments);
-				},
-				onModelSync : function(options) {
-					Calipso.navigate("/page/userRegistrationSubmitted", {
-						trigger : true
-					});
-				},
-			}, {
-				// static members
-				typeName : "UserRegistrationLayout"
+	Calipso.view.UserRegistrationLayout = Calipso.view.SmallPageLayout.extend(
+	/** @lends Calipso.view.UserRegistrationLayout.prototype */
+	{
+		onModelSync : function(options) {
+			Calipso.navigate("/page/userRegistrationSubmitted", {
+				trigger : true
 			});
+		},
+	}, {
+		// static members
+		typeName : "UserRegistrationLayout"
+	});
 });

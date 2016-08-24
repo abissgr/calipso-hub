@@ -42,6 +42,15 @@ define({
 				"login" : "Login",
 				"register" : "Quick Signup",
 			},
+			"login" : {
+				"newUser" : "New User?",
+				"line1" : "Go to ",
+				"lineLink" : "Quick Signup",
+				"lineLinkAlt" : "Click to register",
+				
+				"fbLink" : "Facebook Signin",
+				"fbLinkAlt" : "Click to sign in with Facebook"
+			},
 			"userRegistration" : {
 				"titleNewPassword" : "New Password",
 				"titleLogin" : "User Login",
@@ -56,6 +65,25 @@ define({
 			},
 
 		},// tmpl
+		"useCases" : {
+			"userDetails" : {
+				"login" : {
+					"title" : "User Login",
+					"message" : "Enter your account credentials below, to login.",
+					"forgotPassword" : "Reset Password",
+					"newUser" : "Create Account"
+				},
+				"forgotPassword" : {
+					"message" : "Please enter your email address bellow. You will receive a confirmation email in your inbox with instructions to create a new password.",
+					"submitButton" : "Send Email"
+				},
+				"resetPassword" : {
+					"title" : "New Password",
+					"message" : "Please complete the form below to create a new password.",
+					"submitButton" : "Update Password"
+				},
+			},
+		},
 		"calipso" : {
 			"words" : {
 				"close" : "Close",
@@ -64,11 +92,14 @@ define({
 				"no" : "No",
 				"new" : "New",
 				"of" : "of",
+				"or" : "or",
 				"showing" : "showing",
 				"create" : "Create",
 				"update" : "Update",
 				"show" : "Show",
 				"hide" : "Hide",
+				"login" : "Login",
+				"register" : "Register",
 			},
 			"grid" : {
 				"emptyText" : "No records found",
@@ -429,5 +460,5 @@ define({
 			"ZW" : "Zimbabwe"
 		}
 	},
-	"de" : true,
+//	"de" : true,
 });

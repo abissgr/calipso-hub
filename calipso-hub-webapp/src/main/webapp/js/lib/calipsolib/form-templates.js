@@ -51,15 +51,17 @@ function(Calipso, BackboneFormsBootstrap) {
 					<button class="btn btn-info btn-sm addLazyField" data-field="firstName">add<button>\
 				<% } %>\
 				<% if (submitButton) { %>\
-				<button type="submit" class="submit btn btn-primary"><%= submitButton %></button>\
+				<button type="submit" class="submit btn btn-primary btn-block"><%= submitButton %></button>\
 				<% } %>\
 		  </form>'),
 			field : _.template('\
 		    <div class="form-group field-<%= key %>">\
-		      <label class="control-label" for="<%= editorId %>">\
-		        <% if (titleHTML){ %><%= titleHTML %>\
-		        <% } else { %><%- title %><% } %>\
-		      </label>\
+					<% if (!placeHolderLabelsOnly) { %>\
+			      <label class="control-label" for="<%= editorId %>">\
+			        <% if (titleHTML){ %><%= titleHTML %>\
+			        <% } else { %><%- title %><% } %>\
+			      </label>\
+					<% } %>\
 		      <div data-editor></div>\
 		      <p class="col-sm-12" class="help-block" data-error></p>\
 		    </div>\
@@ -69,7 +71,7 @@ function(Calipso, BackboneFormsBootstrap) {
 			formClassName : "form-inline",
 			form :  _.template('\
 			<form class="form-inline">\
-		    <span data-ffieldsets></span>\
+		    <span data-fieldsets></span>\
 				<% if (fieldsInitiallyShown) { %>\
 				<% } %>\
 				<% if (submitButton) { %>\

@@ -89,15 +89,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 	Calipso.view.UseCaseItemView = Calipso.view.ItemView.extend({
-		mergableOptions : [ 'useCaseContext', 'fields', 'formOptions' ],
-		templateHelpers : {
-			viewId : function() {
-				return Marionette.getOption(this, "id");
-			},
-		},
+
 		initialize : function(options) {
 			Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
-			this.mergeOptions(options, this.mergableOptions);
 		},
 		getSchemaType : function(){
 			return this.constructor.getSchemaType();
@@ -172,12 +166,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		template : Calipso.getTemplate('UseCaseGridView'),
 		events : {
 			"click button.btn-windowcontrols-destroy" : "back"
-		},
-
-		templateHelpers : {
-			viewId : function() {
-				return Marionette.getOption(this, "id");
-			},
 		},
 		back : function(e) {
 			Calipso.stopEvent(e);
@@ -276,6 +264,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		// Define view template
 		formTitle : "options.formTitle",
 		template : Calipso.getTemplate('UseCaseFormView'),
+		mergableOptions : ["addToCollection", "submitButton", "formTemplatesKey", "formTemplates", 'fieldsInitiallyShown', "formControlSize", "placeHolderLabelsOnly"],
 		events : {
 			"click button.submit" : "commit",
 			"submit form" : "commit",
@@ -290,9 +279,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.form.renderLazyField(fieldKey);
 		},
 		initialize : function(options) {
+			console.log("UseCaseFormView#initialize options: ");
+			console.log(options);
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
-			this.mergeOptions(options, [ "modal", "addToCollection",
-				"formTemplatesKey", "formTemplates", 'fieldsInitiallyShown' ]);
 			this.searchResultsCollection = this.model.wrappedCollection;
 			// get the form/field templates
 			if (!this.formTemplates) {
@@ -432,7 +421,10 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		renderForm : function(formSchema) {
 			var _self = this;
 
-			var formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
+			var formSubmitButton = this.submitButton;
+			if(!formSubmitButton){
+				formSubmitButton = _self.model.getFormSubmitButton ? _self.model.getFormSubmitButton() : false;
+			}
 			if (!formSubmitButton) {
 				if (_self.useCaseContext.key.indexOf("search") == 0) {
 					formSubmitButton = "<i class=\"glyphicon glyphicon-search\"></i>&nbsp;Search";
@@ -464,6 +456,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				fieldTemplate : _self.formTemplates.field,
 				fieldsetTemplate : _self.formTemplates.fieldset,
 				fieldsInitiallyShown : _self.fieldsInitiallyShown,
+				formControlSize : _self.formControlSize,
+				placeHolderLabelsOnly : _self.placeHolderLabelsOnly,
 			};
 
 			// model driven submit button?
@@ -568,28 +562,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		}
 	});
 
-	Calipso.view.AbstractItemView = Calipso.view.ItemView.extend({
-		initialize : function(options) {
-			if (!options || !options.id) {
-				this.id = _.uniqueId(this.getTypeName() + "_");
-				$(this.el).attr('id', this.id);
-			}
-			Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
-		},
-		getTypeName : function() {
-			return this.constructor.getTypeName();
-		},
-		//override toString to return something more meaningful
-		toString : function() {
-			return this.getTypeName() + "(" + JSON.stringify(this.attributes) + ")";
-		},
-	},
-	// static members
-	{
-		typeName : "Calipso.view.AbstractItemView",
-	});
 
-	Calipso.view.UserProfileView = Calipso.view.AbstractItemView.extend({
+	Calipso.view.UserProfileView = Calipso.view.ItemView.extend({
 		template : Calipso.getTemplate('userProfile'),
 	},
 	// static members

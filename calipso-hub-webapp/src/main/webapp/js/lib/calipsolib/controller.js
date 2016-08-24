@@ -27,6 +27,7 @@ define(
 			Marionette.Controller.prototype.constructor.call(this, options);
 		},
 		showView : function(view){
+			console.log("Controller#showView");
 			Calipso.app.mainContentRegion.show(view);
 		},
 		toHome : function() {
@@ -69,8 +70,12 @@ define(
 		},
 		logout : function() {
 			Calipso.session.logout();
-			// this.login();
-			//window.parent.destroy();
+			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
+				model : userDetails
+			}));
+			Calipso.navigate("home", {
+				trigger : true
+			});
 		},
 		register : function() {
 			Calipso.navigate("useCases/users/register", {
@@ -119,6 +124,7 @@ define(
 		},
 		showUseCaseView : function(pathFragment, modelId, useCaseKey, httpParams) {
 
+			console.log("Controller#showUseCaseView");
 			httpParams = Calipso.getHttpUrlParams(httpParams);
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
@@ -126,7 +132,6 @@ define(
 				modelId = modelId.substring(0, qIndex);
 			}
 			// build the model instance representing the current request
-			console.log("SHOW USECASE VIEW");
 			$.when(Calipso.util.getUseCaseFactory(pathFragment)).done(
 				function(UseCaseFactory){
 					// check for usecase routes for new instances

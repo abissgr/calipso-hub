@@ -73,12 +73,23 @@ define(
 
 	Calipso.backboneform.Field = Backbone.Form.Field.extend({
 		render: function() {
+
 			//Only render the editor if Hidden
 			if (this.schema.type.isHidden || this.schema.isHidden) {
 				return this.setElement(this.editor.render().el);
 			} else {
 				return Backbone.Form.Field.prototype.render.apply(this, arguments);
 			}
+		},
+		/**
+		 * Returns the data to be passed to the template
+		 *
+		 * @return {Object}
+		 */
+		templateData: function() {
+			var data = Backbone.Form.Field.prototype.templateData.apply(this, arguments);
+			data.placeHolderLabelsOnly = this.schema.placeHolderLabelsOnly;
+			return data;
 		},
 	});
 
@@ -119,6 +130,8 @@ define(
 	});
 	Calipso.backboneform.Form = Backbone.Form.extend({
 		hintRequiredFields : true,
+		placeHolderLabelsOnly : false,
+		formControlSize : null,
 		capitalizeKeys : true,
 		lazyFieldContainers : {},
 		Field : Calipso.backboneform.Field,
@@ -145,9 +158,11 @@ define(
 				this.hintRequiredFields = hintRequiredFields;
 			}
 			this.formClassName = options.formClassName;
+			this.formControlSize = options.formControlSize;
 			this.fieldTemplate = options.fieldTemplate;
 			this.fieldsetTemplate = options.fieldsetTemplate;
 			this.fieldsInitiallyShown = options.fieldsInitiallyShown;
+			this.placeHolderLabelsOnly = options.placeHolderLabelsOnly || false;
 			// add search mode if missing
 			if(!options.schema["_searchmode"]){
 				options.schema["_searchmode"] = {
@@ -181,10 +196,33 @@ define(
 		},
 		createField: function(key, schema) {
 
-			if(!schema.template && this.fieldTemplate){
-	   	 schema.template = this.fieldTemplate;
-	    }
+			// checkif the fields needs to be hidden
+			var value = this.model.get(key);
+			if(schema.hideNonEmpty && !value && !_.isBoolean(value)){
+				schema.type = "Hidden";
+			}
+			else{
+				// transform labels to placeholders?
+				if(this.placeHolderLabelsOnly){
+					schema.placeHolderLabelsOnly = true;
+					schema.editorAttrs || (schema.editorAttrs = {});
+					if(!schema.editorAttrs.placeholder){
+						var placeholder = schema.title;
+						if(!placeholder && schema.titleHTML){
+							var span = document.createElement('span');
+							span.innerHTML= schema.titleHTML;
+							placeholder = span.textContent || span.innerText;
+						}
+						schema.editorAttrs.placeholder = placeholder;
+					}
+				}
 
+				// apply default custom template if not overriden by field
+				if(!schema.template && this.fieldTemplate){
+		   	 schema.template = this.fieldTemplate;
+		    }
+			}
+			
 			return Backbone.Form.prototype.createField.apply(this, arguments);;
 		},
 		createFieldset: function(schema) {
@@ -288,17 +326,29 @@ define(
 				});
 			});
 
+			// add size
+			this.setSizes($form);
+
 			//Set class
 			$form.addClass(this.className);
 			this.trigger("attach");
 			return this;
+		},
+		setSizes : function($elem){
+			if(this.formControlSize){
+				$elem.find('.form-control').addClass("form-control-" + this.formControlSize);
+				$elem.find('.btn').addClass("btn-" + this.formControlSize);
+				$elem.find('.input-group').addClass("input-group-" + this.formControlSize);
+
+			}
 		},
 	  templateData: function() {
 	    var options = this.options;
 
 	    return {
 	      submitButton: options.submitButton,
-	      fieldsInitiallyShown : options.fieldsInitiallyShown
+	      fieldsInitiallyShown : options.fieldsInitiallyShown,
+				placeHolderLabelsOnly : this.placeHolderLabelsOnly	,
 	    }
 	  },
 		close : function() {
@@ -321,7 +371,7 @@ define(
 			return q;
 		},
 	});
-	Calipso.backboneform.SearchMode = Backbone.Form.editors.Text.extend({
+	Calipso.backboneform.SearchMode = Backbone.Form.editors.Hidden.extend({
 		defaultValue : "AND",
 	},
 	{
@@ -393,6 +443,7 @@ define(
 			this.$el.parent().find('button.pass-toggle:first').on('click', function (e) {
 				_this.passToggle(e);
 		  })
+			this.form.setSizes(this.$el.parent());
 		},
 		passToggle : function(e) {
 			if(this.$el.attr("type").toLowerCase() == "password"){

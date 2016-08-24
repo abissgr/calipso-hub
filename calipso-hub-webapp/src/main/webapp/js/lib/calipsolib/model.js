@@ -121,11 +121,16 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		typeName : "Calipso.Model",
 		superClass : null,
 		label : "GenericModel",
+    labelIcon : "fa fa-list fa-fw",
 		showInMenu : false,
 		public : false,
 		nameProperty : "name",
 		baseFragment : '/api/rest/',
 		typeaheadSources : {},
+    menuConfig : {
+      rolesIncluded : ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
+      rolesExcluded : null,
+    },
 		isPublic : function() {
 			return this.public || false;
 		},
@@ -247,7 +252,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			// if not lready created
 			if (!_this.typeaheadSources[sourceKey]) {
 				var sourceUrl = Calipso.getBaseUrl() + this.baseFragment + config.pathFragment + config.query;
-				console.log(_this.getTypeName() + "#getTypeaheadSource creating new source for url " + sourceUrl);
 				var bloodhound = new Bloodhound({
 					remote : {
 						url : sourceUrl,
@@ -285,8 +289,13 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
   }, {
     // static members
     label : "Role",
+    labelIcon : "fa fa-users fa-fw",
     pathFragment : "roles",
     typeName : "Calipso.model.RoleModel",
+    menuConfig : {
+      rolesIncluded : ["ROLE_ADMIN"],
+      rolesExcluded : null,
+    },
     formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
 
     fields : {
@@ -316,7 +325,9 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	}, {
 		// static members
 		label : "User",
+    labelIcon : "fa fa-user fa-fw",
 		showInMenu : true,
+    public : true,
 		pathFragment : "users",
 		typeName : "Calipso.model.UserModel",
 		useCases : {
@@ -325,7 +336,22 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			},
 			register : {
 				view : Calipso.view.UserRegistrationLayout,
-				fieldIncludes : [ "firstName", "lastName", "email" ]
+				fieldIncludes : [ "firstName", "lastName", "email" ],
+        overrides : {
+          contentRegion : {
+            viewOptions : {
+              template : Calipso.getTemplate("UseCaseCardFormView"),
+              title : Calipso.util.getLabels("tmpl.userRegistration.titleNewAccount") +
+                '<a href="#" class="btn btn-secondary btn-sm btn-social btn-facebook  pull-right" title="' +
+                Calipso.util.getLabels("tmpl.login.fbLinkAlt") +
+                '"><i class="fa fa-facebook-f"></i> ' + Calipso.util.getLabels("tmpl.login.fbLink") + '</a>',
+              message : Calipso.util.getLabels("tmpl.userRegistration.formHelpNewAccount"),
+              placeHolderLabelsOnly : true,
+              formControlSize : "lg",
+              submitButton : '<i class="fa fa-user-plus" aria-hidden="true"></i> ' + Calipso.util.getLabels("calipso.words.register")
+            },
+          },
+        },
 			},
 			search : {
 				view : Calipso.view.UseCaseSearchLayout,
@@ -450,7 +476,8 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		label : "Role",
+		label : "Country",
+    labelIcon : "fa fa-marker fa-fw",
 		pathFragment : "countries",
 		typeName : "Calipso.model.RoleModel",
 		fields : {
@@ -508,6 +535,53 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	Calipso.model.UserDetailsModel = Calipso.Model.extend(
 	/** @lends Calipso.model.UserDetailsModel.prototype */
 	{
+
+    browseMenu : {},
+    initialize : function() {
+      Calipso.Model.prototype.initialize.apply(this, arguments);
+      var _this = this;
+      this.set("translatedName", Calipso.util.getLabels("countries." + this.get("id")));
+      var buildBrowseMenu = function(){
+        _this.buildBrowseMenu();
+      };
+      this.on('sync', buildBrowseMenu);
+      this.on('error', buildBrowseMenu);
+    },
+		buildBrowseMenu : function(){
+			var _this = this;
+			var allModelLabels = Calipso.util.getLabels("models");
+			var browseMenu = {};
+			var parseModel = function(ModelType) {
+				// setup model-based usecase factories
+				if (ModelType.getTypeName() != "Calipso.model.Model" &&
+					ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
+						ModelType.getTypeName() != "Calipso.model.UserDetailsModel" &&
+					ModelType.getTypeName() != "Calipso.model.GenericModel") {
+
+						// build "browse" menu
+						if(ModelType.menuConfig){
+							var rolesIncluded = ModelType.menuConfig.rolesIncluded;
+							var rolesExcluded = ModelType.menuConfig.rolesExcluded || {};
+							// if inclusions are passed or empty
+							if(!rolesIncluded || Calipso.isUserInAnyRole(rolesIncluded)){
+								// and exclusions have no match
+								if(!Calipso.isUserInAnyRole(rolesExcluded)){
+									var modelLabels = allModelLabels[ModelType.getPathFragment()] || {};
+									browseMenu[ModelType.getPathFragment()] = {
+										label : modelLabels.menuLabel || modelLabels.label || ModelType.getPathFragment(),
+  									labelIcon : ModelType.labelIcon,
+									}
+								}
+							}
+						}
+
+				}
+			};
+			_(Calipso.model).each(parseModel);
+			_(Calipso.customModel).each(parseModel);
+			_this.browseMenu = browseMenu;
+      Calipso.updateHeaderFooter();
+		},
 		// TODO: move to usecases/labels
 		getViewTitle : function() {
 			var schemaKey = this.getFormSchemaKey();
@@ -532,34 +606,71 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		typeName : "Calipso.model.UserDetailsModel",
 		useCases : {
 			login : {
-				titleHtml : "<i class='fa fa-lock'></i> User Login",
-				description : "To login, please enter your credentials below.",
 				view : Calipso.view.UserDetailsLayout,
 				fieldIncludes : [ "email", "password" ],
-        childViewOptions : {
-          template : Calipso.getTemplate("login")
-        }
+        overrides : {
+          contentRegion : {
+            viewOptions : {
+              template : Calipso.getTemplate("UseCaseCardFormView"),
+              title : '<i class="fa fa-lock"></i> ' + Calipso.util.getLabels("useCases.userDetails.login.title") +
+                '<div class="btn-group btn-group-sm pull-right" role="group">\
+                  <a class="btn btn-secondary" href="/userDetails/forgotPassword">' +
+                   Calipso.util.getLabels("useCases.userDetails.login.forgotPassword") + '</a>\
+                  <a class="btn btn-secondary" href="/useCases/users/register">' +
+                   Calipso.util.getLabels("useCases.userDetails.login.newUser") + '</a>\
+                </div>',
+              message : Calipso.util.getLabels("useCases.userDetails.login.message"),
+              placeHolderLabelsOnly : true,
+              formControlSize : "lg",
+              submitButton : '<i class="fa fa-sign-in" aria-hidden="true"></i> ' + Calipso.util.getLabels("calipso.words.login")
+            }
+          }
+        },
 			},
-			resetPassword : {
-				titleHtml : "<i class='fa fa-lock'></i> Reset password",
-				description : "To create a new password, please complete the form below.",
+			forgotPassword : {// request reselt link by email
+				view : Calipso.view.UserDetailsLayout,
+				fieldIncludes : [ "email" ],
+				defaultNext : "resetPassword",
+        overrides : {
+          contentRegion : {
+            viewOptions : {
+              template : Calipso.getTemplate("UseCaseCardFormView"),
+      				title : "<i class='fa fa-lock'></i> " + Calipso.util.getLabels("useCases.userDetails.login.forgotPassword"),
+              message : Calipso.util.getLabels("useCases.userDetails.forgotPassword.message"),
+              placeHolderLabelsOnly : true,
+              formControlSize : "lg",
+              submitButton : '<i class="fa fa-sign-in" aria-hidden="true"></i> ' + Calipso.util.getLabels("useCases.userDetails.forgotPassword.submitButton")
+            }
+          }
+        },
+			},
+			resetPassword : {// enter new password
 				view : Calipso.view.UserDetailsLayout,
 				fieldIncludes : [ "email", "resetPasswordToken", "password", "passwordConfirmation" ],
 				fields : {
 					email : {
-						hideNonEmpty : true
+					       form : {
+                   	hideNonEmpty : true
+                 }
 					},
 					resetPasswordToken : {
-						hideNonEmpty : true
+					       form : {
+                   	hideNonEmpty : true
+                 }
 					}
-				}
-			},
-			forgotPassword : {// enter new password
-				titleHtml : "<i class='fa fa-lock'></i> Forgot password",
-				description : "Please enter your email address bellow. You will receive a confirmation email in your inbox with instructions to create a new password. ",
-				view : Calipso.view.UserDetailsLayout,
-				fieldIncludes : [ "email" ],
-				defaultNext : "resetPassword",
+				},
+        overrides : {
+          contentRegion : {
+            viewOptions : {
+              template : Calipso.getTemplate("UseCaseCardFormView"),
+      				title : "<i class='fa fa-lock'></i> " + Calipso.util.getLabels("useCases.userDetails.resetPassword.title"),
+              message : Calipso.util.getLabels("useCases.userDetails.resetPassword.message"),
+              placeHolderLabelsOnly : true,
+              formControlSize : "lg",
+              submitButton : '<i class="fa fa-sign-in" aria-hidden="true"></i> ' + Calipso.util.getLabels("useCases.userDetails.resetPassword.submitButton")
+            }
+          }
+        },
 			},
 		},
 		fields : {
@@ -583,7 +694,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			}
 		},
 		create : function(options) {
-      console.log(this.getTypeName() + "#create singleton ");
 			if (this._instance === undefined) {
 				this._instance = new this(options);
 			} else {

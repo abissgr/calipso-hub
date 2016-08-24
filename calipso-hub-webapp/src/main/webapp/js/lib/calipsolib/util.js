@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 define(
-		[ "i18n!nls/labels", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms',
+		[ "i18n!nls/labels",  "i18n!nls/labels-custom", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms',
 		'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator',
 		/*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
-		function(labels, _, Handlebars, calipsoTemplates, moment, Backbone, PageableCollection, BackboneForms,
+		function(labels, labelsCustom, _, Handlebars, calipsoTemplates, moment, Backbone, PageableCollection, BackboneForms,
 			BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridPaginator,
 /*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, jqueryColor, intlTelInput, q, chartjs) {
 
@@ -34,7 +34,6 @@ define(
 		util : {
 			getLocale : function(){
 				var locale = localStorage.getItem('locale');
-			//console.log("Calipso.util.getLocale: " + locale);
 				return locale;
 			},
 		},
@@ -45,7 +44,35 @@ define(
 		view : {},
 		controller : {},
 		hbs : {},
-		labels : labels,
+		labels : $.extend(true, {}, labels, labelsCustom)
+	};
+
+	// plumbing for handlebars template helpers
+	// Also provides i18n labels
+	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
+		var self = this;
+		var templateHelpers = Marionette.getOption(self, "templateHelpers");
+		// add i18n labels from requirejs i18n
+		var result = {
+			labels : Calipso.util.getLabels(),
+			useCase : self.useCaseContext,
+		};
+		target = target || {};
+
+		if (_.isFunction(templateHelpers)) {
+			templateHelpers = templateHelpers.call(self);
+		}
+
+		// This _.each block is what we're adding
+		_.each(templateHelpers, function(helper, index) {
+			if (_.isFunction(helper)) {
+				result[index] = helper.call(self);
+			} else {
+				result[index] = helper;
+			}
+		});
+
+		return _.extend(target, result);
 	};
 
 	// baseComponents pretty much says how we want types to be exteneded, or rather,
@@ -84,19 +111,43 @@ define(
 			};
 
 			// add view defaults
-			console.log("add view defaults? packageName: " + packageName + ", newClassName: " + newClassName);
-
-
-			if(packageName == "view" && newClassName == "Layout"){
-				extendOptions.templateHelpers = {
-					viewId : function() {
-						return Marionette.getOption(this, "id");
+			if(packageName == "view"){
+				_.extend(extendOptions, {
+					taName : "div",
+					useCaseContext : null,
+					skipSrollToTop : false,
+					title : "",
+					message : "",
+					mergableOptions : ['useCaseContext', 'model', 'closeModalOnSync', 'regionPath', 'regionName', 'title', 'message','fields', 'formOptions'],
+					getTitle : function(){
+							return Marionette.getOption(this, "title");
 					},
-				};
+					getMessage : function(){
+							return Marionette.getOption(this, "message");
+					},
+					templateHelpers : {
+						viewId : function() {
+							return Marionette.getOption(this, "id");
+						},
+						viewTitle : function() {
+							return this.getTitle();
+						},
+						viewMessage : function() {
+							return this.getMessage();
+						},
+					},
+					initialize : function(options) {
+						BaseType.prototype.initialize.apply(this, arguments);
+						this.mergeOptions(options, this.mergableOptions);
+						if (!this.skipSrollToTop) {
+							$(window).scrollTop(0);
+						}
+					}
+				});
 				if(newClassName == "Layout"){
 					extendOptions.events = {
 						// TODO: move to layouts
-						"click .btn-social-login" : "socialLogin",
+						"click .btn-social" : "socialLogin",
 							// TODO: move to layouts
 						"click .open-modal-page" : "openModalPage"
 					};
@@ -129,9 +180,14 @@ define(
 			//	return Backbone.Collection.prototype.fetch.call(this, options);
 				var NewClass = BaseType.extend.call(this, protoProps, staticProps);
 				// properly extend prototype hashes like events
-				_.each(["events", "triggers"], function(mergableProp){
+				_.each([ "events", "triggers", "templateHelpers" ], function(mergableProp){
 					if(_this.prototype[mergableProp]){
-						NewClass.prototype[mergableProp] = _.extend({}, _this.prototype[mergableProp], protoProps[mergableProp]);
+						NewClass.prototype[mergableProp] = _.extend({}, _this.prototype[mergableProp], protoProps[mergableProp] || {});
+					}
+				});
+				_.each(["mergableOptions"], function(mergableProp){
+					if(_this.prototype[mergableProp]){
+						NewClass.prototype[mergableProp] = $.merge(_this.prototype[mergableProp], protoProps[mergableProp] || []);
 					}
 				});
 				// let the conditioned kiddo through
@@ -371,7 +427,7 @@ Calipso.cloneSpecificValue = function(val) {
 		var providerName;
 
 		for (var i = 0; i < providerNames.length; i++) {
-			if (clicked.hasClass("btn-social-login-" + providerNames[i])) {
+			if (clicked.hasClass("btn-" + providerNames[i])) {
 				providerName = providerNames[i];
 				break;
 			}
@@ -586,17 +642,6 @@ Calipso.cloneSpecificValue = function(val) {
 
 		});
 
-		// TODO: on userDetails model destroy
-		/*Calipso.vent.on('session:destroy', function(userDetails) {
-			Calipso.session.destroy();
-			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
-				model : userDetails
-			}));
-			Calipso.navigate("home", {
-				trigger : true
-			});
-		});
-*/
 		Calipso.vent.on('nav-menu:change', function(modelkey) {
 			// console.log("vent event nav-menu:change");
 		});
@@ -682,10 +727,12 @@ Calipso.cloneSpecificValue = function(val) {
 
 			// set model types map
 			Calipso.useCaseFactoriesMap = _.extend({}, Calipso.config.useCaseFactories || {});
+			var allModelLabels = Calipso.util.getLabels("models");
 			var parseModel = function(ModelType) {
+				// setup model-based usecase factories
 				if (ModelType.getTypeName() != "Calipso.model.Model" &&
-				ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
-				ModelType.getTypeName() != "Calipso.model.GenericModel") {
+					ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
+					ModelType.getTypeName() != "Calipso.model.GenericModel") {
 					Calipso.useCaseFactoriesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
 				}
 			};
@@ -700,21 +747,8 @@ Calipso.cloneSpecificValue = function(val) {
 	}
 
 	Calipso._startHistory = function(){
-		/*
-					// TODO: move after loading the sidebar DOM
-					//Loads the correct sidebar on window load,
-					//collapses the sidebar on window resize.
-					$(function() {
-						$(window).bind("load resize", function() {
-							width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
-							if (width < 768) {
-								$('div.sidebar-collapse').addClass('collapse');
-							} else {
-								$('div.sidebar-collapse').removeClass('collapse');
-							}
-						});
-					});
-		*/
+		console.log("Calipso._startHistory");
+
 		var pushStateSupported = _.isFunction(history.pushState);
 		var contextPath = Calipso.getConfigProperty("contextPath");
 
@@ -765,7 +799,6 @@ Calipso.cloneSpecificValue = function(val) {
 	}
 
 	Calipso.updateHeaderFooter = function(){
-		//console.log("Calipso.updateHeaderFooter");
 		// render basic structure
 		Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
 			model : Calipso.session.userDetails
@@ -783,7 +816,7 @@ Calipso.cloneSpecificValue = function(val) {
 		// initialize header, footer, history
 		Calipso.app.on("start", function() {
 			//console.log("Calipso.app started");
-
+			Calipso.updateHeaderFooter();
 			// setup vent
 			Calipso._initializeVent();
 			// start backbone history
@@ -1203,7 +1236,6 @@ Calipso.cloneSpecificValue = function(val) {
 	* business key/URI componenent
 	*/
 	Calipso.util.getUseCaseFactory = function(modelTypeKey) {
-		console.log("getModelType, modelTypeKey: " + modelTypeKey);
 		var d = $.Deferred();
 		if(Calipso.useCaseFactoriesMap[modelTypeKey]){
 			d.resolve(Calipso.useCaseFactoriesMap[modelTypeKey]);
@@ -1211,7 +1243,6 @@ Calipso.cloneSpecificValue = function(val) {
 		else{
 			$.get( Calipso.getBaseUrl() + '/api/rest/' + modelTypeKey + "/uischema").
 				done(function(staticMembers){
-					console.log("UISCHEMA: " + staticMembers);
 					staticMembers.pathFragment = modelTypeKey;
 					Calipso.useCaseFactoriesMap[modelTypeKey] = Calipso.Model.extend({},staticMembers);
 					d.resolve(Calipso.useCaseFactoriesMap[modelTypeKey]);
@@ -1336,11 +1367,13 @@ Calipso.cloneSpecificValue = function(val) {
 			mergableOptions: ['key', 'pathFragment', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model', 'factory',
 				'view', 'viewOptions', 'childViewOptions',
 				'roleIncludes', 'roleExcludes',
-				"formTemplate", "formFieldTemplate",
+				"template", "formTemplate", "formFieldTemplate", "formControlSize",
 				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks', 'overrides'],
+			inheritableOptions: ['key', 'pathFragment', 'title', 'defaultNext', 'model',
+				'roleIncludes', 'roleExcludes',
+			  "formTemplate", "formFieldTemplate","formControlSize",
+				'fields', 'fieldIncludes', 'fieldExcludes', 'fieldMasks'],
 			initialize : function(options){
-				//console.log("UseCaseContext#initialize options: ");
-				//console.log(options);
 				Marionette.Object.prototype.initialize.apply(this, arguments);
 				this.mergeOptions(options, this.mergableOptions);
 				this.parentContext = options.parentContext;
@@ -1348,7 +1381,6 @@ Calipso.cloneSpecificValue = function(val) {
 				if(this.addToCollection){
 					var _this = this;
 					this.listenToOnce(this.model, "sync", function(){
-						console.log("usecase context, adding to collection");
 						_this.addToCollection.add(_this.model);
 						_this.model.trigger("added");
 					});
@@ -1361,7 +1393,6 @@ Calipso.cloneSpecificValue = function(val) {
 				viewOptions.model = this.model;
 				viewOptions.addToCollection = this.addToCollection;
 				return new this.view(viewOptions);
-
 			},
 			getRouteUrl : function(){
 				var s = "/useCases/" +this.pathFragment;
@@ -1399,22 +1430,21 @@ Calipso.cloneSpecificValue = function(val) {
 				});
 				return caseFields;
 			},
-			getChildContext : function(regionName, ViewType){
+			getChildContext : function(regionName, DefaultViewType){
 				var _this = this;
 				var schemaTypeOverrideKey;
-				var childOptions = {};
+				// set the layout's region view type as default
+				var childOptions = {view : DefaultViewType};
 				// self as base config
-				_.each(this.mergableOptions, function(mergableProp){
-					if(_this[mergableProp]){
-						childOptions[mergableProp] = _this[mergableProp];
+				_.each(this.inheritableOptions, function(inheritableOption){
+					if(_this[inheritableOption]){
+						childOptions[inheritableOption] = _this[inheritableOption];
 					}
 				});
-				// apply layout's default region view type if given
-				ViewType && (childOptions.view = ViewType);
 				// apply ovverrides?
 				if(_this.overrides){
-					delete childOptions.overrides;
-					// apply child usecase overrides based on region name
+					// apply child usecase overrides based on region name,
+					// NOTE: may update view option
 					Calipso.deepExtend(childOptions, _this.overrides[regionName]);
 					// apply child usecase overrides based on scehame type
 					schemaTypeOverrideKey = childOptions.view.getSchemaType();
@@ -1423,38 +1453,13 @@ Calipso.cloneSpecificValue = function(val) {
 				}
 				// Luke... I am your father
 				childOptions.parentContext = this;
+
 				return new Calipso.UseCaseContext(childOptions);
 			}
 
 		}
 	);
-	// plumbing for handlebars template helpers
-	// Also provides i18n labels
-	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
-		var self = this;
-		var templateHelpers = Marionette.getOption(self, "templateHelpers");
-		// add i18n labels from requirejs i18n
-		var result = {
-			labels : Calipso.util.getLabels(),
-			useCase : self.useCaseContext,
-		};
-		target = target || {};
 
-		if (_.isFunction(templateHelpers)) {
-			templateHelpers = templateHelpers.call(self);
-		}
-
-		// This _.each block is what we're adding
-		_.each(templateHelpers, function(helper, index) {
-			if (_.isFunction(helper)) {
-				result[index] = helper.call(self);
-			} else {
-				result[index] = helper;
-			}
-		});
-
-		return _.extend(target, result);
-	};
 
 	return Calipso;
 
