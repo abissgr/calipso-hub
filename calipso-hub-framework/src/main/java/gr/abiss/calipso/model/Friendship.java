@@ -25,11 +25,14 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @Entity
 @Table(name = "friendship")
-@ModelResource(path = "friendships", apiName = "Friendships", apiDescription = "Operations about friendships")
+@ModelResource(path = Friendship.API_PATH, apiName = "Friendships", apiDescription = "Operations about friendships")
 @ApiModel(value = "Friendship", description = "A model representing a directional connection between two users. ")
 public class Friendship extends AbstractAuditable<User> {
+	
 	private static final long serialVersionUID = 1L;
 
+	public static final String API_PATH = "friendships";
+	
 	@ApiModelProperty(required = true, example = "{id: '[id]'}")
 	@NotNull
 	@ManyToOne

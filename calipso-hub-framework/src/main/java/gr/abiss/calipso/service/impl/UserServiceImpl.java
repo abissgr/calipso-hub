@@ -49,6 +49,8 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
@@ -269,6 +271,5 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		u = this.update(u);
 		return u;
 	}
-
-
+	
 }

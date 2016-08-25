@@ -17,11 +17,18 @@
  */
 package gr.abiss.calipso.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import gr.abiss.calipso.model.Friendship;
-import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserDTO;
 import gr.abiss.calipso.tiers.service.ModelService;
 
 public interface FriendshipService extends ModelService<Friendship, String> {
 
-//	public Friendship findOneByFriends(User one, User other);
+	public static final String BEAN_ID = "friendshipService";
+
+	public Iterable<UserDTO> findAllMyFriends();
+
+	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest);
 }

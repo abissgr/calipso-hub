@@ -23,6 +23,8 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.UserDTO;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -55,4 +57,5 @@ public interface UserRepository extends ModelRepository<User, String> {
 	@Query("UPDATE User AS u SET u.resetPasswordTokenCreated = NULL, u.resetPasswordToken = NULL "
 			+ "WHERE u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < ?1")
 	public void expireResetPasswordTokens(Date yesterday);
+	
 }

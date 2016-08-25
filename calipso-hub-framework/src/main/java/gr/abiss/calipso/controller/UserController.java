@@ -60,7 +60,6 @@ public class UserController extends AbstractNoDeleteModelController<User, String
 	@RequestMapping(value = "byUserNameOrEmail/{userNameOrEmail}", method = RequestMethod.GET)
 	@ResponseBody
 	@ApiOperation(value = "Get one by username or email", notes = "Get the single user with the given username or email.")
-	
 	public User getByUserNameOrEmail(@PathVariable String userNameOrEmail) {
 		return this.service.findByUserNameOrEmail(userNameOrEmail);
 	}

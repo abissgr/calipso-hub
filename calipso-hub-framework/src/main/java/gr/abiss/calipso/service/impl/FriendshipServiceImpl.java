@@ -9,10 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 
 import gr.abiss.calipso.model.Friendship;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserDTO;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.repository.FriendshipRepository;
 import gr.abiss.calipso.repository.UserRepository;
@@ -22,7 +24,7 @@ import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
 
-@Named("friendshipService")
+@Named(FriendshipService.BEAN_ID)
 @Transactional(readOnly = true)
 public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, String, FriendshipRepository> implements FriendshipService {
 
@@ -34,36 +36,35 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	 */
 	@Override
 	@Transactional(readOnly = false)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public Friendship create(Friendship friendship) {
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();
-		
-		// if not admin, then
-		if(!userDetails.isAdmin()){
-			
-			// make sure the right sender is set if not empty
-			if(friendship.getRequestSender() != null){
-				// ensure sender is the current user
-				if(!userDetails.getId().equals(friendship.getRequestSender().getId())){
-					throw new IllegalArgumentException("Invalid friendship sender");
-				}
-			}
-			else{
-				// otherwise set as the current user
-				friendship.setRequestSender(new User.Builder().id(userDetails.getId()).username(userDetails.getUsername()).build());
-			}
 
-			// check status if any
-			if(friendship.getStatus() != null){
-				if(!friendship.getStatus().equals(FriendshipStatus.PENDING)){
-					throw new IllegalArgumentException("Invalid friendship status");
-				}
-			}
-			// set automatically otherwise
-			else{
-				friendship.setStatus(FriendshipStatus.PENDING);
+		
+		// make sure the right sender is set if not empty
+		if(friendship.getRequestSender() != null){
+			// ensure sender is the current user
+			if(!userDetails.getId().equals(friendship.getRequestSender().getId())){
+				throw new IllegalArgumentException("Invalid friendship sender");
 			}
 		}
+		else{
+			// otherwise set as the current user
+			friendship.setRequestSender(new User.Builder().id(userDetails.getId()).username(userDetails.getUsername()).build());
+		}
+
+		// check status if any
+		if(friendship.getStatus() != null){
+			if(!friendship.getStatus().equals(FriendshipStatus.PENDING)){
+				throw new IllegalArgumentException("Invalid friendship status");
+			}
+		}
+		// set automatically otherwise
+		else{
+			friendship.setStatus(FriendshipStatus.PENDING);
+		}
+	
 		
 		// make sure the friendship does not already exist
 		if(this.repository.existsAny(friendship.getRequestSender(), friendship.getRequestRecipient())){
@@ -180,7 +181,19 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		return super.findAll(pageRequest);
 	}
 	
-	
+
+	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public Iterable<UserDTO> findAllMyFriends() {
+        return repository.findAllMyFriends(this.getPrincipal().getId());
+	}
+
+	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest) {
+        return repository.findAllMyFriendsPaginated(this.getPrincipal().getId(), pageRequest);
+	}
+
 	
 
 }

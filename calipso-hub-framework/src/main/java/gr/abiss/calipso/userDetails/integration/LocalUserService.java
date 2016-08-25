@@ -24,6 +24,9 @@ import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 
 /**
@@ -85,5 +88,6 @@ public interface LocalUserService<ID extends Serializable, T extends LocalUser> 
 	public void updateLastLogin(ICalipsoUserDetails u);
 
 	public void expireResetPasswordTokens();
+
 
 }

@@ -71,11 +71,7 @@ public class ConfigurationFactory {
 					LOGGER.warn("Loaded configuration from " + propFile);
 				}
 			} catch (ConfigurationException e) {
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.warn("Failed to load configuration from " + propFile, e);
-				}else{
-					LOGGER.warn("Failed to load configuration from " + propFile);
-				}
+				LOGGER.warn("Failed to load configuration from " + propFile);
 			}
 		}
 		

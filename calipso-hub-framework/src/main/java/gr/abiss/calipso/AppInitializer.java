@@ -99,6 +99,7 @@ public class AppInitializer {
 		this.initRoles();
 		if (initData && this.userService.count() == 0) {
 			Role adminRole = this.roleService.findByIdOrName(Role.ROLE_ADMIN);
+			Role operatorRole = this.roleService.findByIdOrName(Role.ROLE_SITE_OPERATOR);
 			
 			Date now = new Date();
 
@@ -142,16 +143,27 @@ public class AppInitializer {
 			SecurityContextHolder.getContext().setAuthentication(
 					new UsernamePasswordAuthenticationToken(system, system.getPassword(), system.getRoles()));
 
-			User u0 = new User();
-			u0.setEmail("info@abiss.gr");
-			u0.setFirstName("Admin");
-			u0.setLastName("User");
-			u0.setUsername("admin");
-			u0.setPassword("admin");
-			u0.setLastVisit(now);
-			u0.addRole(adminRole);
-			u0.setCreatedBy(system);
-			u0 = userService.createActive(u0);
+			User adminUser = new User();
+			adminUser.setEmail("info@abiss.gr");
+			adminUser.setFirstName("Admin");
+			adminUser.setLastName("User");
+			adminUser.setUsername("admin");
+			adminUser.setPassword("admin");
+			adminUser.setLastVisit(now);
+			adminUser.addRole(adminRole);
+			adminUser.setCreatedBy(system);
+			adminUser = userService.createActive(adminUser);
+
+			User opUser = new User();
+			opUser.setEmail("operator@abiss.gr");
+			opUser.setFirstName("Operator");
+			opUser.setLastName("User");
+			opUser.setUsername("operator");
+			opUser.setPassword("operator");
+			opUser.setLastVisit(now);
+			opUser.addRole(adminRole);
+			opUser.setCreatedBy(system);
+			opUser = userService.createActive(opUser);
 
 			int usersMax = numberOfUsersToCreate != null ? numberOfUsersToCreate : 10;
 			int usersCreated = 0;
@@ -169,7 +181,7 @@ public class AppInitializer {
 					u = userService.createActive(u);
 					usersCreated++;
 					// notify the admin for each user creation to test notifications
-					baseNotificationService.create(new BaseNotification(u, u0, null, now, false));
+					baseNotificationService.create(new BaseNotification(u, adminUser, null, now, false));
 					LOGGER.info("Created user: " + u);
 					if(usersCreated >= usersMax){
 						break;
@@ -177,7 +189,7 @@ public class AppInitializer {
 				}
 			}
 
-			LOGGER.info("Admin has " + this.baseNotificationService.countUnseen(u0) + " notifications");
+			LOGGER.info("Admin has " + this.baseNotificationService.countUnseen(adminUser) + " notifications");
 
 		}
 		
