@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import gr.abiss.calipso.model.Friendship;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.UserDTO;
+import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.repository.ModelRepository;import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +21,7 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public interface FriendshipRepository extends ModelRepository<Friendship,String> {
 
-	static final String QUERY_FRIENDS_BY_USERID = "select new gr.abiss.calipso.model.UserDTO(friendship.requestRecipient.id, "
+	static final String QUERY_FRIENDS_BY_USERID = "select new gr.abiss.calipso.model.dto.UserDTO(friendship.requestRecipient.id, "
 			+ "		friendship.requestRecipient.firstName, "
 			+ "		friendship.requestRecipient.lastName, "
 			+ "		friendship.requestRecipient.username, "

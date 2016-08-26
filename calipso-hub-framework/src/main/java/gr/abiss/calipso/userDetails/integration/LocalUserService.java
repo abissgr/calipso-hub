@@ -18,8 +18,8 @@
 package gr.abiss.calipso.userDetails.integration;
 
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.UserInvitationResultsDTO;
-import gr.abiss.calipso.model.UserInvitationsDTO;
+import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 

@@ -45,9 +45,9 @@ import org.springframework.util.CollectionUtils;
 
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.UserDTO;
-import gr.abiss.calipso.model.UserInvitationResultsDTO;
-import gr.abiss.calipso.model.UserInvitationsDTO;
+import gr.abiss.calipso.model.dto.UserDTO;
+import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.repository.RoleRepository;

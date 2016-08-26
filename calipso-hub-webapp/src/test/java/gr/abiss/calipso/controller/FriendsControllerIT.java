@@ -31,6 +31,9 @@ import org.testng.annotations.Test;
 
 import gr.abiss.calipso.model.Friendship;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.dto.UserDTO;
+import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
@@ -92,6 +95,23 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		// get friends
 		given().spec(adminRequestSpec)
 			.get("/calipso/api/rest/friends/my").then().log().all();
+
+		// --------------------------------
+		// Create bulk friendship requests (invitations
+		// --------------------------------
+		UserInvitationsDTO invitations = new UserInvitationsDTO.Builder()
+				.addressLines("abc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@app.com,abc@xyz.com,asd@dsa.com")
+				.recepient(new UserDTO.Builder().email("test@pick.com").build()).build();
+		
+		UserInvitationResultsDTO userInvitationResults = given().spec(adminRequestSpec)
+				.body(invitations)
+				.post("/calipso/api/rest/users/invites")
+				.then().log().all()
+				//.assertThat()
+				// test assertions
+				//.body("id", notNullValue())
+				// get model
+				.extract().as(UserInvitationResultsDTO.class);
 		
 	}
 

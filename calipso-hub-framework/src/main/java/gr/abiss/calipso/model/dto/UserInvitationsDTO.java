@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.model;
+package gr.abiss.calipso.model.dto;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 
 @ApiModel(value = "UserInvitationsDTO", description = "Data transfer object for user invitations")
 public class UserInvitationsDTO implements Serializable {
@@ -52,6 +52,32 @@ public class UserInvitationsDTO implements Serializable {
 		this.recepients = recepients;
 	}
 
-	
+	public static class Builder {
+		private String addressLines;
+		private List<UserDTO> recepients = new LinkedList<UserDTO>();
 
+		public Builder addressLines(String addressLines) {
+			this.addressLines = addressLines;
+			return this;
+		}
+
+		public Builder recepients(List<UserDTO> recepients) {
+			this.recepients.addAll(recepients);
+			return this;
+		}
+		
+		public Builder recepient(UserDTO recepient) {
+			this.recepients.add(recepient);
+			return this;
+		}
+
+		public UserInvitationsDTO build() {
+			return new UserInvitationsDTO(this);
+		}
+	}
+
+	private UserInvitationsDTO(Builder builder) {
+		this.addressLines = builder.addressLines;
+		this.recepients = builder.recepients;
+	}
 }

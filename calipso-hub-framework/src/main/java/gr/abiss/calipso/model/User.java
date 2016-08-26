@@ -58,6 +58,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import gr.abiss.calipso.fs.FilePersistence;
 import gr.abiss.calipso.fs.FilePersistencePreview;
+import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;

@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import gr.abiss.calipso.fs.FilePersistenceService;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.UserInvitationResultsDTO;
-import gr.abiss.calipso.model.UserInvitationsDTO;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
+import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
 import gr.abiss.calipso.tiers.controller.IFilesModelController;

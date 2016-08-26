@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gr.abiss.calipso.model.Friendship;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.UserDTO;
+import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.repository.FriendshipRepository;
 import gr.abiss.calipso.repository.UserRepository;

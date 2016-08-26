@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.model;
+package gr.abiss.calipso.model.dto;
 
 import java.io.Serializable;
 
@@ -23,33 +23,31 @@ import javax.persistence.Column;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.User.Builder;
 import io.swagger.annotations.ApiModel;
-
 
 @ApiModel(value = "UserDTO", description = "UserDTO is a lightweight DTO version of User")
 public class UserDTO implements Serializable {
-	
+
 	private String id;
-	
+
 	private String firstName;
-	
+
 	private String lastName;
-	
+
 	private String username;
-	
+
 	@Column(name = "email", unique = true, nullable = false)
 	private String email;
 
 	@Column(name = "email_hash", nullable = false)
 	private String emailHash;
 
-
 	public UserDTO() {
 	}
 
-	
-	public UserDTO(String id, String firstName, String lastName,
-			String username, String email, String emailHash) {
+	public UserDTO(String id, String firstName, String lastName, String username, String email, String emailHash) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -59,91 +57,116 @@ public class UserDTO implements Serializable {
 		this.emailHash = emailHash;
 	}
 
-
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this)
-			.appendSuper(super.toString())
-			.append("id", this.getUsername())
-			.append("firstName", this.getUsername())
-			.append("lastName", this.getUsername())
-			.append("username", this.getUsername())
-			.append("email", this.getUsername())
-			.append("emailHash", this.getEmail())
-			.toString();
+		return new ToStringBuilder(this).appendSuper(super.toString()).append("id", this.getUsername())
+				.append("firstName", this.getUsername()).append("lastName", this.getUsername())
+				.append("username", this.getUsername()).append("email", this.getUsername())
+				.append("emailHash", this.getEmail()).toString();
 	}
-	
+
 	public User toUser() {
-		return new User.Builder()
-			.id(this.id)
-			.firstName(this.firstName)
-			.lastName(this.lastName)
-			.username(this.username)
-			.email(this.email)
-			.build();
+		return new User.Builder().id(this.id).firstName(this.firstName).lastName(this.lastName).username(this.username)
+				.email(this.email).build();
 	}
-	
-	
-	
+
 	public String getId() {
 		return id;
 	}
-
 
 	public void setId(String id) {
 		this.id = id;
 	}
 
-
 	public String getFirstName() {
 		return firstName;
 	}
-
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
-
 	public String getLastName() {
 		return lastName;
 	}
-
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
 
-
 	public String getUsername() {
 		return username;
 	}
-
 
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
-
 	public String getEmail() {
 		return email;
 	}
-
 
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
-
 	public String getEmailHash() {
 		return emailHash;
 	}
 
-
 	public void setEmailHash(String emailHash) {
 		this.emailHash = emailHash;
 	}
-	
-	
 
+	public static class Builder {
+		private String id;
+		private String firstName;
+		private String lastName;
+		private String username;
+		private String email;
+		private String emailHash;
+
+		public Builder id(String id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder firstName(String firstName) {
+			this.firstName = firstName;
+			return this;
+		}
+
+		public Builder lastName(String lastName) {
+			this.lastName = lastName;
+			return this;
+		}
+
+		public Builder username(String username) {
+			this.username = username;
+			return this;
+		}
+
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
+
+		public Builder emailHash(String emailHash) {
+			this.emailHash = emailHash;
+			return this;
+		}
+
+		public UserDTO build() {
+			return new UserDTO(this);
+		}
+	}
+
+	private UserDTO(Builder builder) {
+		this.id = builder.id;
+		this.firstName = builder.firstName;
+		this.lastName = builder.lastName;
+		this.username = builder.username;
+		this.email = builder.email;
+		this.emailHash = builder.emailHash;
+	}
 }

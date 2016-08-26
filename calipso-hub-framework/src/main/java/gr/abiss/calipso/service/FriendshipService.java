@@ -21,7 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import gr.abiss.calipso.model.Friendship;
-import gr.abiss.calipso.model.UserDTO;
+import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.service.ModelService;
 
 public interface FriendshipService extends ModelService<Friendship, String> {

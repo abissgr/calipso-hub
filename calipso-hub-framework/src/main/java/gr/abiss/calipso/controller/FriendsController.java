@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import gr.abiss.calipso.model.UserDTO;
+import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.service.FriendshipService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
