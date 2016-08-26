@@ -23,7 +23,10 @@ import javax.persistence.Column;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import io.swagger.annotations.ApiModel;
 
+
+@ApiModel(value = "UserDTO", description = "UserDTO is a lightweight DTO version of User")
 public class UserDTO implements Serializable {
 	
 	private String id;
@@ -69,6 +72,18 @@ public class UserDTO implements Serializable {
 			.append("emailHash", this.getEmail())
 			.toString();
 	}
+	
+	public User toUser() {
+		return new User.Builder()
+			.id(this.id)
+			.firstName(this.firstName)
+			.lastName(this.lastName)
+			.username(this.username)
+			.email(this.email)
+			.build();
+	}
+	
+	
 	
 	public String getId() {
 		return id;

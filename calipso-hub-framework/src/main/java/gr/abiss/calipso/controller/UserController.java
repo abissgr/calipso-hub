@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import gr.abiss.calipso.fs.FilePersistenceService;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.UserInvitationsDTO;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
@@ -63,13 +65,20 @@ public class UserController extends AbstractNoDeleteModelController<User, String
 	public User getByUserNameOrEmail(@PathVariable String userNameOrEmail) {
 		return this.service.findByUserNameOrEmail(userNameOrEmail);
 	}
-	
+
 	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
 	@ResponseBody
     @ApiOperation(value = "Add metadatum", notes = "Add or update a resource metadatum")
 	public void addMetadatum(@PathVariable String subjectId,
 			@RequestBody MetadatumDTO dto) {
 		service.addMetadatum(subjectId, dto);
+	}
+	
+	@RequestMapping(value = "invites", method = RequestMethod.POST)
+	@ResponseBody
+    @ApiOperation(value = "Invite users", notes = "Invite users by email")
+	public UserInvitationResultsDTO inviteUsers(UserInvitationsDTO invitations) {
+		return service.inviteUsers(invitations);
 	}
     
 }

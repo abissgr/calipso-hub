@@ -815,29 +815,9 @@
       <attribute value="jar:file:/home/manos/.m2/repository/org/jruby/jruby-complete/1.7.21/jruby-complete-1.7.21-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/websocket/websocket-client/9.4.0.M0/websocket-client-9.4.0.M0.jar" sourcepath="M2_REPO/org/eclipse/jetty/websocket/websocket-client/9.4.0.M0/websocket-client-9.4.0.M0-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/org/glassfish/tyrus/bundles/tyrus-standalone-client/1.9/tyrus-standalone-client-1.9.jar" sourcepath="M2_REPO/org/glassfish/tyrus/bundles/tyrus-standalone-client/1.9/tyrus-standalone-client-1.9-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/websocket/websocket-client/9.4.0.M0/websocket-client-9.4.0.M0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-util/9.4.0.M0/jetty-util-9.4.0.M0.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-util/9.4.0.M0/jetty-util-9.4.0.M0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-util/9.4.0.M0/jetty-util-9.4.0.M0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-io/9.4.0.M0/jetty-io-9.4.0.M0.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-io/9.4.0.M0/jetty-io-9.4.0.M0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/jetty-io/9.4.0.M0/jetty-io-9.4.0.M0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/websocket/websocket-common/9.4.0.M0/websocket-common-9.4.0.M0.jar" sourcepath="M2_REPO/org/eclipse/jetty/websocket/websocket-common/9.4.0.M0/websocket-common-9.4.0.M0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/websocket/websocket-common/9.4.0.M0/websocket-common-9.4.0.M0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/websocket/websocket-api/9.4.0.M0/websocket-api-9.4.0.M0.jar" sourcepath="M2_REPO/org/eclipse/jetty/websocket/websocket-api/9.4.0.M0/websocket-api-9.4.0.M0-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/eclipse/jetty/websocket/websocket-api/9.4.0.M0/websocket-api-9.4.0.M0-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/glassfish/tyrus/bundles/tyrus-standalone-client/1.9/tyrus-standalone-client-1.9-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
 </classpath>

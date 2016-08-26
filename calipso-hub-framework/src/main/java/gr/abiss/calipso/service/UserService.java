@@ -20,11 +20,13 @@ package gr.abiss.calipso.service;
 import java.util.Map;
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserInvitationsDTO;
 import gr.abiss.calipso.tiers.service.GenericService;
 import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.userDetails.integration.LocalUserService;
 
 public interface UserService extends ModelService<User, String>, LocalUserService<String, User> {
+
 
 
 }

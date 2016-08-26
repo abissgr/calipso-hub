@@ -17,30 +17,16 @@
  */
 package gr.abiss.calipso.service.impl;
 
-import gr.abiss.calipso.model.Role;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.UserDTO;
-import gr.abiss.calipso.model.interfaces.Metadatum;
-import gr.abiss.calipso.model.metadata.UserMetadatum;
-import gr.abiss.calipso.repository.RoleRepository;
-import gr.abiss.calipso.repository.UserRepository;
-import gr.abiss.calipso.service.EmailService;
-import gr.abiss.calipso.service.UserService;
-import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.userDetails.integration.LocalUserService;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
-
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.mail.MessagingException;
-import javax.persistence.Query;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
@@ -49,14 +35,28 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+
+import gr.abiss.calipso.model.Role;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserDTO;
+import gr.abiss.calipso.model.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.UserInvitationsDTO;
+import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.metadata.UserMetadatum;
+import gr.abiss.calipso.repository.RoleRepository;
+import gr.abiss.calipso.repository.UserRepository;
+import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
+import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
 //@Named("userService")
 public class UserServiceImpl extends AbstractModelServiceImpl<User, String, UserRepository> 
@@ -271,5 +271,88 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		u = this.update(u);
 		return u;
 	}
+
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public UserInvitationResultsDTO inviteUsers(UserInvitationsDTO invitations) {
+		UserInvitationResultsDTO results = new UserInvitationResultsDTO();
+		// add from list
+		if(!CollectionUtils.isEmpty(invitations.getRecepients())){
+			for(UserDTO dto : invitations.getRecepients()){
+				User u = this.repository.findByUsernameOrEmail(dto.getEmail());
+				if(u == null){
+					if(results.getInvited().contains(dto.getEmail())){
+						results.getDuplicate().add(dto.getEmail());
+					}
+					else{
+						results.getInvited().add(this.create(u).getEmail());
+					}
+				}
+				else{
+					results.getExisting().add(dto.getEmail());
+				}
+			}
+		}
+		// add from string of addresses
+		if(StringUtils.isNotBlank(invitations.getAddressLines())){
+			List<String> addresses = Arrays.asList(invitations.getAddressLines().replaceAll("\\r?\\n", ",").split(","));
+			if(!CollectionUtils.isEmpty(addresses)){
+				for(String sAddress : addresses){
+					InternetAddress email = isValidEmailAddress(sAddress);
+					if(email != null){
+						User u = this.repository.findByUsernameOrEmail(email.getAddress());
+						if(u == null){
+							if(results.getInvited().contains(email.getAddress())){
+								results.getDuplicate().add(email.getAddress());
+							}
+							else{
+
+								u = new User();
+								u.setEmail(email.getAddress());
+								String personal = email.getPersonal();
+								if(StringUtils.isNotBlank(personal)){
+									String[] names = personal.split(" ");
+									if(names.length > 0){
+										if(StringUtils.isNotBlank(names[0])){
+											u.setFirstName(names[0]);
+										}
+										if(names.length > 1 && StringUtils.isNotBlank(names[1])){
+											u.setLastName(names[1]);
+										}
+										// handle middle name
+										if(names.length > 2 && StringUtils.isNotBlank(names[2])){
+											u.setLastName(names[2]);
+										}
+									}
+								}
+								results.getInvited().add(this.create(u).getEmail());
+							}
+						}
+						else{
+							results.getExisting().add(u.getEmail());
+						}
+					
+					}
+					else{
+						results.getInvalid().add(sAddress);
+					}
+				}
+			}
+			
+		}
+		return results;
+		
+	}
 	
+	public static InternetAddress isValidEmailAddress(String email) {
+		InternetAddress emailAddr = null;
+		   try {
+		      emailAddr = new InternetAddress(email);
+		      emailAddr.validate();
+		   } catch (AddressException ex) {
+			   emailAddr = null;
+		   }
+		   return emailAddr;
+		}
 }
