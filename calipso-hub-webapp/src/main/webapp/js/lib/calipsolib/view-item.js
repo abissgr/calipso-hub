@@ -279,8 +279,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.form.renderLazyField(fieldKey);
 		},
 		initialize : function(options) {
-			console.log("UseCaseFormView#initialize options: ");
-			console.log(options);
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
 			this.searchResultsCollection = this.model.wrappedCollection;
 			// get the form/field templates

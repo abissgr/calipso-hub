@@ -19,10 +19,10 @@
 
 define([
   'jquery', 'underscore', 'underscore-inflection', 'backbone', 'bootstrap',
-  'calipso', 'backbone', 'modules-config', 'routers/MainRouter' ],
+  'calipso', 'modules-config', 'routers/MainRouter' ],
 function(
 	$, _, _inflection, Backbone, bootstrap,
-	Calipso, Backbone, modulesConfig, MainRouter) {
+	Calipso, modulesConfig, MainRouter) {
 
 
 	//////////////////////////////////
@@ -52,7 +52,10 @@ function(
 					$a.closest(".navbar-toggleable-xs").removeClass('in');
 				}
 			}
-			Backbone.history.navigate(href, true);
+			//Backbone.history.navigate(href, true);
+      Calipso.navigate(href, {
+        trigger: true
+      })
 		}
 	});
 

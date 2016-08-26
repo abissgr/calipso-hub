@@ -541,16 +541,50 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
       Calipso.Model.prototype.initialize.apply(this, arguments);
       var _this = this;
       this.set("translatedName", Calipso.util.getLabels("countries." + this.get("id")));
-      var buildBrowseMenu = function(){
-        _this.buildBrowseMenu();
-      };
-      this.on('sync', buildBrowseMenu);
-      this.on('error', buildBrowseMenu);
+      this.on('sync', function(model, response, options) {
+        _this.onLogin(model, response, options);
+      });
+      this.on('error', function(model, response, options) {
+        alert("Authentication failed!");
+      });
+    },
+    onLogin : function(model, response, options){
+      // send logged in user on their way
+      var fw = "home";
+      if (Calipso.app.fw) {
+        fw = Calipso.app.fw;
+        Calipso.app.fw = null;
+      }
+      // reload the app if locale needs to be changed
+      var userLocale = this.get("locale");
+      var oldLocale = localStorage.getItem("locale");
+
+
+      if (!oldLocale || (oldLocale && oldLocale != userLocale)) {
+        localStorage.setItem("locale", this.userDetails.get("locale"));
+        Calipso.navigate(fw, {
+          trigger : false
+        });
+        window.location.reload();
+      }
+      else{
+        // is the application started?
+        if(Calipso.app.isStarted()){
+          Calipso.app.updateHeaderFooter();
+          Calipso.navigate(fw, {
+            trigger : true
+          });
+        }
+        else{
+          Calipso.app.start(Calipso.getConfigProperty("startOptions"));
+        }
+      }
+
     },
 		buildBrowseMenu : function(){
 			var _this = this;
 			var allModelLabels = Calipso.util.getLabels("models");
-			var browseMenu = {};
+			var browseMenu = null;
 			var parseModel = function(ModelType) {
 				// setup model-based usecase factories
 				if (ModelType.getTypeName() != "Calipso.model.Model" &&
@@ -566,6 +600,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 							if(!rolesIncluded || Calipso.isUserInAnyRole(rolesIncluded)){
 								// and exclusions have no match
 								if(!Calipso.isUserInAnyRole(rolesExcluded)){
+                  browseMenu || (browseMenu = {});
 									var modelLabels = allModelLabels[ModelType.getPathFragment()] || {};
 									browseMenu[ModelType.getPathFragment()] = {
 										label : modelLabels.menuLabel || modelLabels.label || ModelType.getPathFragment(),
@@ -579,8 +614,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			};
 			_(Calipso.model).each(parseModel);
 			_(Calipso.customModel).each(parseModel);
-			_this.browseMenu = browseMenu;
-      Calipso.updateHeaderFooter();
+			_this.set("browseMenu", browseMenu);
 		},
 		// TODO: move to usecases/labels
 		getViewTitle : function() {

@@ -192,8 +192,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		tagName : "nav",
 		className : "navbar navbar-dark bg-inverse",
 		events : {
-			"click a.login" : "login",
-			"click a.register" : "register",
+			//"click a.login" : "login",
+			//"click a.register" : "register",
 			"click a.logout" : "logout",
 			"click a.locale" : "changeLocale",
 		},
@@ -217,17 +217,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			Calipso.changeLocale($(e.currentTarget).data("locale"));
 		},
 		onShow : function() {
-			var menuModel = [ {
-				url : "users",
-				label : "Users"
-			}, {
-				url : "hosts",
-				label : "Hosts"
-			} ];// header-menu-item
-			var MenuItemView = Backbone.Marionette.ItemView.extend({
-				tagName : "li",
-				template : Calipso.getTemplate('header-menuitem')
-			});
 
 			if (Calipso.util.isAuthenticated()) {
 				// load and render notifications list
@@ -250,10 +239,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				Calipso.updateBadges(".badge-notifications-count", Calipso.session.userDetails ? Calipso.session.userDetails.get("notificationCount") : 0);
 			}
 
-		},
-		logout : function(e) {
-			Calipso.stopEvent(e);
-			Calipso.vent.trigger("session:destroy");
 		},
 	}, {
 		typeName : "Calipso.view.HeaderView"

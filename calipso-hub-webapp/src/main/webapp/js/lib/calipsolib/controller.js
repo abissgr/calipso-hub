@@ -27,7 +27,6 @@ define(
 			Marionette.Controller.prototype.constructor.call(this, options);
 		},
 		showView : function(view){
-			console.log("Controller#showView");
 			Calipso.app.mainContentRegion.show(view);
 		},
 		toHome : function() {
@@ -70,36 +69,12 @@ define(
 		},
 		logout : function() {
 			Calipso.session.logout();
-			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
-				model : userDetails
-			}));
-			Calipso.navigate("home", {
-				trigger : true
-			});
 		},
 		register : function() {
 			Calipso.navigate("useCases/users/register", {
 				trigger : true
 			});
 		},
-		/**
-		 * Instantiate and show a layout for the given model
-		 * @param  {Calipso.model.GenericModel} givenModel the model for which the layout will be shown
-		 * @param  {Calipso.view.MainLayout]} the layout type to use. If absent the method will
-		 *                                             obtain the layout type from givenModel.getLayoutType()
-
-		// TODO: remove
-		showLayoutForModel : function(givenModel, useCaseContext, layoutOptions) {
-			// instantiate and show the layout
-			var view = new useCaseContext.view({model: givenModel, useCaseContext: useCaseContext});
-			//Calipso.vent.trigger("app:show", view);
-
-			this.showView(view);
-		},*/
-
-		/**
-		 *
-		 */
 		showEntitySearch : function(pathFragment, httpParams) {
 			this.showUseCaseView(pathFragment, null, "search", httpParams);
 		},
@@ -109,22 +84,8 @@ define(
 		showUserDetailsView : function(useCaseKey, httpParams) {
 			// temp line
 			this.showUseCaseView( "userDetails", null, useCaseKey, httpParams);
-			/*
-			if(!useCaseKey){
-				Calipso.navigate(
-					Calipso.util.session.isAuthenticated() ? "userDetails/changePassword" : "userDetails/login" ,
-					{
-						trigger : true
-					});
-			}
-			else{
-				this.showUseCaseView( "userDetails", null, useCaseKey, httpParams);
-			}
-			*/
 		},
 		showUseCaseView : function(pathFragment, modelId, useCaseKey, httpParams) {
-
-			console.log("Controller#showUseCaseView");
 			httpParams = Calipso.getHttpUrlParams(httpParams);
 			var _self = this;
 			var qIndex = modelId ? modelId.indexOf("?") : -1;
@@ -152,7 +113,6 @@ define(
 
 						var renderFetchable = function() {
 							_self.showView(useCaseContext.createView({regionName : "/", regionPath : "/"}));
-							_self.syncMainNavigationState(model);
 						};
 						var fetchable = useCaseContext.getFetchable();
 
@@ -172,31 +132,6 @@ define(
 		notFoundRoute : function() {
 			this.showView(new Calipso.view.NotFoundView());
 
-		},
-		//		decodeParam : function(s) {
-		//			return decodeURIComponent(s.replace(/\+/g, " "));
-		//		},
-		syncMainNavigationState : function(modelForRoute) {
-			var pathFragment = modelForRoute.getPathFragment(), contentNavTabName = modelForRoute.get("id");
-			//console.log("AbstractController#syncMainNavigationState, pathFragment: " + pathFragment + ", contentNavTabName: " + contentNavTabName);
-			// update active nav menu tab
-			if (pathFragment && pathFragment != this.lastMainNavTabName) {
-				$('.navbar-nav li.active').removeClass('active');
-				$('#mainNavigationTab-' + pathFragment).addClass('active');
-				this.lastMainNavTabName = pathFragment;
-			}
-			// update active content tab
-			if (contentNavTabName && contentNavTabName != this.lastContentNavTabName) {
-				$('#calipsoTabLabelsRegion li.active').removeClass('active');
-				//				$('#md-crud-layout-tab-label-' + contentNavTabName).addClass('active');
-				// show coressponding content
-				// console.log("show tab: "+contentNavTabName);
-				$('#calipsoTabContentsRegion .tab-pane').removeClass('active');
-				$('#calipsoTabContentsRegion .tab-pane').addClass('hidden');
-				$('#tab-' + contentNavTabName).removeClass('hidden');
-				$('#tab-' + contentNavTabName).addClass('active');
-				this.lastContentNavTabName = contentNavTabName;
-			}
 		},
 		/**
 		* route for template-based pages ('page/:templateName')
