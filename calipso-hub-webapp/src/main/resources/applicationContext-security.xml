@@ -59,7 +59,18 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
         <!-- Adds social authentication filter to the Spring Security filter chain. 
         <sec:custom-filter ref="socialAuthenticationFilter" before="PRE_AUTH_FILTER" />-->
 	</sec:http>
-
+	
+	<!-- sec:websocket-message-broker>
+	        <sec:intercept-message type="CONNECT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message type="UNSUBSCRIBE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message type="DISCONNECT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message type="MESSAGE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message type="SUBSCRIBE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message pattern="/app/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message pattern="/topic/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message pattern="/user/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	</sec:websocket-message-broker-->
+	
 	<!-- Declare an authentication-manager to use custom userDetailsService implementations -->
 	<sec:authentication-manager alias="authenticationManager">
 		<sec:authentication-provider user-service-ref='userDetailsService' />

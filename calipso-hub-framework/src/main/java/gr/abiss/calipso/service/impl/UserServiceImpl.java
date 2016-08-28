@@ -279,17 +279,21 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		UserInvitationResultsDTO results = new UserInvitationResultsDTO();
 		// add from list
 		if(!CollectionUtils.isEmpty(invitations.getRecepients())){
+			// Proces recepients
 			for(UserDTO dto : invitations.getRecepients()){
 				User u = this.repository.findByUsernameOrEmail(dto.getEmail());
 				if(u == null){
 					if(results.getInvited().contains(dto.getEmail())){
+						// Ignore duplicate user
 						results.getDuplicate().add(dto.getEmail());
 					}
 					else{
-						results.getInvited().add(this.create(u).getEmail());
+						// invite user
+						results.getInvited().add(this.create(dto.toUser()).getEmail());
 					}
 				}
 				else{
+					// skip existing user email
 					results.getExisting().add(dto.getEmail());
 				}
 			}
@@ -301,13 +305,13 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 				for(String sAddress : addresses){
 					InternetAddress email = isValidEmailAddress(sAddress);
 					if(email != null){
-						User u = this.repository.findByUsernameOrEmail(email.getAddress());
-						if(u == null){
-							if(results.getInvited().contains(email.getAddress())){
-								results.getDuplicate().add(email.getAddress());
-							}
-							else{
-
+						if(results.getInvited().contains(email.getAddress())){
+							// ignore duplicate email
+							results.getDuplicate().add(email.getAddress());
+						}
+						else{
+							User u = this.repository.findByUsernameOrEmail(email.getAddress());
+							if(u == null){
 								u = new User();
 								u.setEmail(email.getAddress());
 								String personal = email.getPersonal();
@@ -326,21 +330,20 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 										}
 									}
 								}
+								// invite user
 								results.getInvited().add(this.create(u).getEmail());
 							}
 						}
-						else{
-							results.getExisting().add(u.getEmail());
-						}
-					
 					}
 					else{
+						// ignore invalid email
 						results.getInvalid().add(sAddress);
 					}
 				}
 			}
 			
 		}
+
 		return results;
 		
 	}

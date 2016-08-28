@@ -44,11 +44,14 @@ public interface UserRepository extends ModelRepository<User, String> {
 	@Query("select u from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public User findByIdOrUsernameOrEmail(String idOrUsernameOrEmail);
 
-	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
-	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
+	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public UserDTO findAsLink(String usernameOrEmailOrId);
-	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
-
+	
+	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl) "
+			+ "from User u where u.id = ?1")
+	public UserDTO findCompactUserById(String id);
+	
+	
 	@Modifying
 	@Query("UPDATE User AS u SET u.lastLogin = CURRENT_TIMESTAMP() WHERE u.id = ?1")
 	public void updateLastLogin(String userId);

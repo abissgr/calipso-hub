@@ -19,23 +19,30 @@ package gr.abiss.calipso.controller;
 
 import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.testng.annotations.Test;
 
 import gr.abiss.calipso.model.Friendship;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
 import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.test.AbstractControllerIT;
+import gr.abiss.calipso.test.AbstractControllerIT.DefaultStompFrameHandler;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.userDetails.model.LoginSubmission;
 import gr.abiss.calipso.utils.Constants;
@@ -66,6 +73,21 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		
 
 		// --------------------------------
+		// subscribe to friendship websocket updates
+		// --------------------------------
+		// 
+		StompSession adminSession = getStompSession(WEBSOCKET_URI, adminLoginContext);
+		StompSession operatorSession = getStompSession(WEBSOCKET_URI, operatorLoginContext);
+		// subsscribe to updates
+		BlockingQueue<FriendshipDTO> adminFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
+		Subscription adminFriendshipQueueSubscription = adminSession.subscribe("/user/queue/friendship", 
+				new DefaultStompFrameHandler<FriendshipDTO>(adminSession, FriendshipDTO.class, adminFriendshipsQueueBlockingQueue));
+
+		BlockingQueue<FriendshipDTO> operatorFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
+		Subscription operatorFriendshipQueueSubscription = operatorSession.subscribe("/user/queue/friendship", 
+				new DefaultStompFrameHandler<FriendshipDTO>(operatorSession, FriendshipDTO.class, operatorFriendshipsQueueBlockingQueue));
+		
+		// --------------------------------
 		// Create a friendship request
 		// --------------------------------
 		LOGGER.info("Create a friendship request");
@@ -75,11 +97,14 @@ public class FriendsControllerIT extends AbstractControllerIT {
 				.requestRecipient(new User(operatorLoginContext.userId))
 				.build())
 			.post("/calipso/api/rest/" + Friendship.API_PATH)
-			.then().log().all().assertThat()
+			.then().assertThat()
 			// test assertions
 			.body("id", notNullValue())
 			// get model
 			.extract().as(Friendship.class);
+		
+		// test operator user queue
+	    Assert.assertEquals(FriendshipStatus.PENDING, operatorFriendshipsQueueBlockingQueue.poll(15, SECONDS).getStatus());
 
 		LOGGER.info("Accept request");
 		// accept request
@@ -88,25 +113,27 @@ public class FriendsControllerIT extends AbstractControllerIT {
 			.body(friendship)
 			.put("/calipso/api/rest/" + Friendship.API_PATH + "/" + friendship.getId())
 			// get model
-			.then().log().all().extract().as(Friendship.class);
-
+			.then().extract().as(Friendship.class);
+		
+		// test admin user queue
+	    Assert.assertEquals(FriendshipStatus.ACCEPTED, adminFriendshipsQueueBlockingQueue.poll(10, SECONDS).getStatus());
 
 		LOGGER.info("Get friends");
 		// get friends
 		given().spec(adminRequestSpec)
-			.get("/calipso/api/rest/friends/my").then().log().all();
+			.get("/calipso/api/rest/friends/my");
 
 		// --------------------------------
 		// Create bulk friendship requests (invitations
 		// --------------------------------
 		UserInvitationsDTO invitations = new UserInvitationsDTO.Builder()
-				.addressLines("abc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@app.com,abc@xyz.com,asd@dsa.com")
+				.addressLines("manos, info@abiss.gr\nabc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@app.com,abc@xyz.com,asd@dsa.com")
 				.recepient(new UserDTO.Builder().email("test@pick.com").build()).build();
 		
 		UserInvitationResultsDTO userInvitationResults = given().spec(adminRequestSpec)
 				.body(invitations)
-				.post("/calipso/api/rest/users/invites")
-				.then().log().all()
+				.post("/calipso/api/rest/friends/invites")
+				.then()
 				//.assertThat()
 				// test assertions
 				//.body("id", notNullValue())

@@ -74,11 +74,5 @@ public class UserController extends AbstractNoDeleteModelController<User, String
 		service.addMetadatum(subjectId, dto);
 	}
 	
-	@RequestMapping(value = "invites", method = RequestMethod.POST)
-	@ResponseBody
-    @ApiOperation(value = "Invite users", notes = "Invite users by email")
-	public UserInvitationResultsDTO inviteUsers(UserInvitationsDTO invitations) {
-		return service.inviteUsers(invitations);
-	}
     
 }

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gr.abiss.calipso.model.Friendship;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.repository.FriendshipRepository;
@@ -73,6 +74,12 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		
 		// create
 		friendship = super.create(friendship);
+		if(friendship.getStatus().equals(FriendshipStatus.PENDING)){
+			// notify request recepient
+			String username = this.userRepository.findCompactUserById(friendship.getRequestRecipient().getId()).getUsername();
+			LOGGER.debug("Sending friendship DTO to " + username);
+			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendship", new FriendshipDTO(friendship));
+		}
 
 		// create inverse if accepted
 		this.createInverseIfAccepted(friendship);
@@ -143,6 +150,11 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 			inverse = new Friendship(friendship.getRequestRecipient(), friendship.getRequestSender());
 			inverse.setStatus(FriendshipStatus.INVERSE);
 			super.create(inverse);
+			// notify request sender
+
+			String username = this.userRepository.findCompactUserById(friendship.getRequestSender().getId()).getUsername();
+			LOGGER.debug("Sending friendship DTO to " + username);
+			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendship", new FriendshipDTO(friendship));
 		}
 		return inverse;
 	}

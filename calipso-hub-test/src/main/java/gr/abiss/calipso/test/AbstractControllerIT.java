@@ -31,19 +31,23 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
@@ -61,6 +65,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.Constants;
 import io.restassured.RestAssured;
@@ -83,9 +88,33 @@ public class AbstractControllerIT {
 
 	protected static final Configuration CONFIG = ConfigurationFactory.getConfiguration();
 
+	protected String WEBSOCKET_URI;
+	
 	protected static Configuration getConfig() {
 		return CONFIG;
 	}
+
+	protected StompSession getStompSession(String url, Loggedincontext loginContext) {
+		StompSession ownerSession = null;
+		
+		WebSocketHttpHeaders ownerHandshakeHeaders = new WebSocketHttpHeaders();
+		ownerHandshakeHeaders.add("Authorization", "Basic " + loginContext.ssoToken);
+		try {
+			ownerSession = getWebSocketStompClient().connect(url, ownerHandshakeHeaders, new DefaultStompSessionHandler() {}).get(1, SECONDS);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			throw new RuntimeException(e);
+		}
+		return ownerSession;
+	}
+	
+	protected WebSocketStompClient getWebSocketStompClient() {
+    	// setup websocket
+		StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
+		WebSocketStompClient stompClient = new WebSocketStompClient(webSocketClient);
+         // support JSON messages
+         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+         return stompClient;
+    }
 
 	@BeforeClass
 	public void setup() {
@@ -99,6 +128,10 @@ public class AbstractControllerIT {
 		String port = System.getProperty("jetty.http.port");
 		RestAssured.port = port != null ? Integer.parseInt(port) : 8080;
 
+		this.WEBSOCKET_URI = new StringBuffer("ws://localhost:")
+				.append(RestAssured.port)
+				.append("/calipso/ws")
+				.toString();
 		// TODO:
 		// String basePath = System.getProperty("server.base");
 		// if (basePath == null) {
@@ -178,4 +211,119 @@ public class AbstractControllerIT {
 		public RequestSpecification requestSpec;
 	}
 
+	/**
+	 * Handle stream connection info updates by adding them to a local queue storage
+	 */
+	public static class DefaultInitialDataStompFrameHandler<T> implements StompFrameHandler {
+
+		private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStompFrameHandler.class);
+
+	    private Class datumClass;
+	    private StompSession session;
+	    public List<T>  initialData;
+	    
+	    private DefaultInitialDataStompFrameHandler() {
+	    }
+	    
+	    public DefaultInitialDataStompFrameHandler(StompSession session, Class datumClass) {
+	        this.session = session;
+	        this.datumClass = datumClass;
+	    }
+
+	    @Override
+	    public Type getPayloadType(StompHeaders headers) {
+	        return datumClass;
+	    }
+
+	    @SuppressWarnings("unchecked")
+		@Override
+	    public void handleFrame(StompHeaders headers, Object payload) {
+	        LOGGER.info("handleFrame: payload: " + payload);
+	        this.initialData = (List<T>) payload;
+	    }
+
+	}
+	/**
+	 * Handle stream connection info updates by adding them to a local queue storage
+	 */
+	public static class DefaultStompFrameHandler<T> implements StompFrameHandler {
+
+		private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStompFrameHandler.class);
+
+	    private Class messageClazz;
+	    private StompSession session;
+	    private BlockingQueue<T> blockingQueue;
+	    
+	    private DefaultStompFrameHandler() {
+	    }
+	    
+	    public DefaultStompFrameHandler(StompSession session, Class messageClazz, BlockingQueue<T> blockingQueue) {
+	        this.session = session;
+	        this.blockingQueue = blockingQueue;
+	        this.messageClazz = messageClazz;
+	    }
+
+	    @Override
+	    public Type getPayloadType(StompHeaders headers) {
+	        return this.messageClazz;
+	    }
+
+	    @SuppressWarnings("unchecked")
+		@Override
+	    public void handleFrame(StompHeaders headers, Object payload) {
+	        LOGGER.info("handleFrame: payload: " + payload);
+	        this.blockingQueue.offer((T) payload);
+	    }
+
+	}
+	
+	public static class DefaultStompSessionHandler implements StompSessionHandler {
+
+		private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStompSessionHandler.class);
+		/**
+		 * This implementation is empty.
+		 */
+		@Override
+		public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+
+	        LOGGER.info("afterConnected: session: " + session + ". connectedHeaders: " + connectedHeaders);
+		}
+
+		/**
+		 * This implementation returns String as the expected payload type
+		 * for STOMP ERROR frames.
+		 */
+		@Override
+		public Type getPayloadType(StompHeaders headers) {
+	        LOGGER.info("getPayloadType: headers: " + headers);
+			return String.class;
+		}
+
+		/**
+		 * This implementation is empty.
+		 */
+		@Override
+		public void handleFrame(StompHeaders headers, Object payload) {
+	        LOGGER.info("handleFrame: headers: " + headers + ", payload: " + payload);
+		}
+
+		/**
+		 * This implementation is empty.
+		 */
+		@Override
+		public void handleException(StompSession session, StompCommand command, StompHeaders headers,
+				byte[] payload, Throwable exception) {
+
+	        LOGGER.info("handleException: session: " + session + ", command: " + command + ", headers: " + headers);
+		}
+
+		/**
+		 * This implementation is empty.
+		 */
+		@Override
+		public void handleTransportError(StompSession session, Throwable exception) {
+	        LOGGER.error("Transport ERROR for session: " + session.getSessionId(), exception);
+		}
+
+	}
 }

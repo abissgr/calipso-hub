@@ -189,11 +189,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			}
 
 		}
-
-
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("create, testing returning null, userDetails: " + userDetails);
-		}
 		return userDetails;
 	}
 

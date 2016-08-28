@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Persistable;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
@@ -47,6 +48,9 @@ implements ModelService<T, ID>{
 	
 	protected UserRepository userRepository;
 	protected EmailService emailService;
+	
+	@Inject
+	protected SimpMessageSendingOperations messagingTemplate;
 	
 	@Override
 	@Inject

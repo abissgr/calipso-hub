@@ -91,10 +91,10 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 	@Formula("concat(first_name, ' ', last_name )")
 	private String name;
 
-	@Column(name = "first_name", nullable = false)
+	@Column(name = "first_name", nullable = true)
 	private String firstName;
 
-	@Column(name = "last_name", nullable = false)
+	@Column(name = "last_name", nullable = true)
 	private String lastName;
 
 	@Column(name = "user_name", unique = true, nullable = false)
@@ -296,6 +296,12 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 	@PrePersist
 	@PreUpdate
 	public void resetEmailHash() {
+		if(!StringUtils.isNotBlank(this.getUsername())){
+			this.setUsername(this.getEmail());
+		}
+		if(!StringUtils.isNotBlank(this.getLocale())){
+			this.setLocale("en");
+		}
 		// create the email hash, 
 		// use email as username if latter is empty
 		if (this.getEmail() != null) {

@@ -12,7 +12,7 @@
         	th:unless="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
-        <p class="greetings" th:text="#{email.greeting(${user.getUserName()})}"
+        <p class="greetings" th:text="#{email.greeting(${user.getUsername()})}"
         	th:if="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>

@@ -26,7 +26,9 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 			+ "		friendship.requestRecipient.lastName, "
 			+ "		friendship.requestRecipient.username, "
 			+ "		friendship.requestRecipient.email, "
-			+ "		friendship.requestRecipient.emailHash) "
+			+ "		friendship.requestRecipient.emailHash,"
+			+ "		friendship.requestRecipient.avatarUrl"
+			+ ") "
 			+ "from Friendship friendship where friendship.requestSender.id =  ?1 "
 			+ "and (friendship.status = gr.abiss.calipso.model.types.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.model.types.FriendshipStatus.INVERSE)";
 	/**

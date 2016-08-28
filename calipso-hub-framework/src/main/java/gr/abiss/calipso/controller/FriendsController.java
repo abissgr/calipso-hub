@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +39,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import gr.abiss.calipso.model.dto.UserDTO;
+import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.service.FriendshipService;
+import gr.abiss.calipso.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -53,6 +57,10 @@ public class FriendsController {
 	@Inject
 	@Qualifier(FriendshipService.BEAN_ID)
 	FriendshipService friendshipService;
+	
+	@Inject
+	@Qualifier("userService")
+	UserService userService;
 
 
 	@RequestMapping(value = "my", method = RequestMethod.GET, params = "page=no")
@@ -90,5 +98,14 @@ public class FriendsController {
 		}
 
 		return new PageRequest(page, size, pageableSort);
+	}
+	
+
+	@RequestMapping(value = "invites", method = RequestMethod.POST)
+	@ResponseBody
+    @ApiOperation(value = "Invite users", notes = "Invite users by email")
+	public UserInvitationResultsDTO inviteUsers(@RequestBody UserInvitationsDTO invitations) {
+		LOGGER.debug("INVITE USERS: " + invitations);
+		return this.userService.inviteUsers(invitations);
 	}
 }

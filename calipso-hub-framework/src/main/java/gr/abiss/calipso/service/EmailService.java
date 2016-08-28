@@ -19,6 +19,7 @@ package gr.abiss.calipso.service;
 
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.utils.ConfigurationFactory;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +118,8 @@ public class EmailService {
 		String emailTo = user.getEmail();
 		String emailFrom = getDefaultSender(user);
 		// Prepare the evaluation context
-		final Context ctx = new Context(new Locale(user.getLocale()));
+		String locale = StringUtils.isNoneBlank(user.getLocale()) ? user.getLocale() : "en"; 
+		final Context ctx = new Context(new Locale(locale));
 		ctx.setVariable("user", user);
 
 		sendEmail(subject, templateName, emailTo, emailFrom, ctx);
@@ -154,10 +157,16 @@ public class EmailService {
 			message.setText(htmlContent, true /* isHtml */);
 	
 			// Send email
-			this.mailSender.send(mimeMessage);
+			if(StringUtils.isNotBlank(ConfigurationFactory.getConfiguration().getString("mail.server.host"))){
+				this.mailSender.send(mimeMessage);}
+			else{
+				LOGGER.warn("Skipped sending email as mail.server.host property is empty");
+			}
 		} catch (Exception e) {
 			LOGGER.error("Failed to send email: ", e);
 		}
+		
+		
 	}
 
     
