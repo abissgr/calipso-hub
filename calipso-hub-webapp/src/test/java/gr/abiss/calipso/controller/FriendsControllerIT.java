@@ -80,11 +80,11 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		StompSession operatorSession = getStompSession(WEBSOCKET_URI, operatorLoginContext);
 		// subsscribe to updates
 		BlockingQueue<FriendshipDTO> adminFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
-		Subscription adminFriendshipQueueSubscription = adminSession.subscribe("/user/queue/friendship", 
+		Subscription adminFriendshipQueueSubscription = adminSession.subscribe("/user/queue/friendships", 
 				new DefaultStompFrameHandler<FriendshipDTO>(adminSession, FriendshipDTO.class, adminFriendshipsQueueBlockingQueue));
 
 		BlockingQueue<FriendshipDTO> operatorFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
-		Subscription operatorFriendshipQueueSubscription = operatorSession.subscribe("/user/queue/friendship", 
+		Subscription operatorFriendshipQueueSubscription = operatorSession.subscribe("/user/queue/friendships", 
 				new DefaultStompFrameHandler<FriendshipDTO>(operatorSession, FriendshipDTO.class, operatorFriendshipsQueueBlockingQueue));
 		
 		// --------------------------------

@@ -78,7 +78,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 			// notify request recepient
 			String username = this.userRepository.findCompactUserById(friendship.getRequestRecipient().getId()).getUsername();
 			LOGGER.debug("Sending friendship DTO to " + username);
-			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendship", new FriendshipDTO(friendship));
+			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendships", new FriendshipDTO(friendship));
 		}
 
 		// create inverse if accepted
@@ -154,7 +154,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 
 			String username = this.userRepository.findCompactUserById(friendship.getRequestSender().getId()).getUsername();
 			LOGGER.debug("Sending friendship DTO to " + username);
-			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendship", new FriendshipDTO(friendship));
+			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendships", new FriendshipDTO(friendship));
 		}
 		return inverse;
 	}
