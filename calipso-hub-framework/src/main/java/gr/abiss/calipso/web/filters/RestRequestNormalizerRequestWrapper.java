@@ -27,6 +27,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Simple {@link HttpServletRequestWrapper} wrapper that returns the supplied
  * HTTP BAsic authentication token and HTTP method for {@link HttpServletRequest#getMethod()}.
@@ -54,7 +56,7 @@ class RestRequestNormalizerRequestWrapper extends
 			this.method = request.getMethod();
 		}
 		
-		// setup SSO auth token
+		// setup SSO auth token if needed
 		if(org.apache.commons.lang3.StringUtils.isNotBlank(ssoToken)){
 			this.addHeader("Authorization", "Basic " + ssoToken);
 		}			

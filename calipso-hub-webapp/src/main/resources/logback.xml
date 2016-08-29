@@ -36,19 +36,23 @@
 <!--     <logger name="org.hibernate.type"> -->
 <!--         <level value="ERROR" /> -->
 <!--     </logger> -->
-    <logger name="org.springframework.messaging">
+<!--     <logger name="org.springframework.messaging"> -->
+<!--         <level value="debug" /> -->
+<!--     </logger> -->
+<!--     <logger name="gr.abiss.calipso.websocket"> -->
+<!--         <level value="debug" /> -->
+<!--     </logger> -->
+<!--     <logger name="gr.abiss.calipso.controller"> -->
+<!--         <level value="debug" /> -->
+<!--     </logger> -->
+<!--     <logger name="org.springframework.web.socket"> -->
+<!--         <level value="debug" /> -->
+<!--     </logger> -->
+    
+    <logger name="gr.abiss.calipso">
         <level value="debug" />
     </logger>
-    <logger name="gr.abiss.calipso.service.impl.FriendshipServiceImpl">
-        <level value="debug" />
-    </logger>
-    <logger name="gr.abiss.calipso.websocket">
-        <level value="debug" />
-    </logger>
-    <logger name="gr.abiss.calipso.controller">
-        <level value="debug" />
-    </logger>
-    <logger name="org.springframework.web.socket">
+    <logger name="org.springframework.security">
         <level value="debug" />
     </logger>
     

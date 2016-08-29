@@ -73,13 +73,19 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		
 		String requestMethodOverride = getMethodOverride(request);
-		String authToken = getSecurityToken(request);
+		String authorizationHeader = request.getHeader(Constants.HEADER_AUTHORIZATION);
+		String cookieToken = 
+				org.apache.commons.lang3.StringUtils.isNotBlank(authorizationHeader) 
+				? null : getCookieToken(request);
+
+		LOGGER.debug("doFilterInternal, requestMethodOverride: " + requestMethodOverride +
+				", authorizationHeader: " + authorizationHeader + ", cookieToken: " + cookieToken);
 		response.setContentType(JSON_UTF8);
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("doFilterInternal, path: " + request.getContextPath() + ", method override: " + requestMethodOverride  + ", authToken: " + authToken );
+			LOGGER.debug("doFilterInternal, path: " + request.getContextPath() + ", method override: " + requestMethodOverride  + ", authToken: " + cookieToken );
 		}
-		if (!StringUtils.isEmpty(requestMethodOverride) || !StringUtils.isEmpty(authToken) ) {
-			HttpServletRequest wrapper = new RestRequestNormalizerRequestWrapper(request, requestMethodOverride, authToken);
+		if (!StringUtils.isEmpty(requestMethodOverride) || !StringUtils.isEmpty(cookieToken) ) {
+			HttpServletRequest wrapper = new RestRequestNormalizerRequestWrapper(request, requestMethodOverride, cookieToken);
 			filterChain.doFilter(wrapper, response);
 		} else {
 			filterChain.doFilter(request, response);
@@ -87,7 +93,7 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 		
 	}
 	
-	protected String getSecurityToken(HttpServletRequest httpRequest) {
+	protected String getCookieToken(HttpServletRequest httpRequest) {
 		String authToken = null;
 		Cookie[] cookies = httpRequest.getCookies();
 		String ssoCookieName = userDetailsConfig.getCookiesBasicAuthTokenName();

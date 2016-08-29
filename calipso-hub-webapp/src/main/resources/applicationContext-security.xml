@@ -27,6 +27,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		        </bean>
 		   </constructor-arg>
 	</bean>
+	
 	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"  use-expressions="true"
 		disable-url-rewriting="true">
 		<!-- Disable Spring Security CSRF protection since 
@@ -39,7 +40,6 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		<!-- REST client login -->
 		<sec:intercept-url pattern="/apiauth/**" access="permitAll"/>
 		<!-- for spring social login/signup -->
-		<sec:intercept-url pattern="/auth/**" access="permitAll"/>
         <sec:intercept-url pattern="/login" access="permitAll"/>
         <sec:intercept-url pattern="/signin/**" access="permitAll"/>
         <sec:intercept-url pattern="/signup/**" access="permitAll"/>

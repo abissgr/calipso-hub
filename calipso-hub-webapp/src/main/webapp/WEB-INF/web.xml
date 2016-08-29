@@ -105,14 +105,18 @@
     
     <filter-mapping>
         <filter-name>restRequestNormalizerFilter</filter-name>
-		<url-pattern>/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
+        <url-pattern>/apiauth/*</url-pattern>
+        <url-pattern>/ws/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
 	
 	<filter-mapping>
 		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/*</url-pattern>
+        <url-pattern>/api/rest/*</url-pattern>
+        <url-pattern>/apiauth/*</url-pattern>
+        <url-pattern>/ws/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
 		<dispatcher>FORWARD</dispatcher>
 	</filter-mapping>
