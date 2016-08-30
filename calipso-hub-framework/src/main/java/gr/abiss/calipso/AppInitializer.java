@@ -26,6 +26,8 @@ import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.notification.model.BaseNotification;
 import gr.abiss.calipso.notification.model.NotificationType;
 import gr.abiss.calipso.notification.service.BaseNotificationService;
+import gr.abiss.calipso.repository.RoleRepository;
+import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.repository.geography.ContinentRepository;
 import gr.abiss.calipso.repository.geography.CountryRepository;
 import gr.abiss.calipso.service.EmailService;
@@ -86,6 +88,12 @@ public class AppInitializer {
 	@Inject
 	private CountryRepository countryRepository;
 
+	@Inject
+	private RoleRepository roleRepository;
+	
+	@Inject
+	private UserRepository userRepository;
+
 	@PostInitialize
 	public void init() {
 		this.init(10);
@@ -97,9 +105,9 @@ public class AppInitializer {
 
 		this.initContinentsAndCountries();
 		this.initRoles();
-		if (initData && this.userService.count() == 0) {
-			Role adminRole = this.roleService.findByIdOrName(Role.ROLE_ADMIN);
-			Role operatorRole = this.roleService.findByIdOrName(Role.ROLE_SITE_OPERATOR);
+		if (initData && this.userRepository.count() == 0) {
+			Role adminRole = this.roleRepository.findByIdOrName(Role.ROLE_ADMIN);
+			Role operatorRole = this.roleRepository.findByIdOrName(Role.ROLE_SITE_OPERATOR);
 			
 			Date now = new Date();
 
@@ -206,14 +214,14 @@ public class AppInitializer {
 	}
 
 	private void initRoles() {
-		if (roleService.count() == 0) {
+		if (this.roleRepository.count() == 0) {
 			Role adminRole = new Role(Role.ROLE_ADMIN, "System Administrator.");
-			adminRole = roleService.create(adminRole);
+			adminRole = this.roleRepository.save(adminRole);
 			Role siteAdminRole = new Role(Role.ROLE_SITE_OPERATOR, "Site Operator.");
-			siteAdminRole = roleService.create(siteAdminRole);
+			siteAdminRole = this.roleRepository.save(siteAdminRole);
 			// this is added to users by user service, just creating it
 			Role userRole = new Role(Role.ROLE_USER, "Logged in user");
-			userRole = roleService.create(userRole);
+			userRole = this.roleRepository.save(userRole);
 		}
 	}
 

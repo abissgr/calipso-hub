@@ -30,9 +30,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+
 @Entity
 @Table(name = "acl_sid")
-public class AclSid implements Persistable<Long> {
+public class AclSid implements CalipsoPersistable<Long> {
 
 	private static final long serialVersionUID = -6859990313570031965L;
 

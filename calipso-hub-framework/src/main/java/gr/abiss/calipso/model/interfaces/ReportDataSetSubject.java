@@ -20,7 +20,7 @@ package gr.abiss.calipso.model.interfaces;
 import java.io.Serializable;
 
 
-public interface ReportDataSetSubject<ID extends Serializable> {
+public interface ReportDataSetSubject<ID extends Serializable> extends CalipsoPersistable<ID>{
 
 	public abstract ID getId();
 

@@ -29,7 +29,7 @@ import java.util.List;
  * @see gr.abiss.calipso.model.entities.AbstractAuditableRateable
  * @see gr.abiss.calipso.repository.RateableRepository
  */
-public interface Rateable<R extends AbstractRating> {
+public interface Rateable<R extends AbstractRating>{
 
 	/**
 	 * Get the average rating for this entity

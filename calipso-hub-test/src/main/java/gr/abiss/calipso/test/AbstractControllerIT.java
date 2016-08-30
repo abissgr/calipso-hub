@@ -43,7 +43,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -68,6 +67,7 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.Constants;
+import gr.abiss.calipso.websocket.DefaultStompSessionHandler;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
@@ -93,14 +93,17 @@ public class AbstractControllerIT {
 	protected static Configuration getConfig() {
 		return CONFIG;
 	}
-
 	protected StompSession getStompSession(String url, Loggedincontext loginContext) {
+		return getStompSession(url, loginContext, new DefaultStompSessionHandler());
+	}
+
+	protected StompSession getStompSession(String url, Loggedincontext loginContext, StompSessionHandler sessionHandler) {
 		StompSession ownerSession = null;
 		
 		WebSocketHttpHeaders ownerHandshakeHeaders = new WebSocketHttpHeaders();
 		ownerHandshakeHeaders.add("Authorization", "Basic " + loginContext.ssoToken);
 		try {
-			ownerSession = getWebSocketStompClient().connect(url, ownerHandshakeHeaders, new DefaultStompSessionHandler() {}).get(1, SECONDS);
+			ownerSession = getWebSocketStompClient().connect(url, ownerHandshakeHeaders, sessionHandler).get(1, SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new RuntimeException(e);
 		}
@@ -119,8 +122,6 @@ public class AbstractControllerIT {
 	@BeforeClass
 	public void setup() {
 
-		// parse JSON by default
-		// RestAssured.defaultParser = Parser.JSON;
 		// log request/response in errors
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
@@ -274,56 +275,6 @@ public class AbstractControllerIT {
 	        LOGGER.info("handleFrame: payload: " + payload);
 	        this.blockingQueue.offer((T) payload);
 	    }
-
-	}
-	
-	public static class DefaultStompSessionHandler implements StompSessionHandler {
-
-		private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStompSessionHandler.class);
-		/**
-		 * This implementation is empty.
-		 */
-		@Override
-		public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-
-	        LOGGER.info("afterConnected: session: " + session + ". connectedHeaders: " + connectedHeaders);
-		}
-
-		/**
-		 * This implementation returns String as the expected payload type
-		 * for STOMP ERROR frames.
-		 */
-		@Override
-		public Type getPayloadType(StompHeaders headers) {
-	        LOGGER.info("getPayloadType: headers: " + headers);
-			return String.class;
-		}
-
-		/**
-		 * This implementation is empty.
-		 */
-		@Override
-		public void handleFrame(StompHeaders headers, Object payload) {
-	        LOGGER.info("handleFrame: headers: " + headers + ", payload: " + payload);
-		}
-
-		/**
-		 * This implementation is empty.
-		 */
-		@Override
-		public void handleException(StompSession session, StompCommand command, StompHeaders headers,
-				byte[] payload, Throwable exception) {
-
-	        LOGGER.info("handleException: session: " + session + ", command: " + command + ", headers: " + headers);
-		}
-
-		/**
-		 * This implementation is empty.
-		 */
-		@Override
-		public void handleTransportError(StompSession session, Throwable exception) {
-	        LOGGER.error("Transport ERROR for session: " + session.getSessionId(), exception);
-		}
 
 	}
 }

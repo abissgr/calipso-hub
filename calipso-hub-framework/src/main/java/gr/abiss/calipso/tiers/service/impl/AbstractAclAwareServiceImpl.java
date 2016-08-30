@@ -23,6 +23,7 @@ import gr.abiss.calipso.model.acl.AclObjectIdentity;
 import gr.abiss.calipso.model.acl.AclSid;
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.dto.ReportDataSet;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.types.AggregateFunction;
@@ -32,6 +33,7 @@ import gr.abiss.calipso.repository.acl.AclObjectIdentityRepository;
 import gr.abiss.calipso.repository.acl.AclSidRepository;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.tiers.service.GenericService;
+import gr.abiss.calipso.tiers.util.EntityUtil;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
@@ -42,6 +44,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -49,10 +52,12 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +72,7 @@ import org.springframework.util.CollectionUtils;
  * @param <R> The repository class
  */
 @Transactional(readOnly = true)
-public abstract class AbstractAclAwareServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
+public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
 		extends CrudServiceImpl<T, ID, R> implements GenericService<T, ID> {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -108,6 +113,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends Persistable<ID>, ID 
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_CREATE)
 	public T create(T resource) {
 		Map<String, Metadatum> metadata = noteMetadata(resource);
 		T saved = super.create(resource);
@@ -149,6 +155,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends Persistable<ID>, ID 
 	 */
 	@Override
 	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_UPDATE)
 	public T update(T resource) {
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("update, resource: " + resource);
@@ -157,6 +164,22 @@ public abstract class AbstractAclAwareServiceImpl<T extends Persistable<ID>, ID 
 		T saved = super.update(resource);
 		persistNotedMetadata(metadata, saved);
 		return saved;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_UPDATE)
+	public T patch(T resource) {
+		// make sure entity is set to support partial updates
+		T persisted = this.findById(resource.getId());
+		// copy non-null properties to persisted
+		BeanUtils.copyProperties(resource, persisted, EntityUtil.getNullPropertyNames(resource));
+		resource = persisted;
+		// FW to normal update
+		return this.update(persisted);
 	}
 
 
@@ -250,5 +273,101 @@ public abstract class AbstractAclAwareServiceImpl<T extends Persistable<ID>, ID 
 	public List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName){
 		return this.repository.getUploadsForProperty(subjectId, propertyName);
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_DELETE)
+	public void delete(T resource) {
+		// TODO Auto-generated method stub
+		super.delete(resource);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_DELETE_BY_ID)
+	public void delete(ID id) {
+		// TODO Auto-generated method stub
+		super.delete(id);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_DELETE_ALL)
+	public void deleteAll() {
+		// TODO Auto-generated method stub
+		super.deleteAll();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_DELETE_WITH_CASCADE)
+	public void deleteAllWithCascade() {
+		// TODO Auto-generated method stub
+		super.deleteAllWithCascade();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@PreAuthorize(T.PRE_AUTHORIZE_VIEW)
+	public T findById(ID id) {
+		// TODO Auto-generated method stub
+		return super.findById(id);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@PreAuthorize(T.PRE_AUTHORIZE_FIND_BY_IDS)
+	public Iterable<T> findByIds(Set<ID> ids) {
+		// TODO Auto-generated method stub
+		return super.findByIds(ids);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@PreAuthorize(T.PRE_AUTHORIZE_FIND_ALL)
+	public Iterable<T> findAll() {
+		// TODO Auto-generated method stub
+		return super.findAll();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@PreAuthorize(T.PRE_AUTHORIZE_SEARCH)
+	public Page<T> findAll(Pageable pageRequest) {
+		// TODO Auto-generated method stub
+		return super.findAll(pageRequest);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	@PreAuthorize(T.PRE_AUTHORIZE_COUNT)
+	public Long count() {
+		// TODO Auto-generated method stub
+		return super.count();
+	}
+	
+	
 
 }

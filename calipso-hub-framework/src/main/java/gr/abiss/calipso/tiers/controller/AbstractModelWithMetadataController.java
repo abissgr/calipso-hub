@@ -30,10 +30,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import gr.abiss.calipso.model.dto.MetadatumDTO;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.tiers.service.ModelService;
 import io.swagger.annotations.ApiOperation;
 
-public abstract class AbstractModelWithMetadataController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
+public abstract class AbstractModelWithMetadataController<T extends CalipsoPersistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends AbstractModelController<T, ID, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelWithMetadataController.class);

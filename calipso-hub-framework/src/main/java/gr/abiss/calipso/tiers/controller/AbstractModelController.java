@@ -57,6 +57,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.service.cms.BinaryFileService;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
@@ -68,7 +69,7 @@ import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-public abstract class AbstractModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
+public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelController.class);
@@ -259,16 +260,12 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
      */
 	@RequestMapping(value = "{id}", method = RequestMethod.PATCH)
     @ResponseBody
-    @ApiOperation(value = "Partially update a resource", notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+    @ApiOperation(value = "Patch (partially update) a resource", notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
-	public T updatePartial(/*@ApiParam(name = "id", required = true, value = "string")*/ @PathVariable ID id, @RequestBody T resource) {
-		// make sure entity is set to support partial updates
-		T persisted = this.service.findById(id);
-		// copy non-null properties to persisted
-		BeanUtils.copyProperties(resource, persisted, EntityUtil.getNullPropertyNames(resource));
-		resource = persisted;
-		// FW to normal update
-		return this.update(id, resource);
+	public T patch(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id, @RequestBody T resource) {
+		applyCurrentPrincipal(resource);
+		resource.setId(id);
+		return this.service.patch(resource);
 	}
 	
     /**
@@ -281,7 +278,8 @@ public abstract class AbstractModelController<T extends Persistable<ID>, ID exte
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
 	public T update(@ApiParam(name = "id", required = true, value = "string") @PathVariable ID id, @RequestBody T resource) {
 		applyCurrentPrincipal(resource);
-		return super.update(id, resource);
+		resource.setId(id);
+		return this.service.update(resource);
 	}
 
     /**

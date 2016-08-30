@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.testng.annotations.Test;
@@ -46,6 +47,7 @@ import gr.abiss.calipso.test.AbstractControllerIT.DefaultStompFrameHandler;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.userDetails.model.LoginSubmission;
 import gr.abiss.calipso.utils.Constants;
+import gr.abiss.calipso.websocket.DefaultStompSessionHandler;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -139,6 +141,16 @@ public class FriendsControllerIT extends AbstractControllerIT {
 				//.body("id", notNullValue())
 				// get model
 				.extract().as(UserInvitationResultsDTO.class);
+		
+	}
+	
+	public static class HeartBeatStompSessionHandler extends DefaultStompSessionHandler{
+
+		@Override
+		public void handleFrame(StompHeaders headers, Object payload) {
+			// TODO Auto-generated method stub
+			super.handleFrame(headers, payload);
+		}
 		
 	}
 

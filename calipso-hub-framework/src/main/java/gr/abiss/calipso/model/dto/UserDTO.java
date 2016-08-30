@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiModel;
 public class UserDTO implements Serializable {
 
 	public static UserDTO fromUser(User user){
-		return new UserDTO(user.getId(), user.getFirstName(), user.getLabel(), user.getUsername(), user.getEmail(), user.getEmailHash(), user.getAvatarUrl());
+		return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), user.getEmailHash(), user.getAvatarUrl());
 	}
 	
 	private String id;

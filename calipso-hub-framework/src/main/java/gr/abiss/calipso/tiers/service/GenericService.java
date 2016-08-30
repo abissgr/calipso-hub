@@ -67,4 +67,6 @@ public interface GenericService<T extends Persistable<ID>, ID extends Serializab
 	 * @return the uploads
 	 */
 	public List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName);
+
+	public T patch(T resource);
 }

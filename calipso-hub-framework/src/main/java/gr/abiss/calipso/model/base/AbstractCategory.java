@@ -41,7 +41,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * Resource categories are hierarchical, have aliases and can be used as tags
  */
 @MappedSuperclass
-public abstract class AbstractCategory<T extends AbstractCategory<T>> extends AuditableResource<T> implements ReportDataSetSubject{
+public abstract class AbstractCategory<T extends AbstractCategory<T>> extends AuditableResource<T>{
 
 	private static final long serialVersionUID = -1329254539598110186L;
 
@@ -55,16 +55,6 @@ public abstract class AbstractCategory<T extends AbstractCategory<T>> extends Au
 	public AbstractCategory(String name, T parent) {
 		super(name, parent);
 	}
-
-	/**
-	 * {@inheritDoc}}
-	 * @see gr.abiss.calipso.model.interfaces.ReportDataSetSubject#getLabel()
-	 */
-	@Override
-	public String getLabel(){
-		return this.getName();
-	}
-
 	
 	@Override
     public boolean equals(Object obj) {

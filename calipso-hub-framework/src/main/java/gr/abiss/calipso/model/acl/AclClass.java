@@ -26,9 +26,11 @@ import javax.persistence.Table;
 
 import org.springframework.data.domain.Persistable;
 
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+
 @Entity
 @Table(name = "acl_class")
-public class AclClass implements Persistable<Long> {
+public class AclClass implements CalipsoPersistable<Long> {
 
 	private static final long serialVersionUID = -8538893700776925998L;
 

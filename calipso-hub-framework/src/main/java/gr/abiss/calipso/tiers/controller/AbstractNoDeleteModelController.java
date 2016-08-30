@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import gr.abiss.calipso.model.cms.BinaryFile;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import io.swagger.annotations.ApiOperation;
@@ -47,7 +48,7 @@ import io.swagger.annotations.ApiParam;
  * Base class for model controllers that must not support HTTP DELETE
  * operations.
  */
-public abstract class AbstractNoDeleteModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
+public abstract class AbstractNoDeleteModelController<T extends CalipsoPersistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends AbstractModelController<T, ID, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractNoDeleteModelController.class);

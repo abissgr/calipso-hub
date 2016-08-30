@@ -92,6 +92,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	 */
 	@Override
 	@Transactional(readOnly = false)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public Friendship update(Friendship resource) {
 		// Get current principal,
 		ICalipsoUserDetails userDetails = this.getPrincipal();
@@ -128,6 +129,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	 */
 	@Override
 	@Transactional(readOnly = false)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public void delete(Friendship resource) {
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();
@@ -160,6 +162,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public Page<Friendship> findAll(Pageable pageRequest) {
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();

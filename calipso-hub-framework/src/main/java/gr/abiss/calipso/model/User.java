@@ -79,10 +79,11 @@ import io.swagger.annotations.ApiModelProperty;
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
-		implements LocalUser, ReportDataSetSubject {
+		implements LocalUser {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 	private static final long serialVersionUID = -7942906897981646998L;
+	public static final String PRE_AUTHORIZE_CREATE = "permitAll";
 
 	@ApiModelProperty(hidden = true)
 	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
@@ -233,15 +234,6 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 			}
 		}
 		return hasIt;
-	}
-
-	/**
-	 * {@inheritDoc}}
-	 * @see gr.abiss.calipso.model.interfaces.ReportDataSetSubject#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		return this.getName();
 	}
 
 	@Override

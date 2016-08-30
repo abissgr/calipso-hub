@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.tiers.service;
 
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
@@ -38,7 +39,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
 
-public abstract class AbstractModelServiceImpl<T extends Persistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
+public abstract class AbstractModelServiceImpl<T extends CalipsoPersistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
 		extends AbstractAclAwareServiceImpl<T, ID, R> 
 implements ModelService<T, ID>{
 	

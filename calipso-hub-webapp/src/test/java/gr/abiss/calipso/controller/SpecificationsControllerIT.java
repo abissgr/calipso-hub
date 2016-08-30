@@ -26,9 +26,13 @@ import java.math.BigDecimal;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import gr.abiss.calipso.test.AbstractControllerIT;
+import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
+import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 
 @Test(/*singleThreaded = true, */description = "Test dynamic JPA specifications used in default search stack")
 @SuppressWarnings("unused")
@@ -36,9 +40,21 @@ public class SpecificationsControllerIT extends AbstractControllerIT {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationsControllerIT.class);
 
+	Loggedincontext adminLoginContext;
+	RequestSpecification adminRequestSpec;
+    @BeforeClass
+	public void setup() {
+    	super.setup();
+		// parse JSON by default
+		// RestAssured.defaultParser = Parser.JSON;
+
+		adminLoginContext = this.getLoggedinContext("admin", "admin");
+		adminRequestSpec = adminLoginContext.requestSpec;
+    }
+
 	@Test(description = "Test simple type properties")
 	public void testSimpleTypeProperty() throws Exception {
-		 given().param("name", "Greece")
+		 given().spec(adminRequestSpec).param("name", "Greece")
 			.get("/calipso/api/rest/countries").
 		then().assertThat()
 			.body("content[0].name", equalTo("Greece"));
@@ -46,7 +62,7 @@ public class SpecificationsControllerIT extends AbstractControllerIT {
 
 	@Test(description = "Test related entity properties")
 	public void testRelatedEntityTypeProperty() throws Exception {
-		 given().
+		 given().spec(adminRequestSpec).
 		 	param("parent", "AS").
 		 get("/calipso/api/rest/countries").
 		 then().
@@ -57,7 +73,7 @@ public class SpecificationsControllerIT extends AbstractControllerIT {
 
 	@Test(description = "Test related entity IDs")
 	public void testRelatedEntityId() throws Exception {
-		 given().
+		 given().spec(adminRequestSpec).
 		 	param("parent.id", "AS").
 		 get("/calipso/api/rest/countries").
 		 then().
@@ -67,7 +83,7 @@ public class SpecificationsControllerIT extends AbstractControllerIT {
 
 	@Test(description = "Test path to related entities simple type property")
 	public void testPathToRelatedSimpleTypeProperty() throws Exception {
-		 given().
+		 given().spec(adminRequestSpec).
 		 	param("parent.name", "Oceania").
 		 get("/calipso/api/rest/countries").
 		then().

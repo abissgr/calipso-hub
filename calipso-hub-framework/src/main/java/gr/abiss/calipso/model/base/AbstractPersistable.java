@@ -26,13 +26,14 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.domain.Persistable;
 
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 
 /**
  * Abstract base class for all persistent entities.
  * @param <ID> The id Serializable
  */
 @MappedSuperclass
-public abstract class AbstractPersistable<ID extends Serializable> implements Persistable<ID> {
+public abstract class AbstractPersistable<ID extends Serializable> implements CalipsoPersistable<ID> {
 
 	private static final long serialVersionUID = -6009587976502456848L;
 

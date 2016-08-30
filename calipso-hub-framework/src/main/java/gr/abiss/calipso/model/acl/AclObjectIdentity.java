@@ -29,12 +29,14 @@ import javax.persistence.Table;
 
 import org.springframework.data.domain.Persistable;
 
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+
 /**
  * Simple JPA implementation of Spring's AclObjectIdentity.
  */
 @Entity
 @Table(name = "acl_object_identity")
-public class AclObjectIdentity implements Persistable<Long> {
+public class AclObjectIdentity implements CalipsoPersistable<Long> {
 
 	private static final long serialVersionUID = -412927951704768649L;
 

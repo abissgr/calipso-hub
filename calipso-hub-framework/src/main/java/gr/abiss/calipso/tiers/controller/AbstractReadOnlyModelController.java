@@ -29,13 +29,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.tiers.service.ModelService;
 import io.swagger.annotations.ApiOperation;
 
 /**
  * Base class for read-only model controllers, i.e. with no support for HTTP PUT, PATCH or DELETE.
  */
-public abstract class AbstractReadOnlyModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
+public abstract class AbstractReadOnlyModelController<T extends CalipsoPersistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends AbstractNoDeleteModelController<T, ID, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractReadOnlyModelController.class);
@@ -61,7 +62,7 @@ public abstract class AbstractReadOnlyModelController<T extends Persistable<ID>,
 	@RequestMapping(value = "{id}", method = RequestMethod.PATCH)
 	@ResponseBody
 	@ApiOperation(hidden = true, value = "Perform a partial update (unsupported)")
-	public T updatePartial(ID id, T resource) {
+	public T patch(ID id, T resource) {
 		throw new NotImplementedClientException("Method is unsupported.");
 	}
 

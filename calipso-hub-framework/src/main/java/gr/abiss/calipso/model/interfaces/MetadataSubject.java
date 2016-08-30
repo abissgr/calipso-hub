@@ -20,7 +20,7 @@ package gr.abiss.calipso.model.interfaces;
 import java.util.Collection;
 import java.util.Map;
 
-public interface MetadataSubject<M extends Metadatum> {
+public interface MetadataSubject<M extends Metadatum>{
 
 	Map<String, M> getMetadata();
 
