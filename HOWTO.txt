@@ -27,7 +27,9 @@ build.calipso.cookies.secure=false
 build.log.rootlevel=warn
 
 # Email
-build.mail.server.host=MAIL.YOU.COM
+build.mail.test.enable=true
+build.mail.test.user=system
+build.mail.server.host=
 build.mail.server.port=2525
 build.mail.server.protocol=smtp
 build.mail.server.from=YOU@YOU.YOU
