@@ -107,11 +107,15 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User create(User resource) {
+		LOGGER.debug("create, PRE_AUTHORIZE_CREATE: {}", resource.PRE_AUTHORIZE_CREATE);
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
 		resource.setResetPasswordToken(generator.generateKey());
+		LOGGER.debug("create, PRE_AUTHORIZE_CREATE1: {}", resource.PRE_AUTHORIZE_CREATE);
 		resource = super.create(resource);
+		LOGGER.debug("create, PRE_AUTHORIZE_CREATE2: {}", resource.PRE_AUTHORIZE_CREATE);
 		emailService.sendAccountConfirmation(resource);
+		LOGGER.debug("create, PRE_AUTHORIZE_CREATE3: {}", resource.PRE_AUTHORIZE_CREATE);
 		return resource;
 	}
 

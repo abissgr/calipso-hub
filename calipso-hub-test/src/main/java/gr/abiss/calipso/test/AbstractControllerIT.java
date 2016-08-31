@@ -198,8 +198,12 @@ public class AbstractControllerIT {
 
 	protected RequestSpecification getRequestSpec(String ssoToken) {
 		// extend the global spec we have already set to add the SSO token
-		RequestSpecification requestSpec = new RequestSpecBuilder().setAccept(JSON_UTF8).setContentType(JSON_UTF8)
-				.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, ssoToken).build();
+		RequestSpecification requestSpec; 
+		RequestSpecBuilder b = new RequestSpecBuilder().setAccept(JSON_UTF8).setContentType(JSON_UTF8);
+		if(ssoToken != null){
+			b.addCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, ssoToken);
+		}
+		requestSpec = b.build();
 		return requestSpec;
 	}
 

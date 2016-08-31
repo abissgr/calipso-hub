@@ -61,6 +61,7 @@ import gr.abiss.calipso.fs.FilePersistencePreview;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
 import gr.abiss.calipso.model.geography.Country;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
@@ -79,11 +80,24 @@ import io.swagger.annotations.ApiModelProperty;
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
-		implements LocalUser {
+		implements LocalUser, CalipsoPersistable<String> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 	private static final long serialVersionUID = -7942906897981646998L;
+	public static final String PRE_AUTHORIZE_SEARCH = "isAuthenticated()";
 	public static final String PRE_AUTHORIZE_CREATE = "permitAll";
+	public static final String PRE_AUTHORIZE_UPDATE = "isAuthenticated()";
+	public static final String PRE_AUTHORIZE_PATCH = "isAuthenticated()";
+	public static final String PRE_AUTHORIZE_VIEW = "isAuthenticated()";
+	public static final String PRE_AUTHORIZE_DELETE = "isAuthenticated()";
+	
+
+	public static final String PRE_AUTHORIZE_DELETE_BY_ID = "denyAll";
+	public static final String PRE_AUTHORIZE_DELETE_ALL = "denyAll";
+	public static final String PRE_AUTHORIZE_DELETE_WITH_CASCADE = "denyAll";
+	public static final String PRE_AUTHORIZE_FIND_BY_IDS = "denyAll";
+	public static final String PRE_AUTHORIZE_FIND_ALL = "denyAll";
+	public static final String PRE_AUTHORIZE_COUNT = "denyAll";
 
 	@ApiModelProperty(hidden = true)
 	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")

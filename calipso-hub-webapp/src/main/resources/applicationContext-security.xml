@@ -43,7 +43,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
         <sec:intercept-url pattern="/login" access="permitAll"/>
         <sec:intercept-url pattern="/signin/**" access="permitAll"/>
         <sec:intercept-url pattern="/signup/**" access="permitAll"/>
-        <sec:intercept-url pattern="/user/register/**" access="permitAll"/>
+        <sec:intercept-url pattern="/api/rest/users/**" method="POST" access="permitAll" />
 		<!-- 
         <sec:intercept-url pattern="/api/rest/users/**" method="GET" access="hasAuthority('ROLE_USER')" />
         <sec:intercept-url pattern="/api/rest/users/**" method="POST" access="permitAll" />
@@ -80,22 +80,6 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	<!-- To enable Method Security Expressions and custom PermissionEvaluator
         we need to add the following 
     -->
-    <!-- sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled">
-        <sec:expression-handler ref="expressionHandler" />
-    </sec:global-method-security-->
-    <sec:global-method-security pre-post-annotations="enabled" secured-annotations="enabled" />
-    
-    <!-- To use hasPermission() expressions, we have to configure a PermissionEvaluator -->
-    <!-- See 15.3.2 Built-In Expression 
-            @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator     
-    --> 
-    <bean id="expressionHandler"
-        class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
-        <!--property name="permissionEvaluator" ref="customPermissionEvaluator" />
-        <property name = "roleHierarchy" ref="roleHierarchy"/-->
-    </bean>
-    
-    
     <!--
     Configures the social authentication filter which integrates Spring Social
     with Spring Security.

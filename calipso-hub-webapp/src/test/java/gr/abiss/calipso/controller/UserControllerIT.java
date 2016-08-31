@@ -29,10 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import gr.abiss.calipso.model.Friendship;
+import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import gr.abiss.calipso.userDetails.model.LoginSubmission;
 import gr.abiss.calipso.utils.Constants;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 @Test(/*singleThreaded = true, */description = "Test dynamic JPA specifications used in default search stack")
 @SuppressWarnings("unused")
@@ -43,6 +46,23 @@ public class UserControllerIT extends AbstractControllerIT {
 	@Test(description = "Test logging in with correct credentials")
 	public void testCorrectLogin() throws Exception {
 		this.getLoggedinContext("admin", "admin");
+	}
+	
+	@Test(description = "Test registration")
+	public void testRegistration() throws Exception {
+		RequestSpecification spec = this.getRequestSpec(null);
+		User user = given().spec(spec)
+				.body(new User.Builder()
+					.firstName("Firstname")
+					.lastName("LastName")
+					.email("ittestreg@UserControllerIT.evasyst.com")
+					.build())
+				.post("/calipso/api/rest/users")
+				.then().assertThat()
+				// test assertions
+				.body("id", notNullValue())
+				// get model
+				.extract().as(User.class);
 	}
 
 	

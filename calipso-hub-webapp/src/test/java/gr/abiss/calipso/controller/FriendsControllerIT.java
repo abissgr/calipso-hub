@@ -134,7 +134,7 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		
 		UserInvitationResultsDTO userInvitationResults = given().spec(adminRequestSpec)
 				.body(invitations)
-				.post("/calipso/api/rest/friends/invites")
+				.post("/calipso/api/rest/invitations")
 				.then()
 				//.assertThat()
 				// test assertions

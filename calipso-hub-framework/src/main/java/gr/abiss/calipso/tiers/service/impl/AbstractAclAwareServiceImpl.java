@@ -57,6 +57,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
+import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Propagation;
@@ -114,7 +115,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<I
 	@Override
 	@Transactional(readOnly = false)
 	@PreAuthorize(T.PRE_AUTHORIZE_CREATE)
-	public T create(T resource) {
+	public T create(@P("resource") T resource) {
 		Map<String, Metadatum> metadata = noteMetadata(resource);
 		T saved = super.create(resource);
 		createAclObjectIdentity(saved, this.getDomainClass());
@@ -156,7 +157,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<I
 	@Override
 	@Transactional(readOnly = false)
 	@PreAuthorize(T.PRE_AUTHORIZE_UPDATE)
-	public T update(T resource) {
+	public T update(@P("resource") T resource) {
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("update, resource: " + resource);
 		}
@@ -172,7 +173,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<I
 	@Override
 	@Transactional(readOnly = false)
 	@PreAuthorize(T.PRE_AUTHORIZE_UPDATE)
-	public T patch(T resource) {
+	public T patch(@P("resource") T resource) {
 		// make sure entity is set to support partial updates
 		T persisted = this.findById(resource.getId());
 		// copy non-null properties to persisted
@@ -280,7 +281,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<I
 	@Override
 	@Transactional(readOnly = false)
 	@PreAuthorize(T.PRE_AUTHORIZE_DELETE)
-	public void delete(T resource) {
+	public void delete(@P("resource") T resource) {
 		// TODO Auto-generated method stub
 		super.delete(resource);
 	}
