@@ -17,17 +17,6 @@
  */
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.model.entities.AbstractAuditable;
-import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
-import gr.abiss.calipso.model.metadata.UserMetadatum;
-import gr.abiss.calipso.tiers.annotation.ModelResource;
-import gr.abiss.calipso.tiers.controller.AbstractModelController;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.utils.MD5Utils;
-
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,37 +27,52 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.annotations.Formula;
-import org.springframework.security.core.GrantedAuthority;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-//import com.wordnik.swagger.annotations.ApiModel;
+import gr.abiss.calipso.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.geography.Country;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
+import gr.abiss.calipso.tiers.controller.AbstractModelController;
 
 /**
  */
-@ModelResource(path = "hosts", controllerSuperClass = AbstractModelController.class, 
-	apiName = "Hosts", apiDescription = "Operations about hosts")
+@ModelResource(path = "hosts", controllerSuperClass = AbstractModelController.class, apiName = "Hosts", apiDescription = "Operations about hosts")
 @Entity
 @Table(name = "host")
 public class Host extends AbstractAuditable<User> {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 
-	@Formula("domain")
+	public static final String PRE_AUTHORIZE_SEARCH = "hasAnyRole('ROLE_ADMIN', 'ROLE_SITE_OPERATOR')";
+	public static final String PRE_AUTHORIZE_CREATE = "hasRole('ROLE_ADMIN')";
+	public static final String PRE_AUTHORIZE_UPDATE = "hasRole('ROLE_ADMIN')";
+	public static final String PRE_AUTHORIZE_PATCH = "hasRole('ROLE_ADMIN')";
+	public static final String PRE_AUTHORIZE_VIEW = "hasAnyRole('ROLE_ADMIN', 'ROLE_SITE_OPERATOR')";
+	public static final String PRE_AUTHORIZE_DELETE = "denyAll";
+
+	public static final String PRE_AUTHORIZE_DELETE_BY_ID = "denyAll";
+	public static final String PRE_AUTHORIZE_DELETE_ALL = "denyAll";
+	public static final String PRE_AUTHORIZE_DELETE_WITH_CASCADE = "denyAll";
+	public static final String PRE_AUTHORIZE_FIND_BY_IDS = "denyAll";
+	public static final String PRE_AUTHORIZE_FIND_ALL = "hasAnyRole('ROLE_ADMIN', 'ROLE_SITE_OPERATOR')";
+	public static final String PRE_AUTHORIZE_COUNT = "denyAll";
+
+	@Column(name = "name", nullable = false, unique = true)
 	private String name;
+
+	@NotNull
+	@Column(name = "description", length = 500, nullable = false)
+	private String description;
 	
-	@Column(name = "domain", nullable = false)
-	private String domain;
-	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "country_id", referencedColumnName = "id", nullable = true)
+	private Country country;
+
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-	@CollectionTable(name = "host_aliases", joinColumns = @JoinColumn(name = "host_id"))
+	@CollectionTable(name = "host_aliases", joinColumns = @JoinColumn(name = "host_id"), uniqueConstraints = {
+			@UniqueConstraint(columnNames = { "host_alias" }) })
 	@Column(name = "host_alias")
 	Set<String> aliases = new HashSet<String>();
 
@@ -76,11 +80,16 @@ public class Host extends AbstractAuditable<User> {
 		super();
 	}
 
-	public Host(String domain) {
+	public Host(String name) {
 		this();
-		this.domain = domain;
+		this.name = name;
 	}
-
+	
+	public Host(String name, String description, Country country) {
+		this(name);
+		this.description = description;
+		this.country = country;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -98,8 +107,6 @@ public class Host extends AbstractAuditable<User> {
 		return null == this.getId() ? false : this.getId().equals(that.getId());
 	}
 
-	
-	
 	public String getName() {
 		return name;
 	}
@@ -108,12 +115,32 @@ public class Host extends AbstractAuditable<User> {
 		this.name = name;
 	}
 
-	public String getDomain() {
-		return domain;
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
 	}
 
-	public void setDomain(String domain) {
-		this.domain = domain;
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return the country
+	 */
+	public Country getCountry() {
+		return country;
+	}
+
+	/**
+	 * @param country the country to set
+	 */
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 
 	public Set<String> getAliases() {
@@ -125,12 +152,45 @@ public class Host extends AbstractAuditable<User> {
 	}
 
 	public void addAlias(String alias) {
-		if(this.aliases == null){
+		if (this.aliases == null) {
 			this.aliases = new HashSet<String>();
 		}
 		this.aliases.add(alias);
 	}
-	
-	
 
+	public static class Builder {
+		private String name;
+		private Country country;
+		private Set<String> aliases = new HashSet<String>();
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder country(Country country) {
+			this.country = country;
+			return this;
+		}
+
+		public Builder aliases(Set<String> aliases) {
+			this.aliases.addAll(aliases);
+			return this;
+		}
+		
+		public Builder aliase(String alias) {
+			this.aliases.add(alias);
+			return this;
+		}
+
+		public Host build() {
+			return new Host(this);
+		}
+	}
+
+	private Host(Builder builder) {
+		this.name = builder.name;
+		this.country = builder.country;
+		this.aliases = builder.aliases;
+	}
 }

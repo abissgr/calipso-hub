@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-define([ 'jquery', 'underscore', "lib/calipsolib/util", "lib/calipsolib/form",
+define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util", "lib/calipsolib/form",
          "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', 'moment' ],
-function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, moment) {
+function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, moment) {
 
 	/**
 	 * A base model implementation to extend for your own models.
@@ -67,8 +67,8 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		isPublic : function() {
 			return this.constructor.isPublic(this);
 		},
-		getUseCaseContext : function(key) {
-			return this.constructor.getUseCaseContext(key);
+		getUseCaseContext : function(options) {
+			return this.constructor.getUseCaseContext(options);
 		},
 		hasUseCase : function(key) {
 			return this.constructor.hasUseCase(key);
@@ -99,10 +99,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		isCollectionCacheable : function() {
 			return this.constructor.isCollectionCacheable && this.constructor.isCollectionCacheable();
 		},
-		getUseCaseContext : function(options) {
-      options.model = this;
-			return this.constructor.getUseCaseContext(options);
-		},
 		getTypeaheadSource : function(options) {
 			return this.constructor.getTypeaheadSource(options);
 		},
@@ -120,9 +116,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		formSchemaCacheMode : this.FORM_SCHEMA_CACHE_CLIENT,
 		typeName : "Calipso.Model",
 		superClass : null,
-		label : "GenericModel",
     labelIcon : "fa fa-list fa-fw",
-		showInMenu : false,
 		public : false,
 		nameProperty : "name",
 		baseFragment : '/api/rest/',
@@ -136,10 +130,18 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		},
 		create : function(attrs, options) {
       var modelAttributes = attrs;
+      console.log("create, modelAttributes: ");
+      console.log(modelAttributes);
+
       if(options && options.httpParams){
         var params = _.isString(options.httpParams) ? Calipso.getHttpUrlParams(options.httpParams) : options.httpParams;
-        modelAttributes = _.extend(params);
+
+        console.log("create, params: ");
+        console.log(params);
+        _.extend(modelAttributes, params);
   		}
+      console.log("create, modelAttributes: ");
+      console.log(modelAttributes);
 			var model = new this(modelAttributes, options);
       if (!modelAttributes.id && this.getTypeName() != "Calipso.model.UserDetailsModel") {
   			var collectionOptions = {
@@ -177,6 +179,13 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 		fields : {},
 		fieldNames : [],
 		useCases : {
+			view : {
+				view : Calipso.view.BrowseLayout,
+				viewOptions : {
+					closeModalOnSync : true,
+          formTemplatesKey : "horizontal",
+				}
+			},
 			create : {
 				view : Calipso.view.BrowseLayout,
 				viewOptions : {
@@ -207,10 +216,12 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
       return useCaseConfig;
 		},
 		getUseCaseContext : function(options) {
+      console.log("getUseCaseContext options: ");
+      console.log(options);
 			var useCaseConfig = this._getUseCaseConfig(options.key);
       Calipso.deepExtend(useCaseConfig.viewOptions, options.viewOptions);
       // setup a model instance if needed
-      useCaseConfig.model = options.model || this.create({id : options.modelId}, {httpParams : options.httpParams});
+      useCaseConfig.model = this.create({id : options.modelId}, {httpParams : options.httpParams});
       useCaseConfig.factory = this;
       useCaseConfig.addToCollection = options.addToCollection;
       useCaseConfig.key = options.key;
@@ -252,12 +263,13 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 			// if not lready created
 			if (!_this.typeaheadSources[sourceKey]) {
 				var sourceUrl = Calipso.getBaseUrl() + this.baseFragment + config.pathFragment + config.query;
-				var bloodhound = new Bloodhound({
+        console.log(_this.getTypeName() + "#getTypeaheadSource, sourceUrl: " + sourceUrl);
+        var bloodhound = new Bloodhound({
 					remote : {
 						url : sourceUrl,
 						wildcard : config.wildcard,
 						transform : function(response) {
-							//console.log(_this.getTypeName() + ' transform', response.content);
+							console.log(_this.getTypeName() + ' transform', response.content);
 							return response.content;
 						}
 					},
@@ -269,13 +281,50 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 						return Bloodhound.tokenizers.whitespace(d.name);
 					},
 				});
+        console.log(_this.getTypeName() + "#getTypeaheadSource, initializing bloodhound");
+
 				bloodhound.initialize();
+        console.log(_this.getTypeName() + "#getTypeaheadSource, bloodhound initialized adding adapter: " + sourceKey);
 				_this.typeaheadSources[sourceKey] = bloodhound.ttAdapter();
+        console.log(_this.getTypeName() + "#getTypeaheadSource, bloodhound initialized added adapter: ");
+        console.log(_this.typeaheadSources[sourceKey]);
 			}
 
 			return _this.typeaheadSources[sourceKey];
 		},
 	});
+
+
+	Calipso.model.HostModel = Calipso.Model.extend(
+  /** @lends Calipso.model.RoleModel.prototype */
+  {
+    toString : function() {
+      return this.get("name");
+    }
+  }, {
+    // static members
+    labelIcon : "fa fa-server fa-fw",
+    pathFragment : "hosts",
+    typeName : "Calipso.model.HostModel",
+    menuConfig : {
+      rolesIncluded : ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
+      rolesExcluded : null,
+    },
+
+
+    fields : {
+      name : {
+        fieldType : "String",
+      },
+      description : {
+        fieldType : "Text",
+      },
+      country : {
+				fieldType : "RelatedModel",
+				"pathFragment" : "countries",
+      },
+    },
+  });
 
 	// Role model
 	// ---------------------------------------
@@ -288,15 +337,14 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
     }
   }, {
     // static members
-    label : "Role",
     labelIcon : "fa fa-users fa-fw",
     pathFragment : "roles",
     typeName : "Calipso.model.RoleModel",
     menuConfig : {
-      rolesIncluded : ["ROLE_ADMIN"],
+      rolesIncluded : ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
       rolesExcluded : null,
     },
-    formSchemaCacheMode : this.FORM_SCHEMA_CACHE_STATIC,
+
 
     fields : {
       name : {
@@ -307,9 +355,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
       },
       description : {
         fieldType : "String",
-      },
-      edit : {
-        fieldType : "Edit",
       },
     },
   });
@@ -324,12 +369,14 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		label : "User",
     labelIcon : "fa fa-user fa-fw",
-		showInMenu : true,
     public : true,
 		pathFragment : "users",
 		typeName : "Calipso.model.UserModel",
+    menuConfig : {
+      rolesIncluded : ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
+      rolesExcluded : null,
+    },
 		useCases : {
       view : {
 				view : Calipso.view.UserProfileLayout,
@@ -432,27 +479,6 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 
 	});
 
-/*
-	Calipso.model.HostModel = Calipso.Model.extend({},
-	// static members
-	{
-		label : "Host",
-		pathFragment : "hosts",
-		typeName : "Calipso.model.HostModel",
-		fields : {
-			"domain" : {
-				fieldType : "Link",
-				backgrid : {
-					cell : Calipso.components.backgrid.ViewRowCell,
-				}
-			},
-			edit : {
-				fieldType : "Edit",
-			},
-		},
-	});
-  */
-
 
 	//////////////////////////////////////////////////
 	// More models
@@ -476,10 +502,13 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	//urlRoot : "/api/rest/users"
 	}, {
 		// static members
-		label : "Country",
-    labelIcon : "fa fa-marker fa-fw",
+    labelIcon : "fa fa-globe fa-fw",
 		pathFragment : "countries",
-		typeName : "Calipso.model.RoleModel",
+		typeName : "Calipso.model.CountryModel",
+    menuConfig : {
+      rolesIncluded : ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
+      rolesExcluded : null,
+    },
 		fields : {
 			"name" : {
 				fieldType : "String",
@@ -517,9 +546,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 					validators : [ 'required' ]
 				}
 			},
-			"edit" : {
-				fieldType : "Edit",
-			},
+
 		},
 	});
 
@@ -530,6 +557,10 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
 	{
 		pathFragment : "baseNotifications",
 		typeName : "Calipso.model.BaseNotificationModel",
+    menuConfig : {
+      rolesIncluded : [],
+      rolesExcluded : null,
+    },
 	});
 
 	Calipso.model.UserDetailsModel = Calipso.Model.extend(
@@ -559,7 +590,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
       var userLocale = this.get("locale");
       var oldLocale = localStorage.getItem("locale");
 
-
+      // change locale?
       if (!oldLocale || (oldLocale && oldLocale != userLocale)) {
         localStorage.setItem("locale", this.userDetails.get("locale"));
         Calipso.navigate(fw, {
@@ -568,16 +599,21 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
         window.location.reload();
       }
       else{
-        // is the application started?
-        if(Calipso.app.isStarted()){
-          Calipso.app.updateHeaderFooter();
-          Calipso.navigate(fw, {
-            trigger : true
-          });
-        }
-        else{
-          Calipso.app.start(Calipso.getConfigProperty("startOptions"));
-        }
+          // is the application started?
+          if(Calipso.app.isStarted()){
+            if(this.get("id")){
+              Calipso.app.updateHeaderFooter();
+              Calipso.navigate(fw, {
+                trigger : true
+              });
+            }
+            else {
+              alert("Invalid credentials")
+            }
+          }
+          else{
+            Calipso.app.start(Calipso.getConfigProperty("startOptions"));
+          }
       }
 
     },
@@ -603,7 +639,7 @@ function($, _, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Han
                   browseMenu || (browseMenu = {});
 									var modelLabels = allModelLabels[ModelType.getPathFragment()] || {};
 									browseMenu[ModelType.getPathFragment()] = {
-										label : modelLabels.menuLabel || modelLabels.label || ModelType.getPathFragment(),
+										label : ModelType.label || Calipso.util.getLabel(ModelType.getPathFragment() + ".plural.label", allModelLabels),
   									labelIcon : ModelType.labelIcon,
 									}
 								}

@@ -567,6 +567,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.model.set(Calipso.getHttpUrlParams());
 		},
 		onModelSync : function(options) {
+			/*
 			// if successful login
 			if (this.model.get("id")) {
 				// TODO: add 'forward' HTTP/URL param in controller cases
@@ -588,9 +589,10 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 						trigger : true
 					})
 				} else {
-					throw "Use case does not define a defaultNext";
+					console.log("Use case does not define a defaultNext");
 				}
 			}
+			*/
 		},
 	},
 	// static members

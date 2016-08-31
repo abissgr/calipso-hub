@@ -32,7 +32,7 @@ define({
 
 		"tmpl" : {
 			"header" : {
-				"settings" : "Site Settings",
+				"browse" : "Browse",
 				"users" : "Users",
 				"roles" : "Roles",
 				"hosts" : "Hosts",
@@ -114,6 +114,12 @@ define({
 		},//calipso
 		"models" : {
 			"users" : {
+				"singular" : {
+					"label" : "User"
+				},
+				"plural" : {
+					"label" : "Users"
+				},
 				"firstName" : {
 					"label" : "First Name"
 				},
@@ -140,6 +146,26 @@ define({
 				}
 			},
 			"roles" : {
+				"singular" : {
+					"label" : "Role"
+				},
+				"plural" : {
+					"label" : "Roles"
+				},
+				"name" : {
+					"label" : "Name"
+				},
+				"description" : {
+					"label" : "Description"
+				}
+			},
+			"hosts" : {
+				"singular" : {
+					"label" : "Host"
+				},
+				"plural" : {
+					"label" : "Hosts"
+				},
 				"name" : {
 					"label" : "Name"
 				},
@@ -148,6 +174,12 @@ define({
 				}
 			},
 			"countries" : {
+				"singular" : {
+					"label" : "Country"
+				},
+				"plural" : {
+					"label" : "Countries"
+				},
 				"name" : {
 					"label" : "Name"
 				},

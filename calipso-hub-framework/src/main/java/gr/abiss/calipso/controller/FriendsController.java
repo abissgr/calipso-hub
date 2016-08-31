@@ -63,14 +63,14 @@ public class FriendsController {
 	UserService userService;
 
 
-	@RequestMapping(value = "my", method = RequestMethod.GET, params = "page=no")
+	@RequestMapping(value = {"", "my"}, method = RequestMethod.GET, params = "page=no")
 	@ResponseBody
 	@ApiOperation(value = "Find all friends", notes = "Find all friends of the current user")
 	public Iterable<UserDTO> findAllMyFriends() {
 		return this.friendshipService.findAllMyFriends();
 	}
 
-	@RequestMapping(value = "my", method = RequestMethod.GET)
+	@RequestMapping(value = {"", "my"}, method = RequestMethod.GET)
 	@ResponseBody
 	@ApiOperation(value = "Find all friends (paginated)", notes = "Find all friends of the current user. Returns paginated results")
 	public Page<UserDTO> findAllMyFriendsPaginated(
@@ -98,14 +98,5 @@ public class FriendsController {
 		}
 
 		return new PageRequest(page, size, pageableSort);
-	}
-	
-
-	@RequestMapping(value = "invites", method = RequestMethod.POST)
-	@ResponseBody
-    @ApiOperation(value = "Invite users", notes = "Invite users by email")
-	public UserInvitationResultsDTO inviteUsers(@RequestBody UserInvitationsDTO invitations) {
-		LOGGER.debug("INVITE USERS: " + invitations);
-		return this.userService.inviteUsers(invitations);
 	}
 }

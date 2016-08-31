@@ -120,6 +120,73 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 			});
 		}
 	});
+  Calipso.components.backgrid.RelatedModelCell = Backgrid.UriCell.extend(
+	/** @lends Calipso.components.backgrid.RelatedModelCell.prototype */
+	{
+		className : "related-model-cell",
+    target: "",
+    pathFragment : null,
+    useCase : "view",
+		initialize : function(options) {
+			Backgrid.UriCell.prototype.initialize.apply(this, arguments);
+      this.pathFragment = options.column.get("pathFragment");
+      if(!this.pathFragment){
+        throw "Required option missing: pathFragment";
+      }
+		},
+    render: function () {
+      this.$el.empty();
+      var rawValue = this.model.get(this.column.get("name")) || "";
+      var text = rawValue.name || rawValue.title || rawValue;
+      this.$el.append($("<a>", {
+        tabIndex: -1,
+        href: "/useCases/" + this.pathFragment + "/" + (rawValue.id || rawValue) + "/" + this.useCase,
+        title: this.title || rawValue.description || text,
+        target: this.target
+      }).text(text));
+      return this;
+    }
+
+	});
+
+
+	Calipso.components.backgrid.TextCell = Backgrid.StringCell.extend(
+	/** @lends Calipso.components.backgrid.ViewRowCell.prototype */
+	{
+    className : "text-cell",
+    tooltipStarted : false,
+    /** @property */
+    events: {
+      "mouseenter": "addTooltipToTruncated",
+    },
+		initialize : function(options) {
+			Backgrid.StringCell.prototype.initialize.apply(this, arguments);
+		},
+    render: function () {
+      this.$el.empty();
+      var model = this.model;
+      this.$el.html("<span>" +
+        this.formatter.fromRaw(model.get(this.column.get("name")), model) +
+        "</span>");
+      this.delegateEvents();
+      return this;
+    },
+		addTooltipToTruncated : function() {
+      if(this.el.offsetWidth < this.el.scrollWidth) {
+          if(!this.tooltipStarted){
+            this.tooltipStarted = true;
+            var $span = this.$("span:first");
+            $span.tooltip({
+                 title: this.$el.text(),
+                 placement: "bottom",
+                // container: 'body'
+            });
+            $span.tooltip('show');
+          }
+        }
+     },
+
+  });
 	Calipso.components.backgrid.ViewRowCell = Backgrid.StringCell.extend(
 	/** @lends Calipso.components.backgrid.ViewRowCell.prototype */
 	{
@@ -278,7 +345,11 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 		caption : Calipso.components.backgrid.Caption,
 		emptyText :labels.calipso.grid.emptyText,
 		initialize : function(options) {
+      console.log("Calipso.components.backgrid.Grid emptyText" + this.emptyText);
+      console.log("Calipso.components.backgrid.Grid optons");
+      console.log(options);
       var _this = this;
+      options.emptyText || (options.emptyText = this.emptyText);
       options.row || (options.row = Calipso.components.backgrid.SmartHighlightRow);
 			Backgrid.Grid.prototype.initialize.apply(this, arguments);
 			this.caption = options.caption || this.caption;

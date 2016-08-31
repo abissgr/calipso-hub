@@ -112,14 +112,27 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				schema = isArray ? [] : {};
 				_.each(fields, function(field, key) {
-
-					baseSchemaEntry = Calipso.fields[field.fieldType][schemaType];
-					overrideSchemaEntry = field[schemaType];
+					baseSchemaEntry = {
+						pathFragment : field.pathFragment
+					};
+					// use a base type?
+					if(field.fieldType){
+						var FieldType = _.isObject(field.fieldType)
+							? field.fieldType
+							: Calipso.fields[field.fieldType];
+						// validate
+						if(!FieldType){
+							throw "Failed looking up field type:" + field.fieldType;
+						}
+						// apply
+						_.extend(baseSchemaEntry, FieldType[schemaType] || {});
+					}
+					// overrides?
+					overrideSchemaEntry = field[schemaType] || {};
 					// if a schema entry exists, add it
 					if (baseSchemaEntry || overrideSchemaEntry) {
 						// merge to new object
-						schemaEntry = _.extend({}, baseSchemaEntry || {}, overrideSchemaEntry || {});
-
+						schemaEntry = Calipso.deepExtend({}, baseSchemaEntry, overrideSchemaEntry);
 						//TODO: also labelPropertyCopy
 						if (_this.keyPropertyCopy) {
 							schemaEntry[_this.keyPropertyCopy] = key;

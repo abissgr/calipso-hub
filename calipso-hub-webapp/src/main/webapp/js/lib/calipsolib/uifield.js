@@ -39,6 +39,21 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 		return extended;
 	};
 */
+
+	Calipso.fields.RelatedModel = Calipso.fields.Base.extend({}, {
+		"form" : {
+			type : Calipso.backboneform.TypeaheadObject, //'Text'
+      minLength : 1,
+      typeaheadSource: {
+				displayKey : "name",
+			}
+		},
+		"backgrid" : {
+			editable : false,
+			sortable : true,
+			cell : Calipso.components.backgrid.RelatedModelCell
+		},
+	});
 	Calipso.fields.Hidden = Calipso.fields.hidden = Calipso.fields.Base.extend({}, {
 		"form" : {
 			type : "Hidden",
@@ -48,7 +63,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 	Calipso.fields.String = Calipso.fields.string = Calipso.fields.Base.extend({}, {
 		"backgrid" : {
 			editable : false,
-			sortable : false,
+			sortable : true,
 			cell : "Text",
 		},
 		"form" : {
@@ -66,7 +81,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 		"backgrid" : {
 			editable : false,
 			sortable : false,
-			cell : "Text",
+			cell : Calipso.components.backgrid.TextCell,
 		},
 		"form" : {
 			type : "Text",
@@ -175,6 +190,11 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 		}
 	});
 
+	Calipso.fields.EnumValue = Calipso.fields.enumValue = Calipso.fields.String.extend({}, {
+			"form" : {
+				type : Backbone.Form.editors.ModelSelect2,
+			}
+	});
 	Calipso.fields.Lov = Calipso.fields.lov = Calipso.fields.Base.extend({}, {
 	});
 

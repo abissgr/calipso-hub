@@ -210,6 +210,15 @@ define(
 		;
 		return JSON.parse(JSON.stringify(labels));
 	}
+	Calipso.util.getLabel = function(path, labels) {
+		// return a copy, not the actual object
+		labels || (labels = Calipso.labels);
+		if (!path) {
+			throw "Apath is required"
+		}
+		var s = Calipso.getPathValue(labels, path, null);
+		return _.isString(s) ? s : null;
+	}
 	// Get the DOM manipulator for later use
 	Calipso.$ = Backbone.$;
 	Calipso.decodeParamRegex = /\+/g;
@@ -1255,8 +1264,11 @@ Calipso.cloneSpecificValue = function(val) {
 	* business key/URI componenent
 	*/
 	Calipso.util.getUseCaseFactory = function(modelTypeKey) {
+		console.log("Calipso.util.getUseCaseFactory, modelTypeKey: " + modelTypeKey + "factory in map: " );
+		console.log(Calipso.useCaseFactoriesMap[modelTypeKey]);
 		var d = $.Deferred();
 		if(Calipso.useCaseFactoriesMap[modelTypeKey]){
+			console.log("resolving");
 			d.resolve(Calipso.useCaseFactoriesMap[modelTypeKey]);
 		}
 		else{
@@ -1422,11 +1434,11 @@ Calipso.cloneSpecificValue = function(val) {
 				return s;
 			},
 			getFetchable : function(){
-				return this.model.wrappedCollection ? this.model.wrappedCollection : this.model
+				return this.key.indexOf("search") == 0 ? this.model.wrappedCollection : this.model
 			},
 			getFields : function(){
 				// if not given, pick them up from model
-				var fields = Calipso.deepExtend(this.model.getFields() || {}, this.fields || {});
+				var fields = _.extend({}, this.model.getFields() || {}, this.fields || {});
 				var caseFields = {};
 				var _this = this;
 
@@ -1441,8 +1453,17 @@ Calipso.cloneSpecificValue = function(val) {
 						}
 						// resolve label
 						if(!field.label){
-							field.label = Calipso.util.getLabels(
-								field.labelKey || "models." + _this.model.getPathFragment() + "." + key + ".label");
+							var labelKeys = [
+								field.labelKey,
+								"models." + _this.model.getPathFragment() + "." + key + ".label",
+								"models." + (field.pathFragment || key) + ".singular.label",
+								"calipso.words" + (field.pathFragment || key)
+							];
+							for (var i = 0; !field.label && i < labelKeys.length; i++) {
+								labelKeys[i] && (field.label = Calipso.util.getLabel(labelKeys[i]));
+							}
+							// last resort is the raw field key
+							field.label || (field.label = key);
 						}
 						caseFields[key] = field;
 					}

@@ -46,6 +46,21 @@ public class Country extends AbstractFormalRegion<Continent> {
 
 	private static final long serialVersionUID = 3723330183409907891L;
 
+
+	public static final String PRE_AUTHORIZE_SEARCH = "hasAnyRole('ROLE_USER')";
+	public static final String PRE_AUTHORIZE_CREATE = "hasRole('ROLE_ADMIN')";
+	public static final String PRE_AUTHORIZE_UPDATE = "hasRole('ROLE_ADMIN')";
+	public static final String PRE_AUTHORIZE_PATCH = "hasRole('ROLE_ADMIN')";
+	public static final String PRE_AUTHORIZE_VIEW = "hasAnyRole('ROLE_USER')";
+	public static final String PRE_AUTHORIZE_DELETE = "denyAll";
+
+	public static final String PRE_AUTHORIZE_DELETE_BY_ID = "denyAll";
+	public static final String PRE_AUTHORIZE_DELETE_ALL = "denyAll";
+	public static final String PRE_AUTHORIZE_DELETE_WITH_CASCADE = "denyAll";
+	public static final String PRE_AUTHORIZE_FIND_BY_IDS = "denyAll";
+	public static final String PRE_AUTHORIZE_FIND_ALL = "hasAnyRole('ROLE_ADMIN', 'ROLE_SITE_OPERATOR')";
+	public static final String PRE_AUTHORIZE_COUNT = "denyAll";
+
 	@Column(unique = true, nullable = true, length = 50)
 	private String nativeName;
 

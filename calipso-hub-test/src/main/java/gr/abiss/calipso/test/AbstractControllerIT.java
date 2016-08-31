@@ -63,6 +63,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
+import gr.abiss.calipso.model.Host;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.utils.ConfigurationFactory;
@@ -204,6 +205,17 @@ public class AbstractControllerIT {
 
 	protected User getUserByUsernameOrEmail(String userNameOrEmail) {
 		return get("/calipso/api/rest/users/byUserNameOrEmail/{userNameOrEmail}", userNameOrEmail).as(User.class);
+	}
+	
+	protected Host getRandomHost(RequestSpecification someRequestSpec) {
+		// obtain a random C2 id
+		String id = given().spec(someRequestSpec)
+				.get("/calipso/api/rest/hosts").then()
+				.assertThat().body("content[0].id", notNullValue()).extract().path("content[0].id");
+		// use the public C2
+		Host host = new Host();
+		host.setId(id);
+		return host;
 	}
 
 	public static class Loggedincontext {

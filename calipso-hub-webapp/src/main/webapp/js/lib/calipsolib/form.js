@@ -222,7 +222,7 @@ define(
 		   	 schema.template = this.fieldTemplate;
 		    }
 			}
-			
+
 			return Backbone.Form.prototype.createField.apply(this, arguments);;
 		},
 		createFieldset: function(schema) {
@@ -624,10 +624,22 @@ define(
 		minLength : 2,
 		placeholder : "",
 		initialize : function(options) {
+			console.log("Calipso.backboneform.Typeahead#initialize");
 			Calipso.backboneform.Text.prototype.initialize.call(this, options);
 			// set the options source
 			if (this.schema && this.schema.typeaheadSource) {
 				this.typeaheadSource = this.schema.typeaheadSource;
+				// set up bloodhound?
+				if(this.schema.pathFragment){
+					this.typeaheadSource.source = Calipso.useCaseFactoriesMap[this.schema.pathFragment]
+						.getTypeaheadSource(this.schema.bloodhoundOptions || {});
+				}
+				// infer name?
+				if(!this.typeaheadSource.name){
+					this.typeaheadSource.name = this.key;
+				}
+				console.log("Calipso.backboneform.Typeahead#initialize, typeaheadSource:");
+				console.log(this.typeaheadSource);
 			} else {
 				throw "Missing required option: 'typeaheadSource'";
 			}
@@ -644,6 +656,7 @@ define(
 		 * Adds the editor to the DOM
 		 */
 		onFormAttach : function() {
+			console.log("Calipso.backboneform.Typeahead#onFormAttach");
 			var _this = this;
 			var $el = _this.$el.find("#" + _this.id);
 
@@ -667,6 +680,7 @@ define(
 	});
 	Calipso.backboneform.TypeaheadObject = Calipso.backboneform.Typeahead.extend({
 		initialize : function(options) {
+			console.log("Calipso.backboneform.TypeaheadObject#initialize");
 			Calipso.backboneform.Typeahead.prototype.initialize.call(this, options);
 			this.$el.removeAttr("id class name type autocomplete");
 			this.$el.html('<input type="hidden" id="' + this.id + '" name="' + this.getName() + '" />' + '<input type="text" class="form-control" id="' + this.id + 'Typeahead" name="' + this.getName() + 'Typeahead" autocomplete="off" ' + this.placeholder + '/>');
@@ -675,6 +689,7 @@ define(
 		 * Adds the editor to the DOM
 		 */
 		onFormAttach : function() {
+			console.log("Calipso.backboneform.TypeaheadObject#onFormAttach");
 			var _this = this;
 			var $hidden = _this.$el.find("#" + _this.id);
 			var $el = _this.$el.find("#" + _this.id + "Typeahead");
@@ -853,13 +868,17 @@ define(
 			config : {width: "100%"},
 			initialize : function(options) {
 				// add model collection options if needed
-				if(options.schema && !options.schema.options && options.schema.listModel){
-					options.schema.options = new Calipso.collection.AllCollection([], {
-						url : function() {
-							return Calipso.getBaseUrl() + "/api/rest/" + options.schema.listModel.getPathFragment();
-						},
-						model : options.schema.listModel,
-					});
+
+				if(options.schema){
+					// TODO: translate options
+					if(!options.schema.options && options.schema.listModel){
+						options.schema.options = new Calipso.collection.AllCollection([], {
+							url : function() {
+								return Calipso.getBaseUrl() + "/api/rest/" + options.schema.listModel.getPathFragment();
+							},
+							model : options.schema.listModel,
+						});
+					}
 				}
 				Backbone.Form.editors.Select.prototype.initialize.call(this, options);
 				options = options || {};
