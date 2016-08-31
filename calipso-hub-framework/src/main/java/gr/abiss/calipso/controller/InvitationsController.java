@@ -62,7 +62,7 @@ public class InvitationsController {
 	@Qualifier("userService")
 	UserService userService;
 
-	@RequestMapping(value = "invites", method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
     @ApiOperation(value = "Invite users", notes = "Invite users by email")
 	public UserInvitationResultsDTO inviteUsers(@RequestBody UserInvitationsDTO invitations) {

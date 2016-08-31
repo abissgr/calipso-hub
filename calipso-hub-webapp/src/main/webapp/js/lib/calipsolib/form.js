@@ -17,14 +17,16 @@
  */
 define(
 		[ "lib/calipsolib/form-templates", 'underscore', 'handlebars', 'moment', 'backbone', 'backbone-forms',
-		'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette',
+		'backbone-forms-bootstrap3', 'backbone-bootstrap-modal', 'backbone-forms-list', 'marionette',
 
-		'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'intlTelInput'],
+		'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'intlTelInput', 'select2'],
 		function( Calipso, _, Handlebars, moment, Backbone,
-			BackboneForms, BackboneFormsBootstrap, BackboneFormsSelect2, BackboneMarionette,
-			Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, intlTelInput) {
+			BackboneForms, BackboneFormsBootstrap, BackboneBootstrapModal, BackboneFormsList, BackboneMarionette,
+			Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, intlTelInput, select2) {
 
 
+				//This needs to be set if you want to use the modal to add new nested models
+			Backbone.Form.editors.List.Modal.ModalAdapter = Backbone.BootstrapModal;
 	// inline rendering for checkbox
 	Backbone.Form.editors.Checkbox.prototype.className = '';
 	Calipso.backboneform = {};
@@ -197,7 +199,7 @@ define(
 		createField: function(key, schema) {
 
 			// checkif the fields needs to be hidden
-			var value = this.model.get(key);
+			var value = this.model ? Calipso.getObjectProperty(this.model, key, null) : null;
 			if(schema.hideNonEmpty && !value && !_.isBoolean(value)){
 				schema.type = "Hidden";
 			}

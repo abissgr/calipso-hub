@@ -326,6 +326,63 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
     },
   });
 
+  Calipso.util.UserInvitationRecepientModel = Backbone.Model.extend({
+    schema: {
+      firstName: {
+        type: 'Text',
+        validators: ['required']
+      },
+      lastName: {
+        type: 'Text',
+        validators: ['required']
+      },
+      email: {
+        type: 'Text',
+        validators: ['required', 'email']
+      },
+    },
+    //To string is how models in the list will appear in the "editor".
+    toString: function() {
+      var attrs = this.attributes;
+      return attrs.firstName + ' ' + attrs.lastName + '&lt;' + attrs.email + '&gt;';
+    }
+  });
+
+	Calipso.model.UserInvitationsModel = Calipso.Model.extend(
+  /** @lends Calipso.model.RoleModel.prototype */
+  {
+
+    toString : function() {
+      return this.get("name");
+    }
+  }, {
+    // static members
+    labelIcon : "fa fa-envelope-o fa-fw",
+    pathFragment : "invitations",
+    typeName : "Calipso.model.UserInvitationsModel",
+    menuConfig : {
+      rolesIncluded : ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
+      rolesExcluded : null,
+    },
+    useCases : {
+      create : {
+        view : Calipso.view.UserInvitationsLayout
+      }
+    },
+    fields : {
+      addressLines : {
+        fieldType : "Text",
+      },
+      recepients : {
+				form : {
+          type: 'List',
+          itemType: 'NestedModel',
+          model: Calipso.util.UserInvitationRecepientModel
+        }
+      },
+    },
+  });
+
 	// Role model
 	// ---------------------------------------
 

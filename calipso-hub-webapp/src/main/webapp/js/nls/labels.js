@@ -33,9 +33,7 @@ define({
 		"tmpl" : {
 			"header" : {
 				"browse" : "Browse",
-				"users" : "Users",
-				"roles" : "Roles",
-				"hosts" : "Hosts",
+				"tools" : "Tools",
 				"profile" : "Profile",
 				"password" : "Password",
 				"logout" : "Logout",
@@ -65,7 +63,21 @@ define({
 			},
 
 		},// tmpl
+		
 		"useCases" : {
+			"invitations" : {
+				"title" : "Invite Users",
+				"message" : "Invite users via bulk email addressses and/or structured entries..",
+				"titleResult" : "Invite Users",
+				"invited" : "Invited",
+				"duplicate" : "Duplicates",
+				"existing" : "Existing",
+				"invalid" : "Invalid",
+
+				
+				
+				
+			},
 			"userDetails" : {
 				"login" : {
 					"title" : "User Login",
@@ -113,6 +125,20 @@ define({
 			},//vatInput
 		},//calipso
 		"models" : {
+			"invitations" : {
+				"singular" : {
+					"label" : "Invite Users"
+				},
+				"plural" : {
+					"label" : "Invite Users"
+				},
+				"addressLines" : {
+					"label" : "Emails, comma and/or line separated (RFC 822) "
+				},
+				"recepients" : {
+					"label" : "Recepients"
+				},
+			},
 			"users" : {
 				"singular" : {
 					"label" : "User"

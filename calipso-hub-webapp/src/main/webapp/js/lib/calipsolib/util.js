@@ -16,11 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 define(
-		[ "i18n!nls/labels",  "i18n!nls/labels-custom", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms',
-		'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator',
+		[ "i18n!nls/labels",  "i18n!nls/labels-custom", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator',
+		'backbone-forms',
+		'backbone-bootstrap-modal', 'backbone-forms-list', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator',
 		/*'metis-menu', 'morris', */'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
 		function(labels, labelsCustom, _, Handlebars, calipsoTemplates, moment, Backbone, PageableCollection, BackboneForms,
-			BackboneFormsSelect2, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridPaginator,
+			BackboneFormsBootstrapModal, BackboneFormsList, BackboneMarionette, Backgrid, BackgridMoment, BackgridText, BackgridPaginator,
 /*MetisMenu, */Morris, Bloodhoud, Typeahead, BackboneDatetimepicker, BootstrapSwitch, jqueryColor, intlTelInput, q, chartjs) {
 
 

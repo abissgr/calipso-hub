@@ -9,22 +9,34 @@
                  <div class="pull-sm-right">
 	                 <ul class="nav navbar-nav">
 
-                      {{#if browseMenu}}
+                      {{#ifUserInRole "ROLE_ADMIN" "ROLE_SITE_OPERATOR"}}
 	                     <li class="nav-item dropdown">
 	                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
 	                        <i class="fa fa-cog fa-fw" aria-hidden="true"></i>
-	                        {{labels.tmpl.header.browse}} <!--span class="caret"></span-->
+	                        {{labels.tmpl.header.tools}} <!--span class="caret"></span-->
 	                     </a>
-	                     <div class="dropdown-menu" aria-labelledby="Preview">
-                          {{#each browseMenu}}
-  	                        <a class="dropdown-item triggerCollapseMenu" href="/useCases/{{@key}}"><i class="{{ this.labelIcon }}"></i>&#160;{{ this.label }}</a>
-                          {{/each}}
-	                            <!--a class="dropdown-item triggerCollapseMenu" href="/useCases/users"><i class="fa fa-users fa-fw"></i>&#160;{{labels.tmpl.header.users}}</a>
-	                            <a class="dropdown-item triggerCollapseMenu" href="/useCases/roles"><i class="fa fa-unlock-alt fa-fw"></i>&#160;{{labels.tmpl.header.roles}}</a>
-	                            <a class="dropdown-item triggerCollapseMenu" href="/useCases/hosts"><i class="fa fa-shopping-cart fa-fw"></i>&#160;{{labels.tmpl.header.hosts}}</a-->
-	                        </div>
+	                     <div class="dropdown-menu" aria-labelledby="Tools">
+	                        <a class="dropdown-item triggerCollapseMenu" href="/useCases/invitations/create"><i class="fa fa-envelope-o fa-fw"></i>&#160;{{ labels.models.invitations.plural.label }}</a>
+                        </div>
 	                     </li>
-                        {{/if}}
+                        {{/ifUserInRole}}
+
+                        {{#if browseMenu}}
+  	                     <li class="nav-item dropdown">
+  	                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+  	                        <i class="fa fa-cog fa-fw" aria-hidden="true"></i>
+  	                        {{labels.tmpl.header.browse}} <!--span class="caret"></span-->
+  	                     </a>
+  	                     <div class="dropdown-menu" aria-labelledby="Preview">
+                            {{#each browseMenu}}
+    	                        <a class="dropdown-item triggerCollapseMenu" href="/useCases/{{@key}}"><i class="{{ this.labelIcon }}"></i>&#160;{{ this.label }}</a>
+                            {{/each}}
+  	                            <!--a class="dropdown-item triggerCollapseMenu" href="/useCases/users"><i class="fa fa-users fa-fw"></i>&#160;{{labels.tmpl.header.users}}</a>
+  	                            <a class="dropdown-item triggerCollapseMenu" href="/useCases/roles"><i class="fa fa-unlock-alt fa-fw"></i>&#160;{{labels.tmpl.header.roles}}</a>
+  	                            <a class="dropdown-item triggerCollapseMenu" href="/useCases/hosts"><i class="fa fa-shopping-cart fa-fw"></i>&#160;{{labels.tmpl.header.hosts}}</a-->
+  	                        </div>
+  	                     </li>
+                          {{/if}}
 	                     <!-- /site settings menu -->
 	                     <!-- notifications menu -->
 	                     {{#ifLoggedIn}}

@@ -600,6 +600,25 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "Calipso.view.UserDetailsLayout"
 	});
 
+
+	Calipso.view.UserInvitationsLayout = Calipso.view.BrowseLayout.extend(
+	/** @lends Calipso.view.UserInvitationsLayout.prototype */
+	{
+		onModelSync : function(options) {
+			console.log("UserInvitationsLayout onModelSync")
+			var pageView = new Calipso.view.TemplateBasedItemView({
+				template : Calipso.getTemplate("UserInvitationResults"),
+				tagName : "div",
+				model : this.model
+			});
+			this.showChildView("contentRegion", pageView);
+
+		},
+	}, {
+		// static members
+		typeName : "UserInvitationsLayout"
+	});
+
 	Calipso.view.UserRegistrationLayout = Calipso.view.SmallPageLayout.extend(
 	/** @lends Calipso.view.UserRegistrationLayout.prototype */
 	{

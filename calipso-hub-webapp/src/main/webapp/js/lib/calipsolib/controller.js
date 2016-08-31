@@ -123,7 +123,7 @@ define(
 						console.log(model);
 						console.log("showUseCaseView, fetchable: " + fetchable.getTypeName() + ", id: " + fetchable.get("id"));
 						console.log(fetchable);
-						if (model.getTypeName() != "Calipso.model.UserDetailsModel"/*
+						if (model.get("id") && model.getTypeName() != "Calipso.model.UserDetailsModel"/*
 							&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))
 						*/) {
 							console.log("showUseCaseView, fetching");

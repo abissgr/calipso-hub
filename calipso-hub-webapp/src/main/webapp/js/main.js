@@ -68,6 +68,7 @@ require.config({
 		'tether' : 'lib/tether',
 		'backbone-validation-orig' : 'lib/backbone-validation',
 		'backbone-bootstrap-modal' : 'lib/backbone-bootstrap-modal',
+		'backbone-forms-list' : 'lib/backbone-forms-list',
 		'backbone-forms' : 'lib/backbone-forms',
 		'backbone-forms-bootstrap3' : 'lib/backbone-forms-bootstrap3',
 		'bootstrap-datetimepicker' : 'lib/bootstrap-datetimepicker',
@@ -99,7 +100,6 @@ require.config({
 		'select2' : 'lib/select2',
 		'raty' : 'lib/jquery.raty-fa',
 		'bootstrap-fileInput' : 'lib/fileinput',
-		'backbone-forms-select2' : 'lib/backbone-forms-select2',
 		'typeahead' : 'lib/typeahead.jquery',
 		'bloodhound' : 'lib/bloodhound',
 		'google-maps-loader' : 'lib/google-maps-loader',
@@ -151,13 +151,17 @@ require.config({
 			}
 		},
 		'backbone-bootstrap-modal' : {
-			deps : [ 'jquery', 'underscore', 'backbone', 'bootstrap' ],
+			deps : [ 'jquery', 'underscore', 'backbone'],
 			exports : 'Backbone.BootstrapModal'
 		},
 		'backbone-forms' : {
 			deps : [ 'jquery', 'underscore', 'backbone' ],
 			exports : 'Backbone.Form'
 		},
+//		'backbone-forms-list' : {
+//			deps : [ 'backbone-forms' ],
+//			exports : 'Backbone.Form.editors.List'
+//		},
 		'backbone.paginator' : {
 			deps : [ 'underscore', 'backbone' ],
 			exports : 'PageableCollection'
@@ -200,7 +204,7 @@ require.config({
 			exports : 'async'
 		},
 		'calipso' : {
-			deps : [ "i18n!nls/labels", "i18n!nls/labels-custom", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-forms-select2', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
+			deps : [ "i18n!nls/labels", "i18n!nls/labels-custom", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator', 'backbone-forms', 'backbone-forms-bootstrap3', 'backbone-bootstrap-modal', 'backbone-forms-list', 'marionette', 'backgrid', 'backgrid-moment', 'backgrid-text', 'backgrid-paginator', 'bloodhound', 'typeahead', 'bootstrap-datetimepicker', 'bootstrap-switch', 'jquery-color', 'intlTelInput', 'q', 'chart' ],
 			exports : 'calipso',
 		},
 
