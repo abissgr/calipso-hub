@@ -45,20 +45,16 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
 		 */
 		url : function() {
 			var sUrl = this.collection && _.result(this.collection, 'url') ? _.result(this.collection, 'url') : Calipso.getBaseUrl() + this.getBaseFragment() + this.getPathFragment()/*_.result(this, 'urlRoot')*/|| urlError();
-			//console.log("GenericModel#url, sUrl: " + sUrl);
 			if (!this.isNew()) {
 				sUrl = sUrl + (sUrl.charAt(sUrl.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.get("id"));
 			}
-			// console.log("GenericModel#url: " + sUrl + ", is new: " + this.isNew() + ", id: " + this.get("id"));
 			return sUrl;
 		},
 		sync : function() {
 			// apply partial update hints
 			if (!this.isNew()) {
 				var changed = this.changedAttributes();
-				//console.log("sync, changed attributes: " + changed);
 				if (changed != false) {
-					//console.log(_.keys(changed));
 					this.set("changedAttributes", _.keys(changed));
 				}
 			}
@@ -130,18 +126,11 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
 		},
 		create : function(attrs, options) {
       var modelAttributes = attrs;
-      console.log("create, modelAttributes: ");
-      console.log(modelAttributes);
 
       if(options && options.httpParams){
         var params = _.isString(options.httpParams) ? Calipso.getHttpUrlParams(options.httpParams) : options.httpParams;
-
-        console.log("create, params: ");
-        console.log(params);
         _.extend(modelAttributes, params);
   		}
-      console.log("create, modelAttributes: ");
-      console.log(modelAttributes);
 			var model = new this(modelAttributes, options);
       if (!modelAttributes.id && this.getTypeName() != "Calipso.model.UserDetailsModel") {
   			var collectionOptions = {
@@ -171,7 +160,6 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
 		 * @returns the the path fragment as a string
 		 */
 		getPathFragment : function(instance) {
-			//console.log("GenericModel.getPathFragment returns: " + this.pathFragment);
 			return this.pathFragment;
 		},
 		// TODO: refactor view to region names to
@@ -216,8 +204,6 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
       return useCaseConfig;
 		},
 		getUseCaseContext : function(options) {
-      console.log("getUseCaseContext options: ");
-      console.log(options);
 			var useCaseConfig = this._getUseCaseConfig(options.key);
       Calipso.deepExtend(useCaseConfig.viewOptions, options.viewOptions);
       // setup a model instance if needed
@@ -263,13 +249,11 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
 			// if not lready created
 			if (!_this.typeaheadSources[sourceKey]) {
 				var sourceUrl = Calipso.getBaseUrl() + this.baseFragment + config.pathFragment + config.query;
-        console.log(_this.getTypeName() + "#getTypeaheadSource, sourceUrl: " + sourceUrl);
         var bloodhound = new Bloodhound({
 					remote : {
 						url : sourceUrl,
 						wildcard : config.wildcard,
 						transform : function(response) {
-							console.log(_this.getTypeName() + ' transform', response.content);
 							return response.content;
 						}
 					},
@@ -281,13 +265,9 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
 						return Bloodhound.tokenizers.whitespace(d.name);
 					},
 				});
-        console.log(_this.getTypeName() + "#getTypeaheadSource, initializing bloodhound");
 
 				bloodhound.initialize();
-        console.log(_this.getTypeName() + "#getTypeaheadSource, bloodhound initialized adding adapter: " + sourceKey);
 				_this.typeaheadSources[sourceKey] = bloodhound.ttAdapter();
-        console.log(_this.getTypeName() + "#getTypeaheadSource, bloodhound initialized added adapter: ");
-        console.log(_this.typeaheadSources[sourceKey]);
 			}
 
 			return _this.typeaheadSources[sourceKey];

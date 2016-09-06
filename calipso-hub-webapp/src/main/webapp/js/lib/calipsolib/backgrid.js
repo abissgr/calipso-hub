@@ -242,7 +242,6 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 		},
 		editEntry : function(e) {
 			Calipso.stopEvent(e);
-      console.log("EditRowCell calling this.model.getUseCaseContext");
 			var useCaseContext = this.model.getUseCaseContext({
 				key : "update"
 			});
@@ -305,7 +304,6 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 			Backgrid.HeaderCell.prototype.initialize.apply(this, arguments);
 		},
 		createNewForManualEdit : function(e) {
-			//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
 			Calipso.stopEvent(e);
 			Calipso.vent.trigger("layout:createModel", {
 				modelType : this.collection.model
@@ -328,7 +326,6 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 	});
 	Calipso.components.backgrid.CreateNewInModalHeaderCell = Calipso.components.backgrid.CreateNewHeaderCell.extend({
 		createNewForManualEdit : function(e) {
-			//console.log("CreateNewHeaderCell#newRow, rowModel: " + this.collection.model);
 			Calipso.stopEvent(e);
 			Calipso.vent.trigger("modal:showUseCaseContext", {
 				useCaseKey : "create",
@@ -345,9 +342,6 @@ function( Calipso, _, Handlebars, moment, Backbone, PageableCollection,
 		caption : Calipso.components.backgrid.Caption,
 		emptyText :labels.calipso.grid.emptyText,
 		initialize : function(options) {
-      console.log("Calipso.components.backgrid.Grid emptyText" + this.emptyText);
-      console.log("Calipso.components.backgrid.Grid optons");
-      console.log(options);
       var _this = this;
       options.emptyText || (options.emptyText = this.emptyText);
       options.row || (options.row = Calipso.components.backgrid.SmartHighlightRow);

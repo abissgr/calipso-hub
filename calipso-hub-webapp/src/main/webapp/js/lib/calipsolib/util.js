@@ -1265,11 +1265,8 @@ Calipso.cloneSpecificValue = function(val) {
 	* business key/URI componenent
 	*/
 	Calipso.util.getUseCaseFactory = function(modelTypeKey) {
-		console.log("Calipso.util.getUseCaseFactory, modelTypeKey: " + modelTypeKey + "factory in map: " );
-		console.log(Calipso.useCaseFactoriesMap[modelTypeKey]);
 		var d = $.Deferred();
 		if(Calipso.useCaseFactoriesMap[modelTypeKey]){
-			console.log("resolving");
 			d.resolve(Calipso.useCaseFactoriesMap[modelTypeKey]);
 		}
 		else{

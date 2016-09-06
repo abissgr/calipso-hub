@@ -1,6 +1,5 @@
-@import url("bootstrap.css");
+@import url("coreui.css");
 @import url("bootstrap-switch.css");
-@import url("font-awesome/css/font-awesome.css");
 @import url("calendar.css");
 @import url("select2.css");
 @import url("bootstrap-select2.css");
@@ -12,6 +11,8 @@
 @import url("backgrid-paginator.css");
 @import url("typeahead.css");
 
+@import url("font-awesome.css");
+@import url("simple-line-icons.css");
 
 /* Sticky footer styles
 -------------------------------------------------- */

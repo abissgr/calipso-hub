@@ -188,9 +188,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	Calipso.view.HeaderView = Calipso.view.Layout.extend(
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
+		tagName : "div",
+		className : "container-fluid",
 		template : Calipso.getTemplate('header'),
-		tagName : "nav",
-		className : "navbar navbar-dark bg-inverse",
 		events : {
 			//"click a.login" : "login",
 			//"click a.register" : "register",

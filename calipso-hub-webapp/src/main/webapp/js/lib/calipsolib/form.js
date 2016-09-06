@@ -382,12 +382,15 @@ define(
 
 	Calipso.backboneform.Text = Backbone.Form.editors.Text.extend({
 		config : {},
+		placeholder: null,
 		initialize : function(options) {
 			Backbone.Form.editors.Text.prototype.initialize.call(this, options);
 			options = options || {};
 			if(options.schema && options.schema.config){
 				this.config = $.extend({}, this.config, options.schema.config);
 			}
+			this.placeholder = this.config.placeholder || options.schema.placeholder || options.placeholder || this.placeholder;
+			this.placeholder && (this.$el.attr("placeholder", this.placeholder));
 			if (this.form) {
 				var _this = this;
 				this.listenToOnce(this.form, "attach", function() {
@@ -624,9 +627,8 @@ define(
 		//className: "form-control",
 		typeaheadSource : null,
 		minLength : 2,
-		placeholder : "",
+		placeholder : Calipso.util.getLabel("typeahead.placeholder"),
 		initialize : function(options) {
-			console.log("Calipso.backboneform.Typeahead#initialize");
 			Calipso.backboneform.Text.prototype.initialize.call(this, options);
 			// set the options source
 			if (this.schema && this.schema.typeaheadSource) {
@@ -640,25 +642,22 @@ define(
 				if(!this.typeaheadSource.name){
 					this.typeaheadSource.name = this.key;
 				}
-				console.log("Calipso.backboneform.Typeahead#initialize, typeaheadSource:");
-				console.log(this.typeaheadSource);
 			} else {
 				throw "Missing required option: 'typeaheadSource'";
 			}
 			if (this.schema.minLength) {
 				this.minLength = this.schema.minLength;
 			}
-			if (this.schema.placeholder) {
-				this.placeholder = " placeholder=\"this.schema.placeholder\" ";
-			}
+			var placeholder = this.$el.attr("placeholder") || this.placeholder;
 			this.$el.removeAttr("id class name type autocomplete");
-			this.$el.html('<input type="text" id="' + this.id + '" name="' + this.getName() + '"  class="form-control"  autocomplete="off" ' + this.placeholder + '/>');
+			this.$el.html('<input type="text" id="' + this.id +
+				'" name="' + this.getName() + '"  class="form-control"  autocomplete="off" ' +
+				(placeholder ? ' placeholder="' + placeholder + '" ' : '')  + '/>');
 		},
 		/**
 		 * Adds the editor to the DOM
 		 */
 		onFormAttach : function() {
-			console.log("Calipso.backboneform.Typeahead#onFormAttach");
 			var _this = this;
 			var $el = _this.$el.find("#" + _this.id);
 

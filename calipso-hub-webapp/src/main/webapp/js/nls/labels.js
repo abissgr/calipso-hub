@@ -14,6 +14,9 @@
 
 define({
 	"root" : {
+		"typeahead" : {
+			"placeholder" : "Type to look for matches...",
+		},
 		"intlTelInput" : {
 			"eg" : "e.g.",
 			"DEFAULT" : 'Invalid number',

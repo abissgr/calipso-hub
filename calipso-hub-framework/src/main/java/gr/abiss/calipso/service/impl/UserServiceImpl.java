@@ -128,7 +128,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		Date yesterday = DateUtils.addDays(new Date(), -1);
 		
 		// send email notifications for account confirmation tokens that expired
-        org.hibernate.Query query = session.createQuery("SELECT new gr.abiss.calipso.model.UserDTO(u.id, u.firstName, u.lastName,u.username, u.email, u.emailHash) FROM User u "
+        org.hibernate.Query query = session.createQuery("SELECT new gr.abiss.calipso.model.UserDTO(u.id, u.firstName, u.lastName,u.username, u.email, u.emailHash, u.avatarUrl) FROM User u "
         		+ "WHERE u.password IS NULL and u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < :yesterday");
         query.setParameter("yesterday", yesterday);
         query.setFetchSize(Integer.valueOf(1000));

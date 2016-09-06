@@ -94,22 +94,39 @@ public class AbstractControllerIT {
 	protected static Configuration getConfig() {
 		return CONFIG;
 	}
+	
 	protected StompSession getStompSession(String url, Loggedincontext loginContext) {
 		return getStompSession(url, loginContext, new DefaultStompSessionHandler());
 	}
 
 	protected StompSession getStompSession(String url, Loggedincontext loginContext, StompSessionHandler sessionHandler) {
+		return getStompSession(url, loginContext, sessionHandler, null, null);
+		
+	}
+
+	protected StompSession getStompSession(String url, Loggedincontext loginContext, StompSessionHandler sessionHandler, 
+		WebSocketHttpHeaders handshakeHeaders, StompHeaders connectHeaders) {
+		if(sessionHandler == null){
+			sessionHandler = new DefaultStompSessionHandler();
+		}
 		StompSession ownerSession = null;
 		
-		WebSocketHttpHeaders ownerHandshakeHeaders = new WebSocketHttpHeaders();
-		ownerHandshakeHeaders.add("Authorization", "Basic " + loginContext.ssoToken);
+		// add auth
+		if(handshakeHeaders == null){
+			handshakeHeaders = new WebSocketHttpHeaders();
+		}
+		handshakeHeaders.add("Authorization", "Basic " + loginContext.ssoToken);
+		
+		
 		try {
-			ownerSession = getWebSocketStompClient().connect(url, ownerHandshakeHeaders, sessionHandler).get(1, SECONDS);
+			ownerSession = getWebSocketStompClient().connect(url, handshakeHeaders, connectHeaders, sessionHandler).get(1, SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new RuntimeException(e);
 		}
+		
 		return ownerSession;
 	}
+
 	
 	protected WebSocketStompClient getWebSocketStompClient() {
     	// setup websocket

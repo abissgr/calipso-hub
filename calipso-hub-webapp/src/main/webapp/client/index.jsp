@@ -3,10 +3,19 @@
 <head>
 <%@ include file="../includes/head.jsp" %>
 </head>
-<body class="full-height-column">
+<!-- BODY options, add following classes to body to change options
+		1. 'compact-nav'     	  - Switch sidebar to minified version (width 50px)
+		2. 'sidebar-nav'		  - Navigation on the left
+			2.1. 'sidebar-off-canvas'	- Off-Canvas
+				2.1.1 'sidebar-off-canvas-push'	- Off-Canvas which move content
+				2.1.2 'sidebar-off-canvas-with-shadow'	- Add shadow to body elements
+		3. 'fixed-nav'			  - Fixed navigation
+		4. 'navbar-fixed'		  - Fixed navbar
+	-->
 
-    <div class=" full-height-row" id="calipsoHeaderRegion">
-    </div>
+<body class="navbar-fixed sidebar-nav fixed-nav full-height-column">
+	<header class="navbar  full-height-row" id="calipsoHeaderRegion">
+    </header>
 
     <main class="full-height-row-expanded">
         <div class="container configurable-fluid" id="calipsoMainContentRegion"></div>
