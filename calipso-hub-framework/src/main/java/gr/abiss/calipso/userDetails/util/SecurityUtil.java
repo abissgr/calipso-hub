@@ -17,6 +17,7 @@
  */
 package gr.abiss.calipso.userDetails.util;
 
+import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.integration.LocalUserService;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
@@ -33,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.codec.Base64;
 
@@ -48,9 +51,6 @@ public class SecurityUtil {
 	public static void login(HttpServletRequest request, HttpServletResponse response, LocalUser user, 
 			UserDetailsConfig userDetailsConfig, UserDetailsService userDetailsService) {
 		ICalipsoUserDetails userDetails = UserDetails.fromUser(user);
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("login,  userDetails: "+userDetails);
-		}
 		login(request, response, userDetails, userDetailsConfig, userDetailsService);
 	}
 
@@ -153,20 +153,33 @@ public class SecurityUtil {
 
 	public static ICalipsoUserDetails getPrincipal() {
 		Object principal = null;
+		
 		if (SecurityContextHolder.getContext() != null
 				&& SecurityContextHolder.getContext().getAuthentication() != null) {
+			
 			principal = SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 		}
+
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("getPrincipal, principal: " + principal);
+			LOGGER.debug("getPrincipal1, principal: " + principal);
 		}
-		if (principal != null
-				&& ICalipsoUserDetails.class.isAssignableFrom(principal.getClass())) {
-			return (ICalipsoUserDetails) principal;
-		} else {
-			return null;
+		if (principal != null && User.class.isAssignableFrom(principal.getClass())) {
+			principal = UserDetails.fromUser((User) principal);
 		}
+//		if (principal != null) {
+//			
+//			if (ICalipsoUserDetails.class.isAssignableFrom(principal.getClass())) {
+//				return (ICalipsoUserDetails) principal;
+//			} else if (Authentication.class.isAssignableFrom(principal.getClass())) {
+//				return (ICalipsoUserDetails) authentication.getPrincipal();
+//			}
+//		}
+
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("getPrincipal2, principal: " + principal);
+		}
+		return (ICalipsoUserDetails) principal;
 	}
 
 }

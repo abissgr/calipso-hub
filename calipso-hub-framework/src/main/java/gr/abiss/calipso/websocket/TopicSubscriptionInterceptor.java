@@ -20,9 +20,7 @@ public class TopicSubscriptionInterceptor extends ChannelInterceptorAdapter {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor= StompHeaderAccessor.wrap(message);
-        if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())
-        		//&& headerAccessor.getHeader("simpUser") !=null &&  headerAccessor.getHeader("simpUser") instanceof UsernamePasswordAuthenticationToken
-        		) {
+        if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) headerAccessor.getHeader("simpUser");
 
         	LOGGER.debug("preSend, userToken: {}", userToken);
