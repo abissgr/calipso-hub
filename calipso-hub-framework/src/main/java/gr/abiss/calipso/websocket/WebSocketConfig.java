@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -26,6 +28,7 @@ import gr.abiss.calipso.utils.ConfigurationFactory;
 @Configuration
 @EnableWebSocketMessageBroker
 @ComponentScan(basePackages = "**.calipso.controller")
+@EnableScheduling
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 		implements WebSocketMessageBrokerConfigurer {
 
@@ -71,7 +74,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("configureMessageBroker");
 		}
-		messageBrokerRegistry.enableSimpleBroker("/topic", "/queue");
+		messageBrokerRegistry.enableSimpleBroker("/topic", "/queue").setTaskScheduler(heartbeatTaskScheduler());
 		messageBrokerRegistry.setApplicationDestinationPrefixes("/app");
 	}
 	
@@ -97,5 +100,9 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 		return new DefaultHandshakeHandler(new JettyRequestUpgradeStrategy(new WebSocketServerFactory(policy)));
 	}
 	
+	@Bean
+    ThreadPoolTaskScheduler heartbeatTaskScheduler() {
+        return new ThreadPoolTaskScheduler();
+	}
 
 }

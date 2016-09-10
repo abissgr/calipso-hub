@@ -354,41 +354,6 @@
       <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/spring-messaging/4.3.3.BUILD-SNAPSHOT/spring-messaging-4.3.3.BUILD-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/security/oauth/spring-security-oauth2/2.0.11.RELEASE/spring-security-oauth2-2.0.11.RELEASE.jar" sourcepath="M2_REPO/org/springframework/security/oauth/spring-security-oauth2/2.0.11.RELEASE/spring-security-oauth2-2.0.11.RELEASE-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/security/oauth/spring-security-oauth2/2.0.11.RELEASE/spring-security-oauth2-2.0.11.RELEASE-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.9/commons-codec-1.9.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.9/commons-codec-1.9-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/commons-codec/commons-codec/1.9/commons-codec-1.9-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/security/spring-security-jwt/1.0.5.RELEASE/spring-security-jwt-1.0.5.RELEASE.jar" sourcepath="M2_REPO/org/springframework/security/spring-security-jwt/1.0.5.RELEASE/spring-security-jwt-1.0.5.RELEASE-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/security/spring-security-jwt/1.0.5.RELEASE/spring-security-jwt-1.0.5.RELEASE-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcpkix-jdk15on/1.47/bcpkix-jdk15on-1.47.jar" sourcepath="M2_REPO/org/bouncycastle/bcpkix-jdk15on/1.47/bcpkix-jdk15on-1.47-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.47/bcpkix-jdk15on-1.47-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcprov-jdk15on/1.47/bcprov-jdk15on-1.47.jar" sourcepath="M2_REPO/org/bouncycastle/bcprov-jdk15on/1.47/bcprov-jdk15on-1.47-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.47/bcprov-jdk15on-1.47-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache/2.7.4/ehcache-2.7.4.jar" sourcepath="M2_REPO/net/sf/ehcache/ehcache/2.7.4/ehcache-2.7.4-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/net/sf/ehcache/ehcache/2.7.4/ehcache-2.7.4-javadoc.jar!/" name="javadoc_location"/>
@@ -457,6 +422,39 @@
   <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.jar" sourcepath="M2_REPO/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.9/commons-codec-1.9.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.9/commons-codec-1.9-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/commons-codec/commons-codec/1.9/commons-codec-1.9-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/boot/spring-boot-starter-actuator/1.4.0.RELEASE/spring-boot-starter-actuator-1.4.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/boot/spring-boot-starter-actuator/1.4.0.RELEASE/spring-boot-starter-actuator-1.4.0.RELEASE-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/boot/spring-boot-starter/1.4.0.RELEASE/spring-boot-starter-1.4.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/boot/spring-boot-starter/1.4.0.RELEASE/spring-boot-starter-1.4.0.RELEASE-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/boot/spring-boot/1.4.0.RELEASE/spring-boot-1.4.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/boot/spring-boot/1.4.0.RELEASE/spring-boot-1.4.0.RELEASE-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/boot/spring-boot/1.4.0.RELEASE/spring-boot-1.4.0.RELEASE-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/boot/spring-boot-autoconfigure/1.4.0.RELEASE/spring-boot-autoconfigure-1.4.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/boot/spring-boot-autoconfigure/1.4.0.RELEASE/spring-boot-autoconfigure-1.4.0.RELEASE-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/1.4.0.RELEASE/spring-boot-autoconfigure-1.4.0.RELEASE-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/boot/spring-boot-starter-logging/1.4.0.RELEASE/spring-boot-starter-logging-1.4.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/boot/spring-boot-starter-logging/1.4.0.RELEASE/spring-boot-starter-logging-1.4.0.RELEASE-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.21/log4j-over-slf4j-1.7.21.jar" sourcepath="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.21/log4j-over-slf4j-1.7.21-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/slf4j/log4j-over-slf4j/1.7.21/log4j-over-slf4j-1.7.21-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/yaml/snakeyaml/1.17/snakeyaml-1.17.jar" sourcepath="M2_REPO/org/yaml/snakeyaml/1.17/snakeyaml-1.17-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/yaml/snakeyaml/1.17/snakeyaml-1.17-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/boot/spring-boot-actuator/1.4.0.RELEASE/spring-boot-actuator-1.4.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/boot/spring-boot-actuator/1.4.0.RELEASE/spring-boot-actuator-1.4.0.RELEASE-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/boot/spring-boot-actuator/1.4.0.RELEASE/spring-boot-actuator-1.4.0.RELEASE-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/io/springfox/springfox-swagger2/2.5.0/springfox-swagger2-2.5.0.jar" sourcepath="M2_REPO/io/springfox/springfox-swagger2/2.5.0/springfox-swagger2-2.5.0-sources.jar">
@@ -886,11 +884,6 @@
   <classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.4.5/jackson-dataformat-yaml-2.4.5.jar" sourcepath="M2_REPO/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.4.5/jackson-dataformat-yaml-2.4.5-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.4.5/jackson-dataformat-yaml-2.4.5-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/yaml/snakeyaml/1.12/snakeyaml-1.12.jar" sourcepath="M2_REPO/org/yaml/snakeyaml/1.12/snakeyaml-1.12-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/yaml/snakeyaml/1.12/snakeyaml-1.12-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/io/swagger/swagger-parser/1.0.18/swagger-parser-1.0.18.jar" sourcepath="M2_REPO/io/swagger/swagger-parser/1.0.18/swagger-parser-1.0.18-sources.jar">

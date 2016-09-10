@@ -45,10 +45,9 @@
     <logger name="gr.abiss.calipso">
         <level value="debug" />
     </logger>
-<!--     <logger name="org.springframework.web.socket"> -->
-<!--         <level value="debug" /> -->
-<!--     </logger> -->
-    
+    <logger name="org.springframework">
+        <level value="debug" />
+    </logger>
     <root level="@build.log.rootlevel@">
         <appender-ref ref="STDOUT" />
     </root>

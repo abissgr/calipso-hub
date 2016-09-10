@@ -137,7 +137,6 @@
 	<!-- Configuration for the Runtime -->
 	<task:annotation-driven executor="asyncExecutor" />
 
-
 	<!--mvc:annotation-driven/ -->
 
 	<mvc:resources mapping="/static/**" location="/static/" />
@@ -187,5 +186,11 @@
 
     <!-- Include a swagger configuration-->
 	<bean name="applicationSwaggerConfig" class="gr.abiss.calipso.web.spring.ApplicationSwaggerConfig"/>
+	
+	<!-- actuator stats -->
+<!-- 	<beans> -->
+<!--         <context:annotation-config /> -->
+<!--         <bean name="endpointAutoConfiguration" class="org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration"/> -->
+<!--     </beans> -->
     
 </beans>

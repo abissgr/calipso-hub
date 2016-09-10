@@ -457,6 +457,22 @@
 				<artifactId>spring-data-commons</artifactId>
 				<version>${spring-data-commons-version}</version>
 			</dependency>
+			<!-- actuator stats -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-actuator</artifactId>
+				<version>1.4.0.RELEASE</version>
+				<exclusions>
+<!-- 					<exclusion> -->
+<!-- 						<groupId>org.springframework.boot</groupId> -->
+<!-- 						<artifactId>spring-boot-autoconfigure</artifactId> -->
+<!-- 					</exclusion> -->
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 			<!-- AWS -->
 			<dependency>
 			    <groupId>com.amazonaws</groupId>
