@@ -161,11 +161,15 @@ public class SecurityUtil {
 					.getPrincipal();
 		}
 
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("getPrincipal1, principal: " + principal);
-		}
-		if (principal != null && User.class.isAssignableFrom(principal.getClass())) {
-			principal = UserDetails.fromUser((User) principal);
+		if (principal != null) {
+			if(String.class.isAssignableFrom(principal.getClass())){
+				LOGGER.warn("getPrincipal1, principal is {}, forcing anonymous: ",  principal.toString());
+				principal = null;
+				
+			}
+			else if (User.class.isAssignableFrom(principal.getClass())) {
+				principal = UserDetails.fromUser((User) principal);
+			}
 		}
 //		if (principal != null) {
 //			
@@ -176,9 +180,6 @@ public class SecurityUtil {
 //			}
 //		}
 
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("getPrincipal2, principal: " + principal);
-		}
 		return (ICalipsoUserDetails) principal;
 	}
 

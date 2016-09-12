@@ -47,7 +47,7 @@ define(
 		hbs : {},
 		labels : $.extend(true, {}, labels, labelsCustom)
 	};
-
+  var Marionette = Backbone.Marionette;
 	// plumbing for handlebars template helpers
 	// Also provides i18n labels
 	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
@@ -81,10 +81,9 @@ define(
 	// replaced or explicitly repeated
 	var baseComponents = {
 		view : {
-			"Layout" : Backbone.Marionette.LayoutView,
+			"View" : Backbone.Marionette.View,
 			"CompositeView" : Backbone.Marionette.CompositeView,
 			"CollectionView" : Backbone.Marionette.CollectionView,
-			"ItemView" : Backbone.Marionette.ItemView
 		},
 		model : {
 			"Model" : Backbone.Model
@@ -96,6 +95,7 @@ define(
 	_.each(baseComponents, function(packageComponents, packageName, list){
 		Calipso[packageName] || (Calipso[packageName] = {});
 		_.each(packageComponents, function(BaseType, newClassName, list){
+			console.log("packageName: " + packageName + ", newClassName: " + newClassName)
 			var extendOptions = {
 				initialize : function(models, options) {
 					BaseType.prototype.initialize.apply(this, arguments);
@@ -145,7 +145,7 @@ define(
 						}
 					}
 				});
-				if(newClassName == "Layout"){
+				if(newClassName == "View"){
 					extendOptions.events = {
 						// TODO: move to layouts
 						"click .btn-social" : "socialLogin",
@@ -159,13 +159,32 @@ define(
 							template : Calipso.getTemplate($a.data("page")),
 							tagName : "div"
 						});
+						// TODO
+
 						Calipso.vent.trigger('modal:showInLayout', {
 							view : pageView,
 							title : $a.data("title")
 						});
+
 					};
 					extendOptions.socialLogin = function(e) {
 						Calipso.socialLogin(e);
+					};
+					extendOptions.addRegions = function(regions) {
+						var _this = this;
+						BaseType.prototype.addRegions.apply(this, arguments);
+						_.each(_.keys(regions), function(regionName) {
+							_this.briefRegion(regionName);
+						});
+					};
+					extendOptions.briefRegion = function(regionName) {
+						var region = this.getRegion(regionName);
+						region.regionName = regionName;
+						region.regionPath = this.getRegionPath() + "." + regionName;
+					};
+					extendOptions.regionPath = null;
+					extendOptions.getRegionPath = function() {
+							return this.regionPath;
 					};
 				}
 			}
@@ -377,7 +396,6 @@ Calipso.cloneSpecificValue = function(val) {
 	 * @return {void}
 	 */
 	Calipso.stopEvent = function(e) {
-		Calipso.vent.trigger("calipso:stoppedEvent given: ", e);
 		var event = e ? e : window.event;
 		if (event.preventDefault) {
 			event.preventDefault();
@@ -390,7 +408,6 @@ Calipso.cloneSpecificValue = function(val) {
 		} else {
 			event.cancelBubble = true;
 		}
-		Calipso.vent.trigger("calipso:stoppedEvent", e);
 	};
 	/**
 	 * Update bootstrap badges
@@ -597,13 +614,14 @@ Calipso.cloneSpecificValue = function(val) {
 	Applicartion initialization
 	*****************************************************/
 	Calipso._initializeVent = function(){
+		Calipso.vent = Backbone.Radio.channel('calipso');
 		Calipso.vent.on('app:show', function(appView, navigateToUrl) {
 
 			var $wrapper = $("#container");
 			if (appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")) {
 				$wrapper.attr("class", appView.containerClass);
 			}
-			Calipso.app.mainContentRegion.show(appView);
+			Calipso.app.view.showChildView("mainContentRegion", appView);
 		});
 
 		Calipso.vent.on('session:social-popup', function(providerId) {
@@ -653,9 +671,7 @@ Calipso.cloneSpecificValue = function(val) {
 		});
 		Calipso.vent.on('session:destroy', function(userDetails) {
 			Calipso.session.destroy();
-			Calipso.app.headerRegion.show(new Calipso.config.headerViewType({
-				model : userDetails
-			}));
+			Calipso.app.updateHeaderFooter();
 			Calipso.navigate("home", {
 				trigger : true
 			});
@@ -665,7 +681,7 @@ Calipso.cloneSpecificValue = function(val) {
 		});
 
 		Calipso.vent.on('modal:show', function(view) {
-			Calipso.app.modalRegion.show(view);
+			Calipso.app.view.getRegion("modalRegion").show(view);
 		});
 
 		/**
@@ -687,7 +703,7 @@ Calipso.cloneSpecificValue = function(val) {
 			}
 			// show
 			var modalLayoutView = new Calipso.view.ModalLayout(layoutProperties);
-			Calipso.app.modalRegion.show(modalLayoutView);
+			Calipso.app.view.showChildView("modalRegion", modalLayoutView);
 		});
 
 		Calipso.vent.on('modal:showUseCaseContext', function(useCaseContext) {
@@ -700,17 +716,17 @@ Calipso.cloneSpecificValue = function(val) {
 				layoutProperties.template = properties.template;
 			}*/
 			// show
-			Calipso.app.modalRegion.show(new Calipso.view.DefaulfModalLayout(layoutProperties));
+			Calipso.app.view.showChildView("modalRegion", new Calipso.view.DefaulfModalLayout(layoutProperties));
 		});
 
 
 		Calipso.vent.on('modal:destroy', function() {
 			// console.log("vent event modal:destroy");
-			Calipso.app.modalRegion.closeModal();
+			Calipso.app.view.getRegion("modalRegion").closeModal();
 		});
 	}
 
-	Calipso._initializeAppConfig = function(customConfig, startOptions) {
+	Calipso._initializeAppConfig = function(customConfig) {
 		// set Calipso.config object
 		customConfig = customConfig || {};
 		var config = {
@@ -725,7 +741,6 @@ Calipso.cloneSpecificValue = function(val) {
 			useCaseFactories : {},
 		};
 		Calipso.config = _.defaults(customConfig, config);
-		Calipso.config.startOptions = startOptions;
 	}
 
 
@@ -762,61 +777,52 @@ Calipso.cloneSpecificValue = function(val) {
 		config : {},
 		started : false,
     browseMenu : {},
+	  region: 'body',
+		routers : {},
+	  onBeforeStart: function(onBeforeStartOptions) {
+			onBeforeStartOptions || (onBeforeStartOptions = {});
+			var options = onBeforeStartOptions.options || {};
+			console.log("Calipso.App.onBeforeStart, options: ");
+			console.log(options);
+			//Marionette.Application.prototype.onBeforeStart.apply(this, arguments);
+			var _this = this;
+			// set routers map
+			_(options.routers).each(function(routerClass) {
+				var router = new routerClass();
+				console.log("Calipso.App.onBeforeStart, adding router " + routerClass.getTypeName() + ": " + router);
+				_this.routers[routerClass.getTypeName()] = router;
+			});
+
+			// set model types map
+			Calipso.useCaseFactoriesMap = _.extend({}, Calipso.config.useCaseFactories || {});
+			var allModelLabels = Calipso.util.getLabels("models");
+			var parseModel = function(ModelType) {
+				// setup model-based usecase factories
+				if (ModelType.getTypeName() != "Calipso.model.Model" &&
+					ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
+					ModelType.getTypeName() != "Calipso.model.GenericModel") {
+					Calipso.useCaseFactoriesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
+				}
+			};
+			_(Calipso.model).each(parseModel);
+			_(Calipso.customModel).each(parseModel);
+	  },
+	  onStart: function() {
+			this.view = new Calipso.view.AppRootView();
+	    this.showView(this.view);
+			//console.log("Calipso.app started");
+			this.updateHeaderFooter();
+			// setup vent
+			Calipso._initializeVent();
+			// start backbone history
+			Calipso._startHistory();
+			// flag started
+			this.started = true;
+	  },
 	  initialize: function(options) {
 			Marionette.Application.prototype.initialize.apply(this, arguments);
 
-			var _this = this;
-			// set Calipso.app object regions
-			this.addRegions({
-				headerRegion : "#calipsoHeaderRegion",
-				mainContentRegion : "#calipsoMainContentRegion",
-				modalRegion : Calipso.view.ModalRegion,
-				footerRegion : "#calipsoFooterRegion"
-			});
-			// initialize routers, models
-			this.addInitializer(function(options) {
-				// set routers map
-				_(options.routers).each(function(routerClass) {
-					var router = new routerClass();
-					_this.routers[routerClass.getTypeName()] = router;
-				});
-
-				// set model types map
-				Calipso.useCaseFactoriesMap = _.extend({}, Calipso.config.useCaseFactories || {});
-				var allModelLabels = Calipso.util.getLabels("models");
-				var parseModel = function(ModelType) {
-					// setup model-based usecase factories
-					if (ModelType.getTypeName() != "Calipso.model.Model" &&
-						ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
-						ModelType.getTypeName() != "Calipso.model.GenericModel") {
-						Calipso.useCaseFactoriesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
-					}
-				};
-				_(Calipso.model).each(parseModel);
-				_(Calipso.customModel).each(parseModel);
-			});
-
-			// initialize header, footer, history
-			this.on("start", function() {
-				//console.log("Calipso.app started");
-				_this.updateHeaderFooter();
-				// setup vent
-				Calipso._initializeVent();
-				// start backbone history
-				Calipso._startHistory();
-				// flag started
-				_this.started = true;
-			});
 	  },
-	  /*onBeforeStart: function(options) {
-			console.log("Calipso.App.onBeforeStart");
-			Marionette.Application.prototype.onBeforeStart.apply(this, arguments);
-	  },
-	  onStart: function(options) {
-			console.log("Calipso.App.onStart");
-			Marionette.Application.prototype.onStart.apply(this, arguments);
-			this.started = true;
-	  },*/
 	  isStarted: function() {
 			return this.started;
 	  },
@@ -824,37 +830,29 @@ Calipso.cloneSpecificValue = function(val) {
 			// prepare browse menu
 			Calipso.session.userDetails.buildBrowseMenu();
 			// render basic structure
-			this.headerRegion.show(new this.config.headerViewType({
-				model : Calipso.session.userDetails
+			this.view.showChildView("headerRegion",
+				new (Calipso.getConfigProperty("headerViewType"))({
+					model : Calipso.session.userDetails
 			}));
-			this.footerRegion.show(new this.config.footerViewType());
+			this.view.showChildView("footerRegion",
+				new (Calipso.getConfigProperty("footerViewType"))({
+					model : Calipso.session.userDetails
+			}));
 		},
 	});
-	Calipso.initializeApp = function(customConfig, startOptions) {
-		// set Calipso.config object
-		Calipso._initializeAppConfig(customConfig, startOptions);
 
+	Calipso.start = function(initOptions){
+		// prepare config
+		Calipso._initializeAppConfig(initOptions);
+		// init session
 		var SessionType = Calipso.getConfigProperty("sessionType");
 		Calipso.session = new SessionType();
-
 		// set Calipso.app object
-		Calipso.app = new Calipso.Application({
-			config : Calipso.config,
-			routers : {}
-		});
-
-
-
-	}
-
-
-	Calipso.start = function(initOptions, startOptions){
-		// initialize/configure application
-	  Calipso.initializeApp(initOptions, startOptions);
-
-
+		Calipso.app = new Calipso.Application(Calipso.config);
+		// start it
 		Calipso.session.start();
 	}
+
 	// //////////////////////////////////////
 	// Region
 	// //////////////////////////////////////
@@ -1211,37 +1209,8 @@ Calipso.cloneSpecificValue = function(val) {
 		return "Calipso.collection.PollingCollection";
 	};
 
-	//////////////////////////////////////////////////
-	// vent
-	//////////////////////////////////////////////////
 
-	Calipso.util.Vent = Backbone.Wreqr.EventAggregator.extend({
 
-		constructor : function(debug) {
-
-			this.commands = new Backbone.Wreqr.Commands();
-			this.reqres = new Backbone.Wreqr.RequestResponse();
-
-			Backbone.Wreqr.EventAggregator.prototype.constructor.apply(this, arguments);
-
-		}
-
-	});
-
-	_.extend(Calipso.util.Vent.prototype, {
-		// Command execution, facilitated by Backbone.Wreqr.Commands
-		execute : function() {
-			var args = Array.prototype.slice.apply(arguments);
-			this.commands.execute.apply(this.commands, args);
-		},
-
-		// Request/response, facilitated by Backbone.Wreqr.RequestResponse
-		request : function() {
-			var args = Array.prototype.slice.apply(arguments);
-			return this.reqres.request.apply(this.reqres, args);
-		}
-	});
-	Calipso.vent = new Calipso.util.Vent();
 
 	Calipso._baseUrl = false;
 	Calipso.getBaseUrl = function() {

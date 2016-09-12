@@ -71,15 +71,16 @@ require.config({
 		'backbone-forms-list' : 'lib/backbone-forms-list',
 		'backbone-forms' : 'lib/backbone-forms',
 		'backbone-forms-bootstrap3' : 'lib/backbone-forms-bootstrap3',
+		'backbone-validation' : 'lib/resthub/backbone-validation-ext',
+		'backbone-queryparams' : 'lib/backbone-queryparams',
+		'backbone.paginator' : 'lib/backbone.paginator',
+		'backbone.radio' : 'lib/backbone.radio',
+		'marionette' : 'lib/backbone.marionette',
 		'bootstrap-datetimepicker' : 'lib/bootstrap-datetimepicker',
 		'bootstrap-markdown' : 'lib/bootstrap-markdown',
 		'bootstrap-switch' : 'lib/bootstrap-switch',
-		'backbone-validation' : 'lib/resthub/backbone-validation-ext',
-		'marionette' : 'lib/backbone.marionette',
 		'handlebars-orig' : 'lib/handlebars',
 		'handlebars' : 'lib/resthub/handlebars-helpers',
-		'backbone-queryparams' : 'lib/backbone-queryparams',
-		'backbone.paginator' : 'lib/backbone.paginator',
 		'async' : 'lib/async',
 		'keymaster' : 'lib/keymaster',
 		'moment' : 'lib/moment',
@@ -140,7 +141,7 @@ require.config({
 			}
 		},
 		'marionette' : {
-			deps : [ 'jquery', 'underscore', 'backbone' ],
+			deps : [ 'backbone', 'underscore', 'backbone.radio' ],
 			exports : 'Marionette'
 		},
 		'backgrid' : {

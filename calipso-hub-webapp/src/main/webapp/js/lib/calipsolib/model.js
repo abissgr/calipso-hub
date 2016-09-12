@@ -51,6 +51,7 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
 			return sUrl;
 		},
 		sync : function() {
+      console.log("Calipso.Model#sync");
 			// apply partial update hints
 			if (!this.isNew()) {
 				var changed = this.changedAttributes();

@@ -22,12 +22,11 @@ define(
 	// //////////////////////////////////////
 	// Controller
 	// //////////////////////////////////////
-	Calipso.Controller = Marionette.Controller.extend({
-		constructor : function(options) {
-			Marionette.Controller.prototype.constructor.call(this, options);
-		},
+	var Marionette = Backbone.Marionette;
+	Calipso.Controller = Marionette.Object.extend({
 		showView : function(view){
-			Calipso.app.mainContentRegion.show(view);
+			console.log("Calipso.Controller#showView: " + view.getTypeName());
+			Calipso.app.view.showChildView("mainContentRegion", view);
 		},
 		toHome : function() {
 			Calipso.navigate("home", {
@@ -119,10 +118,12 @@ define(
 						if ((model.get("id") || fetchable.length == 0 ) && model.getTypeName() != "Calipso.model.UserDetailsModel"/*
 							&& (!model.wrappedCollection || (!skipDefaultSearch && fetchable.length == 0))
 						*/) {
+							console.log("FETCHING");
 							fetchable.fetch({
 								data : fetchable.data
 							}).then(renderFetchable);
 						} else {
+							console.log("FETCHED");
 							renderFetchable();
 						}
 					}

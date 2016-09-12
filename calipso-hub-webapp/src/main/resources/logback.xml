@@ -42,12 +42,12 @@
 <!--     <logger name="gr.abiss.calipso.websocket"> -->
 <!--         <level value="debug" /> -->
 <!--     </logger> -->
-    <logger name="gr.abiss.calipso">
+    <logger name="gr.abiss.calipso.userDetails.util">
         <level value="debug" />
     </logger>
-    <logger name="org.springframework">
-        <level value="debug" />
-    </logger>
+<!--     <logger name="org.springframework"> -->
+<!--         <level value="debug" /> -->
+<!--     </logger> -->
     <root level="@build.log.rootlevel@">
         <appender-ref ref="STDOUT" />
     </root>

@@ -21,6 +21,7 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 
 	Calipso.fields = {};
 
+	var Marionette = Backbone.Marionette;
 	// Base attribute dataType
 	Calipso.fields.Base = Marionette.Object.extend({
 		hideNonEmpty : false

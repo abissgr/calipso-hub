@@ -79,20 +79,12 @@ function(
 	//////////////////////////////////
   var initOptions = {
     contextPath: "calipso/",
+  	routers : {
+      main : MainRouter
+    }
   };
 
-	var startOptions = {};
-	startOptions.routers = {};
-	startOptions.routers.main = MainRouter;
-	startOptions.menu = [ {
-		label: "Users",
-		url: "users"
-	},{
-		label: "Hosts",
-		url: "hosts"
-	} ];
-
-  Calipso.start(initOptions, startOptions);
+  Calipso.start(initOptions);
 
 	return Calipso;
 });

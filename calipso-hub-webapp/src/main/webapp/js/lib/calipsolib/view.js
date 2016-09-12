@@ -19,38 +19,34 @@ define(
 [ "lib/calipsolib/view-collection", 'underscore', 'handlebars', 'backbone', 'marionette', 'moment', 'backbone-forms', 'backgrid' ],
 function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneForms, Backgrid) {
 
-	Calipso.util.RegionManager = Backbone.Marionette.RegionManager.extend({
-		addRegion : function(regionName, selector) {
-			Backbone.Marionette.RegionManager.prototype.addRegion.apply(this, arguments);
-			this.briefRegion(regionName);
-		},
-		addRegions : function(regions) {
-			Backbone.Marionette.RegionManager.prototype.addRegions.apply(this, arguments);
-			var _this = this;
-			var region;
-			_.each(_.keys(regions), function(regionName) {
-				_this.briefRegion(regionName);
-			});
-		},
-		briefRegion : function(regionName) {
-			var region = this.get(regionName);
-			region.regionName = regionName;
-			region.regionPath = this.getRegionPath() + "." + regionName;
-		},
-		getRegionPath : function() {
-			throw "Method getRegionPath not implemented"
-		}
-	}, {});
+	var Marionette = Backbone.Marionette;
+
 
 	//////////////////////////////////////////////////
 	// Layouts
 	//////////////////////////////////////////////////
 
+	Calipso.view.AppRootView = Calipso.view.View.extend({
+		template : Calipso.getTemplate('AppRootView'),
+		regions : {
+			headerRegion : "#calipsoHeaderRegion",
+			mainContentRegion : "#calipsoMainContentRegion",
+			modalRegion : Calipso.view.ModalRegion,
+			footerRegion : "#calipsoFooterRegion"
+		},
+		onRender : function() {
+			var _this = this;
+		}
+	},
+	// static members
+	{
+		typeName : "AppRootView",
+	});
 
 
-	Calipso.view.HomeLayout = Calipso.view.Layout.extend({
+	Calipso.view.HomeLayout = Calipso.view.View.extend({
 		template : Calipso.getTemplate('HomeLayout'),
-		onShow : function() {
+		onRender : function() {
 			var _this = this;
 		}
 	},
@@ -59,7 +55,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "HomeLayout",
 	});
 
-	Calipso.view.UseCaseLayout = Calipso.view.Layout.extend({
+	Calipso.view.UseCaseLayout = Calipso.view.View.extend({
 		// regionName : viewType
 		regionViewTypes : {},
 		viewEvents : {
@@ -74,13 +70,12 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			Calipso.vent.trigger("modal:showUseCaseContext",  this.model.constructor.getUseCaseContext({key : "create", addToCollection : this.model.wrappedCollection}));
 		},
 		initialize : function(options) {
-			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
+			Calipso.view.View.prototype.initialize.apply(this, arguments);
 		},
-		onShow : function() {
+		onRender : function() {
 			var _this = this;
 			var childUseCase;
 			_.each(this.regionViewTypes, function(ViewType, regionName, list) {
-				console.log(_this.getTypeName()+"#onShow preparing view of type: " + ViewType.getTypeName() + " for region: " + regionName);
 				// only show existing regions as they may be added contitionally
 				if(_this.getRegion(regionName)){
 						// spawn child usecase
@@ -107,19 +102,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 					}
 				});
 			});
-			Backbone.Marionette.LayoutView.prototype.showChildView.apply(this, arguments);
-		},
-		getRegionManager : function() {
-			var _layout = this;
-			// custom logic
-			var RegionManager = Calipso.util.RegionManager.extend({
-				getRegionPath : function() {
-					return _layout.regionPath;
-				}
-			}, {
-
-			});
-			return new RegionManager();
+			Calipso.view.View.prototype.showChildView.apply(this, arguments);
 		},
 		onModelSync : function(args) {
 			// execute next useCase by default
@@ -162,7 +145,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				this.childView.modal = true;
 			}
 		},
-		onShow : function() {
+		onRender : function() {
 			// render child view
 			this.showChildView("modalBodyRegion", this.childView);
 		},
@@ -185,7 +168,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		this.$el.clear().append('<a href="#" data-toggle="dropdown" class="dropdown-toggle">' + '<i class="fa fa-bell fa-fw"></i>' + '<sup class="badge badge-primary badge-notifications-count hidden"></sup>' + '<i class="fa fa-caret-down"></i>', view.el);
 	};*/
 
-	Calipso.view.HeaderView = Calipso.view.Layout.extend(
+	Calipso.view.HeaderView = Calipso.view.View.extend(
 	/** @lends Calipso.view.HeaderView.prototype */
 	{
 		tagName : "div",
@@ -209,14 +192,14 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 
 		initialize : function(options) {
-			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
+			Calipso.view.View.prototype.initialize.apply(this, arguments);
 			this.mergeOptions(options);
 		},
 		changeLocale : function(e) {
 			Calipso.stopEvent(e);
 			Calipso.changeLocale($(e.currentTarget).data("locale"));
 		},
-		onShow : function() {
+		onRender : function() {
 
 			if (Calipso.util.isAuthenticated()) {
 				// load and render notifications list
@@ -245,7 +228,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 
-	Calipso.view.TabLayout = Calipso.view.Layout.extend({
+	Calipso.view.TabLayout = Calipso.view.View.extend({
 		template : Calipso.getTemplate('tabbed-layout'),
 		tabClass : "nav nav-tabs",
 		idProperty : "id",
@@ -259,7 +242,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			tabContentsRegion : '.region-tab-content'
 		},
 		initialize : function(options) {
-			Calipso.view.Layout.prototype.initialize.apply(this, arguments);
+			Calipso.view.View.prototype.initialize.apply(this, arguments);
 			this.mergeOptions(options);
 		},
 		/**
@@ -274,7 +257,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				}));
 			}
 		},
-		onShow : function() {
+		onRender : function() {
 			var _this = this;
 			if (this.collection.length > 0) {
 				for (var i = 0; i < this.collection.length; i++) {
@@ -456,7 +439,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "Calipso.view.TabContentsCollectionView",
 	});
 
-	Calipso.view.AppLayout = Calipso.view.Layout.extend({
+	Calipso.view.AppLayout = Calipso.view.View.extend({
 		tagName : "div",
 		template : Calipso.getTemplate('applayout'),
 		regions : {
@@ -541,7 +524,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		regions : {
 			modalBodyRegion : ".modal-body"
 		},
-		onShow : function() {
+		onRender : function() {
 			// render child view
 			this.showChildView("modalBodyRegion", this.options.childView);
 		},

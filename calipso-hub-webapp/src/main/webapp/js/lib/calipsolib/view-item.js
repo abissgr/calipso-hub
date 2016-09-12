@@ -19,6 +19,7 @@ define(
 [ "lib/calipsolib/util", 'underscore', 'handlebars', 'backbone', 'marionette', 'moment', 'backbone-forms', 'backgrid' ],
 function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneForms, Backgrid) {
 
+	var Marionette = Backbone.Marionette;
 
 	// The recursive tree view
 	//	var TreeView = Backbone.Marionette.CompositeView.extend({
@@ -45,13 +46,13 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	//
 
 
-	Calipso.view.TemplateBasedItemView = Calipso.view.ItemView.extend(
+	Calipso.view.TemplateBasedItemView = Calipso.view.View.extend(
 	/** @lends Calipso.view.TemplateBasedItemView.prototype */
 	{
 		template : Calipso.getTemplate("templateBasedItemView"),//_.template('{{#if url}}<a href="{{url}}">{{/if}}{{#if name}}<h5>{{name}}</h5>{{else}}{{#if title}}<h5>{{title}}</h5>{{/if}}{{/if}}{{#if description}}{{description}}{{/if}}{{#if url}}</a>{{/if}}'),
 		tagName : "li",
 		initialize : function(models, options) {
-			Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
+			Calipso.view.View.prototype.initialize.apply(this, arguments);
 		},
 		attributes : function() {
 			return this.getOption("attributes");
@@ -66,7 +67,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 
 
-	Calipso.view.NotFoundView = Calipso.view.ItemView.extend(
+	Calipso.view.NotFoundView = Calipso.view.View.extend(
 	/** @lends Calipso.view.NotFoundView.prototype */
 	{
 		className : 'container span8 home',
@@ -76,7 +77,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	{
 		typeName : "Calipso.view.NotFoundView",
 	});
-	Calipso.view.FooterView = Marionette.ItemView.extend(
+	Calipso.view.FooterView = Marionette.View.extend(
 	/** @lends Calipso.view.FooterView.prototype */
 	{
 		className : "container",
@@ -88,15 +89,15 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		typeName : "Calipso.view.FooterView",
 	});
 
-	Calipso.view.UseCaseItemView = Calipso.view.ItemView.extend({
+	Calipso.view.UseCaseItemView = Calipso.view.View.extend({
 
 		initialize : function(options) {
-			Calipso.view.ItemView.prototype.initialize.apply(this, arguments);
+			Calipso.view.View.prototype.initialize.apply(this, arguments);
 		},
 		getSchemaType : function(){
 			return this.constructor.getSchemaType();
 		},
-		onBeforeShow : function() {
+		onBeforeRender : function() {
 			//TODO: roles, masks, nested usecases
 			this.schema = this.buildSchema();
 		},
@@ -106,7 +107,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			var isArray = schemaType == "backgrid", schema = null;
 
 			var fields = this.fields ||this.useCaseContext.getFields();
-
+			console.log("buildSchema, fields: ");
+			console.log(fields);
 			if (fields) {
 				var schemaEntry, baseSchemaEntry, overrideSchemaEntry;
 
@@ -115,6 +117,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 					baseSchemaEntry = {
 						pathFragment : field.pathFragment
 					};
+					console.log("baseSchemaEntry.pathFragment 1: " + baseSchemaEntry.pathFragment + ", field: ");
+					console.log();
 					// use a base type?
 					if(field.fieldType){
 						var FieldType = _.isObject(field.fieldType)
@@ -126,6 +130,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 						}
 						// apply
 						_.extend(baseSchemaEntry, FieldType[schemaType] || {});
+						console.log("baseSchemaEntry.pathFragment 2: " + baseSchemaEntry.pathFragment);
 					}
 					// overrides?
 					overrideSchemaEntry = field[schemaType] || {};
@@ -133,6 +138,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 					if (baseSchemaEntry || overrideSchemaEntry) {
 						// merge to new object
 						schemaEntry = Calipso.deepExtend({}, baseSchemaEntry, overrideSchemaEntry);
+
+						console.log("schemaEntry.pathFragment 1: " + schemaEntry.pathFragment);
 						//TODO: also labelPropertyCopy
 						if (_this.keyPropertyCopy) {
 							schemaEntry[_this.keyPropertyCopy] = key;
@@ -205,7 +212,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		onCollectionFetchFailed : function() {
 
 		},
-		onShow : function() {
+		onRender : function() {
 			var _self = this;
 			this.backgrid = new Calipso.components.backgrid.Grid({
 				columns : _self.schema,
@@ -292,6 +299,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.form.renderLazyField(fieldKey);
 		},
 		initialize : function(options) {
+			console.log("Calipso.view.UseCaseFormView#initialize");
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
 			this.searchResultsCollection = this.model.wrappedCollection;
 			// get the form/field templates
@@ -406,9 +414,10 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			console.log("cancel");
 			window.history.back();
 		},
-		onShow : function() {
+		onRender : function() {
 			var _self = this;
 			// get appropriate schema
+			console.log("Calipso.view.UseCaseFormView#onRender, formSchema: " + formSchema);
 			var formSchema = this.schema;
 
 			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering)
@@ -514,10 +523,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			return this.model.getPathFragment() + '/' + this.model.get("id") + '/' + this.formSchemaKey;
 		},
 		onBeforeDestroy : function(e) {
-			if (this.hasDraft) {
-				this.saveDraft();
-			}
-			this.form.close();
+			this.hasDraft && this.saveDraft();
+			this.form && this.form.close();
 		},
 	},{
 		// static members
@@ -574,7 +581,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	});
 
 
-	Calipso.view.UserProfileView = Calipso.view.ItemView.extend({
+	Calipso.view.UserProfileView = Calipso.view.View.extend({
 		template : Calipso.getTemplate('userProfile'),
 	},
 	// static members
@@ -622,7 +629,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		},
 		getItemView : function(item) {
 			var _this = this;
-			return Backbone.Marionette.ItemView.extend({
+			return Backbone.Marionette.View.extend({
 				tagName : 'li',
 				className : 'calipso-tab-label',
 				id : "calipso-tab-label-" + item.get("id"),
