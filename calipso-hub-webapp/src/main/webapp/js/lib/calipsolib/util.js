@@ -50,9 +50,9 @@ define(
   var Marionette = Backbone.Marionette;
 	// plumbing for handlebars template helpers
 	// Also provides i18n labels
-	Marionette.View.prototype.mixinTemplateHelpers = function(target) {
+	Marionette.View.prototype.mixinTemplateContext = function(target) {
 		var self = this;
-		var templateHelpers = Marionette.getOption(self, "templateHelpers");
+		var templateContext = Marionette.getOption(self, "templateContext");
 		// add i18n labels from requirejs i18n
 		var result = {
 			labels : Calipso.util.getLabels(),
@@ -60,12 +60,12 @@ define(
 		};
 		target = target || {};
 
-		if (_.isFunction(templateHelpers)) {
-			templateHelpers = templateHelpers.call(self);
+		if (_.isFunction(templateContext)) {
+			templateContext = templateContext.call(self);
 		}
 
 		// This _.each block is what we're adding
-		_.each(templateHelpers, function(helper, index) {
+		_.each(templateContext, function(helper, index) {
 			if (_.isFunction(helper)) {
 				result[index] = helper.call(self);
 			} else {
@@ -126,7 +126,7 @@ define(
 					getMessage : function(){
 							return Marionette.getOption(this, "message");
 					},
-					templateHelpers : {
+					templateContext : {
 						viewId : function() {
 							return Marionette.getOption(this, "id");
 						},
@@ -200,7 +200,7 @@ define(
 			//	return Backbone.Collection.prototype.fetch.call(this, options);
 				var NewClass = BaseType.extend.call(this, protoProps, staticProps);
 				// properly extend prototype hashes like events
-				_.each([ "events", "triggers", "templateHelpers" ], function(mergableProp){
+				_.each([ "events", "triggers", "templateContext" ], function(mergableProp){
 					if(_this.prototype[mergableProp]){
 						NewClass.prototype[mergableProp] = _.extend({}, _this.prototype[mergableProp], protoProps[mergableProp] || {});
 					}
@@ -777,7 +777,11 @@ Calipso.cloneSpecificValue = function(val) {
 		config : {},
 		started : false,
     browseMenu : {},
-	  region: 'body',
+		region : "body",
+    regionClass : Backbone.Marionette.Region.extend({
+	  	el: 'body',
+	  	replaceElement: true
+		}),
 		routers : {},
 	  onBeforeStart: function(onBeforeStartOptions) {
 			onBeforeStartOptions || (onBeforeStartOptions = {});

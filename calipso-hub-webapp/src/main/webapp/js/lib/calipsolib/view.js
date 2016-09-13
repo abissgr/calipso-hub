@@ -27,6 +27,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	//////////////////////////////////////////////////
 
 	Calipso.view.AppRootView = Calipso.view.View.extend({
+		tagName : "body",
+		className : "navbar-fixed sidebar-nav fixed-nav full-height-column",
 		template : Calipso.getTemplate('AppRootView'),
 		regions : {
 			headerRegion : "#calipsoHeaderRegion",
