@@ -1,4 +1,4 @@
-package gr.abiss.calipso.websocket;
+package gr.abiss.calipso.websocket.client;
 
 import java.lang.reflect.Type;
 

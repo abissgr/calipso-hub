@@ -47,7 +47,7 @@ import gr.abiss.calipso.test.AbstractControllerIT.DefaultStompFrameHandler;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.userDetails.model.LoginSubmission;
 import gr.abiss.calipso.utils.Constants;
-import gr.abiss.calipso.websocket.DefaultStompSessionHandler;
+import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 

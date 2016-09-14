@@ -100,7 +100,7 @@ public class ModelDrivenBeanGeneratingRegistryPostProcessor implements BeanDefin
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 
 		try {
-			findModels("**.calipso.model");
+			findModels("**.calipso.**.model");
 			findExistingBeans(registry);
 			createBeans(registry);
 			LOGGER.info("Completed generation");
@@ -389,6 +389,7 @@ public class ModelDrivenBeanGeneratingRegistryPostProcessor implements BeanDefin
 		Set<BeanDefinition> entityBeanDefs = EntityUtil.findAnnotatedClasses(basePackage);
 		for (BeanDefinition beanDef : entityBeanDefs) {
 			Class<?> entity = ClassUtils.getClass(beanDef.getBeanClassName());
+			LOGGER.info("Found resource model class {}", entity.getCanonicalName());
 			entityModelContextsMap.put(entity, ModelContext.from(entity));
 		}
 	}

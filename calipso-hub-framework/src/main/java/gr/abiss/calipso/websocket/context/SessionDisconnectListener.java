@@ -1,0 +1,51 @@
+package gr.abiss.calipso.websocket.context;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+
+import gr.abiss.calipso.fs.FilePersistenceService;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.tiers.service.ModelService;
+import gr.abiss.calipso.userDetails.model.UserDetails;
+import gr.abiss.calipso.websocket.model.StompSession;
+import gr.abiss.calipso.websocket.service.StompSessionService;
+
+/**
+ * Removes a {@link StompSession}} instance from persistense upon a {@linkplain SessionDisconnectEvent}
+ */
+@Component("calipsoSessionDisconnectedListener")
+public class SessionDisconnectListener implements ApplicationListener<SessionDisconnectEvent>{
+	private static final Logger LOGGER = LoggerFactory.getLogger(SessionDisconnectListener.class);
+	
+	StompSessionService stompSessionService;
+
+	@Inject
+	@Qualifier("stompSessionService")
+	public void setStompSessionService(StompSessionService stompSessionService) {
+		this.stompSessionService = stompSessionService;
+	}
+	
+    public void onApplicationEvent(SessionDisconnectEvent event) {
+    	
+        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
+
+        // get user
+        org.springframework.security.authentication.UsernamePasswordAuthenticationToken auth = 
+        		(org.springframework.security.authentication.UsernamePasswordAuthenticationToken)event.getUser();
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        
+        // delete STOMP session
+        this.stompSessionService.delete(sha.getSessionId());
+        LOGGER.debug("Un-persisted STOMP session: {}", sha.getSessionId());
+    }
+}

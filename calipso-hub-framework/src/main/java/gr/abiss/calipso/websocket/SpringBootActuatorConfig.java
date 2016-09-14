@@ -24,6 +24,13 @@ import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.socket.config.WebSocketMessageBrokerStats;
 
+import gr.abiss.calipso.websocket.actuate.MessageMappingEndPoint;
+import gr.abiss.calipso.websocket.actuate.WebSocketEndPoint;
+
+/**
+ * Actuator config. Endpoint paths are set in calipso.(defaults.)properties (see endpoints.actuator.*).
+ *
+ */
 @Configuration
 @Import({EndpointAutoConfiguration.class, EndpointWebMvcAutoConfiguration.class, 
 	  ManagementServerPropertiesAutoConfiguration.class, EndpointAutoConfiguration.class, 
@@ -68,4 +75,15 @@ public class SpringBootActuatorConfig {
 		return new EndpointMvcAdapter(delegate);
 	}
 	
+	@Bean
+	@Description("Spring Actuator endpoint to expose WebSocket stats")
+	public WebSocketEndPoint websocketEndpoint(WebSocketMessageBrokerStats stats) {
+		return new WebSocketEndPoint(stats);
+	}
+	
+	@Bean
+	@Description("Spring Actuator endpoint to expose WebSocket message mappings")
+	public MessageMappingEndPoint messageMappingEndpoint() {
+		return new MessageMappingEndPoint();
+}
 }

@@ -68,7 +68,7 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.Constants;
-import gr.abiss.calipso.websocket.DefaultStompSessionHandler;
+import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;

@@ -42,16 +42,9 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
 	@Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
         messages
-        // allow connect, disconnect and heartbeat to anonymous
-        .simpTypeMatchers(SimpMessageType.CONNECT, SimpMessageType.HEARTBEAT, SimpMessageType.DISCONNECT).permitAll()
-        .simpDestMatchers("/topic/**").permitAll()//.authenticated()
-        .simpDestMatchers("/app/**").permitAll()//.authenticated()
-        // (i.e. cannot send messages directly to /topic/, /queue/)
-        // (i.e. cannot subscribe to /topic/messages/* to get messages sent to
-        // /topic/messages-user<id>)
-        .simpTypeMatchers(SimpMessageType.MESSAGE, SimpMessageType.SUBSCRIBE).permitAll()//.denyAll()
-        // catch all
-        .anyMessage().permitAll();//.denyAll();
+        .simpMessageDestMatchers("/queue/**","/topic/**").denyAll()
+		.simpSubscribeDestMatchers("/queue/**/*-user*","/topic/**/*-user*").denyAll()
+		.anyMessage().authenticated();
 
     }
 	
