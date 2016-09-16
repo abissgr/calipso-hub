@@ -729,4 +729,9 @@ public class UserDetails implements  ICalipsoUserDetails{
 		this.passwordConfirmation = passwordConfirmation;
 	}
 
+	@Override
+	public String getName() {
+		return this.getUsername();
+	}
+
 }

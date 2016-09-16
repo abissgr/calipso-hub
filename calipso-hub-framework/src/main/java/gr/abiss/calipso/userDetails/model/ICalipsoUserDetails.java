@@ -19,6 +19,7 @@ package gr.abiss.calipso.userDetails.model;
 
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.springframework.social.security.SocialUserDetails;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(as=UserDetails.class)
-public interface ICalipsoUserDetails extends SocialUserDetails {
+public interface ICalipsoUserDetails extends SocialUserDetails, Principal {
 
 	public String getEmailOrUsername();
 

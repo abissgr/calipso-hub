@@ -1,5 +1,8 @@
 package gr.abiss.calipso.websocket;
 
+import java.security.Principal;
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
@@ -11,18 +14,24 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.HandshakeHandler;
+import org.springframework.web.socket.server.RequestUpgradeStrategy;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 
 @Configuration
@@ -51,11 +60,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
 		org.apache.commons.configuration.Configuration config = ConfigurationFactory.getConfiguration();
 		String domain = config.getString(ConfigurationFactory.DOMAIN);
-		String originWithPort = new StringBuffer(domain).append(':').append(config.getString(ConfigurationFactory.PORT)).toString();
-		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("registerStompEndpoints");
-		}
+//		String originWithPort = new StringBuffer(domain).append(':').append(config.getString(ConfigurationFactory.PORT)).toString();
 		stompEndpointRegistry.addEndpoint("/ws")
 			.setHandshakeHandler(handshakeHandler())
 			.setAllowedOrigins("*"/*domain, originWithPort*/);
@@ -71,9 +76,6 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	 */
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry messageBrokerRegistry) {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("configureMessageBroker");
-		}
 		messageBrokerRegistry.enableSimpleBroker("/topic", "/queue").setTaskScheduler(heartbeatTaskScheduler());
 		messageBrokerRegistry.setApplicationDestinationPrefixes("/app");
 	}
@@ -89,20 +91,30 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	 */
 	@Bean
 	public HandshakeHandler handshakeHandler() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("handshakeHandler");
-		}
-
 		WebSocketPolicy policy = new WebSocketPolicy(WebSocketBehavior.SERVER);
 		policy.setInputBufferSize(8192);
 		policy.setIdleTimeout(600000);
 
-		return new DefaultHandshakeHandler(new JettyRequestUpgradeStrategy(new WebSocketServerFactory(policy)));
+		return new CalipsoHandshakeHandler(new JettyRequestUpgradeStrategy(new WebSocketServerFactory(policy)));
 	}
 	
 	@Bean
     ThreadPoolTaskScheduler heartbeatTaskScheduler() {
         return new ThreadPoolTaskScheduler();
+	}
+	
+	public static class CalipsoHandshakeHandler extends DefaultHandshakeHandler{
+		
+		public CalipsoHandshakeHandler(RequestUpgradeStrategy requestUpgradeStrategy) {
+			super(requestUpgradeStrategy);
+		}
+
+//		@Override
+//		protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
+//				Map<String, Object> attributes) {
+//			return SecurityUtil.getPrincipal();
+//		}
+		
 	}
 
 }
