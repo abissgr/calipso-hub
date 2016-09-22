@@ -18,9 +18,10 @@
 package gr.abiss.calipso.model.cms;
 
 import static org.apache.commons.lang.CharEncoding.UTF_8;
+
 import gr.abiss.calipso.model.Host;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.types.ResourceProtocol;
 
 import java.io.UnsupportedEncodingException;
@@ -42,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Table(name = "content_resource")
-public class Resource extends AbstractAuditable<User> {
+public class Resource extends AbstractSystemUuidPersistable {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);

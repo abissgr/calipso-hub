@@ -186,9 +186,9 @@
       <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/data/spring-data-jpa/1.8.1.RELEASE/spring-data-jpa-1.8.1.RELEASE-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.8.5/aspectjrt-1.8.5.jar" sourcepath="M2_REPO/org/aspectj/aspectjrt/1.8.5/aspectjrt-1.8.5-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.6.11/aspectjrt-1.6.11.jar" sourcepath="M2_REPO/org/aspectj/aspectjrt/1.6.11/aspectjrt-1.6.11-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/aspectj/aspectjrt/1.8.5/aspectjrt-1.8.5-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/aspectj/aspectjrt/1.6.11/aspectjrt-1.6.11-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-entitymanager/4.3.6.Final/hibernate-entitymanager-4.3.6.Final.jar" sourcepath="M2_REPO/org/hibernate/hibernate-entitymanager/4.3.6.Final/hibernate-entitymanager-4.3.6.Final-sources.jar"/>
@@ -441,12 +441,6 @@
       <attribute value="jar:file:/home/manos/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/1.4.0.RELEASE/spring-boot-autoconfigure-1.4.0.RELEASE-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/boot/spring-boot-starter-logging/1.4.0.RELEASE/spring-boot-starter-logging-1.4.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/boot/spring-boot-starter-logging/1.4.0.RELEASE/spring-boot-starter-logging-1.4.0.RELEASE-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.21/log4j-over-slf4j-1.7.21.jar" sourcepath="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.21/log4j-over-slf4j-1.7.21-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/slf4j/log4j-over-slf4j/1.7.21/log4j-over-slf4j-1.7.21-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/yaml/snakeyaml/1.17/snakeyaml-1.17.jar" sourcepath="M2_REPO/org/yaml/snakeyaml/1.17/snakeyaml-1.17-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/yaml/snakeyaml/1.17/snakeyaml-1.17-javadoc.jar!/" name="javadoc_location"/>
@@ -602,6 +596,61 @@
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/log4j/log4j/1.2.16/log4j-1.2.16-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/javers/javers-core/2.3.0/javers-core-2.3.0.jar" sourcepath="M2_REPO/org/javers/javers-core/2.3.0/javers-core-2.3.0-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/javers/javers-core/2.3.0/javers-core-2.3.0-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/picocontainer/picocontainer/2.14.3/picocontainer-2.14.3.jar" sourcepath="M2_REPO/org/picocontainer/picocontainer/2.14.3/picocontainer-2.14.3-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/picocontainer/picocontainer/2.14.3/picocontainer-2.14.3-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/io/github/lukehutch/fast-classpath-scanner/2.0.3/fast-classpath-scanner-2.0.3.jar" sourcepath="M2_REPO/io/github/lukehutch/fast-classpath-scanner/2.0.3/fast-classpath-scanner-2.0.3-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/io/github/lukehutch/fast-classpath-scanner/2.0.3/fast-classpath-scanner-2.0.3-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.5/gson-2.5.jar" sourcepath="M2_REPO/com/google/code/gson/gson/2.5/gson-2.5-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/com/google/code/gson/gson/2.5/gson-2.5-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/javers/javers-spring/2.3.0/javers-spring-2.3.0.jar" sourcepath="M2_REPO/org/javers/javers-spring/2.3.0/javers-spring-2.3.0-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/javers/javers-spring/2.3.0/javers-spring-2.3.0-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6.jar" sourcepath="M2_REPO/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/javers/javers-persistence-sql/2.3.0/javers-persistence-sql-2.3.0.jar" sourcepath="M2_REPO/org/javers/javers-persistence-sql/2.3.0/javers-persistence-sql-2.3.0-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/javers/javers-persistence-sql/2.3.0/javers-persistence-sql-2.3.0-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/polyjdbc/polyjdbc/0.6.2/polyjdbc-0.6.2.jar" sourcepath="M2_REPO/org/polyjdbc/polyjdbc/0.6.2/polyjdbc-0.6.2-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/polyjdbc/polyjdbc/0.6.2/polyjdbc-0.6.2-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/javers/javers-spring-data/1.1.0-RC1/javers-spring-data-1.1.0-RC1.jar" sourcepath="M2_REPO/org/javers/javers-spring-data/1.1.0-RC1/javers-spring-data-1.1.0-RC1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/javers/javers-spring-data/1.1.0-RC1/javers-spring-data-1.1.0-RC1-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/cglib/cglib/3.1/cglib-3.1.jar" sourcepath="M2_REPO/cglib/cglib/3.1/cglib-3.1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/cglib/cglib/3.1/cglib-3.1-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/ow2/asm/asm/4.2/asm-4.2.jar" sourcepath="M2_REPO/org/ow2/asm/asm/4.2/asm-4.2-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/ow2/asm/asm/4.2/asm-4.2-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/thymeleaf/thymeleaf/2.0.16/thymeleaf-2.0.16.jar" sourcepath="M2_REPO/org/thymeleaf/thymeleaf/2.0.16/thymeleaf-2.0.16-sources.jar">
@@ -844,11 +893,6 @@
   <classpathentry kind="var" path="M2_REPO/org/parboiled/parboiled-core/1.1.6/parboiled-core-1.1.6.jar" sourcepath="M2_REPO/org/parboiled/parboiled-core/1.1.6/parboiled-core-1.1.6-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/parboiled/parboiled-core/1.1.6/parboiled-core-1.1.6-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/ow2/asm/asm/4.1/asm-4.1.jar" sourcepath="M2_REPO/org/ow2/asm/asm/4.1/asm-4.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/ow2/asm/asm/4.1/asm-4.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/ow2/asm/asm-tree/4.1/asm-tree-4.1.jar" sourcepath="M2_REPO/org/ow2/asm/asm-tree/4.1/asm-tree-4.1-sources.jar">

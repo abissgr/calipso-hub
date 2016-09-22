@@ -1,4 +1,4 @@
-package gr.abiss.calipso.service.impl;
+package gr.abiss.calipso.friends.service.impl;
 
 import java.util.Map;
 
@@ -12,14 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 
-import gr.abiss.calipso.model.Friendship;
+import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.repository.FriendshipRepository;
+import gr.abiss.calipso.friends.service.FriendshipService;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.types.FriendshipStatus;
-import gr.abiss.calipso.repository.FriendshipRepository;
 import gr.abiss.calipso.repository.UserRepository;
-import gr.abiss.calipso.service.FriendshipService;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;

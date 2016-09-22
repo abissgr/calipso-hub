@@ -27,6 +27,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.javers.core.metamodel.annotation.ShallowReference;
 import org.springframework.data.domain.Persistable;
 
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
@@ -34,6 +35,8 @@ import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 /**
  * Simple JPA implementation of Spring's AclObjectIdentity.
  */
+
+@ShallowReference
 @Entity
 @Table(name = "acl_object_identity")
 public class AclObjectIdentity implements CalipsoPersistable<Long> {

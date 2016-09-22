@@ -24,6 +24,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.javers.core.metamodel.annotation.ShallowReference;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.core.Authentication;
@@ -32,6 +33,7 @@ import org.springframework.util.Assert;
 
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 
+@ShallowReference
 @Entity
 @Table(name = "acl_sid")
 public class AclSid implements CalipsoPersistable<Long> {

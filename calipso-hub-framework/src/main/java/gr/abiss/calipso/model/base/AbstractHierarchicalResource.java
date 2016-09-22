@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.entities.AbstractAuditable;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -37,23 +36,20 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
- * A base class for auditable resource entities: files, folders, categories etc.
+ * A base class for path-like resource entities: files, folders, categories etc.
  */
 @MappedSuperclass
-public abstract class AuditableResource<T extends AuditableResource<T>> extends AbstractAuditable<User> {
+public abstract class AbstractHierarchicalResource<T extends AbstractHierarchicalResource<T>> extends AbstractNamedResource {
+
+	private static final long serialVersionUID = 1L;
 
 	private static final String PATH_SEPARATOR = "/";
-
-	/**
-	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
-	 */
-	@Column(name = "name", length = 500, nullable = false)
-	private String name;
 
 	/**
 	 * The HTTP URL of the resource, excluding the protocol, domain and port. Starts with a slash. 
@@ -67,33 +63,36 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 	@Column(name = "path_level", nullable = false)
 	private Short pathLevel;
 
+	@DiffIgnore
 	@JsonIgnore
 	@ManyToOne(/* cascade=CascadeType.ALL, */fetch = FetchType.EAGER)
 	@JoinColumn(name = "same_as", referencedColumnName = "id", nullable = true)
 	private T sameAs;
 
+	@DiffIgnore
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent", referencedColumnName = "id", nullable = true)
 	private T parent;
 
+	@DiffIgnore
 	@JsonIgnore
 	@OneToMany(mappedBy = "parent", /* cascade=CascadeType.ALL, */ fetch=FetchType.LAZY)
 	private List<T> children = new ArrayList<T>(0);
 
-	public AuditableResource() {
+	public AbstractHierarchicalResource() {
 		super();
 	}
-	public AuditableResource(String name) {
+	public AbstractHierarchicalResource(String name) {
 		this.setName(name);
 	}
-	public AuditableResource(String name, T parent) {
+	public AbstractHierarchicalResource(String name, T parent) {
 		this(name);
 		this.setParent(parent);
 	}
 	
 	@JsonIgnore
 	@Transient
-	public String getPathSeparator(){
+	protected String getPathSeparator(){
 		return PATH_SEPARATOR;
 	}
 	
@@ -116,6 +115,7 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 		
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean equals(Object obj) {
 		if (null == obj) {
@@ -125,24 +125,18 @@ public abstract class AuditableResource<T extends AuditableResource<T>> extends 
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof User)) {
+		if (!this.getClass().isAssignableFrom(obj.getClass())) {
 			return false;
 		}
-		AuditableResource other = (AuditableResource) obj;
+		
+		AbstractHierarchicalResource other = (AbstractHierarchicalResource) obj;
 		EqualsBuilder builder = new EqualsBuilder();
 		builder.appendSuper(super.equals(obj));
-		builder.append(this.getName(), other.getName());
 		builder.append(this.getPath(), other.getPath());
 		return builder.isEquals();
 	}
 	
 	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
 	public String getPath() {
 		return path;
 	}

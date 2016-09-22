@@ -1,24 +1,25 @@
-package gr.abiss.calipso.repository;
+package gr.abiss.calipso.friends.repository;
 
 
 import java.util.List;
 import java.util.Optional;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import gr.abiss.calipso.model.Friendship;
+import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
-import gr.abiss.calipso.tiers.repository.ModelRepository;import java.util.List;
-import java.util.Optional;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 /**
  * Spring Data JPA repository for the Friendship entity.
  */
 @SuppressWarnings("unused")
+@JaversSpringDataAuditable
 public interface FriendshipRepository extends ModelRepository<Friendship,String> {
 
 	static final String QUERY_FRIENDS_BY_USERID = "select new gr.abiss.calipso.model.dto.UserDTO(friendship.requestRecipient.id, "
@@ -27,7 +28,8 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 			+ "		friendship.requestRecipient.username, "
 			+ "		friendship.requestRecipient.email, "
 			+ "		friendship.requestRecipient.emailHash,"
-			+ "		friendship.requestRecipient.avatarUrl"
+			+ "		friendship.requestRecipient.avatarUrl,"
+			+ "		friendship.requestRecipient.bannerUrl"
 			+ ") "
 			+ "from Friendship friendship where friendship.requestSender.id =  ?1 "
 			+ "and (friendship.status = gr.abiss.calipso.model.types.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.model.types.FriendshipStatus.INVERSE)";

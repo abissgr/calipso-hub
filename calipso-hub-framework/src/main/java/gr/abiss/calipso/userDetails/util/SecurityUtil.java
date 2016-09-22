@@ -25,6 +25,8 @@ import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 
+import java.util.Optional;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -143,7 +145,7 @@ public class SecurityUtil {
 		
 		if (StringUtils.isBlank(cookieValue)) {
 			if(LOGGER.isDebugEnabled()){
-				LOGGER.debug("addCookie, setting max-age to 0 to clear cookie: " + cookieName);
+				LOGGER.debug("addCookie, setting max-age to 0 to clear cookie: {}", cookieName);
 			}
 			cookie.setMaxAge(0);
 		}
@@ -151,16 +153,31 @@ public class SecurityUtil {
 		response.addHeader("X-Calipso-Token", cookieValue);
 	}
 
+	public static Authentication getAuthentication() {
+		Authentication auth = null;
+		if (SecurityContextHolder.getContext() != null){
+			auth = SecurityContextHolder.getContext().getAuthentication();
+		}
+		LOGGER.debug("getAuthentication: {}", auth);
+		return auth;
+	}
+	
+
+	public static Optional<ICalipsoUserDetails> getPrincipalOptional() {
+		return Optional.ofNullable(getPrincipal()); 
+	}
+	
+	
 	public static ICalipsoUserDetails getPrincipal() {
 		Object principal = null;
-		
-		if (SecurityContextHolder.getContext() != null
-				&& SecurityContextHolder.getContext().getAuthentication() != null) {
-			
-			principal = SecurityContextHolder.getContext().getAuthentication()
-					.getPrincipal();
+		Authentication auth = getAuthentication();
+		if (auth != null) {
+			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
 		}
 
+		LOGGER.warn("getPrincipal1 1: {}",  principal);
+		
 		if (principal != null) {
 			if(String.class.isAssignableFrom(principal.getClass())){
 				LOGGER.warn("getPrincipal1, principal is {}, forcing anonymous: ",  principal.toString());
@@ -171,6 +188,8 @@ public class SecurityUtil {
 				principal = UserDetails.fromUser((User) principal);
 			}
 		}
+
+		LOGGER.warn("getPrincipal1 2: {}",  principal);
 //		if (principal != null) {
 //			
 //			if (ICalipsoUserDetails.class.isAssignableFrom(principal.getClass())) {

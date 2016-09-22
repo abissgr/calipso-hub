@@ -90,7 +90,11 @@
 		<spring-data-jpa-version>1.8.1.RELEASE</spring-data-jpa-version>
 		<spring-data-commons-version>1.10.1.RELEASE</spring-data-commons-version>
 		<spring-data-elasticsearch-version>1.0.0.M1</spring-data-elasticsearch-version>
-
+		<!-- javers auditing -->
+		<javers-core.version>2.3.0</javers-core.version>
+		<javers-spring.version>2.3.0</javers-spring.version>
+		<javers-spring-data.version>1.1.0-RC1</javers-spring-data.version>
+		
 		<!-- Spring Social -->
 		<spring-social.version>1.1.4.RELEASE</spring-social.version>
 		<spring-social-facebook-version>2.0.3.RELEASE</spring-social-facebook-version>
@@ -457,6 +461,22 @@
 				<artifactId>spring-data-commons</artifactId>
 				<version>${spring-data-commons-version}</version>
 			</dependency>
+			<!-- javers auditing -->
+			<dependency>
+			    <groupId>org.javers</groupId>
+			    <artifactId>javers-core</artifactId>
+			    <version>${javers-core.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.javers</groupId>
+			    <artifactId>javers-spring</artifactId>
+			    <version>${javers-spring.version}</version>
+			</dependency>
+<!-- 			<dependency> -->
+<!-- 			    <groupId>org.javers</groupId> -->
+<!-- 			    <artifactId>javers-spring-data</artifactId> -->
+<!-- 			    <version>${javers-spring-data.version}</version> -->
+<!-- 			</dependency> -->
 			<!-- actuator stats -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>

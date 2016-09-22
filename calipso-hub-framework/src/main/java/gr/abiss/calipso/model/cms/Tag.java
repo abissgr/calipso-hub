@@ -19,6 +19,7 @@ package gr.abiss.calipso.model.cms;
 
 import gr.abiss.calipso.model.base.AbstractCategory;
 
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 

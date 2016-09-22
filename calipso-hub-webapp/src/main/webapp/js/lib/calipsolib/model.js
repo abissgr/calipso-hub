@@ -304,9 +304,12 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
 				fieldType : "RelatedModel",
 				"pathFragment" : "countries",
       },
+			edit : {
+				fieldType : "Edit",
+			},
     },
   });
-
+/*
   Calipso.util.UserInvitationRecepientModel = Backbone.Model.extend({
     schema: {
       firstName: {
@@ -328,7 +331,7 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
       return attrs.firstName + ' ' + attrs.lastName + '&lt;' + attrs.email + '&gt;';
     }
   });
-
+*/
 	Calipso.model.UserInvitationsModel = Calipso.Model.extend(
   /** @lends Calipso.model.RoleModel.prototype */
   {
@@ -394,6 +397,9 @@ function($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, Calipso
       description : {
         fieldType : "String",
       },
+			edit : {
+				fieldType : "Edit",
+			},
     },
   });
 

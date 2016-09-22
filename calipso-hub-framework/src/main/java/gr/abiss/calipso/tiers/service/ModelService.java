@@ -26,11 +26,26 @@ import java.io.Serializable;
 import org.springframework.data.domain.Persistable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Provides SCRUD and utility operations for {@link T} entities
+ * @author manos
+ *
+ * @param <T> the entity type
+ * @param <ID> the entity ID type
+ */
 @Service
 public interface ModelService <T extends Persistable<ID>, ID extends Serializable>
 extends GenericService<T, ID>{
 
+	/**
+	 * Get the current user's details
+	 * @return
+	 */
 	public ICalipsoUserDetails getPrincipal();
 
+	/**
+	 * Get the current user's details from the DB
+	 * @return
+	 */
 	public LocalUser getPrincipalLocalUser();
 }

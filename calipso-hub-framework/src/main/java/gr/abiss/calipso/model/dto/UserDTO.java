@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiModel;
 public class UserDTO implements Serializable {
 
 	public static UserDTO fromUser(User user){
-		return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), user.getEmailHash(), user.getAvatarUrl());
+		return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), user.getEmailHash(), user.getAvatarUrl(), user.getBannerUrl());
 	}
 	
 	private String id;
@@ -47,11 +47,13 @@ public class UserDTO implements Serializable {
 	private String emailHash;
 	
 	private String avatarUrl;
+	
+	private String bannerUrl;
 
 	public UserDTO() {
 	}
 
-	public UserDTO(String id, String firstName, String lastName, String username, String email, String emailHash, String avatarUrl) {
+	public UserDTO(String id, String firstName, String lastName, String username, String email, String emailHash, String avatarUrl, String bannerUrl) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -60,6 +62,7 @@ public class UserDTO implements Serializable {
 		this.email = email;
 		this.emailHash = emailHash;
 		this.avatarUrl = avatarUrl;
+		this.bannerUrl = bannerUrl;
 	}
 
 	@Override
@@ -67,12 +70,12 @@ public class UserDTO implements Serializable {
 		return new ToStringBuilder(this).appendSuper(super.toString()).append("id", this.getUsername())
 				.append("firstName", this.getUsername()).append("lastName", this.getUsername())
 				.append("username", this.getUsername()).append("email", this.getUsername())
-				.append("emailHash", this.getEmail()).append("avatarUrl", this.getAvatarUrl()).toString();
+				.append("emailHash", this.getEmail()).append("avatarUrl", this.getAvatarUrl()).append("bannerUrl", this.getBannerUrl()).toString();
 	}
 
 	public User toUser() {
 		return new User.Builder().id(this.id).firstName(this.firstName).lastName(this.lastName).username(this.username)
-				.email(this.email).emailHash(this.emailHash).avatarUrl(this.avatarUrl).build();
+				.email(this.email).emailHash(this.emailHash).avatarUrl(this.avatarUrl).bannerUrl(bannerUrl).build();
 	}
 
 	public String getId() {
@@ -132,6 +135,13 @@ public class UserDTO implements Serializable {
 		this.avatarUrl = avatarUrl;
 	}
 
+	public String getBannerUrl() {
+		return bannerUrl;
+	}
+
+	public void setBannerUrl(String bannerUrl) {
+		this.bannerUrl = bannerUrl;
+	}
 
 	public static class Builder {
 		private String id;

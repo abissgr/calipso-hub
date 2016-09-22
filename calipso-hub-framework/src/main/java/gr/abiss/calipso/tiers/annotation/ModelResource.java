@@ -98,11 +98,18 @@ public @interface ModelResource {
      * The API (grouping) name for the generated controller. Used for swagger documentation.
      */
     String apiName() default "";
+
     /**
      * 
      * The API description for the generated controller. Used for swagger documentation.
      */
     String apiDescription() default "";
+    
+    /**
+     * 
+     * Hint to enable (javers auditing b
+     */
+    boolean auditable() default false;
     
     
 }

@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -24,7 +23,6 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.HandshakeHandler;
 import org.springframework.web.socket.server.RequestUpgradeStrategy;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
@@ -104,16 +102,18 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	}
 	
 	public static class CalipsoHandshakeHandler extends DefaultHandshakeHandler{
-		
+
+		private static final Logger LOGGER = LoggerFactory.getLogger(CalipsoHandshakeHandler.class);
 		public CalipsoHandshakeHandler(RequestUpgradeStrategy requestUpgradeStrategy) {
 			super(requestUpgradeStrategy);
 		}
 
-//		@Override
-//		protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
-//				Map<String, Object> attributes) {
-//			return SecurityUtil.getPrincipal();
-//		}
+		@Override
+		protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
+			Principal auth = SecurityUtil.getAuthentication();
+			LOGGER.info("determineUser: {}", auth);
+			return auth;
+		}
 		
 	}
 

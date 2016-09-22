@@ -18,6 +18,7 @@
 package gr.abiss.calipso.model.acl;
 
 import javax.persistence.Column;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,10 +28,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.javers.core.metamodel.annotation.ShallowReference;
 import org.springframework.data.domain.Persistable;
 
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 
+@ShallowReference
 @Entity
 @Table(name = "acl_entry")
 public class AclEntry implements CalipsoPersistable<Long> {

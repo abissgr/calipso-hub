@@ -48,6 +48,8 @@ import gr.abiss.calipso.tiers.annotation.ModelResource;
  */
 public final class ModelContext {
 	
+	private static final String AUDITABLE2 = "auditable";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModelContext.class);
 
     private Class<?> modelType;
@@ -65,6 +67,12 @@ public final class ModelContext {
 	private Map<String, Object> apiAnnotationMembers;
 
 	private ModelResource modelResource;
+	
+	private boolean auditable;
+
+	public boolean isAuditable() {
+		return auditable;
+	}
 
 	public List<Class<?>> getGenericTypes() {
 		List<Class<?>> genericTypes = new LinkedList<Class<?>>();
@@ -238,6 +246,8 @@ public final class ModelContext {
         ModelResource resource = domainClass.getAnnotation(ModelResource.class);
         Map<String, Object> apiAnnotationMembers = new HashMap<String, Object>();
         if( resource != null ){
+        	// auditable?
+        	apiAnnotationMembers.put(AUDITABLE2, resource.auditable());
         	// get tags (grouping key, try API name)
             if(StringUtils.isNotBlank(resource.apiName())){
             	String[] tags = {resource.apiName()};
@@ -268,6 +278,7 @@ public final class ModelContext {
         return apiAnnotationMembers.size() > 0 ? apiAnnotationMembers : null;
     }
 
+	
 	public Class<?> getModelIdType() {
 		return modelIdType;
 	}

@@ -17,9 +17,8 @@
  */
 package gr.abiss.calipso.model;
 
-import gr.abiss.calipso.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
-import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
 import io.swagger.annotations.ApiModel;
 
@@ -35,6 +34,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,7 +47,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "role")
 @Inheritance(strategy = InheritanceType.JOINED)
 @ApiModel(value = "Role", description = "User principal roles. Roles are principals themselves and can be assigned to users.")
-public class Role extends AbstractAuditable<User> implements GrantedAuthority {
+public class Role extends AbstractSystemUuidPersistable implements GrantedAuthority {
 
 	private static final long serialVersionUID = 3558291745762331656L;
 	
@@ -78,6 +78,7 @@ public class Role extends AbstractAuditable<User> implements GrantedAuthority {
 	private String description;
 
 	@JsonIgnore
+	@DiffIgnore 
 	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
 	private Collection<User> members = new ArrayList<User>(0);
 

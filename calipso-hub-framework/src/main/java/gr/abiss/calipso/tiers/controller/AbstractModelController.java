@@ -69,6 +69,15 @@ import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+/**
+ * RESTful controller providing SCRUD and utility calls for {@link T} entities
+ * 
+ * @author manos
+ *
+ * @param <T> the entity type
+ * @param <ID> the entity ID type
+ * @param <S> the service type
+ */
 public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, ID extends Serializable, S extends ModelService<T, ID>>
 		extends ServiceBasedRestController<T, ID, S> implements ModelController<T, ID, S>{
 

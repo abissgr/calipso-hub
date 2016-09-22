@@ -114,30 +114,22 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				schema = isArray ? [] : {};
 				_.each(fields, function(field, key) {
-					baseSchemaEntry = {
-						pathFragment : field.pathFragment
-					};
-					console.log("baseSchemaEntry.pathFragment 1: " + baseSchemaEntry.pathFragment + ", field: ");
-					console.log();
-					// use a base type?
-					if(field.fieldType){
-						var FieldType = _.isObject(field.fieldType)
-							? field.fieldType
-							: Calipso.fields[field.fieldType];
-						// validate
-						if(!FieldType){
-							throw "Failed looking up field type:" + field.fieldType;
-						}
-						// apply
-						_.extend(baseSchemaEntry, FieldType[schemaType] || {});
-						console.log("baseSchemaEntry.pathFragment 2: " + baseSchemaEntry.pathFragment);
-					}
-					// overrides?
-					overrideSchemaEntry = field[schemaType] || {};
+
+					// type and instance schemas
+					baseSchemaEntry = _.isObject(field.fieldType)
+						? field.fieldType[schemaType]
+						: Calipso.fields[field.fieldType][schemaType];
+
+					overrideSchemaEntry = field[schemaType];
+
 					// if a schema entry exists, add it
 					if (baseSchemaEntry || overrideSchemaEntry) {
+
 						// merge to new object
-						schemaEntry = Calipso.deepExtend({}, baseSchemaEntry, overrideSchemaEntry);
+						schemaEntry = Calipso.deepExtend(
+							{pathFragment : field.pathFragment},
+							(baseSchemaEntry || {}),
+							(overrideSchemaEntry || {}));
 
 						console.log("schemaEntry.pathFragment 1: " + schemaEntry.pathFragment);
 						//TODO: also labelPropertyCopy
@@ -159,6 +151,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				});
 			}
+			console.log("buildSchema returns:");
+			console.log(schema);
 			return schema;
 		},
 	}, {

@@ -217,8 +217,22 @@
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch-transport-wares</artifactId>
 		</dependency>
+		
+		<!-- javers auditing -->
+		<dependency>
+		    <groupId>org.javers</groupId>
+		    <artifactId>javers-core</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.javers</groupId>
+		    <artifactId>javers-spring</artifactId>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 		    <groupId>org.javers</groupId> -->
+<!-- 		    <artifactId>javers-spring-data</artifactId> -->
+<!-- 		</dependency> -->
+		
 		<!-- Thymeleaf Template Engine -->
-
 		<dependency>
 			<groupId>org.thymeleaf</groupId>
 			<artifactId>thymeleaf</artifactId>

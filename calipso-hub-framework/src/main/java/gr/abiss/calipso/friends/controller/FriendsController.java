@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.controller;
+package gr.abiss.calipso.friends.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +38,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import gr.abiss.calipso.friends.service.FriendshipService;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
 import gr.abiss.calipso.model.dto.UserInvitationsDTO;
-import gr.abiss.calipso.service.FriendshipService;
 import gr.abiss.calipso.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

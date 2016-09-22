@@ -19,11 +19,15 @@ package gr.abiss.calipso.repository;
 
 import java.util.List;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 
-import org.springframework.data.jpa.repository.Query;
-
+@Repository
+@JaversSpringDataAuditable
 public interface RoleRepository extends ModelRepository<Role, String> {
 
 	@Query("select r from Role r where r.name = ?1")

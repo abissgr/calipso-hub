@@ -24,7 +24,6 @@ import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
-import gr.abiss.calipso.notification.service.BaseNotificationService;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
@@ -82,8 +81,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	private LocalUserService<? extends Serializable, ? extends LocalUser> localUserService;
 	
-	private BaseNotificationService baseNotificationService;
-	
 	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {
 		this.userDetailsConfig = userDetailsConfig;
@@ -94,11 +91,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	public void setLocalUserService(
 			LocalUserService<? extends Serializable, ? extends LocalUser> localUserService) {
 		this.localUserService = localUserService;
-	}
-
-	@Autowired(required = true)
-	public void setBaseNotificationsService(BaseNotificationService baseNotificationService) {
-		this.baseNotificationService = baseNotificationService;
 	}
 
 	@Override
@@ -128,7 +120,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		}
 
 		userDetails = UserDetails.fromUser(user);
-		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("loadUserByUsername returns userDetails: " + userDetails
@@ -180,7 +171,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 						}
 						// convert to UserDetails if not null
 						userDetails = UserDetails.fromUser(localUser);
-						userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 					}
 					
 				}
@@ -229,7 +219,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		localUser.setResetPasswordToken(null);
 		localUser.setPassword(newPassword);
 		userDetails = UserDetails.fromUser(localUser);
-		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 		// LOGGER.info("create returning loggedInUserDetails: " +
 		// loggedInUserDetails);
 		return userDetails;
@@ -325,7 +314,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			// Role userRole = new Role(Role.ROLE_USER);
 			// user.addRole(userRole);
 			userDetails = UserDetails.fromUser(user);
-			userDetails.setNotificationCount(this.baseNotificationService.countUnseen(user));
 		}
 
 		if (user == null) {
@@ -340,78 +328,22 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	@Transactional(readOnly = false)
 	public String execute(Connection<?> connection) {
-		//if(LOGGER.isDebugEnabled()){
-			LOGGER.info("ConnectionSignUp#execute, connection: "+connection);
-		//}
-		//String localUsername = null;
-		String accessToken = connection.createData().getAccessToken();
+		
 		UserProfile profile = connection.fetchUserProfile();
-		ConnectionData data = connection.createData();
 
 		String socialUsername = profile.getUsername();
-		if (StringUtils.isBlank(socialUsername)) {
-			LOGGER.info("blank username for profile class: " + profile.getClass());
-			Object api = connection.getApi();
-			if (SocialMediaService.FACEBOOK.toString().equalsIgnoreCase(
-					connection.createData().getProviderId())) {
-				Facebook fbApi = new FacebookTemplate(accessToken);
-				User fbProfile = fbApi.userOperations().getUserProfile();
-				if (fbProfile != null) {
-					socialUsername = fbProfile.getId();
-					LOGGER.debug("ConnectionSignUp#execute, Got facebook id: " 	+ socialUsername);
-				}
-			}
-			else if (SocialMediaService.LINKEDIN.toString().equalsIgnoreCase(
-						connection.createData().getProviderId())) {
-					LinkedIn liApi = new LinkedInTemplate(accessToken);
-					LinkedInProfile liProfile = liApi.profileOperations().getUserProfile();
-					if (liProfile != null) {
-						socialUsername = liProfile.getId();
-						LOGGER.debug("ConnectionSignUp#execute, Got linkedin id: " 	+ socialUsername);
-					}
-				}
-		}
 		String socialName = profile.getName();
 		String socialEmail = profile.getEmail();
 		String socialFirstName = profile.getFirstName();
 		String socialLastName = profile.getLastName();
 
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("ConnectionSignUp#execute, profile: " + profile + 
-				", data: " + data +
-				", socialUsername: " + socialUsername + 
-				", socialName: " + socialName +
-				", socialEmail: " + socialEmail +
-				", socialFirstName: " + socialFirstName +
-				", socialLastName: " + socialLastName+
-				", accessToken: "+accessToken);
-		}
-		// get email from github if empty
-		//		if (StringUtils.isNullOrEmpty(socialEmail)) {
-		//			Object api = connection.getApi();
-		//			if (SocialMediaService.GITHUB.toString().equalsIgnoreCase(connection.createData().getProviderId())) {
-		//				GitHub githubApi = new GitHubTemplate(accessToken);//(GitHub) api;
-		//				GitHubUserProfile githubProfile = githubApi.userOperations().getUserProfile();
-		//				LOGGER.debug("ConnectionSignUp#execute, Got github profile: " + githubProfile + ", authorized: " + githubApi.isAuthorized());
-		//				if (githubProfile != null) {
-		//					socialEmail = githubProfile.getEmail();
-		//					LOGGER.debug("ConnectionSignUp#execute, Got github email: " + socialEmail);
-		//				}
-		//			}
-		//		}
-		LocalUser user = null;
+		LocalUser user = this.getPrincipalLocalUser();
+		
 		if (!StringUtils.isBlank(socialEmail)) {
-			// LOGGER.debug("ConnectionSignUp#execute, Social email accessible, looking for local user match");
-
 			user = localUserService.findByUserNameOrEmail(socialEmail);
 			// 
 
-			if (user != null) {
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.debug("ConnectionSignUp#execute, Email matches existing local user, no need to create one");
-				}
-				//localUsername = user.getUsername();
-			} else {
+			if (user == null) {
 				if(LOGGER.isDebugEnabled()){
 					LOGGER.debug("ConnectionSignUp#execute, Email did not match an local user, trying to create one");
 				}
@@ -473,7 +405,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		LOGGER.info("createForImplicitSignup, localUser: " + localUser);
 		ICalipsoUserDetails userDetails = UserDetails
 				.fromUser(this.localUserService	.createForImplicitSignup(localUser));
-		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 		return userDetails;
 	}
 

@@ -35,7 +35,7 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.testng.annotations.Test;
 
-import gr.abiss.calipso.model.Friendship;
+import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;

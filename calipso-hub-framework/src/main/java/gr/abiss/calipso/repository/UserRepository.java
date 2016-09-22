@@ -23,11 +23,15 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 
+//#import org.javers.spring.data.JaversSpringDataAuditable;
+
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+@JaversSpringDataAuditable
 public interface UserRepository extends ModelRepository<User, String> {
 
 //	@Query("select u from User u where u.confirmationToken = ?1")
@@ -44,10 +48,10 @@ public interface UserRepository extends ModelRepository<User, String> {
 	@Query("select u from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public User findByIdOrUsernameOrEmail(String idOrUsernameOrEmail);
 
-	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
+	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl, u.bannerUrl) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public UserDTO findAsLink(String usernameOrEmailOrId);
 	
-	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl) "
+	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl, u.bannerUrl) "
 			+ "from User u where u.id = ?1")
 	public UserDTO findCompactUserById(String id);
 	

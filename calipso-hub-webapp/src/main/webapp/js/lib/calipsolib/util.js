@@ -707,6 +707,8 @@ Calipso.cloneSpecificValue = function(val) {
 		});
 
 		Calipso.vent.on('modal:showUseCaseContext', function(useCaseContext) {
+			console.log("on modal:showUseCaseContext:");
+			console.log(useCaseContext);
 			var layoutProperties = {
 				useCaseContext : useCaseContext,
 				childView : useCaseContext.createView({modal : true}),

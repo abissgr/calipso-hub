@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import gr.abiss.calipso.model.Friendship;
+import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import gr.abiss.calipso.userDetails.model.LoginSubmission;

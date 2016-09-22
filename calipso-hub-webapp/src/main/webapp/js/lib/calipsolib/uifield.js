@@ -310,7 +310,8 @@ function(Calipso, CalipsoBackgrid, _, Handlebars, moment, Backbone, BackboneForm
 			sortable : false,
 			cell : Calipso.components.backgrid.EditRowInModalCell,
 			headerCell : Calipso.components.backgrid.ActionsIconCell
-		}
+		},
+		"form" : null
 	});
 
 	return Calipso;

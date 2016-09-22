@@ -284,7 +284,7 @@ public class ModelDrivenBeanGeneratingRegistryPostProcessor implements BeanDefin
 			// create the new interface
 			Class<?> newRepoInterface = JavassistUtil.createInterface(
 					newBeanPackage + modelContext.getGeneratedClassNamePrefix() + "Repository", repoSUperInterface,
-					genericTypes);
+					genericTypes, modelContext.isAuditable());
 
 			// register using the uncapitalised className as the key
 			AbstractBeanDefinition def = BeanDefinitionBuilder.rootBeanDefinition(ModelRepositoryFactoryBean.class)

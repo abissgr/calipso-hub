@@ -1,4 +1,4 @@
-package gr.abiss.calipso.model;
+package gr.abiss.calipso.friends.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import io.swagger.annotations.ApiModel;
@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Table(name = "friendship")
 @ModelResource(path = Friendship.API_PATH, apiName = "Friendships", apiDescription = "Operations about friendships")
 @ApiModel(value = "Friendship", description = "A model representing a directional connection between two users. ")
-public class Friendship extends AbstractAuditable<User> {
+public class Friendship extends AbstractSystemUuidPersistable {
 	
 	private static final long serialVersionUID = 1L;
 

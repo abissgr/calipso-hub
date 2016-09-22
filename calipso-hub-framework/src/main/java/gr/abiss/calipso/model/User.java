@@ -46,6 +46,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
+import org.javers.core.metamodel.annotation.ShallowReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,14 +56,15 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-
+import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.fs.FilePersistence;
 import gr.abiss.calipso.fs.FilePersistencePreview;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.dto.UserDTO;
-import gr.abiss.calipso.model.entities.AbstractAuditableMetadataSubject;
+import gr.abiss.calipso.model.entities.AbstractMetadataSubject;
 import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.model.interfaces.ReportDataSetSubject;
+import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.uischema.annotation.FormSchemaEntry;
@@ -75,12 +77,13 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  */
+
+@ShallowReference
 @Entity
 @ApiModel(description = "Human users")
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
-		implements LocalUser, CalipsoPersistable<String> {
+public class User extends AbstractMetadataSubject<UserMetadatum> implements LocalUser, CalipsoPersistable<String> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 	private static final long serialVersionUID = -7942906897981646998L;
@@ -200,6 +203,12 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 	@Transient
 	private String redirectUrl;
 
+	@Column(name = "stomp_session_count", nullable = false)
+	private Integer stompSessionCount = 0;
+
+	@Formula(" (stomp_session_count > 0) ")
+	private Boolean stompActive;
+	
 	//	@OneToOne(optional = true, fetch=FetchType.LAZY)
 	//	@MapsId
 	//	private LocalRegionMailingAddress mailingAddress;
@@ -292,6 +301,22 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 
 	public void setRedirectUrl(String redirectUrl) {
 		this.redirectUrl = redirectUrl;
+	}
+
+	public Integer getStompSessionCount() {
+		return stompSessionCount;
+	}
+
+	public void setStompSessionCount(Integer stompSessionCount) {
+		this.stompSessionCount = stompSessionCount;
+	}
+
+	public Boolean getStompActive() {
+		return stompActive;
+	}
+
+	public void setStompActive(Boolean stompActive) {
+		this.stompActive = stompActive;
 	}
 
 	/**
@@ -638,6 +663,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 		private String email;
 		private String emailHash;
 		private String avatarUrl;
+		private String bannerUrl;
 		private String telephone;
 		private String cellphone;
 		private String address;
@@ -722,6 +748,11 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 
 		public Builder avatarUrl(String avatarUrl) {
 			this.avatarUrl = avatarUrl;
+			return this;
+		}
+		
+		public Builder bannerUrl(String bannerUrl) {
+			this.bannerUrl = bannerUrl;
 			return this;
 		}
 
@@ -825,6 +856,7 @@ public class User extends AbstractAuditableMetadataSubject<UserMetadatum, User>
 		this.email = builder.email;
 		this.emailHash = builder.emailHash;
 		this.avatarUrl = builder.avatarUrl;
+		this.bannerUrl = builder.bannerUrl;
 		this.telephone = builder.telephone;
 		this.cellphone = builder.cellphone;
 		this.address = builder.address;

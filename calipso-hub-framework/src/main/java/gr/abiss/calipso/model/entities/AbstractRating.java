@@ -17,7 +17,7 @@
  */
 package gr.abiss.calipso.model.entities;
 
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -28,7 +28,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * Abstract base class for all persistent entities representing a rating
  */
 @MappedSuperclass
-public abstract class AbstractRating<U extends AbstractSystemUuidPersistable> extends AbstractAuditable<U>{
+public abstract class AbstractRating<S extends Serializable> {
+
+	private static final long serialVersionUID = 1L;
 
 	@Column(name = "rating")
 	private Float rating;
@@ -46,20 +48,7 @@ public abstract class AbstractRating<U extends AbstractSystemUuidPersistable> ex
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (null == obj) {
-			return false;
-		}
-
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof AbstractRating)) {
-			return false;
-		}
-		AbstractRating that = (AbstractRating) obj;
-		return null == this.getId() ? false : this.getId().equals(that.getId());
-	}
+	public abstract boolean equals(Object obj);
 
 
 	public Float getRating() {
@@ -77,5 +66,9 @@ public abstract class AbstractRating<U extends AbstractSystemUuidPersistable> ex
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+
+	public abstract S getSubject();
+	
+	public abstract void setSubject(S subject);
 
 }

@@ -31,17 +31,20 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import gr.abiss.calipso.model.entities.AbstractAuditable;
+import org.javers.core.metamodel.annotation.ShallowReference;
+
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
 
 /**
  */
+@ShallowReference
 @ModelResource(path = "hosts", controllerSuperClass = AbstractModelController.class, apiName = "Hosts", apiDescription = "Operations about hosts")
 @Entity
 @Table(name = "host")
-public class Host extends AbstractAuditable<User> {
+public class Host extends AbstractSystemUuidPersistable  {
 
 	private static final long serialVersionUID = -7942906897981646998L;
 

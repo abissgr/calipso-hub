@@ -17,29 +17,6 @@
  */
 package gr.abiss.calipso;
 
-import gr.abiss.calipso.model.Host;
-import gr.abiss.calipso.model.Role;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.cms.Text;
-import gr.abiss.calipso.model.geography.Continent;
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.notification.model.BaseNotification;
-import gr.abiss.calipso.notification.model.NotificationType;
-import gr.abiss.calipso.notification.service.BaseNotificationService;
-import gr.abiss.calipso.repository.RoleRepository;
-import gr.abiss.calipso.repository.UserRepository;
-import gr.abiss.calipso.repository.geography.ContinentRepository;
-import gr.abiss.calipso.repository.geography.CountryRepository;
-import gr.abiss.calipso.service.EmailService;
-//import gr.abiss.calipso.service.HostService;
-import gr.abiss.calipso.service.RoleService;
-import gr.abiss.calipso.service.UserService;
-import gr.abiss.calipso.service.cms.TextService;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.UserDetails;
-import gr.abiss.calipso.userDetails.service.UserDetailsService;
-import gr.abiss.calipso.utils.ConfigurationFactory;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -57,7 +34,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-//@Named("sampleInitializer")
+import gr.abiss.calipso.model.Role;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.geography.Continent;
+import gr.abiss.calipso.model.geography.Country;
+import gr.abiss.calipso.repository.RoleRepository;
+import gr.abiss.calipso.repository.UserRepository;
+import gr.abiss.calipso.repository.geography.ContinentRepository;
+import gr.abiss.calipso.repository.geography.CountryRepository;
+import gr.abiss.calipso.service.EmailService;
+
+import gr.abiss.calipso.service.RoleService;
+import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.service.cms.TextService;
+import gr.abiss.calipso.utils.ConfigurationFactory;
+
+
 public class AppInitializer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppInitializer.class);
@@ -77,10 +69,6 @@ public class AppInitializer {
 	@Inject
 	@Named("emailService")
 	private EmailService emailService;
-
-	@Inject
-	@Named("baseNotificationService")
-	private BaseNotificationService baseNotificationService;
 
 	@Inject
 	private ContinentRepository continentRepository;;
@@ -159,7 +147,7 @@ public class AppInitializer {
 			adminUser.setPassword("admin");
 			adminUser.setLastVisit(now);
 			adminUser.addRole(adminRole);
-			adminUser.setCreatedBy(system);
+//			adminUser.setCreatedBy(system);
 			adminUser = userService.createActive(adminUser);
 
 			User opUser = new User();
@@ -170,7 +158,7 @@ public class AppInitializer {
 			opUser.setPassword("operator");
 			opUser.setLastVisit(now);
 			opUser.addRole(adminRole);
-			opUser.setCreatedBy(system);
+//			opUser.setCreatedBy(system);
 			opUser = userService.createActive(opUser);
 
 			int usersMax = numberOfUsersToCreate != null ? numberOfUsersToCreate : 10;
@@ -185,19 +173,15 @@ public class AppInitializer {
 					u.setUsername(userName);
 					u.setPassword(userName);
 					u.setLastVisit(now);
-					u.setCreatedBy(system);
+//					u.setCreatedBy(system);
 					u = userService.createActive(u);
 					usersCreated++;
-					// notify the admin for each user creation to test notifications
-					baseNotificationService.create(new BaseNotification(u, adminUser, null, now, false));
 					LOGGER.info("Created user: " + u);
 					if(usersCreated >= usersMax){
 						break;
 					}
 				}
 			}
-
-			LOGGER.info("Admin has " + this.baseNotificationService.countUnseen(adminUser) + " notifications");
 
 		}
 		

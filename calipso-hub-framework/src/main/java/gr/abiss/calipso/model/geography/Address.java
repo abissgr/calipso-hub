@@ -25,18 +25,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.javers.core.metamodel.annotation.ShallowReference;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 
 
 /**
  * An entity topersist postal addresses. 
  */
+@ShallowReference
 @Entity
 @Table(name="postal_address")
-public class Address extends AbstractAuditable<User> {
+public class Address extends AbstractSystemUuidPersistable  {
 	
 	private static final long serialVersionUID = 1L;
 

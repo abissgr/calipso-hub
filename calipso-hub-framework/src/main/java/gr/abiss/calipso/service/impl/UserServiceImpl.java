@@ -63,12 +63,10 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	implements UserService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
-	
 	private static final String USERDTO_CLASS = UserDTO.class.getCanonicalName();
-	
-	
 
 	private final StringKeyGenerator generator = KeyGenerators.string();
+	
 	private RoleRepository roleRepository;
 
 	@Inject
@@ -237,22 +235,17 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		user.setFirstName(userAccountData.getFirstName());
 		user.setLastName(userAccountData.getLastName());
 		user.setPassword(userAccountData.getPassword());
-		User existing = this.repository.findByUsernameOrEmail(user.getEmail());
+		
+		
+		LocalUser existing = this.getPrincipalLocalUser();
+		if(existing == null){
+			existing = this.repository.findByUsernameOrEmail(user.getEmail());
+		}
 		if(existing == null){
 			existing = this.repository.findByUsernameOrEmail(user.getUsername());
 		}
 		
-//		if (this.repository.findByUsernameOrEmail(user.getUsername()) != null) {
-//			throw new DuplicateEmailException("Email address exists: " + userAccountData.getEmail());
-//		}
-//		if (this.repository.findByUsernameOrEmail(user.getUsername()) != null) {
-//			throw new DuplicateEmailException("Username exists: " + userAccountData.getEmail());
-//		}
-//
-//		if(LOGGER.isDebugEnabled()){
-//			LOGGER.debug("createForImplicitSignup returning local user: " + user);
-//		}
-		return existing != null ? existing : createActive(user);
+		return existing != null ? (User) existing : createActive(user);
 	}
 	
 	/**

@@ -60,7 +60,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 	Calipso.view.UseCaseLayout = Calipso.view.View.extend({
 		// regionName : viewType
 		regionViewTypes : {},
-		viewEvents : {
+		childViewEvents : {
 			"model:sync" : "onModelSync"
 		},
 		events : {
@@ -91,8 +91,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		showChildView : function(regionName, view) {
 			var _this = this;
 
-			// bind to view events according to viewEvents hash
-			_.each(this.viewEvents, function(method, eventName, list) {
+			// bind to view events according to childViewEvents hash
+			_.each(this.childViewEvents, function(method, eventName, list) {
 				_this.listenTo(view, eventName, function(options) {
 					// if method is own method name
 					if (_.isString(method) && _this[method]) {

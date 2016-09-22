@@ -79,6 +79,10 @@ public class JavassistUtil {
     }
 
     public static Class<?> createInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs) throws NotFoundException, CannotCompileException {
+    	return createInterface(name, superInterface, typeArgs, false);
+    }
+
+    public static Class<?> createInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs, boolean auditable) throws NotFoundException, CannotCompileException {
         ClassPool pool = ClassPool.getDefault();
         
         // add classpaths
@@ -90,7 +94,7 @@ public class JavassistUtil {
         CtClass impl = pool.makeInterface( name );
         impl.setSuperclass( pool.get(superInterface.getName()) );
         impl.setGenericSignature( getGenericSignature(pool, superInterface, new ArrayList<Class<?>>(), typeArgs));
-
+        
         Class<?> result = impl.toClass();
         return result;
     }

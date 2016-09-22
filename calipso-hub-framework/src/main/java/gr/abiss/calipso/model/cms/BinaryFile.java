@@ -19,6 +19,7 @@ package gr.abiss.calipso.model.cms;
 
 
 import java.util.LinkedList;
+
 import java.util.List;
 
 import javax.persistence.Column;
@@ -30,7 +31,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.Formula;
 
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.entities.AbstractAuditable;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 
 /**
  *
@@ -38,7 +39,7 @@ import gr.abiss.calipso.model.entities.AbstractAuditable;
  */
 @Entity
 @Table(name = "images")
-public class BinaryFile extends AbstractAuditable<User> {
+public class BinaryFile extends AbstractSystemUuidPersistable{
     
     private String name;
 
@@ -80,33 +81,33 @@ public class BinaryFile extends AbstractAuditable<User> {
 	}
 
 	
-	@Override
-	public String toString() {
-		return "BinaryFile [name=" + name + ", thumbnailFilename="
-				+ thumbnailFilename + ", newFilename=" + newFilename
-				+ ", fileNameExtention=" + fileNameExtention + ", path=" + path
-				+ ", parentPath=" + parentPath + ", contentType=" + contentType
-				+ ", size=" + size + ", thumbnailSize=" + thumbnailSize
-				+ ", url=" + url + ", thumbnailUrl=" + thumbnailUrl
-				+ ", deleteUrl=" + deleteUrl + ", deleteType=" + deleteType
-				+ ", getName()=" + getName() + ", getThumbnailFilename()="
-				+ getThumbnailFilename() + ", getNewFilename()="
-				+ getNewFilename() + ", getFileNameExtention()="
-				+ getFileNameExtention() + ", getPath()=" + getPath()
-				+ ", getParentPath()=" + getParentPath()
-				+ ", getContentType()=" + getContentType() + ", getSize()="
-				+ getSize() + ", getThumbnailSize()=" + getThumbnailSize()
-				+ ", getUrl()=" + getUrl() + ", getThumbnailUrl()="
-				+ getThumbnailUrl() + ", getDeleteUrl()=" + getDeleteUrl()
-				+ ", getDeleteType()=" + getDeleteType() + ", toString()="
-				+ super.toString() + ", getCreatedBy()=" + getCreatedBy()
-				+ ", getCreatedDate()=" + getCreatedDate()
-				+ ", getLastModifiedBy()=" + getLastModifiedBy()
-				+ ", getLastModifiedDate()=" + getLastModifiedDate()
-				+ ", getId()=" + getId() + ", isNew()=" + isNew()
-				+ ", hashCode()="
-				+ hashCode() + ", getClass()=" + getClass() + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "BinaryFile [name=" + name + ", thumbnailFilename="
+//				+ thumbnailFilename + ", newFilename=" + newFilename
+//				+ ", fileNameExtention=" + fileNameExtention + ", path=" + path
+//				+ ", parentPath=" + parentPath + ", contentType=" + contentType
+//				+ ", size=" + size + ", thumbnailSize=" + thumbnailSize
+//				+ ", url=" + url + ", thumbnailUrl=" + thumbnailUrl
+//				+ ", deleteUrl=" + deleteUrl + ", deleteType=" + deleteType
+//				+ ", getName()=" + getName() + ", getThumbnailFilename()="
+//				+ getThumbnailFilename() + ", getNewFilename()="
+//				+ getNewFilename() + ", getFileNameExtention()="
+//				+ getFileNameExtention() + ", getPath()=" + getPath()
+//				+ ", getParentPath()=" + getParentPath()
+//				+ ", getContentType()=" + getContentType() + ", getSize()="
+//				+ getSize() + ", getThumbnailSize()=" + getThumbnailSize()
+//				+ ", getUrl()=" + getUrl() + ", getThumbnailUrl()="
+//				+ getThumbnailUrl() + ", getDeleteUrl()=" + getDeleteUrl()
+//				+ ", getDeleteType()=" + getDeleteType() + ", toString()="
+//				+ super.toString() + ", getCreatedBy()=" + getCreatedBy()
+//				+ ", getCreatedDate()=" + getCreatedDate()
+//				+ ", getLastModifiedBy()=" + getLastModifiedBy()
+//				+ ", getLastModifiedDate()=" + getLastModifiedDate()
+//				+ ", getId()=" + getId() + ", isNew()=" + isNew()
+//				+ ", hashCode()="
+//				+ hashCode() + ", getClass()=" + getClass() + "]";
+//	}
 
 	public void setName(String name) {
 		this.name = name;
