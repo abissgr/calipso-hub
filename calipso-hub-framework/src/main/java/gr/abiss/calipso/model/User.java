@@ -204,7 +204,7 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	@Transient
 	private String redirectUrl;
 
-	@Formula("select count(*) from stomp_session where stomp_session.user = id")
+	@Formula(" (select count(*) from stomp_session s where s.user = id) ")
 	private Integer stompSessionCount;
 
 	
