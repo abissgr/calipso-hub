@@ -26,7 +26,7 @@ public class StompSession extends AbstractAssignedidPersistable<String> {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(referencedColumnName = "id", nullable = false, updatable = false)
+	@JoinColumn(name = "user", referencedColumnName = "id", nullable = false, updatable = false)
 	private User user;
 
 	public StompSession() {

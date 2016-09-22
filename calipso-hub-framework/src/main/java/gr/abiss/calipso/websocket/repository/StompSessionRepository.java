@@ -26,11 +26,7 @@ import gr.abiss.calipso.websocket.model.StompSession;
 
 public interface StompSessionRepository extends ModelRepository<StompSession, String> {
 
-	@Modifying
-	@Query("UPDATE User AS u SET u.stompSessionCount = u.stompSessionCount + 1 WHERE u.id = ?1")
-	public void addUserStompSession(String userId);
+	@Query("select count(*) from StompSession s where s.user.id = ?1")
+	public Long countForUser(String userId);
 	
-	@Modifying
-	@Query("UPDATE User AS u SET u.stompSessionCount = u.stompSessionCount - 1 WHERE u.id = ?1")
-	public void removeUserStompSession(String userId);
 }

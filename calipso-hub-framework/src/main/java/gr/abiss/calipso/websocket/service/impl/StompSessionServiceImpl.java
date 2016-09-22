@@ -33,8 +33,12 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 	@PreAuthorize(StompSession.PRE_AUTHORIZE_CREATE)
 	public StompSession create(StompSession resource) {
 		validateUser(resource);
+		long count = this.repository.countForUser(resource.getUser().getId()).longValue();
 		resource = super.create(resource);
-		this.repository.addUserStompSession(resource.getUser().getInactivationReason());
+		// TODO: otify user is now active if needed
+		if(count == 0){
+			
+		}
 		return resource;
 	}
 
@@ -54,9 +58,12 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 	@Transactional(readOnly = false)
 	@PreAuthorize(StompSession.PRE_AUTHORIZE_DELETE)
 	public void delete(@P("resource") StompSession resource) {
-		// TODO Auto-generated method stub
+		long count = this.repository.countForUser(resource.getUser().getId()).longValue();
 		super.delete(resource);
-		this.repository.removeUserStompSession(resource.getUser().getInactivationReason());
+		// TODO: notify user is now inactive if needed
+		if(count <= 1){
+			
+		}
 	}
 
     /**

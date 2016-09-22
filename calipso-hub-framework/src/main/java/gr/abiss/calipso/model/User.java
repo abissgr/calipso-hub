@@ -54,6 +54,7 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import gr.abiss.calipso.friends.model.Friendship;
@@ -203,11 +204,9 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	@Transient
 	private String redirectUrl;
 
-	@Column(name = "stomp_session_count", nullable = false)
-	private Integer stompSessionCount = 0;
+	@Formula("select count(*) from stomp_session where stomp_session.user = id")
+	private Integer stompSessionCount;
 
-	@Formula(" (stomp_session_count > 0) ")
-	private Boolean stompActive;
 	
 	//	@OneToOne(optional = true, fetch=FetchType.LAZY)
 	//	@MapsId
@@ -309,14 +308,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	public void setStompSessionCount(Integer stompSessionCount) {
 		this.stompSessionCount = stompSessionCount;
-	}
-
-	public Boolean getStompActive() {
-		return stompActive;
-	}
-
-	public void setStompActive(Boolean stompActive) {
-		this.stompActive = stompActive;
 	}
 
 	/**
