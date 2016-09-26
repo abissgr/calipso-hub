@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

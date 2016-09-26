@@ -24,9 +24,9 @@ import javax.persistence.Column;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipStatus;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.User.Builder;
-import gr.abiss.calipso.model.types.FriendshipStatus;
 import io.swagger.annotations.ApiModel;
 
 @ApiModel(value = "FriendshipDTO", description = "FriendshipDTO is a lightweight DTO version of Friendship")

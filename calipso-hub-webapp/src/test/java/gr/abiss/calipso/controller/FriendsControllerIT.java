@@ -36,12 +36,12 @@ import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.testng.annotations.Test;
 
 import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipStatus;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
 import gr.abiss.calipso.model.dto.UserInvitationsDTO;
-import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import gr.abiss.calipso.test.AbstractControllerIT.DefaultStompFrameHandler;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;

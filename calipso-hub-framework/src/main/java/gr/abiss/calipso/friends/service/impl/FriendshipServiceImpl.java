@@ -12,12 +12,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 
 import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipStatus;
 import gr.abiss.calipso.friends.repository.FriendshipRepository;
 import gr.abiss.calipso.friends.service.FriendshipService;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
-import gr.abiss.calipso.model.types.FriendshipStatus;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
@@ -40,7 +40,6 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();
 
-		
 		// make sure the right sender is set if not empty
 		if(friendship.getRequestSender() != null){
 			// ensure sender is the current user
@@ -52,7 +51,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 			// otherwise set as the current user
 			friendship.setRequestSender(new User.Builder().id(userDetails.getId()).username(userDetails.getUsername()).build());
 		}
-
+		
 		// check status if any
 		if(friendship.getStatus() != null){
 			if(!friendship.getStatus().equals(FriendshipStatus.PENDING)){
