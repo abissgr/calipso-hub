@@ -60,6 +60,7 @@ public class FilePersistenceConfigPostProcessor
     		this.repositoryClass = DummyFilePersistenceServiceImpl.class;
     	}
 
+		LOGGER.debug("Setting file persistence service BEAN {}", this.repositoryClass.getCanonicalName());
     	// create bean
         RootBeanDefinition beanDefinition = 
                 new RootBeanDefinition(this.repositoryClass); //The service implementation
