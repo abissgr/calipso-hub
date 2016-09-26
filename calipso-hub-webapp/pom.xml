@@ -59,7 +59,7 @@
 							<outputDirectory>src/main/resources</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${property.resources.dir}</directory>
+									<directory>src/main/resources-filterable</directory>
 									<filtering>true</filtering>
 								</resource>
 							</resources>

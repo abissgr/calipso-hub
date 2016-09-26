@@ -32,7 +32,7 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 			+ "		friendship.requestRecipient.bannerUrl"
 			+ ") "
 			+ "from Friendship friendship where friendship.requestSender.id =  ?1 "
-			+ "and (friendship.status = gr.abiss.calipso.model.types.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.model.types.FriendshipStatus.INVERSE)";
+			+ "and (friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE)";
 	/**
 	 * Native modifying query to delete along with inverse
 	 * @param oneUserId
@@ -44,18 +44,18 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
     void delete(String oneUserId, String otherUserId);
     
     @Query("select f from Friendship f where f.requestSender.id = ?#{principal.id} "
-    		+ "and status <> gr.abiss.calipso.model.types.FriendshipStatus.INVERSE")
+    		+ "and status <> gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE")
     List<Friendship> findSentByCurrentUser();
 
     @Query("select f from Friendship f where f.requestRecipient.id = ?#{principal.id} "
-    		+ "and status <> gr.abiss.calipso.model.types.FriendshipStatus.INVERSE")
+    		+ "and status <> gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE")
     List<Friendship> findReceivedByCurrentUser();
 
 
     @Query("select case when count(f) > 0 then true else false end from Friendship f where "
     		+ "f.requestSender = ?1 and f.requestRecipient = ?2 "
-    		+ " and (status <> gr.abiss.calipso.model.types.FriendshipStatus.ACCEPTED "
-    		+ "		or status <> gr.abiss.calipso.model.types.FriendshipStatus.INVERSE)")
+    		+ " and (status <> gr.abiss.calipso.friends.model.FriendshipStatus.ACCEPTED "
+    		+ "		or status <> gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE)")
     Boolean existsEstablished(User one, User other);
     
     @Query("select case when count(f) > 0 then true else false end from Friendship f where "
