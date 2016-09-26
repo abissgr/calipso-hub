@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso;
+package gr.abiss.calipso.init;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,7 +23,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.configuration.Configuration;
@@ -31,8 +30,12 @@ import org.apache.commons.lang.StringUtils;
 import org.resthub.common.util.PostInitialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
@@ -43,57 +46,68 @@ import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.repository.geography.ContinentRepository;
 import gr.abiss.calipso.repository.geography.CountryRepository;
 import gr.abiss.calipso.service.EmailService;
-
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.service.cms.TextService;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 
 
-public class AppInitializer {
+@Component
+public class CalipsoDataInitializer {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AppInitializer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalipsoDataInitializer.class);
 
-	@Inject
-	@Named("userService")
 	private UserService userService;
-
-	@Inject
-	@Named("textService")
-	private TextService textService;
-
-	@Inject
-	@Named("roleService")
-	private RoleService roleService;
-	
-	@Inject
-	@Named("emailService")
 	private EmailService emailService;
-
-	@Inject
 	private ContinentRepository continentRepository;;
-
-	@Inject
 	private CountryRepository countryRepository;
-
-	@Inject
 	private RoleRepository roleRepository;
-	
-	@Inject
 	private UserRepository userRepository;
 
-	@PostInitialize
-	public void init() {
-		this.init(10);
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.userService = userService;
 	}
-	
-	public void init(Integer numberOfUsersToCreate) {
+
+	@Autowired
+	public void setEmailService(EmailService emailService) {
+		this.emailService = emailService;
+	}
+
+	@Autowired
+	public void setContinentRepository(ContinentRepository continentRepository) {
+		this.continentRepository = continentRepository;
+	}
+
+	@Autowired
+	public void setCountryRepository(CountryRepository countryRepository) {
+		this.countryRepository = countryRepository;
+	}
+
+	@Autowired
+	public void setRoleRepository(RoleRepository roleRepository) {
+		this.roleRepository = roleRepository;
+	}
+
+	@Autowired
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	@PostInitialize(order = 10)
+	@Transactional(readOnly = false)
+	public void postInitialize(){
+		
 		Configuration config = ConfigurationFactory.getConfiguration();
 		boolean initData = config.getBoolean(ConfigurationFactory.INIT_DATA, true);
 
-		this.initContinentsAndCountries();
-		this.initRoles();
 		if (initData && this.userRepository.count() == 0) {
+			
+
+			this.initContinentsAndCountries();
+			this.initRoles();
+			
+			
 			Role adminRole = this.roleRepository.findByIdOrName(Role.ROLE_ADMIN);
 			Role operatorRole = this.roleRepository.findByIdOrName(Role.ROLE_SITE_OPERATOR);
 			
@@ -161,7 +175,7 @@ public class AppInitializer {
 //			opUser.setCreatedBy(system);
 			opUser = userService.createActive(opUser);
 
-			int usersMax = numberOfUsersToCreate != null ? numberOfUsersToCreate : 10;
+			int usersMax =  10;
 			int usersCreated = 0;
 			while(usersCreated < usersMax){
 				for (String fullName : this.getTenNames()) {

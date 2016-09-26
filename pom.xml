@@ -821,9 +821,35 @@
 		
 			<plugins>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.19.1</version>
+				</plugin>
+				<plugin>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-maven-plugin</artifactId>
 					<version>${jetty.version}</version>
+									<configuration>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<stopPort>8005</stopPort>
+					<stopKey>STOP</stopKey>
+					<!-- We use non NIO connector in order to avoid read only static files 
+						under windows -->
+					<connectors>
+						<connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
+							<port>${jetty.port}</port>
+							<maxIdleTime>60000</maxIdleTime>
+							<requestBufferSize>30000</requestBufferSize>
+							<requestHeaderSize>30000</requestHeaderSize>
+						</connector>
+					</connectors>
+					<systemProperties>
+				      <systemProperty>
+				         <name>jetty.http.port</name>
+				         <value>${jetty.port}</value>
+				       </systemProperty>
+				    </systemProperties>
+				</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -839,7 +865,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>2.6</version>
+					<version>2.7</version>
 					<configuration>
 						<encoding>${encoding}</encoding>
 					</configuration>

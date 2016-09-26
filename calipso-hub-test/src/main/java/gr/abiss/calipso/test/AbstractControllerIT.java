@@ -143,14 +143,13 @@ public class AbstractControllerIT {
 		// log request/response in errors
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
-		// pickup from the command line if given for the jetty-maven-plugin
-		String port = System.getProperty("jetty.http.port");
-		RestAssured.port = port != null ? Integer.parseInt(port) : 8080;
-
+		// pickup from the jetty port
+		RestAssured.port = CONFIG.getInt("jetty.http.port", 8080);
 		this.WEBSOCKET_URI = new StringBuffer("ws://localhost:")
 				.append(RestAssured.port)
 				.append("/calipso/ws")
 				.toString();
+		LOGGER.info("Using websocket URL {}", this.WEBSOCKET_URI );
 		// TODO:
 		// String basePath = System.getProperty("server.base");
 		// if (basePath == null) {

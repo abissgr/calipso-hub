@@ -17,23 +17,21 @@
  */
 package gr.abiss.calipso.web.spring;
 
-import java.io.Serializable;
-
-import javax.inject.Named;
-
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.userDetails.integration.LocalUserService;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.service.UserDetailsService;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.AuditorAware;
 
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.service.UserDetailsService;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
+
+/**
+ * @deprecated Use javers {@link org.javers.spring.annotation.JaversSpringDataAuditable} annotation to your repositories instead
+ */
+@Deprecated
 public class AuditorBean implements AuditorAware<User> {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AuditorBean.class);

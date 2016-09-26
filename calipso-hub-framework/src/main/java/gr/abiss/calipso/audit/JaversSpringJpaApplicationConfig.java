@@ -1,10 +1,10 @@
 package gr.abiss.calipso.audit;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
-import gr.abiss.calipso.websocket.WebSocketConfig;
+import javax.sql.DataSource;
 
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
@@ -13,7 +13,6 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
@@ -28,31 +27,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-
-/**
- * @author bartosz walacik
- */
 @Configuration
-@ComponentScan(basePackages = "**.calipso")
-@EnableTransactionManagement
+//@ComponentScan(basePackages = "**.calipso")
+//@EnableTransactionManagement
 @EnableAspectJAutoProxy
 //@EnableJpaRepositories(basePackages = "org.javers.spring.repository.jpa")
 public class JaversSpringJpaApplicationConfig {
@@ -82,10 +65,12 @@ public class JaversSpringJpaApplicationConfig {
      */
     @Bean
     public Javers javers() {
+    	DialectName dialect = dialectsMap.get(this.dialect);
+    	LOGGER.info("Hbm dialect: {}, name: {}", this.dialect, dialect);
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(jpaConnectionProvider())
-                .withDialect(dialectsMap.get(this.dialect))
+                .withDialect(dialect)
                 .build();
 
         return TransactionalJaversBuilder

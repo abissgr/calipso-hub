@@ -34,33 +34,33 @@ public class FilePersistenceConfigPostProcessor
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FilePersistenceConfigPostProcessor.class);
 
-	@Value("${fs.FilePersistenceService}")
-	private String repositoryClassName;
+	@SuppressWarnings("rawtypes")
 	private Class repositoryClass;
-
 	
-
 	@Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
             throws BeansException {
     	if(this.repositoryClass == null){
 
-    		LOGGER.debug("Adding FilePersistenceService bean using: " + this.repositoryClassName);
-    		if(StringUtils.isBlank(this.repositoryClassName)){
-    			this.repositoryClassName = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.FS_IMPL_CLASS);
-    		}
-    		
-    		
-			try {
-				this.repositoryClass = FilePersistenceConfigPostProcessor.class.forName(this.repositoryClassName);
-			} catch (ClassNotFoundException e) {
-				LOGGER.error("Failed to obtain repository class: " + this.repositoryClassName + ", will fallback to default");
+    		// get class canonical name from configuration
+			String repositoryClassName = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.FS_IMPL_CLASS);
+			if(StringUtils.isNotBlank(repositoryClassName)){
+				// get a class instance
+				try {
+					this.getClass();
+					this.repositoryClass = FilePersistenceConfigPostProcessor.class.forName(repositoryClassName);
+				} catch (ClassNotFoundException e) {
+					LOGGER.error("Failed to obtain repository class {}, will fallback to dummy, non-persisting impl", repositoryClassName);
+				}
 			}
     	}
+    	// dummy fallback class
     	if(this.repositoryClass == null){
+    		LOGGER.warn("No filesystem repository implementation was configured, falling back to dummy, non-persisting impl");
     		this.repositoryClass = DummyFilePersistenceServiceImpl.class;
     	}
 
+    	// create bean
         RootBeanDefinition beanDefinition = 
                 new RootBeanDefinition(this.repositoryClass); //The service implementation
     	beanDefinition.setTargetType(FilePersistenceService.class); //The service interface

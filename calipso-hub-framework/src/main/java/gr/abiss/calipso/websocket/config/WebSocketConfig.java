@@ -1,18 +1,14 @@
-package gr.abiss.calipso.websocket;
+package gr.abiss.calipso.websocket.config;
 
 import java.security.Principal;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -28,23 +24,17 @@ import org.springframework.web.socket.server.RequestUpgradeStrategy;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
-import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
-import gr.abiss.calipso.utils.ConfigurationFactory;
 
 @Configuration
 @EnableWebSocketMessageBroker
-@ComponentScan(basePackages = "**.calipso.controller")
+//@ComponentScan(basePackages = "**.calipso.controller")
 @EnableScheduling
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 		implements WebSocketMessageBrokerConfigurer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketConfig.class);
 
-	@Inject
-	@Qualifier("userDetailsService")
-	private UserDetailsService userDetailsService;
-	
 	/**
 	 * Registers the "/ws" endpoint, enabling SockJS fallback options so that alternative 
 	 * messaging options may be used if WebSocket is not available. 
@@ -56,9 +46,6 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	 */
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
-		org.apache.commons.configuration.Configuration config = ConfigurationFactory.getConfiguration();
-		String domain = config.getString(ConfigurationFactory.DOMAIN);
-//		String originWithPort = new StringBuffer(domain).append(':').append(config.getString(ConfigurationFactory.PORT)).toString();
 		stompEndpointRegistry.addEndpoint("/ws")
 			.setHandshakeHandler(handshakeHandler())
 			.setAllowedOrigins("*"/*domain, originWithPort*/);

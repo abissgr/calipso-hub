@@ -1,4 +1,4 @@
-package gr.abiss.calipso.websocket;
+package gr.abiss.calipso.websocket.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

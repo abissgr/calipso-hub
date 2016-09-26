@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
@@ -35,6 +34,7 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.keygen.KeyGenerators;
@@ -69,7 +69,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	
 	private RoleRepository roleRepository;
 
-	@Inject
+	@Autowired
 	public void setRoleRepository(RoleRepository roleRepository) {
 		this.roleRepository = roleRepository;
 	}

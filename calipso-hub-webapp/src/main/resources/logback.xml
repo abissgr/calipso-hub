@@ -42,8 +42,13 @@
 <!--     <logger name="gr.abiss.calipso.websocket"> -->
 <!--         <level value="debug" /> -->
 <!--     </logger> -->
+
     <logger name="gr.abiss.calipso.userDetails.util">
         <level value="debug" />
+    </logger>
+    
+    <logger name="gr.abiss.calipso.init.CalipsoDataInitializer">
+        <level value="DEBUG" />
     </logger>
 <!--     <logger name="org.springframework"> -->
 <!--         <level value="debug" /> -->

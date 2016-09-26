@@ -32,6 +32,9 @@
             </list>
         </property> 
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
+	    <property name="properties">
+	        <value>calipso.initClass.replaced=${calipso.initClass}</value>
+	    </property>
     </bean>
     
     <!-- Setup default file storage adapter -->
@@ -172,15 +175,10 @@
 	<!--import resource="applicationContext-swagger.xml" /-->
 
 
-
 	<bean id="userService" class="gr.abiss.calipso.service.impl.UserServiceImpl">
 	</bean>
 	<alias name="userService" alias="localUserService" />
 	
-	<!-- DB data initializers -->
-	<bean id="appInitializer" class="gr.abiss.calipso.AppInitializer">
-    </bean>
-    
     <!-- Springfox/Swagger config -->
      <!-- Enables swgger ui-->
     <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
@@ -188,7 +186,7 @@
     <mvc:resources mapping="/webjars/**" location="/webjars/"/>
 
     <!-- Include a swagger configuration-->
-	<bean name="applicationSwaggerConfig" class="gr.abiss.calipso.web.spring.ApplicationSwaggerConfig"/>
+<!-- 	<bean name="applicationSwaggerConfig" class="gr.abiss.calipso.web.spring.ApplicationSwaggerConfig"/> -->
 	
 	<!-- actuator stats -->
 <!-- 	<beans> -->

@@ -17,16 +17,15 @@
  */
 package gr.abiss.calipso.service.impl;
 
+import javax.inject.Named;
+
+import org.springframework.transaction.annotation.Transactional;
+
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.repository.RoleRepository;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Named("roleService")

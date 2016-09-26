@@ -1,4 +1,4 @@
-package gr.abiss.calipso.websocket;
+package gr.abiss.calipso.actuate;
 
 import java.util.Collection;
 

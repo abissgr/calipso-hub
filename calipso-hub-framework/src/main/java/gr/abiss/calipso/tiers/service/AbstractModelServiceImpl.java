@@ -17,6 +17,14 @@
  */
 package gr.abiss.calipso.tiers.service;
 
+import java.io.Serializable;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
@@ -26,18 +34,6 @@ import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
-import java.io.Serializable;
-
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Persistable;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.crypto.keygen.KeyGenerators;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
-
 
 public abstract class AbstractModelServiceImpl<T extends CalipsoPersistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
 		extends AbstractAclAwareServiceImpl<T, ID, R> 
@@ -45,36 +41,37 @@ implements ModelService<T, ID>{
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceImpl.class);
 	
-	private final StringKeyGenerator generator = KeyGenerators.string();
-	
 	protected UserRepository userRepository;
 	protected EmailService emailService;
 	
-	@Inject
 	protected SimpMessageSendingOperations messagingTemplate;
 	
-	@Override
-	@Inject
+	@Autowired
 	public void setRepository(R repository) {
 		LOGGER.debug("setRepository: " + repository);
 		super.setRepository(repository);
 	}
-	
-	@Inject
+
+	@Autowired
 	public void setEmailService(EmailService emailService) {
 		this.emailService = emailService;
 	}
-	
-	@Inject
+
+	@Autowired
 	public void setUserRepository(UserRepository userRepository) {
 		this.userRepository = userRepository;
+	}
+
+	@Autowired
+	public void setMessagingTemplate(SimpMessageSendingOperations messagingTemplate) {
+		this.messagingTemplate = messagingTemplate;
 	}
 
 	@Override
 	public ICalipsoUserDetails getPrincipal() {
 		return SecurityUtil.getPrincipal();
 	}
-
+	
 	@Override
 	public LocalUser getPrincipalLocalUser() {
 		ICalipsoUserDetails principal = getPrincipal();

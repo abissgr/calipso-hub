@@ -17,12 +17,15 @@
  */
 package gr.abiss.calipso.utils;
 
+import java.net.URI;
 import java.net.URL;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.EnvironmentConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.SystemConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,18 +67,40 @@ public class ConfigurationFactory {
 	private static CompositeConfiguration config = new CompositeConfiguration();
 	
 	static {
+		// add default and custom calipso properties
 		String[] propertyFiles = {"calipso.properties", "calipso.defaults.properties"};
 		for(String propFile : propertyFiles){
+			addConfiguration(propFile);
+		}
+		// add system level properties
+		config.addConfiguration(new SystemConfiguration());
+		// add environment level properties
+		config.addConfiguration(new EnvironmentConfiguration());
+		
+	}
+
+	public static void addConfiguration(String propFile) {
+		PropertiesConfiguration properties = loadClasspathResource(propFile);
+
+		if(properties != null){
+			config.addConfiguration(properties);
+		}
+	}
+
+	public static PropertiesConfiguration loadClasspathResource(String propFile) {
+		PropertiesConfiguration properties = null;
+		try {
+			properties = new PropertiesConfiguration(propFile);
+			LOGGER.debug("Added configuration file {}", properties.getPath());
+		} catch (ConfigurationException ex) {
 			try {
-				config.addConfiguration(new PropertiesConfiguration(propFile));
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.warn("Loaded configuration from " + propFile);
-				}
+				properties = new PropertiesConfiguration("classpath:/" + propFile);
+				LOGGER.debug("Added configuration file {}", properties.getPath());
 			} catch (ConfigurationException e) {
-				LOGGER.warn("Failed to load configuration from " + propFile);
+				LOGGER.warn("Failed to load configuration file {}", propFile);
 			}
 		}
-		
+		return properties;
 	}
 
 	public static Configuration getConfiguration() {

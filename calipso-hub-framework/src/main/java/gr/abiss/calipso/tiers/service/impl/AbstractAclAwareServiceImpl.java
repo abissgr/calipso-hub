@@ -17,26 +17,6 @@
  */
 package gr.abiss.calipso.tiers.service.impl;
 
-import gr.abiss.calipso.model.acl.AclClass;
-import gr.abiss.calipso.model.acl.AclObject;
-import gr.abiss.calipso.model.acl.AclObjectIdentity;
-import gr.abiss.calipso.model.acl.AclSid;
-import gr.abiss.calipso.model.cms.BinaryFile;
-import gr.abiss.calipso.model.dto.ReportDataSet;
-import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.model.interfaces.MetadataSubject;
-import gr.abiss.calipso.model.interfaces.Metadatum;
-import gr.abiss.calipso.model.types.AggregateFunction;
-import gr.abiss.calipso.model.types.TimeUnit;
-import gr.abiss.calipso.repository.acl.AclClassRepository;
-import gr.abiss.calipso.repository.acl.AclObjectIdentityRepository;
-import gr.abiss.calipso.repository.acl.AclSidRepository;
-import gr.abiss.calipso.tiers.repository.ModelRepository;
-import gr.abiss.calipso.tiers.service.GenericService;
-import gr.abiss.calipso.tiers.util.EntityUtil;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,23 +26,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.resthub.common.service.CrudServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Persistable;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import gr.abiss.calipso.model.acl.AclClass;
+import gr.abiss.calipso.model.acl.AclObject;
+import gr.abiss.calipso.model.acl.AclObjectIdentity;
+import gr.abiss.calipso.model.acl.AclSid;
+import gr.abiss.calipso.model.cms.BinaryFile;
+import gr.abiss.calipso.model.dto.ReportDataSet;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import gr.abiss.calipso.model.interfaces.MetadataSubject;
+import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.types.TimeUnit;
+import gr.abiss.calipso.repository.acl.AclClassRepository;
+import gr.abiss.calipso.repository.acl.AclObjectIdentityRepository;
+import gr.abiss.calipso.repository.acl.AclSidRepository;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
+import gr.abiss.calipso.tiers.service.GenericService;
+import gr.abiss.calipso.tiers.util.EntityUtil;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
 
 /**
  * JPA Entity CRUD and search service that uses a Spring Data repository implementation.
@@ -76,25 +71,24 @@ import org.springframework.util.CollectionUtils;
 public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
 		extends CrudServiceImpl<T, ID, R> implements GenericService<T, ID> {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(AbstractAclAwareServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAclAwareServiceImpl.class);
 
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
 	private AclClassRepository aclClassRepository;
 	private AclSidRepository aclSidRepository;
 
-	@Inject
+	@Autowired
 	public void setAclObjectIdentityRepository(
 			AclObjectIdentityRepository aclObjectIdentityRepository) {
 		this.aclObjectIdentityRepository = aclObjectIdentityRepository;
 	}
 
-	@Inject
+	@Autowired
 	public void setAclClassRepository(AclClassRepository aclClassRepository) {
 		this.aclClassRepository = aclClassRepository;
 	}
 
-	@Inject
+	@Autowired
 	public void setAclSidRepository(AclSidRepository aclSidRepository) {
 		this.aclSidRepository = aclSidRepository;
 	}
@@ -111,7 +105,6 @@ public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<I
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = false)
 	@PreAuthorize(T.PRE_AUTHORIZE_CREATE)
@@ -123,6 +116,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<I
 		return saved;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void createAclObjectIdentity(T saved, Class domainClass) {
 		if (AclObject.class.isAssignableFrom(domainClass)) {
 			AclObject<ID, ID> aclObject = (AclObject<ID, ID>) saved;
@@ -184,6 +178,7 @@ public abstract class AbstractAclAwareServiceImpl<T extends CalipsoPersistable<I
 	}
 
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void persistNotedMetadata(Map<String, Metadatum> metadata, T saved) {
 
 		if(LOGGER.isDebugEnabled()){

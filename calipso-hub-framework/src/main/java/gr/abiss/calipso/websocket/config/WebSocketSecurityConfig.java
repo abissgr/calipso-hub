@@ -1,4 +1,4 @@
-package gr.abiss.calipso.websocket;
+package gr.abiss.calipso.websocket.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;

@@ -1,4 +1,4 @@
-package gr.abiss.calipso.websocket.context;
+package gr.abiss.calipso.websocket.config;
 
 import javax.inject.Inject;
 

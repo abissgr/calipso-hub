@@ -2,7 +2,6 @@ package gr.abiss.calipso.friends.service.impl;
 
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.slf4j.Logger;
@@ -19,7 +18,6 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.types.FriendshipStatus;
-import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
