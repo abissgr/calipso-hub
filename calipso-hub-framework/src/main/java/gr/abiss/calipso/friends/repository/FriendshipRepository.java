@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
+import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 
 /**
@@ -22,17 +23,24 @@ import gr.abiss.calipso.tiers.repository.ModelRepository;
 @JaversSpringDataAuditable
 public interface FriendshipRepository extends ModelRepository<Friendship,String> {
 
-	static final String QUERY_FRIENDS_BY_USERID = "select new gr.abiss.calipso.model.dto.UserDTO(friendship.requestRecipient.id, "
+	public static final String SELECT_USERDTO = "select new gr.abiss.calipso.model.dto.UserDTO(friendship.requestRecipient.id, "
 			+ "		friendship.requestRecipient.firstName, "
 			+ "		friendship.requestRecipient.lastName, "
 			+ "		friendship.requestRecipient.username, "
 			+ "		friendship.requestRecipient.email, "
 			+ "		friendship.requestRecipient.emailHash,"
 			+ "		friendship.requestRecipient.avatarUrl,"
-			+ "		friendship.requestRecipient.bannerUrl"
-			+ ") "
-			+ "from Friendship friendship where friendship.requestSender.id =  ?1 "
+			+ "		friendship.requestRecipient.bannerUrl,"
+			+ "		friendship.requestRecipient.stompSessionCount"
+			+ ") ";
+	
+	static final String FROM__FRIENDS_BY_USERID = " from Friendship friendship where friendship.requestSender.id =  ?1 "
 			+ "and (friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE)";
+	
+	static final String QUERY_FRIEND_USERNAMES_BY_USERID =  "select friendship.requestRecipient.username " + FROM__FRIENDS_BY_USERID;
+	
+	static final String QUERY_FRIENDS_BY_USERID = SELECT_USERDTO + FROM__FRIENDS_BY_USERID;
+	
 	/**
 	 * Native modifying query to delete along with inverse
 	 * @param oneUserId
@@ -62,11 +70,14 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
     		+ " (f.requestSender = ?1 and f.requestRecipient = ?2) "
     		+ "	or (f.requestSender = ?2 and f.requestRecipient = ?1) ")
     Boolean existsAny(User one, User other);
-    
+
+
+	@Query(QUERY_FRIEND_USERNAMES_BY_USERID)
+	public Iterable<String> findAllFriendUsernames(String userId);
 
 	@Query(QUERY_FRIENDS_BY_USERID)
-	public Iterable<UserDTO> findAllMyFriends(String userId);
+	public Iterable<UserDTO> findAllFriends(String userId);
 
 	@Query(QUERY_FRIENDS_BY_USERID)
-	public Page<UserDTO> findAllMyFriendsPaginated(String userId, Pageable pageRequest);
+	public Page<UserDTO> findAllFriendsPaginated(String userId, Pageable pageRequest);
 }

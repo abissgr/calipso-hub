@@ -4,18 +4,20 @@ package gr.abiss.calipso.websocket.message;
  * Convenient generic base type for "subject > predicate > object"-style messages. 
  * The semantics are generic enough to denote events like user > posted > comment or user > status > active
  *
+ * @param <S> the message subject type
  * @param <P> the predicate type
+ * @param <S> the message object type
  */
-public class AbstractResourceModificationsMessage<S extends MessageResource<?>, P extends Enum<P>, O extends MessageResource<?>>
-		implements NotificationMessage<S, P, O> {
+public class ActivityNotificationMessage<S extends IMessageResource<?>, P extends Enum<P>, O extends IMessageResource<?>> 
+	 implements IActivityNotificationMessage<S, P, O> {
 
 	private S subject;
-
+	
 	private P predicate;
 
 	private O object;
 
-	public AbstractResourceModificationsMessage() {
+	public ActivityNotificationMessage() {
 		super();
 	}
 
@@ -28,7 +30,7 @@ public class AbstractResourceModificationsMessage<S extends MessageResource<?>, 
 	public void setSubject(S subject) {
 		this.subject = subject;
 	}
-
+	
 	@Override
 	public P getPredicate() {
 		return predicate;

@@ -21,6 +21,7 @@ import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.websocket.Destinations;
 
 
 @Named(FriendshipService.BEAN_ID)
@@ -153,7 +154,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 
 			String username = this.userRepository.findCompactUserById(friendship.getRequestSender().getId()).getUsername();
 			LOGGER.debug("Sending friendship DTO to " + username);
-			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendships", new FriendshipDTO(friendship));
+			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_FRIENDSHIPS, new FriendshipDTO(friendship));
 		}
 		return inverse;
 	}
@@ -197,13 +198,13 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	@Override
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public Iterable<UserDTO> findAllMyFriends() {
-        return repository.findAllMyFriends(this.getPrincipal().getId());
+        return repository.findAllFriends(this.getPrincipal().getId());
 	}
 
 	@Override
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest) {
-        return repository.findAllMyFriendsPaginated(this.getPrincipal().getId(), pageRequest);
+        return repository.findAllFriendsPaginated(this.getPrincipal().getId(), pageRequest);
 	}
 
 	

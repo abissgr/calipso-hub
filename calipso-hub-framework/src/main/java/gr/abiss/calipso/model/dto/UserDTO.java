@@ -17,24 +17,22 @@
  */
 package gr.abiss.calipso.model.dto;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.User.Builder;
+import gr.abiss.calipso.websocket.message.IMessageResource;
 import io.swagger.annotations.ApiModel;
 
 @ApiModel(value = "UserDTO", description = "UserDTO is a lightweight DTO version of User")
-public class UserDTO implements Serializable {
+public class UserDTO implements IMessageResource<String> {
 
 	public static UserDTO fromUser(User user){
-		return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), user.getEmailHash(), user.getAvatarUrl(), user.getBannerUrl());
+		return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), user.getEmailHash(), user.getAvatarUrl(), user.getBannerUrl(), user.getStompSessionCount());
 	}
 	
 	private String id;
+
+	private String name;
 
 	private String firstName;
 
@@ -49,20 +47,24 @@ public class UserDTO implements Serializable {
 	private String avatarUrl;
 	
 	private String bannerUrl;
+	
+	private Integer stompSessionCount;
 
 	public UserDTO() {
 	}
 
-	public UserDTO(String id, String firstName, String lastName, String username, String email, String emailHash, String avatarUrl, String bannerUrl) {
+	public UserDTO(String id, String firstName, String lastName, String username, String email, String emailHash, String avatarUrl, String bannerUrl, Integer stompSessionCount) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.username = username;
+		this.name = new StringBuffer(firstName != null ? firstName :"").append(" ").append(lastName != null ? lastName :"").toString().trim();
 		this.email = email;
 		this.emailHash = emailHash;
 		this.avatarUrl = avatarUrl;
 		this.bannerUrl = bannerUrl;
+		this.stompSessionCount = stompSessionCount;
 	}
 
 	@Override
@@ -77,15 +79,40 @@ public class UserDTO implements Serializable {
 		return new User.Builder().id(this.id).firstName(this.firstName).lastName(this.lastName).username(this.username)
 				.email(this.email).emailHash(this.emailHash).avatarUrl(this.avatarUrl).bannerUrl(bannerUrl).build();
 	}
-
+	
+	/**
+	 * @see gr.abiss.calipso.websocket.message.IMessageResource#getId()
+	 */
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * @see gr.abiss.calipso.websocket.message.IMessageResource#setId(java.io.Serializable)
+	 */
+	@Override
 	public void setId(String id) {
 		this.id = id;
 	}
 
+	/**
+	 * @see gr.abiss.calipso.websocket.message.IMessageResource#getName()
+	 */
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * @see gr.abiss.calipso.websocket.message.IMessageResource#setName(java.lang.String)
+	 */
+	@Override
+	public void setName(String name) {
+		this.name = name;
+		
+	}
+	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -143,6 +170,14 @@ public class UserDTO implements Serializable {
 		this.bannerUrl = bannerUrl;
 	}
 
+	public Integer getStompSessionCount() {
+		return stompSessionCount;
+	}
+
+	public void setStompSessionCount(Integer stompSessionCount) {
+		this.stompSessionCount = stompSessionCount;
+	}
+
 	public static class Builder {
 		private String id;
 		private String firstName;
@@ -151,6 +186,7 @@ public class UserDTO implements Serializable {
 		private String email;
 		private String emailHash;
 		private String avatarUrl;
+		private Integer stompSessionCount;
 
 		public Builder id(String id) {
 			this.id = id;
@@ -181,9 +217,14 @@ public class UserDTO implements Serializable {
 			this.emailHash = emailHash;
 			return this;
 		}
-		
+
 		public Builder avatarUrl(String avatarUrl) {
 			this.avatarUrl = avatarUrl;
+			return this;
+		}
+
+		public Builder stompSessionCount(Integer stompSessionCount) {
+			this.stompSessionCount = stompSessionCount;
 			return this;
 		}
 		
@@ -200,5 +241,7 @@ public class UserDTO implements Serializable {
 		this.email = builder.email;
 		this.emailHash = builder.emailHash;
 		this.avatarUrl = builder.avatarUrl;
+		this.stompSessionCount = builder.stompSessionCount;
 	}
+
 }

@@ -6,14 +6,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * Generic interface for "subject > predicate > object"-style messages. 
  * The semantics are generic enough to denote events like user > posted > comment or user > status > active
  *
+ * @param <S> the message subject type
  * @param <P> the predicate type
- * @see AbstractNotificationMessage
+ * @param <S> the message object type
+ * @see ActivityNotificationMessage
  */
 @JsonTypeInfo(
 	    use = JsonTypeInfo.Id.MINIMAL_CLASS,
 	    include = JsonTypeInfo.As.PROPERTY,
 	    property = "@class")
-public interface NotificationMessage<S extends MessageResource<?>, P extends Enum<P>, O extends MessageResource<?>> {
+public interface IActivityNotificationMessage<S extends IMessageResource<?>, P extends Enum<P>, O extends IMessageResource<?>> {
 
 	S getSubject();
 

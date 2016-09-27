@@ -73,6 +73,7 @@ import gr.abiss.calipso.uischema.annotation.FormSchemas;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.Constants;
 import gr.abiss.calipso.utils.MD5Utils;
+import gr.abiss.calipso.websocket.message.IMessageResource;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 

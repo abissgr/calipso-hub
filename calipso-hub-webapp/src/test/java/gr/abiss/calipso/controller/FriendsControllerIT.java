@@ -47,7 +47,9 @@ import gr.abiss.calipso.test.AbstractControllerIT.DefaultStompFrameHandler;
 import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.userDetails.model.LoginSubmission;
 import gr.abiss.calipso.utils.Constants;
+import gr.abiss.calipso.websocket.Destinations;
 import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
+import gr.abiss.calipso.websocket.message.StateUpdateMessage;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -106,7 +108,7 @@ public class FriendsControllerIT extends AbstractControllerIT {
 			.extract().as(Friendship.class);
 		
 		// test operator user queue
-	    Assert.assertEquals(FriendshipStatus.PENDING, operatorFriendshipsQueueBlockingQueue.poll(15, SECONDS).getStatus());
+	    Assert.assertEquals(FriendshipStatus.PENDING, operatorFriendshipsQueueBlockingQueue.poll(5, SECONDS).getStatus());
 
 		LOGGER.info("Accept request");
 		// accept request
@@ -118,7 +120,7 @@ public class FriendsControllerIT extends AbstractControllerIT {
 			.then().extract().as(Friendship.class);
 		
 		// test admin user queue
-	    Assert.assertEquals(FriendshipStatus.ACCEPTED, adminFriendshipsQueueBlockingQueue.poll(10, SECONDS).getStatus());
+	    Assert.assertEquals(FriendshipStatus.ACCEPTED, adminFriendshipsQueueBlockingQueue.poll(5, SECONDS).getStatus());
 
 		LOGGER.info("Get friends");
 		// get friends
@@ -141,6 +143,16 @@ public class FriendsControllerIT extends AbstractControllerIT {
 				//.body("id", notNullValue())
 				// get model
 				.extract().as(UserInvitationResultsDTO.class);
+		
+		// subsscribe to generic state updates and verify user updateof stomsessionCount
+		BlockingQueue<StateUpdateMessage> adminStateUpdatesQueueBlockingQueue = new LinkedBlockingDeque<StateUpdateMessage>();
+		Subscription adminStateUpdatesQueueSubscription = adminSession.subscribe("/user/queue/updates", 
+			new DefaultStompFrameHandler<StateUpdateMessage>(adminSession, StateUpdateMessage.class, adminStateUpdatesQueueBlockingQueue));
+		// disconnect
+		operatorSession.disconnect();
+		StateUpdateMessage update = adminStateUpdatesQueueBlockingQueue.poll(45, SECONDS);
+		LOGGER.info("UPDATE MESSAGE: {}", update);
+	    Assert.assertEquals(update.getModifications().get("stompSessionCount").toString(), "1");
 		
 	}
 	

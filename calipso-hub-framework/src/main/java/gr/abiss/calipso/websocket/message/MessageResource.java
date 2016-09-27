@@ -5,22 +5,43 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Generic interface for subject and object parts of a {@link NotificationMessage}
- * @param <ID> the ID type
- * 
- * @see AbstractMessageResource
+ * Base class for subject and object parts of a {@link IActivityNotificationMessage}
  */
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.MINIMAL_CLASS,
-	    include = JsonTypeInfo.As.PROPERTY,
-	    property = "@class")
-public interface MessageResource<ID extends Serializable> {
+public class MessageResource<ID extends Serializable> implements IMessageResource<ID> {
 
-	public ID getId();
+	/**
+	 * The resource ID
+	 */
+	public ID id;
+	
+	/**
+	 * The resource human-readable name
+	 */
+	public String name;
 
-	public void setId(ID id);
+	public MessageResource() {
+		super();
+	}
 
-	public String getName();
+	public MessageResource(ID id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
 
-	public void setName(String name);
+	public ID getId() {
+		return id;
+	}
+
+	public void setId(ID id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

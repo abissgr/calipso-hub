@@ -34,6 +34,17 @@ import org.springframework.data.jpa.repository.Query;
 @JaversSpringDataAuditable
 public interface UserRepository extends ModelRepository<User, String> {
 
+	public static final String SELECT_USERDTO = "select new gr.abiss.calipso.model.dto.UserDTO(u.id, "
+			+ "		u.firstName, "
+			+ "		u.lastName, "
+			+ "		u.username, "
+			+ "		u.email, "
+			+ "		u.emailHash,"
+			+ "		u.avatarUrl,"
+			+ "		u.bannerUrl,"
+			+ "		u.stompSessionCount"
+			+ ") ";
+	
 //	@Query("select u from User u where u.confirmationToken = ?1")
 //	public User findByConfirmationToken(String token);
 
@@ -48,10 +59,10 @@ public interface UserRepository extends ModelRepository<User, String> {
 	@Query("select u from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public User findByIdOrUsernameOrEmail(String idOrUsernameOrEmail);
 
-	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl, u.bannerUrl) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
+	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl, u.bannerUrl, u.stompSessionCount) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
 	public UserDTO findAsLink(String usernameOrEmailOrId);
 	
-	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl, u.bannerUrl) "
+	@Query(SELECT_USERDTO
 			+ "from User u where u.id = ?1")
 	public UserDTO findCompactUserById(String id);
 	
