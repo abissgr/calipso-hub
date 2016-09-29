@@ -15,6 +15,7 @@ import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
+import gr.abiss.calipso.websocket.model.StompSession;
 
 /**
  * Spring Data JPA repository for the Friendship entity.
@@ -33,13 +34,23 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 			+ "		friendship.requestRecipient.bannerUrl,"
 			+ "		friendship.requestRecipient.stompSessionCount"
 			+ ") ";
+
+
+	public static final String IS_FRIEND = " friendship.requestSender.id =  ?1 "
+			+ "and (friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE) ";
 	
-	static final String FROM__FRIENDS_BY_USERID = " from Friendship friendship where friendship.requestSender.id =  ?1 "
-			+ "and (friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE)";
-	
+
+	static final String FROM__FRIENDS_BY_USERID = " from Friendship friendship where " + IS_FRIEND;
+	static final String FROM__STOMPONLINE_FRIENDS_BY_USERID = " from Friendship friendship where friendship.requestSender.stompSessionCount > 0 and " + IS_FRIEND;
+
 	static final String QUERY_FRIEND_USERNAMES_BY_USERID =  "select friendship.requestRecipient.username " + FROM__FRIENDS_BY_USERID;
+	static final String QUERY_STOMPONLINE_FRIEND_IDS_BY_USERID =  "select friendship.requestRecipient.id " + FROM__STOMPONLINE_FRIENDS_BY_USERID;
 	
 	static final String QUERY_FRIENDS_BY_USERID = SELECT_USERDTO + FROM__FRIENDS_BY_USERID;
+	
+//friendship.requestSender.stompSessionCount > 0 and
+	@Query("select sess from StompSession sess left join sess.user.friendships friendship where  " + IS_FRIEND)
+	public Iterable<StompSession> findAllFriendStompSessions(String userId);
 	
 	/**
 	 * Native modifying query to delete along with inverse
@@ -74,6 +85,7 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 
 	@Query(QUERY_FRIEND_USERNAMES_BY_USERID)
 	public Iterable<String> findAllFriendUsernames(String userId);
+
 
 	@Query(QUERY_FRIENDS_BY_USERID)
 	public Iterable<UserDTO> findAllFriends(String userId);

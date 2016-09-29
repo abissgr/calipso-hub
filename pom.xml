@@ -78,7 +78,7 @@
 		We are using a snapshot because of 
 		https://jira.spring.io/browse/SPR-14520
 		 -->
-		<spring.version>4.3.3.BUILD-SNAPSHOT</spring.version>
+		<spring.version>4.3.3.RELEASE</spring.version>
 		<spring.aspects.version>${spring.version}</spring.aspects.version>
 
 		<!-- Spring Security -->

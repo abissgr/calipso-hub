@@ -249,8 +249,6 @@ public class AbstractControllerIT {
 	 */
 	public static class DefaultInitialDataStompFrameHandler<T> implements StompFrameHandler {
 
-		private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStompFrameHandler.class);
-
 	    private Class datumClass;
 	    private StompSession session;
 	    public List<T>  initialData;
@@ -304,7 +302,7 @@ public class AbstractControllerIT {
 	    @SuppressWarnings("unchecked")
 		@Override
 	    public void handleFrame(StompHeaders headers, Object payload) {
-	        LOGGER.info("handleFrame: payload: " + payload);
+	        LOGGER.info("handleFrame, headers: {}, payload: {}", headers, payload);
 	        this.blockingQueue.offer((T) payload);
 	    }
 

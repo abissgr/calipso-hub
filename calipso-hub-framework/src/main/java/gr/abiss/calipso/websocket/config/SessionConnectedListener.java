@@ -20,7 +20,7 @@ public class SessionConnectedListener extends AbstractSubProtocolEventListener<S
     	// init temp auth context
 		setAuthentication(event);
 		StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
-
+		LOGGER.info("event.getUser(): " +event.getUser());
         // persist STOMP session
         StompSession stompSession = this.stompSessionService.create(new StompSession.Builder().id(sha.getSessionId()).build());
         LOGGER.debug("Persisted STOMP session: {}", stompSession);

@@ -172,11 +172,11 @@ public class SecurityUtil {
 		Object principal = null;
 		Authentication auth = getAuthentication();
 		if (auth != null) {
-			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			principal = auth.getPrincipal();
 
 		}
 
-		LOGGER.warn("getPrincipal1 1: {}",  principal);
+		LOGGER.debug("getPrincipal1 1: {}",  principal);
 		
 		if (principal != null) {
 			if(String.class.isAssignableFrom(principal.getClass())){
@@ -189,7 +189,7 @@ public class SecurityUtil {
 			}
 		}
 
-		LOGGER.warn("getPrincipal1 2: {}",  principal);
+		LOGGER.debug("getPrincipal1 2: {}",  principal);
 //		if (principal != null) {
 //			
 //			if (ICalipsoUserDetails.class.isAssignableFrom(principal.getClass())) {

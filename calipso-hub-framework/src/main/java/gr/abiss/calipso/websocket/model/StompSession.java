@@ -38,6 +38,12 @@ public class StompSession extends AbstractAssignedidPersistable<String> {
 		this.setId(id);
 	}
 
+	
+	@Override
+	public String toString() {
+		return "StompSession [id=" + this.getId() + ", user=" + user + "]";
+	}
+
 	public User getUser() {
 		return user;
 	}

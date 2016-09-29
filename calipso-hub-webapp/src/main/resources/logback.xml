@@ -43,6 +43,12 @@
 <!--         <level value="debug" /> -->
 <!--     </logger> -->
 
+    <logger name="org.springframework.messaging">
+        <level value="DEBUG" />
+    </logger>
+    <logger name="gr.abiss.calipso.test">
+        <level value="DEBUG" />
+    </logger>
     <logger name="gr.abiss.calipso.websocket.service.impl.StompSessionServiceImpl">
         <level value="DEBUG" />
     </logger>

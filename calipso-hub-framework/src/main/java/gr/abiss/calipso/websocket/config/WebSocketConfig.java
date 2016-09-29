@@ -61,8 +61,10 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	 */
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry messageBrokerRegistry) {
-		messageBrokerRegistry.enableSimpleBroker("/topic", "/queue").setTaskScheduler(heartbeatTaskScheduler());
+
+		messageBrokerRegistry.enableSimpleBroker("/queue", "/topic").setTaskScheduler(heartbeatTaskScheduler());
 		messageBrokerRegistry.setApplicationDestinationPrefixes("/app");
+//		messageBrokerRegistry.setUserDestinationPrefix("/user"); 
 	}
 	
 

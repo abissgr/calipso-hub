@@ -2,12 +2,16 @@ package gr.abiss.calipso.websocket.service.impl;
 
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,23 +65,30 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 		if(count == 0){
 			long stompSessionCount = count + 1;
 			
-			sendStomSessionStatusUpdateToFriends(userId, stompSessionCount);
+			sendStomSessionStatusUpdateToFriends(userId);
 		}
 		return resource;
 	}
 
 
-	public void sendStomSessionStatusUpdateToFriends(String userId, long stompSessionCount) {
-		LOGGER.debug("SENDING {} {}", userId, stompSessionCount);
-		Iterable<String> useernames = this.friendshipRepository.findAllFriendUsernames(userId);
+	public void sendStomSessionStatusUpdateToFriends(String userId) {
+		Iterable<StompSession> useernames = this.friendshipRepository.findAllFriendStompSessions(userId);//.findAllFriendUsernames(userId);
 		// create message
 		StateUpdateMessage msg = new StateUpdateMessage();
 		msg.setId(userId);
-		msg.setResourceClass(UserDTO.class);
-		msg.addModification("stompSessionCount", stompSessionCount);
-		for(String username : useernames){
-			LOGGER.debug("SENDING TO USER {}, msg: {}", username, msg);
-			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_UPDATES_STATE, msg);
+		msg.setResourceClass(UserDTO.class.getCanonicalName());
+//		msg.addModification("stompSessionCount", stompSessionCount);
+		List<StompSession> sessions = this.repository.findAll();
+		LOGGER.debug("SENDING sessions: "+sessions);
+		for(StompSession session : sessions){
+			LOGGER.debug("SENDING session: {} ", session);
+			this.messagingTemplate.convertAndSendToUser(session.getUser().getUsername(), Destinations.USERQUEUE_UPDATES_STATE, msg, 
+			           Collections.singletonMap(SimpMessageHeaderAccessor.SESSION_ID_HEADER, session.getId()));
+//			this.messagingTemplate.convertAndSendToUser(session.getUser().getUsername(), "/queue/test", "TEST!!!!!!!", 
+//			           Collections.singletonMap(SimpMessageHeaderAccessor.SESSION_ID_HEADER, session.getId()));
+////			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_UPDATES_STATE, msg);
+////			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_UPDATES_STATE, "TEST");
+////			this.messagingTemplate.convertAndSend("/user/" + username + Destinations.USERQUEUE_UPDATES_STATE, msg);
 		}
 	}
 
@@ -102,7 +113,7 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 		super.delete(sess);
 		// notify friends if user has gone offline
 		if(count <= 1){
-			sendStomSessionStatusUpdateToFriends(sess.getUser().getId(), 0);
+			sendStomSessionStatusUpdateToFriends(sess.getUser().getId());
 		}
 	}
 
@@ -119,7 +130,7 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 			super.delete(sess);
 			// notify friends if user has gone offline
 			if(count <= 1){
-				sendStomSessionStatusUpdateToFriends(sess.getUser().getId(), 0);
+				sendStomSessionStatusUpdateToFriends(sess.getUser().getId());
 			}
 			
 		}
@@ -128,9 +139,11 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 
 	public void validateUser(StompSession resource) {
 		ICalipsoUserDetails ud = this.getPrincipal();
-		LOGGER.info("userDetails: {}", ud);
+		LOGGER.info("validateUser userDetails: {}", ud);
 		if(resource.getUser() == null){
-			resource.setUser(new User(ud.getId()));
+			User user = this.userRepository.getOne(ud.getId());
+			LOGGER.info("validateUser adding current user: {} ", user);
+			resource.setUser(user);
 		}
 		else if(!ud.getId().equals(resource.getUser().getId())){
 			throw new IllegalArgumentException("Session user does not match current principal");

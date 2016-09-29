@@ -7,6 +7,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
@@ -19,9 +20,9 @@ public class StateUpdateMessage implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	private Serializable id;
-
-	@JsonIgnore
-	private Class resourceClass;
+	
+	@JsonProperty("@class")
+	private String resourceClass;
 	
 	private Map<String, Serializable> modifications;
 	
@@ -29,15 +30,10 @@ public class StateUpdateMessage implements Serializable{
 		
 	}
 	
-	
-	
 	@Override
 	public String toString() {
-		return "StateUpdateMessage [id=" + id + ", resourceClass=" + resourceClass.getCanonicalName() + ", modifications=" + modifications
-				+ "]";
+		return "StateUpdateMessage [id=" + id + ", resourceClass=" + resourceClass + ", modifications=" + modifications + "]";
 	}
-
-
 
 	public Serializable getId(){
 		return this.id;
@@ -47,20 +43,15 @@ public class StateUpdateMessage implements Serializable{
 		this.id = id;
 	}
 	
-	public Class  getResourceClass(){
+	public String getResourceClass(){
 		return this.resourceClass;
 	}
 
-	public void setResourceClass(Class resourceClass){
+	public void setResourceClass(String resourceClass){
 		this.resourceClass = resourceClass;
 	}
-	
-	@JsonGetter("@class")
-	public String getResourceClassName(){
-		return this.getResourceClass().getCanonicalName();
-	}
 
-	@JsonAnyGetter
+	//@JsonAnyGetter
 	public Map<String, Serializable> getModifications(){
 		return this.modifications;
 	}

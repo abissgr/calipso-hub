@@ -76,7 +76,7 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 			// notify request recepient
 			String username = this.userRepository.findCompactUserById(friendship.getRequestRecipient().getId()).getUsername();
 			LOGGER.debug("Sending friendship DTO to " + username);
-			this.messagingTemplate.convertAndSendToUser(username, "/queue/friendships", new FriendshipDTO(friendship));
+			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_FRIENDSHIPS, new FriendshipDTO(friendship));
 		}
 
 		// create inverse if accepted
