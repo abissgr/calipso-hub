@@ -162,7 +162,7 @@ implements ModelService<T, ID>{
 				
 				try {
 					// if unique field
-					if(column.unique()){
+					if(column.unique() && !field.getName().equals("id")){
 						Object value = PropertyUtils.getProperty(resource, field.getName());
 						// match the given value if any
 						if(value != null){
