@@ -35,7 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class LoggingHandlerExceptionResolver implements HandlerExceptionResolver, Ordered {
 	@Override
 	public int getOrder() {
-		return Integer.MIN_VALUE; // we're first in line, yay!
+		return Integer.MAX_VALUE; // we're last in line, yay!
 	}
 
 	@Override

@@ -18,13 +18,26 @@
 package gr.abiss.calipso.tiers.service;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.persistence.Column;
+
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.thymeleaf.util.ListUtils;
 
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.repository.UserRepository;
@@ -34,6 +47,8 @@ import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
+import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
 import gr.abiss.calipso.websocket.Destinations;
 import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
 
@@ -104,5 +119,76 @@ implements ModelService<T, ID>{
 			this.messagingTemplate.convertAndSendToUser(useername, Destinations.USERQUEUE_UPDATES_ACTIVITY, msg);
 			
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_CREATE)
+    public T create(T resource) {
+        this.validate(resource);
+        return super.create(resource);
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	@PreAuthorize(T.PRE_AUTHORIZE_UPDATE)
+    public T update(T resource) {
+        this.validate(resource);
+        return super.update(resource);
+    }
+
+	protected void validate(T resource) {
+		List<String> errors = this.validateUniqueConstraints(resource);
+
+		if(!ListUtils.isEmpty(errors)){
+			throw new UniqueConstraintViolationException("Validation failed", errors);
+		}
+		
+	}
+
+	protected List<String> validateUniqueConstraints(T resource) {
+		List<String> errors = new LinkedList<String>();
+		Field[] fields = FieldUtils.getFieldsWithAnnotation(this.getDomainClass(), Column.class);
+		if(fields.length > 0){
+			for(int i = 0; i < fields.length; i++){
+				Field field = fields[i];
+				Column column = field.getAnnotation(Column.class);
+				
+				try {
+					// if unique field
+					if(column.unique()){
+						Object value = PropertyUtils.getProperty(resource, field.getName());
+						// match the given value if any
+						if(value != null){
+							// unwrap ID if entity type
+							if(CalipsoPersistable.class.isAssignableFrom(value.getClass())){
+								value = ((CalipsoPersistable) value).getId();
+							}
+							// create criteria
+							HashMap<String, String[]> parameters = new HashMap<String, String[]>();
+							String[] match = {value.toString()};
+							parameters.put(field.getName(), match);
+							Page<T> page = this.findAll(new ParameterMapBackedPageRequest(parameters, 0 , 1, Direction.ASC, "id"));
+							// if a match exists and is not given resource
+							if(page.hasContent() && !page.getContent().get(0).getId().equals(resource.getId())){
+								errors.add("Value already exists for field " + field.getName());
+							}
+						}
+					}
+				} catch (Exception e) {
+					LOGGER.warn("Failed validating unique constrains for property: " + field.getName(), e);
+				}
+				
+			}
+			
+			
+		}
+		return errors;
 	}
 }

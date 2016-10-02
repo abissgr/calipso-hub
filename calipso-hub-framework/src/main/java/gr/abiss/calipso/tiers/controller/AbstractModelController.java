@@ -22,17 +22,20 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.persistence.Column;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.resthub.common.exception.NotFoundException;
+import org.resthub.common.model.RestError;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.thymeleaf.util.ListUtils;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -66,6 +71,7 @@ import gr.abiss.calipso.tiers.util.EntityUtil;
 import gr.abiss.calipso.uischema.model.UiSchema;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -230,6 +236,7 @@ public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, 
 
 
 
+
 	protected void applyCurrentPrincipal(T resource) {
 		Field[] fields = FieldUtils.getFieldsWithAnnotation(this.service.getDomainClass(), CurrentPrincipal.class);
 		//ApplyPrincipalUse predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalField.class);
@@ -370,5 +377,17 @@ public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, 
 		return this.getSchema();
 	}
 
+	@ExceptionHandler(UniqueConstraintViolationException.class)
+	@ResponseBody
+	public RestError handleEUniqueConstraintViolationException(HttpServletRequest request, Exception e){
 
+		UniqueConstraintViolationException ex = (UniqueConstraintViolationException) e;
+    	StringBuffer error = new StringBuffer();
+    	for(String s : ex.getErrors()){
+    		error.append(s).append(". ");
+    	}
+        RestError.Builder builder = new RestError.Builder();
+        builder.setMessage(error.toString()).setCode(HttpStatus.BAD_REQUEST.value()).setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase()).setThrowable(ex);
+        return builder.build();
+}	
 }
