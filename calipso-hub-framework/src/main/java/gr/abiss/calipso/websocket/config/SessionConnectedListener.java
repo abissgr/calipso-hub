@@ -11,7 +11,7 @@ import gr.abiss.calipso.websocket.model.StompSession;
 /**
  * Creates and persists a {@link StompSession}} instance upon a {@linkplain SessionConnectedEvent}
  */
-@Component("calipsoSessionConnectedListener")
+//@Component("calipsoSessionConnectedListener")
 public class SessionConnectedListener extends AbstractSubProtocolEventListener<SessionConnectedEvent>{
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionConnectedListener.class);
 	

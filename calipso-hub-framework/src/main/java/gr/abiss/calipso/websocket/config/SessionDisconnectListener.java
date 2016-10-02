@@ -11,7 +11,7 @@ import gr.abiss.calipso.websocket.model.StompSession;
 /**
  * Removes a {@link StompSession}} instance from persistense upon a {@linkplain SessionDisconnectEvent}
  */
-@Component("calipsoSessionDisconnectedListener")
+//@Component("calipsoSessionDisconnectedListener")
 public class SessionDisconnectListener extends AbstractSubProtocolEventListener<SessionDisconnectEvent>{
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionDisconnectListener.class);

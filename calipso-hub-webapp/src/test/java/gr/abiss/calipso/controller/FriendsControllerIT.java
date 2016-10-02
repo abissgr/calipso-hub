@@ -22,7 +22,9 @@ import static io.restassured.matcher.RestAssuredMatchers.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -34,6 +36,11 @@ import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.testng.annotations.Test;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JacksonUtils;
 
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.friends.model.FriendshipStatus;
@@ -88,13 +95,14 @@ public class FriendsControllerIT extends AbstractControllerIT {
 			new DefaultStompFrameHandler<FriendshipDTO>(adminSession, FriendshipDTO.class, adminFriendshipsQueueBlockingQueue));
 		
 		// subsscribe to generic state updates and verify user updateof stomsessionCount
-		BlockingQueue<StateUpdateMessage> adminStateUpdatesQueueBlockingQueue = new LinkedBlockingDeque<StateUpdateMessage>();
+		BlockingQueue<JsonNode> adminStateUpdatesQueueBlockingQueue = new LinkedBlockingDeque<JsonNode>();
 		adminSession.subscribe("/user" + Destinations.USERQUEUE_UPDATES_STATE, 
-			new DefaultStompFrameHandler<StateUpdateMessage>(adminSession, StateUpdateMessage.class, adminStateUpdatesQueueBlockingQueue));
+			new DefaultStompFrameHandler<JsonNode>(adminSession, JsonNode.class, adminStateUpdatesQueueBlockingQueue));
 				
 		BlockingQueue<FriendshipDTO> operatorFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
 		Subscription operatorFriendshipQueueSubscription = operatorSession.subscribe("/user/queue/friendships", 
 				new DefaultStompFrameHandler<FriendshipDTO>(operatorSession, FriendshipDTO.class, operatorFriendshipsQueueBlockingQueue));
+
 		// --------------------------------
 		// Create a friendship request
 		// --------------------------------
@@ -149,16 +157,23 @@ public class FriendsControllerIT extends AbstractControllerIT {
 				.extract().as(UserInvitationResultsDTO.class);
 		
 
-		BlockingQueue<String> stringQueue = new LinkedBlockingDeque<String>();
-		adminSession.subscribe("/user/queue/test", new DefaultStompFrameHandler<String>(adminSession, String.class, stringQueue));
 		// disconnect
+		LOGGER.info("DISCONNECT OPERATOR");
 		operatorSession.disconnect();
-		StateUpdateMessage update = adminStateUpdatesQueueBlockingQueue.poll(5, SECONDS);
-		
-		LOGGER.info("UPDATE MESSAGE: {}", update);
+
+		JsonNode disconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
+
+		LOGGER.info("disconnectUpdate MESSAGE: {}", JacksonUtils.prettyPrint(disconnectUpdate));
 		// TODO
-	    //Assert.assertEquals(update.getModifications().get("stompSessionCount").toString(), "1");
-		
+	    Assert.assertNotNull(disconnectUpdate);
+
+		StompSession operatorSession2 = getStompSession(WEBSOCKET_URI, operatorLoginContext);
+
+		JsonNode reconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
+
+		LOGGER.info("reconnectUpdate MESSAGE: {}", JacksonUtils.prettyPrint(reconnectUpdate));
+		// TODO
+	    Assert.assertNotNull(reconnectUpdate);
 	}
 	
 	public static class HeartBeatStompSessionHandler extends DefaultStompSessionHandler{
@@ -170,6 +185,7 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		}
 		
 	}
+	
 
 	
 }

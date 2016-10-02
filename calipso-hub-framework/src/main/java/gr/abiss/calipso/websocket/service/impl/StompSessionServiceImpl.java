@@ -1,35 +1,43 @@
 package gr.abiss.calipso.websocket.service.impl;
 
 
-import java.io.Serializable;
+import java.security.Principal;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import gr.abiss.calipso.friends.repository.FriendshipRepository;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.websocket.Destinations;
-import gr.abiss.calipso.websocket.message.IMessageResource;
 import gr.abiss.calipso.websocket.message.StateUpdateMessage;
 import gr.abiss.calipso.websocket.model.StompSession;
 import gr.abiss.calipso.websocket.repository.StompSessionRepository;
 import gr.abiss.calipso.websocket.service.StompSessionService;
 
-
-@Named(StompSessionService.BEAN_ID)
+@Service(StompSessionService.BEAN_ID)
 @Transactional(readOnly = true)
 public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSession, String, StompSessionRepository> implements StompSessionService {
 
@@ -43,6 +51,41 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 		this.friendshipRepository = friendshipRepository;
 	}
 
+
+//	@EventListener({ SessionConnectEvent.class })
+//	@Transactional(readOnly = false)
+	public void onSessionConnectEvent(SessionConnectEvent event) {
+	}
+	
+	@EventListener({ SessionConnectedEvent.class })
+	@Transactional(readOnly = false)
+	public void onSessionConnectedEvent(SessionConnectedEvent event) {
+		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) event.getUser();
+		UserDetails ud = (UserDetails) auth.getPrincipal();
+        // persist STOMP session
+		StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
+		StompSession stompSession = this.create(new StompSession.Builder().id(sha.getSessionId()).user(new User(ud.getId())).build());
+        LOGGER.debug("Persisted STOMP session: {}:{}", event.getUser().getName(), stompSession.getId());
+	}
+	
+//	@EventListener({ SessionSubscribeEvent.class })
+//	@Transactional(readOnly = false)
+	public void onSessionSubscribeEvent(SessionSubscribeEvent event) {
+	}
+
+//	@EventListener({ SessionUnsubscribeEvent.class })
+//	@Transactional(readOnly = false)
+	public void onSessionUnsubscribeEvent(SessionUnsubscribeEvent event) {
+	}
+
+	@EventListener({ SessionDisconnectEvent.class })
+	@Transactional(readOnly = false)
+	public void onSessionDisconnectEvent(SessionDisconnectEvent event) {
+
+		StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
+		this.delete(event.getSessionId());
+        LOGGER.debug("Deleted  STOMP session: {}:{}", event.getUser().getName(), event.getSessionId());
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -65,30 +108,28 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 		if(count == 0){
 			long stompSessionCount = count + 1;
 			
-			sendStomSessionStatusUpdateToFriends(userId);
+			sendStomSessionStatusUpdateToFriends(userId, stompSessionCount);
 		}
 		return resource;
 	}
 
 
-	public void sendStomSessionStatusUpdateToFriends(String userId) {
-		Iterable<StompSession> useernames = this.friendshipRepository.findAllFriendStompSessions(userId);//.findAllFriendUsernames(userId);
-		// create message
-		StateUpdateMessage msg = new StateUpdateMessage();
+	public void sendStomSessionStatusUpdateToFriends(String userId, long stompSessionCount) {
+		
+		// get online friends
+		Iterable<String> useernames = this.friendshipRepository.findAllStompOnlineFriendUsernames(userId);
+
+		// create state update message
+		StateUpdateMessage<String> msg = new StateUpdateMessage<String>();
 		msg.setId(userId);
 		msg.setResourceClass(UserDTO.class.getCanonicalName());
-//		msg.addModification("stompSessionCount", stompSessionCount);
-		List<StompSession> sessions = this.repository.findAll();
-		LOGGER.debug("SENDING sessions: "+sessions);
-		for(StompSession session : sessions){
-			LOGGER.debug("SENDING session: {} ", session);
-			this.messagingTemplate.convertAndSendToUser(session.getUser().getUsername(), Destinations.USERQUEUE_UPDATES_STATE, msg, 
-			           Collections.singletonMap(SimpMessageHeaderAccessor.SESSION_ID_HEADER, session.getId()));
-//			this.messagingTemplate.convertAndSendToUser(session.getUser().getUsername(), "/queue/test", "TEST!!!!!!!", 
-//			           Collections.singletonMap(SimpMessageHeaderAccessor.SESSION_ID_HEADER, session.getId()));
-////			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_UPDATES_STATE, msg);
-////			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_UPDATES_STATE, "TEST");
-////			this.messagingTemplate.convertAndSend("/user/" + username + Destinations.USERQUEUE_UPDATES_STATE, msg);
+		msg.addModification("stompSessionCount", stompSessionCount);
+		
+		// notify friends
+		for(String useername : useernames){
+			
+			this.messagingTemplate.convertAndSendToUser(useername, Destinations.USERQUEUE_UPDATES_STATE, msg);
+			
 		}
 	}
 
@@ -113,7 +154,7 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 		super.delete(sess);
 		// notify friends if user has gone offline
 		if(count <= 1){
-			sendStomSessionStatusUpdateToFriends(sess.getUser().getId());
+			sendStomSessionStatusUpdateToFriends(sess.getUser().getId(), count - 1);
 		}
 	}
 
@@ -129,9 +170,9 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 			long count = this.repository.countForUser(sess.getUser().getId()).longValue();
 			super.delete(sess);
 			// notify friends if user has gone offline
-			if(count <= 1){
-				sendStomSessionStatusUpdateToFriends(sess.getUser().getId());
-			}
+//			if(count <= 1){
+				sendStomSessionStatusUpdateToFriends(sess.getUser().getId(), count - 1);
+//			}
 			
 		}
 	}
@@ -145,9 +186,9 @@ public class StompSessionServiceImpl extends AbstractModelServiceImpl<StompSessi
 			LOGGER.info("validateUser adding current user: {} ", user);
 			resource.setUser(user);
 		}
-		else if(!ud.getId().equals(resource.getUser().getId())){
-			throw new IllegalArgumentException("Session user does not match current principal");
-		}
+//		else if(!ud.getId().equals(resource.getUser().getId())){
+//			throw new IllegalArgumentException("Session user does not match current principal");
+//		}
 	}
 	
 }

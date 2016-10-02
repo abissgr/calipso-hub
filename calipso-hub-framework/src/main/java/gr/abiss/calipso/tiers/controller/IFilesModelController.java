@@ -49,6 +49,9 @@ import io.swagger.annotations.ApiOperation;
 public interface IFilesModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>> 
  extends ModelController<T, ID, S>{
 
+
+	public static final Logger LOGGER = LoggerFactory.getLogger(IFilesModelController.class);
+			
 	public FilePersistenceService getFilePersistenceService();
 	
 	@ApiOperation(value = "Update files", 
@@ -63,6 +66,7 @@ public interface IFilesModelController<T extends Persistable<ID>, ID extends Ser
 		Logger logger = LoggerFactory.getLogger(IFilesModelController.class);
 
 		T entity = this.getService().findById(id);
+        LOGGER.debug("Entity before uploading files: {}", entity);
 		try {
 			String basePath = new StringBuffer(this.getService().getDomainClass().getSimpleName())
 					.append('/').append(id).append('/').toString();
@@ -86,6 +90,9 @@ public interface IFilesModelController<T extends Persistable<ID>, ID extends Ser
 			throw new RuntimeException("Failed to update files", e);
 		}
 		// return the updated entity
-		return this.getService().update(entity);
+		entity = this.getService().update(entity);
+
+        LOGGER.debug("Entity after uploading files: {}", entity);
+        return entity;
 	}
 }

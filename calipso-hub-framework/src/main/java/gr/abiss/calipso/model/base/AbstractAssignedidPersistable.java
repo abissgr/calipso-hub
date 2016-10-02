@@ -27,12 +27,14 @@ import javax.persistence.MappedSuperclass;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+
 /**
  * Abstract base class for persistent entities with assigned id
  * @param <ID> The id Serializable
  */
 @MappedSuperclass
-public abstract class AbstractAssignedidPersistable<ID extends Serializable> extends AbstractPersistable<ID> {
+public abstract class AbstractAssignedidPersistable<ID extends Serializable>  implements CalipsoPersistable<ID>{
 
 	private static final long serialVersionUID = 4340156130534111231L;
 

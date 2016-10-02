@@ -300,11 +300,11 @@
 							<!-- We use non NIO connector in order to avoid read-only static files 
 								under windows (don't ask) -->
 							<connectors>
-								<connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
+								<connector implementation="org.eclipse.jetty.server.LocalConnector">
 									<port>${jetty.port}</port>
-									<maxIdleTime>60000</maxIdleTime>
-									<requestBufferSize>30000</requestBufferSize>
-									<requestHeaderSize>30000</requestHeaderSize>
+<!-- 									<maxIdleTime>60000</maxIdleTime> -->
+<!-- 									<requestBufferSize>30000</requestBufferSize> -->
+<!-- 									<requestHeaderSize>30000</requestHeaderSize> -->
 								</connector>
 							</connectors>
 							<scanIntervalSeconds>10</scanIntervalSeconds>

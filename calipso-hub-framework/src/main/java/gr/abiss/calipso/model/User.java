@@ -74,6 +74,7 @@ import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.Constants;
 import gr.abiss.calipso.utils.MD5Utils;
 import gr.abiss.calipso.websocket.message.IMessageResource;
+import gr.abiss.calipso.websocket.model.StompSession;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -218,9 +219,14 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	@JoinTable(name = "user_roles", joinColumns = { @JoinColumn(name = "role_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "user_id") })
 	private List<Role> roles = new ArrayList<Role>(0);
-
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "requestSender")
 	private List<Friendship> friendships;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user")
+	private List<StompSession> stompSessions;
 
 	public User() {
 	}
@@ -285,9 +291,14 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).appendSuper(super.toString()).append("username", this.getUsername())
-				.append("firstName", this.getFirstName()).append("lastName", this.getLastName())
-				.append("email", this.getEmail()).append("new", this.isNew()).append("roles", this.getRoles())
+		return new ToStringBuilder(this).appendSuper(super.toString())
+				.append("username", this.getUsername())
+				.append("firstName", this.getFirstName())
+				.append("lastName", this.getLastName())
+				.append("email", this.getEmail())
+				.append("password", this.getPassword())
+				.append("new", this.isNew())
+				.append("roles", this.getRoles())
 				.toString();
 	}
 
@@ -638,6 +649,22 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
+	}
+
+	public List<Friendship> getFriendships() {
+		return friendships;
+	}
+
+	public void setFriendships(List<Friendship> friendships) {
+		this.friendships = friendships;
+	}
+
+	public List<StompSession> getStompSessions() {
+		return stompSessions;
+	}
+
+	public void setStompSessions(List<StompSession> stompSessions) {
+		this.stompSessions = stompSessions;
 	}
 
 	public static class Builder {

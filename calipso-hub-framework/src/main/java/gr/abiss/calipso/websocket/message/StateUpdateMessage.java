@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 
@@ -15,11 +15,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @param <S> the message subject type
  */
-public class StateUpdateMessage implements Serializable{
+@JsonPropertyOrder({ "@class", "id", "name" })
+public class StateUpdateMessage<ID extends Serializable> implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
-	private Serializable id;
+	private ID id;
 	
 	@JsonProperty("@class")
 	private String resourceClass;
@@ -35,11 +36,11 @@ public class StateUpdateMessage implements Serializable{
 		return "StateUpdateMessage [id=" + id + ", resourceClass=" + resourceClass + ", modifications=" + modifications + "]";
 	}
 
-	public Serializable getId(){
+	public ID getId(){
 		return this.id;
 	}
 
-	public void setId(Serializable id){
+	public void setId(ID id){
 		this.id = id;
 	}
 	
@@ -51,11 +52,12 @@ public class StateUpdateMessage implements Serializable{
 		this.resourceClass = resourceClass;
 	}
 
-	//@JsonAnyGetter
+	@JsonAnyGetter
 	public Map<String, Serializable> getModifications(){
 		return this.modifications;
 	}
 	
+	@JsonAnySetter
 	public void addModification(String key, Serializable value){
 		if(this.modifications == null){
 			this.modifications = new HashMap<String, Serializable>();

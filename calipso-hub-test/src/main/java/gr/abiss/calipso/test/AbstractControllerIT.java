@@ -119,7 +119,7 @@ public class AbstractControllerIT {
 		
 		
 		try {
-			ownerSession = getWebSocketStompClient().connect(url, handshakeHeaders, connectHeaders, sessionHandler).get(1, SECONDS);
+			ownerSession = getWebSocketStompClient().connect(url, handshakeHeaders, connectHeaders, sessionHandler).get(5, SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new RuntimeException(e);
 		}

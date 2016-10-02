@@ -17,27 +17,23 @@
  */
 package gr.abiss.calipso.controller;
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
+import static io.restassured.RestAssured.given;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.notNullValue;
 
-import java.math.BigDecimal;
-import java.util.Map;
-
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.userDetails.model.LoginSubmission;
 import gr.abiss.calipso.utils.Constants;
-import io.restassured.response.Response;
+import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 
-@Test(/*singleThreaded = true, */description = "Test dynamic JPA specifications used in default search stack")
+@Test(/*singleThreaded = true, */description = "User entity tests")
 @SuppressWarnings("unused")
 public class UserControllerIT extends AbstractControllerIT {
 
@@ -64,6 +60,59 @@ public class UserControllerIT extends AbstractControllerIT {
 				// get model
 				.extract().as(User.class);
 	}
+	
+	@Test(priority = 10, description = "Test C2 use cases")
+	public void testUploadsPreserveOtherProperties() throws Exception {
+
+		// --------------------------------
+		// Login
+		// --------------------------------
+
+		// login and get a request spec for stateless auth
+		// essentially this posts to "/calipso/apiauth/userDetails"
+		// with request body: {username: "admin", password: "admin"}
+		Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
+		RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
+		
+		// --------------------------------
+		// Upload user images
+		// --------------------------------
+		String file1 = "user_banner.png";
+		String file2 = "user_avatar.jpg";
+        final byte[] bytes1 = IOUtils.toByteArray(getClass().getResourceAsStream("/"+file1)); 
+        final byte[] bytes2 = IOUtils.toByteArray(getClass().getResourceAsStream("/"+file2)); 
+        
+        // select user 	
+        User user = given().spec(adminRequestSpec)
+			.get("/calipso/api/rest/users/" + adminLoginContext.userId)
+			.then().assertThat()
+			// test assertions
+			.body("id", notNullValue())
+			// get model
+			.extract().as(User.class);
+        LOGGER.info("User before uploading files: {}", user);
+        		
+        		
+        User userAfterUploading = given()
+			.contentType("multipart/form-data")
+			.cookies(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME, adminLoginContext.ssoToken)
+	        .multiPart(new MultiPartSpecBuilder(bytes1)
+	                .fileName(file1)
+	                .controlName("bannerUrl")
+	                .mimeType("image/png").build())
+	        .multiPart(new MultiPartSpecBuilder(bytes2)
+	                .fileName(file1)
+	                .controlName("avatarUrl")
+	                .mimeType("image/jpeg").build())
+			.when().post("/calipso/api/rest/users/" + user.getId() + "/files")
+			.then().extract().as(User.class);
+        
+
+        LOGGER.info("User after uploading files: {}", userAfterUploading);
+
+	    Assert.assertEquals(user, userAfterUploading);
+	}
+
 
 	
 }

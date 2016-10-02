@@ -36,21 +36,21 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 			+ ") ";
 
 
-	public static final String IS_FRIEND = " friendship.requestSender.id =  ?1 "
-			+ "and (friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE) ";
+	public static final String IS_FRIEND = " (friendship.requestSender.id =  ?1 "
+			+ "and (friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.ACCEPTED or friendship.status = gr.abiss.calipso.friends.model.FriendshipStatus.INVERSE)) ";
 	
 
 	static final String FROM__FRIENDS_BY_USERID = " from Friendship friendship where " + IS_FRIEND;
-	static final String FROM__STOMPONLINE_FRIENDS_BY_USERID = " from Friendship friendship where friendship.requestSender.stompSessionCount > 0 and " + IS_FRIEND;
+	// TODO: join an inverse stompSessions to count, formula not working here
+	static final String FROM__STOMPONLINE_FRIENDS_BY_USERID = " from Friendship friendship where " + IS_FRIEND + " and friendship.requestRecipient.stompSessionCount > 0 ";
 
 	static final String QUERY_FRIEND_USERNAMES_BY_USERID =  "select friendship.requestRecipient.username " + FROM__FRIENDS_BY_USERID;
-	static final String QUERY_STOMPONLINE_FRIEND_IDS_BY_USERID =  "select friendship.requestRecipient.id " + FROM__STOMPONLINE_FRIENDS_BY_USERID;
+	static final String QUERY_STOMPONLINE_FRIEND_USERNAMES_BY_USERID =  "select friendship.requestRecipient.username " + FROM__STOMPONLINE_FRIENDS_BY_USERID;
 	
 	static final String QUERY_FRIENDS_BY_USERID = SELECT_USERDTO + FROM__FRIENDS_BY_USERID;
 	
-//friendship.requestSender.stompSessionCount > 0 and
-	@Query("select sess from StompSession sess left join sess.user.friendships friendship where  " + IS_FRIEND)
-	public Iterable<StompSession> findAllFriendStompSessions(String userId);
+	@Query(QUERY_STOMPONLINE_FRIEND_USERNAMES_BY_USERID)
+	public Iterable<String> findAllStompOnlineFriendUsernames(String userId);
 	
 	/**
 	 * Native modifying query to delete along with inverse

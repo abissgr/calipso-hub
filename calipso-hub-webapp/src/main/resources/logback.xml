@@ -43,19 +43,26 @@
 <!--         <level value="debug" /> -->
 <!--     </logger> -->
 
+	<!-- test packages -->
+   <logger name="gr.abiss.calipso.test">
+        <level value="DEBUG" />
+    </logger>
+    <logger name="gr.abiss.calipso.controller">
+        <level value="DEBUG" />
+    </logger>
+    
+    <!-- other -->
+    <logger name="gr.abiss.calipso.websocket">
+        <level value="DEBUG" />
+    </logger>
     <logger name="org.springframework.messaging">
         <level value="DEBUG" />
     </logger>
-    <logger name="gr.abiss.calipso.test">
-        <level value="DEBUG" />
-    </logger>
+ 
     <logger name="gr.abiss.calipso.websocket.service.impl.StompSessionServiceImpl">
         <level value="DEBUG" />
     </logger>
     
-    <logger name="gr.abiss.calipso.controller.FriendsControllerIT">
-        <level value="DEBUG" />
-    </logger>
 <!--     <logger name="org.springframework"> -->
 <!--         <level value="debug" /> -->
 <!--     </logger> -->

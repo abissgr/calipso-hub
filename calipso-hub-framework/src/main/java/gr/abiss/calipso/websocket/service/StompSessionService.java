@@ -17,11 +17,29 @@
  */
 package gr.abiss.calipso.websocket.service;
 
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
+
 import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.websocket.model.StompSession;
 
 public interface StompSessionService extends ModelService<StompSession, String> {
 
 	public static final String BEAN_ID = "stompSessionService";
+	
+	public void onSessionConnectEvent(SessionConnectEvent event);
+
+	public void onSessionConnectedEvent(SessionConnectedEvent event);
+	
+	public void onSessionSubscribeEvent(SessionSubscribeEvent event);
+
+	public void onSessionUnsubscribeEvent(SessionUnsubscribeEvent event);
+
+	public void onSessionDisconnectEvent(SessionDisconnectEvent event);
 	
 }

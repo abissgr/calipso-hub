@@ -5,7 +5,7 @@ public class Destinations {
 	/**
 	 * Publishes {@link gr.abiss.calipso.websocket.message.IStateUpdateMessage} state updates for entities the user is expected to be interested in, for example friend status
 	 */
-	public final static String USERQUEUE_UPDATES_STATE = "/queue/stateupdates";
+	public final static String USERQUEUE_UPDATES_STATE = "/queue/updates/state";
 
 	/**
 	 * Publishes {@link gr.abiss.calipso.websocket.message.IActivityNotificationMessage} activity updates of entities the user is expected to be interested in

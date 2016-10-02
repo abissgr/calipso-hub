@@ -46,7 +46,8 @@ public class DefaultStompSessionHandler implements StompSessionHandler {
 	public void handleException(StompSession session, StompCommand command, StompHeaders headers,
 			byte[] payload, Throwable exception) {
 
-        LOGGER.info("handleException: session: " + session + ", command: " + command + ", headers: " + headers);
+        LOGGER.error("handleException: session: " + session + ", command: " + command + ", headers: " + headers, exception);
+        throw new RuntimeException(exception);
 	}
 
 	/**
@@ -55,6 +56,7 @@ public class DefaultStompSessionHandler implements StompSessionHandler {
 	@Override
 	public void handleTransportError(StompSession session, Throwable exception) {
         LOGGER.error("Transport ERROR for session: " + session.getSessionId(), exception);
+        throw new RuntimeException(exception);
 	}
 
 }

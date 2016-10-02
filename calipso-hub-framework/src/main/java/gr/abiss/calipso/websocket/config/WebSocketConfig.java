@@ -100,7 +100,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 		@Override
 		protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
 			Principal auth = SecurityUtil.getAuthentication();
-			LOGGER.info("determineUser: {}", auth);
+//			LOGGER.debug("determineUser: {}", auth);
 			return auth;
 		}
 		
