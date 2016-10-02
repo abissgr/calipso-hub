@@ -379,6 +379,7 @@ public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, 
 
 	@ExceptionHandler(UniqueConstraintViolationException.class)
 	@ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
 	public RestError handleEUniqueConstraintViolationException(HttpServletRequest request, Exception e){
 
 		UniqueConstraintViolationException ex = (UniqueConstraintViolationException) e;
