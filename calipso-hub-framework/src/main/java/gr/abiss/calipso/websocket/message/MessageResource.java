@@ -12,12 +12,12 @@ public class MessageResource<ID extends Serializable> implements IMessageResourc
 	/**
 	 * The resource ID
 	 */
-	public ID id;
+	protected ID id;
 	
 	/**
 	 * The resource human-readable name
 	 */
-	public String name;
+	protected String name;
 
 	public MessageResource() {
 		super();

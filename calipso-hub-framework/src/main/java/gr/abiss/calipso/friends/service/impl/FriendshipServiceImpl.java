@@ -22,6 +22,8 @@ import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 import gr.abiss.calipso.websocket.Destinations;
+import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
+import gr.abiss.calipso.websocket.message.StateUpdateMessage;
 
 
 @Named(FriendshipService.BEAN_ID)
@@ -207,6 +209,16 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
         return repository.findAllFriendsPaginated(this.getPrincipal().getId(), pageRequest);
 	}
 
-	
+
+	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public void sendStompActivityMessageToOnlineFriends(ActivityNotificationMessage msg) {
+		
+		// get online friends
+		Iterable<String> useernames = this.repository.findAllStompOnlineFriendUsernames(this.getPrincipal().getId());
+		
+		this.sendStompActivityMessage(msg, useernames);
+	}
+
 
 }

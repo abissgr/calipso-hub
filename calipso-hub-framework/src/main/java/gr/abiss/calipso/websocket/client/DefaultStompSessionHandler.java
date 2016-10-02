@@ -12,13 +12,16 @@ import org.springframework.messaging.simp.stomp.StompSessionHandler;
 public class DefaultStompSessionHandler implements StompSessionHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStompSessionHandler.class);
+	
+	private String username;
 	/**
 	 * This implementation is empty.
 	 */
 	@Override
 	public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
 
-        LOGGER.info("afterConnected: session: " + session + ". connectedHeaders: " + connectedHeaders);
+        LOGGER.info("afterConnected, user: " +this.username +", session: " + session + ". connectedHeaders: " + connectedHeaders);
+        this.username = connectedHeaders.getFirst("user-name");
 	}
 
 	/**
@@ -36,7 +39,7 @@ public class DefaultStompSessionHandler implements StompSessionHandler {
 	 */
 	@Override
 	public void handleFrame(StompHeaders headers, Object payload) {
-        LOGGER.info("handleFrame: headers: " + headers + ", payload: " + payload);
+        LOGGER.info("handleFrame, user: " +this.username +", headers: " + headers + ", payload: " + payload);
 	}
 
 	/**
@@ -46,7 +49,7 @@ public class DefaultStompSessionHandler implements StompSessionHandler {
 	public void handleException(StompSession session, StompCommand command, StompHeaders headers,
 			byte[] payload, Throwable exception) {
 
-        LOGGER.error("handleException: session: " + session + ", command: " + command + ", headers: " + headers, exception);
+        LOGGER.error("handleException, user: " +this.username +", session: " + session + ", command: " + command + ", headers: " + headers + ", payload: " + payload, exception);
         throw new RuntimeException(exception);
 	}
 
@@ -55,7 +58,7 @@ public class DefaultStompSessionHandler implements StompSessionHandler {
 	 */
 	@Override
 	public void handleTransportError(StompSession session, Throwable exception) {
-        LOGGER.error("Transport ERROR for session: " + session.getSessionId(), exception);
+        LOGGER.error("Transport ERROR, user: " +this.username +",  session: " + session.getSessionId(), exception);
         throw new RuntimeException(exception);
 	}
 

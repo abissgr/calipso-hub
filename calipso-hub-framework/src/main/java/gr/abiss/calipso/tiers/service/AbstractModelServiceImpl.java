@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.repository.UserRepository;
@@ -33,6 +34,8 @@ import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
+import gr.abiss.calipso.websocket.Destinations;
+import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
 
 
 public abstract class AbstractModelServiceImpl<T extends CalipsoPersistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>
@@ -92,4 +95,14 @@ implements ModelService<T, ID>{
 		return user;
 	}
 
+	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public void sendStompActivityMessage(ActivityNotificationMessage msg, Iterable<String> useernames) {
+		// notify users
+		LOGGER.debug("sendStompActivityMessage, useernames: {}", useernames);
+		for(String useername : useernames){
+			this.messagingTemplate.convertAndSendToUser(useername, Destinations.USERQUEUE_UPDATES_ACTIVITY, msg);
+			
+		}
+	}
 }

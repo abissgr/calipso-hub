@@ -263,7 +263,11 @@ public class AbstractControllerIT {
 
 	    @Override
 	    public Type getPayloadType(StompHeaders headers) {
-	        return datumClass;
+	        try {
+				return this.getClass().getField("initialData").getType();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 	    }
 
 	    @SuppressWarnings("unchecked")

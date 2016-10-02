@@ -20,6 +20,7 @@ package gr.abiss.calipso.tiers.service;
 
 import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
 
 import java.io.Serializable;
 
@@ -48,4 +49,6 @@ extends GenericService<T, ID>{
 	 * @return
 	 */
 	public LocalUser getPrincipalLocalUser();
+
+	public void sendStompActivityMessage(ActivityNotificationMessage msg, Iterable<String> useernames);
 }

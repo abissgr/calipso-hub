@@ -20,6 +20,12 @@ public class ActivityNotificationMessage<S extends IMessageResource<?>, P extend
 	public ActivityNotificationMessage() {
 		super();
 	}
+	
+	public ActivityNotificationMessage(S subject, P predicate, O object) {
+		this.subject = subject;
+		this.predicate = predicate;
+		this.object = object;
+	}
 
 	@Override
 	public S getSubject() {

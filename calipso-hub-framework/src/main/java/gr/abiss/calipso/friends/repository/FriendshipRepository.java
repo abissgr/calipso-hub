@@ -50,7 +50,7 @@ public interface FriendshipRepository extends ModelRepository<Friendship,String>
 	static final String QUERY_FRIENDS_BY_USERID = SELECT_USERDTO + FROM__FRIENDS_BY_USERID;
 	
 	@Query(QUERY_STOMPONLINE_FRIEND_USERNAMES_BY_USERID)
-	public Iterable<String> findAllStompOnlineFriendUsernames(String userId);
+	public List<String> findAllStompOnlineFriendUsernames(String userId);
 	
 	/**
 	 * Native modifying query to delete along with inverse

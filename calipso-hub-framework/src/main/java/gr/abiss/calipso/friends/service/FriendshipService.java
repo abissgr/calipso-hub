@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.service.ModelService;
+import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
 
 public interface FriendshipService extends ModelService<Friendship, String> {
 
@@ -31,4 +32,6 @@ public interface FriendshipService extends ModelService<Friendship, String> {
 	public Iterable<UserDTO> findAllMyFriends();
 
 	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest);
+
+	public void sendStompActivityMessageToOnlineFriends(ActivityNotificationMessage msg);
 }
