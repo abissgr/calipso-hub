@@ -163,7 +163,7 @@ public class FriendsControllerIT extends AbstractControllerIT {
 
 		JsonNode disconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
 
-		LOGGER.info("disconnectUpdate MESSAGE: {}", JacksonUtils.prettyPrint(disconnectUpdate));
+		LOGGER.info("disconnectUpdate MESSAGE:\n{}", JacksonUtils.prettyPrint(disconnectUpdate));
 		// TODO
 	    Assert.assertNotNull(disconnectUpdate);
 
@@ -171,7 +171,7 @@ public class FriendsControllerIT extends AbstractControllerIT {
 
 		JsonNode reconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
 
-		LOGGER.info("reconnectUpdate MESSAGE: {}", JacksonUtils.prettyPrint(reconnectUpdate));
+		LOGGER.info("reconnectUpdate MESSAGE: \n{}", JacksonUtils.prettyPrint(reconnectUpdate));
 		// TODO
 	    Assert.assertNotNull(reconnectUpdate);
 	}
