@@ -52,7 +52,7 @@ public class UniqueConstraintControllerIT extends AbstractControllerIT {
 					.username("system")
 					.build())
 				.post("/calipso/api/rest/users")
-				.then().assertThat()
+				.then().assertThat().statusCode(400)
 				// test assertions
 				.body("status", notNullValue())
 				// get model

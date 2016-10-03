@@ -22,13 +22,11 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.persistence.Column;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -39,11 +37,9 @@ import org.resthub.common.model.RestError;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
@@ -56,18 +52,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.thymeleaf.util.ListUtils;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.service.cms.BinaryFileService;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 import gr.abiss.calipso.tiers.service.ModelService;
-import gr.abiss.calipso.tiers.util.EntityUtil;
 import gr.abiss.calipso.uischema.model.UiSchema;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
@@ -256,7 +249,7 @@ public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, 
 							if(id != null){
 								User user = new User();
 								user.setId(id);
-								LOGGER.info("Applying principal to field: " + field.getName() + ", value: " + id);
+								LOGGER.debug("Applying principal to field: {}, value: {}", id, field.getName());
 								PropertyUtils.setProperty(resource, field.getName(), user);
 							}
 						}
@@ -383,12 +376,8 @@ public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, 
 	public RestError handleEUniqueConstraintViolationException(HttpServletRequest request, Exception e){
 
 		UniqueConstraintViolationException ex = (UniqueConstraintViolationException) e;
-    	StringBuffer error = new StringBuffer();
-    	for(String s : ex.getErrors()){
-    		error.append(s).append(". ");
-    	}
         RestError.Builder builder = new RestError.Builder();
-        builder.setMessage(error.toString()).setCode(HttpStatus.BAD_REQUEST.value()).setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase()).setThrowable(ex);
+        builder.setMessage(ex.getMessage()).setCode(HttpStatus.BAD_REQUEST.value()).setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase()).setThrowable(ex);
         return builder.build();
-}	
+	}	
 }

@@ -17,9 +17,12 @@
  */
 package gr.abiss.calipso.model.serializers;
 
+import javax.inject.Named;
+
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 
+@Named("CcstomEnumConverterFactory")
 public class CustomEnumConverterFactory implements ConverterFactory<String, Enum> {
 
     public <T extends Enum> Converter<String, T> getConverter(Class<T> targetType) {

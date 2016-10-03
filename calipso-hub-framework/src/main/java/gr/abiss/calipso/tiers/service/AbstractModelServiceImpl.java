@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.thymeleaf.util.ListUtils;
 
+import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
@@ -147,7 +148,16 @@ implements ModelService<T, ID>{
 		List<String> errors = this.validateUniqueConstraints(resource);
 
 		if(!ListUtils.isEmpty(errors)){
-			throw new UniqueConstraintViolationException("Validation failed", errors);
+			StringBuffer message = new StringBuffer("Validation failed: ")
+					.append( errors.get(0));
+			if(errors.size() > 1){
+				message.append(" (")
+				.append(errors.size() - 1)
+				.append(" more)");
+			}
+			ICalipsoUserDetails ud = this.getPrincipal();
+			boolean complete = ud != null && ud.isAdmin();
+			throw new UniqueConstraintViolationException(message.toString(), errors, complete);
 		}
 		
 	}

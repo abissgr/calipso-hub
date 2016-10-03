@@ -108,14 +108,11 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		// --------------------------------
 		LOGGER.info("Create a friendship request");
 		Friendship friendship = given().spec(adminRequestSpec)
-			.body(new Friendship.Builder()
-				.requestSender(new User(adminLoginContext.userId))
-				.requestRecipient(new User(operatorLoginContext.userId))
-				.build())
+			.body(new Friendship(new User(adminLoginContext.userId), new User(operatorLoginContext.userId)))
 			.post("/calipso/api/rest/" + Friendship.API_PATH)
 			.then().assertThat()
 			// test assertions
-			.body("id", notNullValue())
+			.body("status", notNullValue())
 			// get model
 			.extract().as(Friendship.class);
 		
@@ -125,11 +122,11 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		LOGGER.info("Accept request");
 		// accept request
 		friendship.setStatus(FriendshipStatus.ACCEPTED);
-		friendship = given().spec(operatorRequestSpec)
+		JsonNode friendshipNode = given().spec(operatorRequestSpec).log().all()
 			.body(friendship)
-			.put("/calipso/api/rest/" + Friendship.API_PATH + "/" + friendship.getId())
+			.put("/calipso/api/rest/" + Friendship.API_PATH + "/" + friendship.getId().toStringRepresentation())
 			// get model
-			.then().extract().as(Friendship.class);
+			.then().log().all().extract().as(JsonNode.class);
 		
 		// test admin user queue
 	    Assert.assertEquals(FriendshipStatus.ACCEPTED, adminFriendshipsQueueBlockingQueue.poll(5, SECONDS).getStatus());

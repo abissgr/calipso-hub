@@ -323,13 +323,26 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	}
 
 	/**
-	 * Called by Hibernate <code>@PrePersist</code> and <code>@PreUpdate</code>
+	 * Called by Hibernate  <code>@PreUpdate</code>
+	 * to
+	 * keep the email hash of the user up-to date
+	 */
+	@PreUpdate
+	public void onBeforeUpdate() {
+		this.onBeforeSave();
+	}
+
+	/**
+	 * Called by Hibernate <code>@PrePersist</code> >
 	 * to
 	 * keep the email hash of the user up-to date
 	 */
 	@PrePersist
-	@PreUpdate
-	public void resetEmailHash() {
+	public void onBeforeCreate() {
+		this.onBeforeSave();
+	}
+	
+	protected void onBeforeSave() {
 		if(!StringUtils.isNotBlank(this.getUsername())){
 			this.setUsername(this.getEmail());
 		}

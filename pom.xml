@@ -190,6 +190,11 @@
 				<artifactId>classmate</artifactId>
 				<version>1.2.0</version>
 			</dependency>
+			<dependency>
+			    <groupId>com.github.fge</groupId>
+			    <artifactId>jackson-coreutils</artifactId>
+			    <version>1.8</version>
+			</dependency>
 			<!-- RESTHUB -->
 			<dependency>
 				<groupId>org.resthub</groupId>

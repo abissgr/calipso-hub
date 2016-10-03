@@ -75,11 +75,16 @@
         <property name="objectMapper" ref="xmlMapper" />
     </bean>
     <bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
-    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
-	    <property name="converters">
-	        <!-- converters is a set of both converters and converterfactories -->
-	        <bean class="gr.abiss.calipso.model.serializers.CustomEnumConverterFactory" />
-	    </property>
+<!-- 	<bean id="conversionService" -->
+<!-- 		class="org.springframework.context.support.ConversionServiceFactoryBean"> -->
+  <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" >
+		<property name="converters">
+			<set>
+				<!-- converters is a set of both converters and converterfactories -->
+				<bean class="gr.abiss.calipso.model.serializers.CustomEnumConverterFactory" />
+				<bean class="gr.abiss.calipso.friends.binding.FriendshipIdDeserializer" />
+			</set>
+		</property>
 	</bean>
     
     <!-- auth config -->

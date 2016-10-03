@@ -10,8 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipId;
 import gr.abiss.calipso.friends.model.FriendshipStatus;
 import gr.abiss.calipso.friends.repository.FriendshipRepository;
 import gr.abiss.calipso.friends.service.FriendshipService;
@@ -28,7 +30,7 @@ import gr.abiss.calipso.websocket.message.StateUpdateMessage;
 
 @Named(FriendshipService.BEAN_ID)
 @Transactional(readOnly = true)
-public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, String, FriendshipRepository> implements FriendshipService {
+public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, FriendshipId, FriendshipRepository> implements FriendshipService {
 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FriendshipServiceImpl.class);
@@ -39,52 +41,61 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 	@Override
 	@Transactional(readOnly = false)
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public Friendship create(Friendship friendship) {
+	public Friendship create(Friendship resource) {
 		// get current principal
 		ICalipsoUserDetails userDetails = this.getPrincipal();
 
 		// make sure the right sender is set if not empty
-		if(friendship.getRequestSender() != null){
+		if(resource.getRequestSender() != null){
 			// ensure sender is the current user
-			if(!userDetails.getId().equals(friendship.getRequestSender().getId())){
+			if(!userDetails.getId().equals(resource.getRequestSender().getId())){
 				throw new IllegalArgumentException("Invalid friendship sender");
 			}
 		}
-		else{
-			// otherwise set as the current user
-			friendship.setRequestSender(new User.Builder().id(userDetails.getId()).username(userDetails.getUsername()).build());
-		}
+		
+		// check for existing record
+		Friendship persisted = this.repository.findOne(resource.getId());
+		
+		// otherwise set as the current user
+		resource.setRequestSender(this.userRepository.getOne(resource.getRequestSender().getId()));
+		// TODO: handle update and block/unblock cases
+		
+		// ensure recipient
+		Assert.notNull(resource.getRequestRecipient());
+		Assert.isTrue( ! resource.getRequestRecipient().getId().equals(resource.getRequestSender().getId()));
+		resource.setRequestRecipient(this.userRepository.getOne( resource.getRequestRecipient().getId()));
 		
 		// check status if any
-		if(friendship.getStatus() != null){
-			if(!friendship.getStatus().equals(FriendshipStatus.PENDING)){
+		if(resource.getStatus() != null){
+			if(!resource.getStatus().equals(FriendshipStatus.PENDING)
+					&& !resource.getStatus().equals(FriendshipStatus.BLOCK)){
 				throw new IllegalArgumentException("Invalid friendship status");
 			}
 		}
 		// set automatically otherwise
 		else{
-			friendship.setStatus(FriendshipStatus.PENDING);
+			resource.setStatus(FriendshipStatus.PENDING);
 		}
 	
 		
 		// make sure the friendship does not already exist
-		if(this.repository.existsAny(friendship.getRequestSender(), friendship.getRequestRecipient())){
+		if(this.repository.existsAny(resource.getRequestSender(), resource.getRequestRecipient())){
 			throw new IllegalArgumentException("Friendship already exists");
 		}
 		
 		// create
-		friendship = super.create(friendship);
-		if(friendship.getStatus().equals(FriendshipStatus.PENDING)){
+		resource = super.create(resource);
+		if(resource.getStatus().equals(FriendshipStatus.PENDING)){
 			// notify request recepient
-			String username = this.userRepository.findCompactUserById(friendship.getRequestRecipient().getId()).getUsername();
+			String username = this.userRepository.findCompactUserById(resource.getRequestRecipient().getId()).getUsername();
 			LOGGER.debug("Sending friendship DTO to " + username);
-			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_FRIENDSHIPS, new FriendshipDTO(friendship));
+			this.messagingTemplate.convertAndSendToUser(username, Destinations.USERQUEUE_FRIENDSHIPS, new FriendshipDTO(resource));
 		}
 
 		// create inverse if accepted
-		this.createInverseIfAccepted(friendship);
+		this.createInverseIfAccepted(resource);
 		
-		return friendship;
+		return resource;
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipId;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.repository.UserRepository;
@@ -21,8 +22,8 @@ import gr.abiss.calipso.websocket.model.StompSession;
  * Spring Data JPA repository for the Friendship entity.
  */
 @SuppressWarnings("unused")
-@JaversSpringDataAuditable
-public interface FriendshipRepository extends ModelRepository<Friendship,String> {
+//@JaversSpringDataAuditable
+public interface FriendshipRepository extends ModelRepository<Friendship,FriendshipId> {
 
 	public static final String SELECT_USERDTO = "select new gr.abiss.calipso.model.dto.UserDTO(friendship.requestRecipient.id, "
 			+ "		friendship.requestRecipient.firstName, "
