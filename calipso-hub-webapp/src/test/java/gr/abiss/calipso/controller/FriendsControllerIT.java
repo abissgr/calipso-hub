@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JacksonUtils;
 
 import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipId;
 import gr.abiss.calipso.friends.model.FriendshipStatus;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
@@ -115,21 +116,29 @@ public class FriendsControllerIT extends AbstractControllerIT {
 			.body("status", notNullValue())
 			// get model
 			.extract().as(Friendship.class);
-		
-		// test operator user queue
-	    Assert.assertEquals(FriendshipStatus.PENDING, operatorFriendshipsQueueBlockingQueue.poll(5, SECONDS).getStatus());
 
+		// validate result
+		validateFriendship(friendship, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.NEW);
+	    
+	    // validate oprator/inverse result
+	    FriendshipDTO ioperatorFriendRequestNotification = operatorFriendshipsQueueBlockingQueue.poll(5, SECONDS);
+		validateFriendship(ioperatorFriendRequestNotification, operatorLoginContext.userId, adminLoginContext.userId, FriendshipStatus.PENDING);
+
+		// test operator user queue
 		LOGGER.info("Accept request");
-		// accept request
-		friendship.setStatus(FriendshipStatus.ACCEPTED);
-		JsonNode friendshipNode = given().spec(operatorRequestSpec).log().all()
-			.body(friendship)
-			.put("/calipso/api/rest/" + Friendship.API_PATH + "/" + friendship.getId().toStringRepresentation())
+		// accept request by sending only the new status to the right URL
+		Friendship friendshipInverse = given().spec(operatorRequestSpec).log().all()
+			.body(new Friendship(FriendshipStatus.CONFIRMED))
+			.put("/calipso/api/rest/" + Friendship.API_PATH + "/" + ioperatorFriendRequestNotification.getId())
 			// get model
-			.then().log().all().extract().as(JsonNode.class);
+			.then().log().all().extract().as(Friendship.class);
 		
-		// test admin user queue
-	    Assert.assertEquals(FriendshipStatus.ACCEPTED, adminFriendshipsQueueBlockingQueue.poll(5, SECONDS).getStatus());
+		// validate result
+		validateFriendship(friendshipInverse, operatorLoginContext.userId, adminLoginContext.userId, FriendshipStatus.CONFIRMED);
+
+	    // validate admin/inverse result
+	    FriendshipDTO adminFriendRequestNotification = adminFriendshipsQueueBlockingQueue.poll(5, SECONDS);
+		validateFriendship(adminFriendRequestNotification, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.CONFIRMED);
 
 		LOGGER.info("Get friends");
 		// get friends
@@ -171,6 +180,15 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		LOGGER.info("reconnectUpdate MESSAGE: \n{}", JacksonUtils.prettyPrint(reconnectUpdate));
 		// TODO
 	    Assert.assertNotNull(reconnectUpdate);
+	}
+
+	protected void validateFriendship(Friendship friendship, String one,  String other, FriendshipStatus status) {
+		this.validateFriendship(new FriendshipDTO(friendship), one, other, status);
+	}
+	protected void validateFriendship(FriendshipDTO friendship, String one,  String other, FriendshipStatus status) {
+		Assert.assertEquals(one, friendship.getOwner().getId());
+	    Assert.assertEquals(other, friendship.getFriend().getId());
+	    Assert.assertEquals(status, friendship.getStatus());
 	}
 	
 	public static class HeartBeatStompSessionHandler extends DefaultStompSessionHandler{

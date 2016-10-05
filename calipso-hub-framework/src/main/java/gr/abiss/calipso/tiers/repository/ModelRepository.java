@@ -3,16 +3,16 @@
  * Copyright © 2005 Manos Batsis (manosbatsis gmail)
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Lesser General License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Lesser General License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Lesser General License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package gr.abiss.calipso.tiers.repository;
@@ -20,19 +20,21 @@ package gr.abiss.calipso.tiers.repository;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 
 /**
- * Captures the domain type to manage as well as the domain type's id type.
- * Provides complete Search and CRUD operations, as well as operations 
- * to manage metadata and attachments. 
+ * Generic repository that provides SCRUD and utility methods based on domain and id type variables.
  * 
  * @param <T> the domain type the repository manages
  * @param <ID> the type of the id of the entity the repository manages
@@ -42,25 +44,78 @@ import gr.abiss.calipso.model.interfaces.Metadatum;
  * @see org.springframework.data.domain.Page
  */
 @NoRepositoryBean
-public interface ModelRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
+public interface ModelRepository<T, ID extends Serializable> extends PagingAndSortingRepository<T, ID> {
 
-	public EntityManager getEntityManager();
-
-	public T merge(T entity);
-
-	public T saveAndRefresh(T entity);
-
-	public void refresh(T entity);
+	EntityManager getEntityManager();
 	
-	public Class<T> getDomainClass();
+	/**
+	 * Get the domain type class
+	 * @return the domain type class
+	 */
+	Class<T> getDomainClass();
 
-	public Metadatum addMetadatum(ID subjectId, String predicate, String object);
+	/**
+	 * Retrieves a container holding the entity in case of an id match or nothing (i.e. null) otherwise.
+	 * @param id must not be {@literal null}.
+	 * @return the container
+	 * @throws IllegalArgumentException if {@code id} is {@literal null}
+	 */
+	Optional<T> findOptional(ID id);
+	
+	/**
+	 * Flushes all pending changes to the database.
+	 */
+	void flush();
 
-	public List<Metadatum> addMetadata(ID subjectId, Map<String, String> metadata);
+	/**
+	 * Deletes the given entities in a batch which means it will create a single {@link Query}. Assume that we will clear
+	 * the {@link javax.persistence.EntityManager} after the call.
+	 * 
+	 * @param entities
+	 */
+	void deleteInBatch(Iterable<T> entities);
 
-	public void removeMetadatum(ID subjectId, String predicate);
+	/**
+	 * Deletes all entites in a batch call.
+	 */
+	void deleteAllInBatch();
 
-	public Metadatum findMetadatum(ID subjectId, String predicate);
+	/**
+	 * Returns a reference to the entity with the given identifier.
+	 * 
+	 * @param id must not be {@literal null}.
+	 * @return a reference to the entity with the given identifier.
+	 * @see EntityManager#getReference(Class, Object)
+	 */
+	T getOne(ID id);
+
+	
+	/**
+	 * @param entity
+	 * @return
+	 */
+	T merge(T entity);
+
+
+	/**
+	 * @see javax.persistence.EntityManager.refresh(T)
+	 * @param entity
+	 */
+	void refresh(T entity);
+
+	/**
+	 * @see javax.persistence.EntityManager.persist(T)
+	 * @param entity
+	 */
+	T persist(T entity);
+
+	Metadatum addMetadatum(ID subjectId, String predicate, String object);
+
+	List<Metadatum> addMetadata(ID subjectId, Map<String, String> metadata);
+
+	void removeMetadatum(ID subjectId, String predicate);
+
+	Metadatum findMetadatum(ID subjectId, String predicate);
 	
 	/** 
 	 * Get the entity's file uploads for this property
@@ -68,5 +123,6 @@ public interface ModelRepository<T, ID extends Serializable> extends JpaReposito
 	 * @param propertyName the property holding the upload(s)
 	 * @return the uploads
 	 */
-	public List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName);
+	List<BinaryFile> getUploadsForProperty(ID subjectId, String propertyName);
+
 }

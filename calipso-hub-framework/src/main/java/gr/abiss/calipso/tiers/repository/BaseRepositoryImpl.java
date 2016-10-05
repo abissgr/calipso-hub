@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -45,8 +46,7 @@ import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
-public class BaseRepositoryImpl<T, ID extends Serializable> extends
-		SimpleJpaRepository<T, ID> implements ModelRepository<T, ID> {
+public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements ModelRepository<T, ID> {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BaseRepositoryImpl.class);
@@ -64,6 +64,9 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		this.domainClass = domainClass;
 	}
 
+	/***
+	 * t {@inheritDoc} 
+	 */
 	@Override
 	public Class<T> getDomainClass() {
 		return this.domainClass;
@@ -77,13 +80,25 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		return this.entityManager;
 	}
 
-	
+
 	
 	@Override
 	public T merge(T entity) {
 		return this.getEntityManager().merge(entity);
 	}
+	
+	@Override
+	public T persist(T entity) {
+		this.getEntityManager().persist(entity);
+		return entity;
+	}
 
+	public Optional<T> findOptional(ID id){
+		return Optional.ofNullable(this.findOne(id));
+	}
+	
+	
+	
 	@Override
 	public Metadatum addMetadatum(ID subjectId, String predicate, String object) {
 		Map<String, String> metadata = new HashMap<String, String>();
@@ -211,12 +226,12 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends
 		this.getEntityManager().refresh(entity);
 	}
 
-	@Override
-	public T saveAndRefresh(T entity) {
-		entity = this.save(entity);
-		this.getEntityManager().refresh(entity);
-		return entity;
-	}
+//	@Override
+//	public T saveAndRefresh(T entity) {
+//		entity = this.save(entity);
+//		this.getEntityManager().refresh(entity);
+//		return entity;
+//	}
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {

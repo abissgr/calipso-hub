@@ -1,29 +1,19 @@
 package gr.abiss.calipso.friends.model;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Persistable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
@@ -32,13 +22,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * A model representing a directional connection between two users. An
- * additional record with status INVERSE exists for each record with status
- * ACCEPTED. TODO: Refactor to Embeddable component
+ * A model representing a directional connection between two users. 
  * 
  */
 @Entity
-@IdClass(FriendshipId.class)
 @Table(name = "friendship")
 @ModelResource(path = Friendship.API_PATH, apiName = "Friendships", apiDescription = "Operations about friendships")
 @ApiModel(value = "Friendship", description = "A model representing a directional connection between two users. ")
@@ -48,77 +35,104 @@ public class Friendship implements CalipsoPersistable<FriendshipId> {
 	private static final long serialVersionUID = 1L;
 
 	public static final String API_PATH = "friendships";
-
-	@Id
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
-	@NotNull
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "request_sender", nullable = false, updatable = false)
-	private User requestSender;
-
-	@Id
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
-	@NotNull
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "request_recipient", nullable = false, updatable = false)
-	private User requestRecipient;
-
-	@ApiModelProperty(required = true, example = "{id: \"ACCEPTED\"}")
+	
+	@EmbeddedId
+	@ApiModelProperty(required = true)
+	private FriendshipId id;
+	
+	@ApiModelProperty(required = true, allowableValues = "NEW, CONFIRMED, BLOCK, DELETE")
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
-	private FriendshipStatus status = FriendshipStatus.PENDING;
+	private FriendshipStatus status = FriendshipStatus.NEW;
+
+	@JsonIgnore
+	@Formula(" (status) ")
+	private String previousStatus;
 
 	public Friendship() {
 	}
 
-
-
-	public Friendship(User requestSender, User requestRecipient) {
-		this.requestSender = requestSender;
-		this.requestRecipient = requestRecipient;
+	public Friendship(FriendshipId id) {
+		this.id = id;
+	}
+	
+	public Friendship(FriendshipStatus status) {
+		this.status = status;
+	}
+	
+	public Friendship(FriendshipId id, FriendshipStatus status) {
+		this(id);
+		this.status = status;
 	}
 
-
+	public Friendship(User sender, User recipient) {
+		this.id = new FriendshipId(sender, recipient);
+	}
 
 	@Override
-	public FriendshipId getId() {
-		return new FriendshipId(this.getRequestSender().getId(), this.getRequestRecipient().getId());
+	public String toString() {
+		return new ToStringBuilder(this)
+			.append("id", this.getId())
+			.append("status", this.getStatus())
+			.append("new", this.isNew())
+			.toString();
 	}
 
-
-	@Override
-	public void setId(FriendshipId id) {
-    	LOGGER.debug("setId: {}", id.toStringRepresentation());
+	@JsonIgnore
+	public FriendshipId getInverseId() {
+		FriendshipId thisId = this.getId();
+		return thisId != null ? new FriendshipId(thisId.getFriend(), thisId.getOwner()) : null;
 	}
-
+	
+	@JsonIgnore
 	@Override
 	public boolean isNew() {
-		return this.getRequestSender() == null;
+		return this.getPreviousStatus() != null;
 	}
 
-	public User getRequestSender() {
-		return requestSender;
+	/**
+	 * @return the id
+	 */
+	public FriendshipId getId() {
+		return id;
 	}
 
-	public void setRequestSender(User requestSender) {
-		this.requestSender = requestSender;
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(FriendshipId id) {
+		this.id = id;
 	}
 
-	public User getRequestRecipient() {
-		return requestRecipient;
-	}
-
-	public void setRequestRecipient(User requestRecipient) {
-		this.requestRecipient = requestRecipient;
-	}
-
+	/**
+	 * @return the status
+	 */
 	public FriendshipStatus getStatus() {
 		return status;
 	}
 
+	/**
+	 * @param status the status to set
+	 */
 	public void setStatus(FriendshipStatus status) {
 		this.status = status;
 	}
 
+	/**
+	 * @return the previousStatus
+	 */
+	public String getPreviousStatus() {
+		return previousStatus;
+	}
+
+	/**
+	 * @param previousStatus the previousStatus to set
+	 */
+	public void setPreviousStatus(String previousStatus) {
+		this.previousStatus = previousStatus;
+	}
+
+
+	
 }

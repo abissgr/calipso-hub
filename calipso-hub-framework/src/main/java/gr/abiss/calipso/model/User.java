@@ -221,7 +221,7 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	private List<Role> roles = new ArrayList<Role>(0);
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "requestSender")
+	@OneToMany(mappedBy = "id.owner")
 	private List<Friendship> friendships;
 	
 	@JsonIgnore

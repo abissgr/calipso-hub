@@ -23,9 +23,14 @@ public class UniqueConstraintViolationException extends RuntimeException{
 	@JsonIgnore
 	boolean complete;
 
+	public UniqueConstraintViolationException(String message){
+		this(message, (List<String>) null, false);
+	}
+
 	public UniqueConstraintViolationException(String message, List<String> errors){
 		this(message, errors, false);
 	}
+	
 	
 	public UniqueConstraintViolationException(String message, String error, boolean complete){
 		this(message, stringToList(error), false);

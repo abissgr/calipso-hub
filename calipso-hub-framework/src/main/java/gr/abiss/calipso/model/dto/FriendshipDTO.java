@@ -24,6 +24,7 @@ import javax.persistence.Column;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipId;
 import gr.abiss.calipso.friends.model.FriendshipStatus;
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.User.Builder;
@@ -32,33 +33,56 @@ import io.swagger.annotations.ApiModel;
 @ApiModel(value = "FriendshipDTO", description = "FriendshipDTO is a lightweight DTO version of Friendship")
 public class FriendshipDTO implements Serializable {
 
-	private UserDTO requestSender;
-	private UserDTO requestRecepient;
+
+	private static final long serialVersionUID = 1L;
+	private String id;
+	private UserDTO owner;
+	private UserDTO friend;
 	private FriendshipStatus status = FriendshipStatus.PENDING;
 	
 	public FriendshipDTO() {
 	}
 	
 	public FriendshipDTO(Friendship friendship){
-		this.requestSender = UserDTO.fromUser(friendship.getRequestSender());
-		this.requestRecepient = UserDTO.fromUser(friendship.getRequestRecipient());
+		FriendshipId id = friendship.getId();
+		if(id != null){
+			this.id = id.toStringRepresentation();
+			this.owner = UserDTO.fromUser(id.getOwner());
+			this.friend = UserDTO.fromUser(id.getFriend());
+		}
 		this.status = friendship.getStatus();
 	}
 
-	public UserDTO getRequestSender() {
-		return requestSender;
+	
+	
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
 	}
 
-	public void setRequestSender(UserDTO requestSender) {
-		this.requestSender = requestSender;
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public UserDTO getRequestRecepient() {
-		return requestRecepient;
+	public UserDTO getOwner() {
+		return owner;
 	}
 
-	public void setRequestRecepient(UserDTO requestRecepient) {
-		this.requestRecepient = requestRecepient;
+	public void setOwner(UserDTO owner) {
+		this.owner = owner;
+	}
+
+	public UserDTO getFriend() {
+		return friend;
+	}
+
+	public void setFriend(UserDTO friend) {
+		this.friend = friend;
 	}
 
 	public FriendshipStatus getStatus() {
