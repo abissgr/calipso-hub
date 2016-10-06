@@ -48,7 +48,7 @@ public class EnumStringPredicateFactory implements IPredicateFactory<Enum> {
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<Enum> fieldType,
 			String[] propertyValues) {
 		if (!fieldType.isEnum()) {
 			LOGGER.warn("Non-Enum type for property '" + propertyName + "': " + fieldType.getName() + ", class: " + fieldType.getClass());

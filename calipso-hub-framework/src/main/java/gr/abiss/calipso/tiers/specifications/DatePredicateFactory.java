@@ -37,7 +37,7 @@ public class DatePredicateFactory implements IPredicateFactory<Date> {
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<Date> fieldType,
 			String[] propertyValues) {
 		Predicate predicate = null;
 		if (!Date.class.isAssignableFrom(fieldType)) {

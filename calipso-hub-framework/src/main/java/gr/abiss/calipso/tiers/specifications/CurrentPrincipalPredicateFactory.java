@@ -39,7 +39,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * @see gr.abiss.calipso.tiers.annotation.CurrentPrincipalField
  * @see gr.abiss.calipso.tiers.specifications.GenericSpecifications
  */
-public class CurrentPrincipalPredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
+public class CurrentPrincipalPredicateFactory<F extends Serializable> implements IPredicateFactory<F> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CurrentPrincipalPredicateFactory.class);
 
@@ -53,14 +53,14 @@ public class CurrentPrincipalPredicateFactory<T extends Serializable> implements
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<F> fieldType,
 			String[] propertyValues) {
 		if (!AbstractPersistable.class.isAssignableFrom(fieldType)) {
 			LOGGER.warn("Non-Entity type for property '" + propertyName + "': " + fieldType.getName());
 		}
 		// ignore given values, enforce current principal
 		ICalipsoUserDetails userDetails = SecurityUtil.getPrincipal();
-		Path<T> parentId = root.<AbstractPersistable> get(propertyName).<T> get("id");
+		Path<F> parentId = root.<AbstractPersistable> get(propertyName).<F> get("id");
 
 		LOGGER.info("Creating predicate for current principal: " + userDetails);
 		Predicate predicate = cb.equal(parentId, userDetails.getId());

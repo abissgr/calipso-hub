@@ -18,6 +18,7 @@
 package gr.abiss.calipso.tiers.specifications;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
@@ -29,10 +30,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+
 /**
- * A predicates for many2one members implementing org.springframework.data.domain.Persistable
+ * A predicates for members that are Many2one/OneToOne or members
+ * annotated with {@link javax.persistence.Embedded} or {@link javax.persistence.EmbeddedId}
  */
-public class AnyToOnePredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
+public class AnyToOnePredicateFactory<F extends Serializable> implements IPredicateFactory<F> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePredicateFactory.class);
 
@@ -45,18 +49,42 @@ public class AnyToOnePredicateFactory<T extends Serializable> implements IPredic
 	 *      javax.persistence.criteria.CriteriaBuilder, java.lang.String,
 	 *      java.lang.Class, java.lang.String[])
 	 */
+	
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
-			String[] propertyValues) {
-		if (!Persistable.class.isAssignableFrom(fieldType)) {
-			LOGGER.warn("Non-Entity type for property '" + propertyName + "': " + fieldType.getName());
-		}
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<F> fieldType, String[] propertyValues) {
 
 		Predicate predicate = null;
-		if (propertyValues.length > 0) {
-			Path<T> parentId = root.<AbstractPersistable> get(propertyName).<T> get("id");
-			predicate = cb.equal(parentId, propertyValues[0]);
+		try {
+			LOGGER.info("getPredicate, propertyName: {}, nroot: {}", propertyName, root);
+			if (!CalipsoPersistable.class.isAssignableFrom(fieldType)) {
+				LOGGER.warn("Non-Entity type for property '" + propertyName + "': " + fieldType.getName());
+			}
+
+			if (propertyValues.length > 0) {
+				Path<F> parentId = root.<F> get(propertyName).<F> get("id");
+				predicate = cb.equal(parentId, propertyValues[0]);
+			} else {
+
+				String[] pathSteps = propertyName.split("\\.");
+				Path<F> basePath = root.<F> get(pathSteps[0]);
+				Path targetPath;
+				String step;
+				for (int i = 1; i < pathSteps.length - 2; i++) {
+					LOGGER.info("getPredicate, prepare to add path step: {}, new basePath:: {}, root:" + 
+							root, pathSteps[i],	basePath);
+					step = pathSteps[i];
+					Field subField = fieldType.getField(step);
+					LOGGER.info("getPredicate,subField: {}", subField);
+					targetPath = basePath.<Persistable> get(step);//.as(subField.getType());
+				}
+				Path<Serializable> targetProperty = basePath.<Serializable> get(pathSteps[pathSteps.length - 1]);
+				predicate = cb.equal(targetProperty, propertyValues[0]);
+			}
+		} catch (NoSuchFieldException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
 		return predicate;
 	}
 }

@@ -42,7 +42,7 @@ public class StringPredicateFactory implements IPredicateFactory<String> {
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<String> fieldType,
 			String[] propertyValues) {
 		if (!fieldType.equals(String.class)) {
 			LOGGER.warn("Non-String type for property '" + propertyName + "': " + fieldType.getName());

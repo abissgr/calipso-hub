@@ -35,8 +35,7 @@ public class BooleanPredicateFactory implements IPredicateFactory<Boolean> {
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
-			String[] propertyValues) {
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<Boolean> fieldType, 	String[] propertyValues) {
 		Predicate predicate = null;
 		if (!Boolean.class.isAssignableFrom(fieldType)) {
 			throw new IllegalArgumentException(fieldType

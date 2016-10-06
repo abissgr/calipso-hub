@@ -29,13 +29,13 @@ import io.swagger.annotations.ApiModelProperty;
  * Composite primary key for {@Friendship}
  */
 
-@Embeddable
 @ApiModel(value = "FriendshipId", description = "An {@link javax.persistence;Embeddable} JPA composite key. "
 		+ "The custom implementatin provides supplort to all relevant de)serialization components "
 		+ "(JSON, request mappings, path/param variables etc.) " + "for both [ownerId" + FriendshipId.SPLIT_CHAR
 		+ "friendId]" + " and [friendId] string representations.")
 @JsonSerialize(using = FriendshipIdSerializer.class)
 @JsonDeserialize(using = FriendshipIdDeserializer.class)
+@Embeddable
 public class FriendshipId implements Serializable {
 
 	static final String SPLIT_CHAR = "_";
@@ -46,16 +46,16 @@ public class FriendshipId implements Serializable {
 
 	public static final String EMPTY = "";
 
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
 	@NotNull
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ApiModelProperty(required = true, example = "{id: '[id]'}")
 	@JoinColumn(name = "owner", nullable = false, updatable = false)
+	@ManyToOne(optional = false)
 	private User owner;
 
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
 	@NotNull
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "inverse_user", nullable = false, updatable = false)
+	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@JoinColumn(name = "user", nullable = false, updatable = false)
+	@ManyToOne(optional = false)
 	private User friend;
 
 	public FriendshipId() {

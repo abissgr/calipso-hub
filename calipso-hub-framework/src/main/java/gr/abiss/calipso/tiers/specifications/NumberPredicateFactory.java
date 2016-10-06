@@ -24,16 +24,16 @@ import javax.persistence.criteria.Root;
 import org.springframework.data.domain.Persistable;
 import org.springframework.util.NumberUtils;
 
-public class NumberPredicateFactory<T extends Number> implements IPredicateFactory<T> {
+public class NumberPredicateFactory<F extends Number> implements IPredicateFactory<F> {
 
-	private final Class<T> type;
+	private final Class<F> type;
 
 	@SuppressWarnings("unused")
 	private NumberPredicateFactory() {
 		this.type = null;
 	}
 
-	public NumberPredicateFactory(Class<T> type) {
+	public NumberPredicateFactory(Class<F> type) {
 		this.type = type;
 	}
 
@@ -43,7 +43,7 @@ public class NumberPredicateFactory<T extends Number> implements IPredicateFacto
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<F> fieldType,
 			String[] propertyValues) {
 		Predicate predicate = null;
 		if (!Number.class.isAssignableFrom(fieldType)) {
@@ -51,12 +51,12 @@ public class NumberPredicateFactory<T extends Number> implements IPredicateFacto
 		}
 
 		if (propertyValues.length == 1) {
-			predicate = cb.equal(root.<T> get(propertyName), propertyValues[0]);
+			predicate = cb.equal(root.<F> get(propertyName), propertyValues[0]);
 		} else if (propertyValues.length == 2) {
-			T from = NumberUtils.parseNumber(propertyValues[0], this.type);
-			T to = NumberUtils.parseNumber(propertyValues[1], this.type);
-			Predicate predicate1 = cb.ge(root.<T> get(propertyName), from);
-			Predicate predicate2 = cb.le(root.<T> get(propertyName), to);
+			F from = NumberUtils.parseNumber(propertyValues[0], this.type);
+			F to = NumberUtils.parseNumber(propertyValues[1], this.type);
+			Predicate predicate1 = cb.ge(root.<F> get(propertyName), from);
+			Predicate predicate2 = cb.le(root.<F> get(propertyName), to);
 			predicate = cb.and(predicate1, predicate2);
 			// criteriaQuery.where(criteriaBuilder.and(predicate1,
 			// predicate2));

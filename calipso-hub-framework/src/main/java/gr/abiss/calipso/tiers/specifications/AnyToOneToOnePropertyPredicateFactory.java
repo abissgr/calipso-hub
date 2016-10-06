@@ -32,7 +32,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 /**
  * A predicates for many2one members implementing org.springframework.data.domain.Persistable
  */
-public class AnyToOneToOnePropertyPredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
+public class AnyToOneToOnePropertyPredicateFactory<F extends Serializable> implements IPredicateFactory<F> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOneToOnePropertyPredicateFactory.class);
 
@@ -46,7 +46,7 @@ public class AnyToOneToOnePropertyPredicateFactory<T extends Serializable> imple
 	 *      java.lang.Class, java.lang.String[])
 	 */
 	@Override
-	public Predicate getPredicate(Root<Persistable> root, CriteriaBuilder cb, String propertyName, Class fieldType,
+	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<F> fieldType,
 			String[] propertyValues) {
 		LOGGER.info("getPredicate, propertyName: " + propertyName + ", propertyValues: " + propertyValues);
 
@@ -58,7 +58,7 @@ public class AnyToOneToOnePropertyPredicateFactory<T extends Serializable> imple
 				basePath = basePath.<Persistable> get(pathSteps[i]);
 				LOGGER.info("getPredicate, adding path step: " + pathSteps[i] + ", new basePath: " + basePath);
 			}
-			//Path<T> parentId = basePath.<T> get("id");
+			//Path<F> parentId = basePath.<F> get("id");
 			predicate = cb.equal(basePath, propertyValues[0]);
 		}
 		return predicate;

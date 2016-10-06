@@ -17,8 +17,6 @@
  */
 package gr.abiss.calipso.tiers.repository;
 
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-
 import java.io.Serializable;
 
 import javax.persistence.EntityManager;
@@ -48,12 +46,10 @@ extends JpaRepositoryFactoryBean<R, T, I> {
 			this.entityManager = entityManager;
 		}
 
+
 		@Override
 		protected Object getTargetRepository(RepositoryMetadata metadata) {
-			// return new BaseRepositoryImpl<T, I>((Class<T>)
-			// metadata.getDomainClass(), entityManager);
-			return new BaseRepositoryImpl<T, I>(
-					(Class<T>) metadata.getDomainType(), entityManager);
+			return new BaseRepositoryImpl<T, I>((Class<T>) metadata.getDomainType(), entityManager);
 		}
 
 		@Override

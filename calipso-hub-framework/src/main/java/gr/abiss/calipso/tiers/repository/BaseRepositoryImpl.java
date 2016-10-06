@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -43,25 +44,30 @@ import org.springframework.util.CollectionUtils;
 import gr.abiss.calipso.model.cms.BinaryFile;
 import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.interfaces.Metadatum;
-import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
+import gr.abiss.calipso.tiers.specifications.SpecificationsBuilder;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
 public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements ModelRepository<T, ID> {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(BaseRepositoryImpl.class);
 
-	private final EntityManager entityManager;
-	private final Class<T> domainClass;
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseRepositoryImpl.class);
 
-	// There are two constructors to choose from, either can be used.
+	private SpecificationsBuilder<T, ID> specificationsBuilder;
+	private EntityManager entityManager;
+	private Class<T> domainClass;
+	
+	
+	/**
+	 * Creates a new {@link SimpleJpaRepository} to manage objects of the given {@link JpaEntityInformation}.
+	 * 
+	 * @param entityInformation must not be {@literal null}.
+	 * @param entityManager must not be {@literal null}.
+	 */
 	public BaseRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {
 		super(domainClass, entityManager);
-
-		// This is the recommended method for accessing inherited class
-		// dependencies.
 		this.entityManager = entityManager;
 		this.domainClass = domainClass;
+		this.specificationsBuilder = new SpecificationsBuilder<T, ID>(this.domainClass);
 	}
 
 	/***
@@ -226,22 +232,15 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 		this.getEntityManager().refresh(entity);
 	}
 
-//	@Override
-//	public T saveAndRefresh(T entity) {
-//		entity = this.save(entity);
-//		this.getEntityManager().refresh(entity);
-//		return entity;
-//	}
-
 	@Override
 	public Page<T> findAll(Pageable pageable) {
-		// if 
+		// if
 		if (pageable instanceof ParameterMapBackedPageRequest) {
 			@SuppressWarnings("unchecked")
-			Specification<T> spec = (Specification<T>) GenericSpecifications.matchAll(
-					getDomainClass(),
-					((ParameterMapBackedPageRequest) pageable)
-							.getParameterMap());
+
+			Specification<T> spec = this.specificationsBuilder.getMatchAll(getDomainClass(), 
+					((ParameterMapBackedPageRequest) pageable).getParameterMap());
+
 			return super.findAll(spec, pageable);
 		} else {
 			return super.findAll(pageable);
