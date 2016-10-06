@@ -374,16 +374,7 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		
 		// fallback to gravatar 
 		if(StringUtils.isBlank(this.getAvatarUrl())){
-			try {
-
-				this.setAvatarUrl(new StringBuffer(Constants.GRAVATAR_BASE_IMG_URL)
-						.append(this.getEmailHash())
-						.append("?d=")
-						.append(URLEncoder.encode(Constants.DEFAULT_AVATAR_URL, CharEncoding.UTF_8))
-						.toString());
-			} catch (UnsupportedEncodingException e) {
-				LOGGER.error("Failed encoding avatar url");
-			}
+			initDefaultAvatarUrl();
 		}
 
 	}
@@ -905,5 +896,27 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		this.redirectUrl = builder.redirectUrl;
 		this.roles = builder.roles;
 		this.friendships = builder.friendships;
+	}
+	
+	/**
+	 * Use Gravatar only if application is running on port 80 
+	 * @see http://en.gravatar.com/site/implement/images/#default-image
+	 */
+	protected void initDefaultAvatarUrl() {
+		try {
+			// only enable gravatar if on port 80
+			if(Constants.ON_CUSTOM_PORT){
+				this.setAvatarUrl(Constants.DEFAULT_AVATAR_URL);
+			}
+			else{
+				this.setAvatarUrl(new StringBuffer(Constants.GRAVATAR_BASE_IMG_URL)
+						.append(this.getEmailHash())
+						.append("?d=")
+						.append(URLEncoder.encode(Constants.DEFAULT_AVATAR_URL, CharEncoding.UTF_8))
+						.toString());
+			}
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.error("Failed encoding avatar url");
+		}
 	}
 }

@@ -21,6 +21,9 @@ public class Constants {
 
 	public static final String REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME = "calipso-sso";
 	public static final String BASE_URL = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.BASE_URL);
+	public static final String DOMAIN = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.DOMAIN);
+
+	public static final boolean ON_CUSTOM_PORT = BASE_URL.contains(DOMAIN + ":");
 	public static final String GRAVATAR_BASE_IMG_URL = "https://www.gravatar.com/avatar/";
 
 	public static final String DEFAULT_AVATAR_URL =  BASE_URL + "/img/blank-profile.jpg";

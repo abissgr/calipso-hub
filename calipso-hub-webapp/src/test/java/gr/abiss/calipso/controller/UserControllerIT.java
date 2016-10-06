@@ -54,7 +54,9 @@ public class UserControllerIT extends AbstractControllerIT {
 					.email("ittestreg@UserControllerIT.evasyst.com")
 					.build())
 				.post("/calipso/api/rest/users")
-				.then().assertThat()
+				.then()
+				.log().all()
+				.assertThat()
 				// test assertions
 				.body("id", notNullValue())
 				// get model
