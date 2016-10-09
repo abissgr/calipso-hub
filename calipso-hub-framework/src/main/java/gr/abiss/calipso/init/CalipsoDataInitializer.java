@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserCredentials;
 import gr.abiss.calipso.model.geography.Continent;
 import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.repository.RoleRepository;
@@ -49,6 +50,7 @@ import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.service.cms.TextService;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 
 
@@ -63,6 +65,7 @@ public class CalipsoDataInitializer {
 	private CountryRepository countryRepository;
 	private RoleRepository roleRepository;
 	private UserRepository userRepository;
+	private ModelRepository<UserCredentials, String> credentialsRepository;
 
 	@Autowired
 	public void setUserService(UserService userService) {
@@ -93,6 +96,13 @@ public class CalipsoDataInitializer {
 	public void setUserRepository(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
+	
+	@Autowired
+	public void setCredentialsRepository(ModelRepository<UserCredentials, String> credentialsRepository) {
+		this.credentialsRepository = credentialsRepository;
+	}
+	
+	
 
 	@PostInitialize(order = 10)
 	@Transactional(readOnly = false)
@@ -138,42 +148,39 @@ public class CalipsoDataInitializer {
 			// textService.create(t3);
 
 			User system = new User();
+			system.setActive(false);
 			system.setEmail("system@abiss.gr");
 			system.setFirstName("System");
 			system.setLastName("User");
 			system.setUsername("system");
-			system.setPassword("system");
 			system.setLastVisit(now);
-			system.setActive(false);
-			system.setInactivationDate(now);
-			system.setInactivationReason("System user cannot login");
-			system = userService.createActive(system);
+			system = userService.createTest(system);
 
 			// login
 			SecurityContextHolder.getContext().setAuthentication(
-					new UsernamePasswordAuthenticationToken(system, system.getPassword(), system.getRoles()));
+					new UsernamePasswordAuthenticationToken(system, system.getCredentials().getPassword(), system.getRoles()));
 
 			User adminUser = new User();
+			adminUser.setActive(true);
 			adminUser.setEmail("info@abiss.gr");
 			adminUser.setFirstName("Admin");
 			adminUser.setLastName("User");
 			adminUser.setUsername("admin");
-			adminUser.setPassword("admin");
 			adminUser.setLastVisit(now);
 			adminUser.addRole(adminRole);
 //			adminUser.setCreatedBy(system);
-			adminUser = userService.createActive(adminUser);
+			adminUser = userService.createTest(adminUser);
 
 			User opUser = new User();
+			opUser.setActive(true);
 			opUser.setEmail("operator@abiss.gr");
 			opUser.setFirstName("Operator");
 			opUser.setLastName("User");
 			opUser.setUsername("operator");
-			opUser.setPassword("operator");
 			opUser.setLastVisit(now);
 			opUser.addRole(adminRole);
 //			opUser.setCreatedBy(system);
-			opUser = userService.createActive(opUser);
+			opUser = userService.createTest(opUser);
 
 			int usersMax =  10;
 			int usersCreated = 0;
@@ -181,14 +188,15 @@ public class CalipsoDataInitializer {
 				for (String fullName : this.getTenNames()) {
 					String userName = fullName.toLowerCase().replace(" ", "") + usersCreated;
 					User u = new User();
+					u.setActive(true);
 					u.setEmail(userName + "@abiss.gr");
 					u.setFirstName(fullName.substring(0, fullName.indexOf(" ")));
 					u.setLastName(fullName.substring(fullName.indexOf(" ") + 1));
 					u.setUsername(userName);
-					u.setPassword(userName);
 					u.setLastVisit(now);
 //					u.setCreatedBy(system);
-					u = userService.createActive(u);
+					u = userService.createTest(u);
+					
 					usersCreated++;
 					LOGGER.info("Created user: " + u);
 					if(usersCreated >= usersMax){
@@ -210,6 +218,7 @@ public class CalipsoDataInitializer {
 		
 
 	}
+
 
 	private void initRoles() {
 		if (this.roleRepository.count() == 0) {

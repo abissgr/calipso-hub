@@ -17,17 +17,15 @@
  */
 package gr.abiss.calipso.userDetails.service.impl;
 
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.userDetails.integration.LocalUserService;
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
 import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
-import gr.abiss.calipso.userDetails.util.SocialMediaService;
 
 import java.io.Serializable;
 import java.util.List;
@@ -55,7 +53,6 @@ import org.springframework.social.connect.ConnectionSignUp;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.linkedin.api.LinkedIn;
 import org.springframework.social.linkedin.api.LinkedInProfile;
@@ -79,7 +76,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	private StringKeyGenerator keyGenerator = KeyGenerators.string();
 
-	private LocalUserService<? extends Serializable, ? extends LocalUser> localUserService;
+	private UserService userService;
 	
 	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {
@@ -87,16 +84,15 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Autowired(required = true)
-	@Qualifier("localUserService") // somehow required for CDI to work on 64bit JDK?
-	public void setLocalUserService(
-			LocalUserService<? extends Serializable, ? extends LocalUser> localUserService) {
-		this.localUserService = localUserService;
+	@Qualifier("userService") // somehow required for CDI to work on 64bit JDK?
+	public void setUserService(UserService userService) {
+		this.userService = userService;
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void updateLastLogin(ICalipsoUserDetails u){
-		this.localUserService.updateLastLogin(u);
+		this.userService.updateLastLogin(u);
 	}
 	
 	/**
@@ -112,7 +108,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("loadUserByUsername using: " + findByUsernameOrEmail);
 		}
-		LocalUser user = this.localUserService.findByUserNameOrEmail(findByUsernameOrEmail);
+		User user = this.userService.findByUserNameOrEmail(findByUsernameOrEmail);
 
 
 		if(LOGGER.isDebugEnabled()){
@@ -159,18 +155,18 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 						&& StringUtils.isNotBlank(password)) {
 
 					// ask for the corresponding persisted user
-					LocalUser localUser = this.localUserService
+					User user = this.userService
 							.findByCredentials(usernameOrEmail, password,
 									metadata);
 					if(LOGGER.isDebugEnabled()){
-						LOGGER.debug("create, Matched local user: "+localUser);
+						LOGGER.debug("create, Matched local user: "+user);
 					}
-					if(localUser != null && localUser.getId() != null){
+					if(user != null && user.getId() != null){
 						if(LOGGER.isDebugEnabled()){
-							LOGGER.debug("create, Creating user details from localUser...");
+							LOGGER.debug("create, Creating user details from user...");
 						}
 						// convert to UserDetails if not null
-						userDetails = UserDetails.fromUser(localUser);
+						userDetails = UserDetails.fromUser(user);
 					}
 					
 				}
@@ -188,9 +184,9 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 //		LOGGER.debug("confirmPrincipal confirmationToken: " +  confirmationToken);
 //		Assert.notNull(confirmationToken);
 //		ICalipsoUserDetails userDetails = null;
-//		LocalUser localUser = this.localUserService.confirmPrincipal(confirmationToken);
+//		User user = this.userService.confirmPrincipal(confirmationToken);
 //		// convert to UserDetals if not null
-//		userDetails = UserDetails.fromUser(localUser);
+//		userDetails = UserDetails.fromUser(user);
 //		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
 //		if(LOGGER.isDebugEnabled()){
 //			LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
@@ -201,7 +197,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	@Transactional(readOnly = false)
 	public void handlePasswordResetRequest(String usernameOrEmail) {
-		this.localUserService.handlePasswordResetRequest(usernameOrEmail);
+		this.userService.handlePasswordResetRequest(usernameOrEmail);
 	}
 
 	@Override
@@ -211,14 +207,14 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		String token = userDetails.getResetPasswordToken();
 		String newPassword = userDetails.getPassword();
 		Assert.notNull(userNameOrEmail);
-		LocalUser localUser = this.localUserService.handlePasswordResetToken(
+		User user = this.userService.handlePasswordResetToken(
 				userNameOrEmail, token, newPassword);
-		if (localUser == null) {
+		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
-		localUser.setResetPasswordToken(null);
-		localUser.setPassword(newPassword);
-		userDetails = UserDetails.fromUser(localUser);
+		user.getCredentials().setResetPasswordToken(null);
+		user.getCredentials().setPassword(newPassword);
+		userDetails = UserDetails.fromUser(user);
 		// LOGGER.info("create returning loggedInUserDetails: " +
 		// loggedInUserDetails);
 		return userDetails;
@@ -230,16 +226,16 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	}
 
 	@Override
-	public LocalUser getPrincipalLocalUser() {
+	public User getPrincipalLocalUser() {
 		ICalipsoUserDetails principal = getPrincipal();
-		LocalUser user = null;
+		User user = null;
 		if (principal != null) {
 			String username = principal.getUsername();
 			if(StringUtils.isBlank(username)){
 				username = principal.getEmail();
 			}
 			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
-				user = this.localUserService.findByUserNameOrEmail(username);
+				user = this.userService.findByUserNameOrEmail(username);
 			}
 		}
 
@@ -252,7 +248,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	@Transactional(readOnly = false)
 	public ICalipsoUserDetails update(ICalipsoUserDetails resource) {
-		LocalUser user = this.localUserService.changePassword(resource.getEmailOrUsername(), resource.getCurrentPassword(), resource.getPassword(), resource.getPasswordConfirmation());
+		User user = this.userService.changePassword(resource.getEmailOrUsername(), resource.getCurrentPassword(), resource.getPassword(), resource.getPasswordConfirmation());
 		return UserDetails.fromUser(user);
 	}
 
@@ -305,7 +301,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		ICalipsoUserDetails userDetails = null;
 
 		// LOGGER.info("loadUserByUserId using: " + userId);
-		LocalUser user = this.localUserService.findByUserNameOrEmail(userId);
+		User user = this.userService.findByUserNameOrEmail(userId);
 
 		// LOGGER.info("loadUserByUserId user: " + user);
 		if (user != null) {
@@ -337,10 +333,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		String socialFirstName = profile.getFirstName();
 		String socialLastName = profile.getLastName();
 
-		LocalUser user = this.getPrincipalLocalUser();
+		User user = this.getPrincipalLocalUser();
 		
 		if (!StringUtils.isBlank(socialEmail)) {
-			user = localUserService.findByUserNameOrEmail(socialEmail);
+			user = userService.findByUserNameOrEmail(socialEmail);
 			// 
 
 			if (user == null) {
@@ -348,17 +344,15 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					LOGGER.debug("ConnectionSignUp#execute, Email did not match an local user, trying to create one");
 				}
 
-				user = new SimpleLocalUser();
-				user.setActive(true);
+				user = new User();
 				user.setEmail(socialEmail);
 				user.setUsername(socialEmail);
 				user.setFirstName(socialFirstName);
 				user.setLastName(socialLastName);
-				user.setPassword(UUID.randomUUID().toString());
 				try {
-					user = localUserService.createForImplicitSignup(user);
+					user = userService.createForImplicitSignup(user);
 					
-					//localUsername = user.getUsername();
+					//username = user.getUsername();
 				} catch (DuplicateEmailException e) {
 					LOGGER.error("ConnectionSignUp#executeError while implicitly registering user", e);
 				}
@@ -370,7 +364,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				LOGGER.debug("ConnectionSignUp#execute, Social email was not accessible, unable to implicitly sign in user");
 			}
 		}
-		//localUserService.createAccount(account);
+		//userService.createAccount(account);
 		String result = user != null && user.getId() != null ? user.getId().toString() : null;
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("ConnectionSignUp#execute, returning result: "+result); 
@@ -386,9 +380,9 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	public String signIn(String userId, Connection<?> connection, NativeWebRequest request) {
 		LOGGER.info("signIn, userId: " + userId);
 
-		LocalUser user = this.localUserService.findById(userId);
+		User user = this.userService.findById(userId);
 		if(user == null){
-			user = this.localUserService.findByUserNameOrEmail(userId);
+			user = this.userService.findByUserNameOrEmail(userId);
 		}
 		//if(LOGGER.isDebugEnabled()){
 			LOGGER.info("SignInAdapter#signIn userId: " + userId + ", connection: " + connection.getKey() + ", mached user: " + user);
@@ -401,10 +395,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 	@Override
 	public ICalipsoUserDetails createForImplicitSignup(
-			LocalUser localUser) throws DuplicateEmailException {
-		LOGGER.info("createForImplicitSignup, localUser: " + localUser);
+			User user) throws DuplicateEmailException {
+		LOGGER.info("createForImplicitSignup, user: " + user);
 		ICalipsoUserDetails userDetails = UserDetails
-				.fromUser(this.localUserService	.createForImplicitSignup(localUser));
+				.fromUser(this.userService.createForImplicitSignup(user));
 		return userDetails;
 	}
 

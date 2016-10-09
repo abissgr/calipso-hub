@@ -16,15 +16,15 @@
         	th:if="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
-        <p th:text="#{email.token.is(${user.getResetPasswordToken()})} ">
+        <p th:text="#{email.token.is(${user.getCredentials().getResetPasswordToken()})} ">
         Your confirmation token is:
         </p>
         <p th:text="#{email.accountconfirmation.clicklinktoconfirm}">
         Click the following link to confirm your email address and enable your account:
         </p>
         <p>
-            <a th:href="@{#{email.passwordreset.link(${baseUrl}, ${user.getUsername()}, ${user.getResetPasswordToken()})}}"
-             th:text="#{email.passwordreset.link(${baseUrl}, ${user.getUsername()}, ${user.getResetPasswordToken()})}"> </a>
+            <a th:href="@{#{email.passwordreset.link(${baseUrl}, ${user.getUsername()}, ${user.getCredentials().getResetPasswordToken()})}}"
+             th:text="#{email.passwordreset.link(${baseUrl}, ${user.getUsername()}, ${user.getCredentials().getResetPasswordToken()})}"> </a>
         </p>
         <p class="greetings">
         	&emsp;Regards, <br />

@@ -17,6 +17,8 @@
  */
 package gr.abiss.calipso.userDetails.controller;
 
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserCredentials;
 import gr.abiss.calipso.userDetails.controller.form.RegistrationForm;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
@@ -184,12 +186,13 @@ public class ProviderSignInController extends org.springframework.social.connect
 		ICalipsoUserDetails registered = null;
 
 		try {
-			SimpleLocalUser user = new SimpleLocalUser();
+			User user = new User();
 			user.setEmail(userAccountData.getEmail());
 			user.setFirstName(userAccountData.getFirstName());
 			user.setLastName(userAccountData.getLastName());
 			user.setUsername(userAccountData.getUserName());
-			user.setPassword(userAccountData.getPassword());
+			user.setCredentials(new UserCredentials());
+			user.getCredentials().setPassword(userAccountData.getPassword());
 
 			registered = userService.createForImplicitSignup(user);
 		} catch (DuplicateEmailException ex) {

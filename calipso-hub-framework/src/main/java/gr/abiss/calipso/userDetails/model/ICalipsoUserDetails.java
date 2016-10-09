@@ -17,10 +17,7 @@
  */
 package gr.abiss.calipso.userDetails.model;
 
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-
 import java.security.Principal;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +26,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import gr.abiss.calipso.model.User;
 
 @JsonDeserialize(as=UserDetails.class)
 public interface ICalipsoUserDetails extends SocialUserDetails, Principal {
@@ -138,7 +137,7 @@ public interface ICalipsoUserDetails extends SocialUserDetails, Principal {
 	
 	public void setNotificationCount(Long notificationCount);
 
-	LocalUser getUser();
+	User getUser();
 
 	void setCellphone(String cellphone);
 

@@ -35,6 +35,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -54,26 +55,19 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.fs.FilePersistence;
 import gr.abiss.calipso.fs.FilePersistencePreview;
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.entities.AbstractMetadataSubject;
 import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.model.interfaces.MetadataSubject;
 import gr.abiss.calipso.model.metadata.UserMetadatum;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.uischema.annotation.FormSchemaEntry;
 import gr.abiss.calipso.uischema.annotation.FormSchemas;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.utils.Constants;
 import gr.abiss.calipso.utils.MD5Utils;
-import gr.abiss.calipso.websocket.message.IMessageResource;
 import gr.abiss.calipso.websocket.model.StompSession;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -86,7 +80,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Human users")
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends AbstractMetadataSubject<UserMetadatum> implements LocalUser, CalipsoPersistable<String> {
+public class User extends AbstractMetadataSubject<UserMetadatum> implements CalipsoPersistable<String> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 	private static final long serialVersionUID = -7942906897981646998L;
@@ -96,7 +90,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	public static final String PRE_AUTHORIZE_PATCH = "isAuthenticated()";
 	public static final String PRE_AUTHORIZE_VIEW = "isAuthenticated()";
 	public static final String PRE_AUTHORIZE_DELETE = "isAuthenticated()";
-	
 
 	public static final String PRE_AUTHORIZE_DELETE_BY_ID = "denyAll";
 	public static final String PRE_AUTHORIZE_DELETE_ALL = "denyAll";
@@ -104,6 +97,15 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	public static final String PRE_AUTHORIZE_FIND_BY_IDS = "denyAll";
 	public static final String PRE_AUTHORIZE_FIND_ALL = "denyAll";
 	public static final String PRE_AUTHORIZE_COUNT = "denyAll";
+
+	@Column(name = "active")
+	private Boolean active = false;
+
+	@Column(name = "inactivation_reason")
+	private String inactivationReason;
+
+	@Column(name = "inactivation_date")
+	private Date inactivationDate;
 
 	@ApiModelProperty(hidden = true)
 	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
@@ -120,29 +122,13 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	@Column(name = "user_name", unique = true, nullable = false)
 	private String username;
-
-	@ApiModelProperty(hidden = true)
-	@JsonSerialize(using = SkipPropertySerializer.class)
-	@Column(name = "user_password")
-	private String password;
-
+	@OneToOne
 	@Transient
 	List<String> changedAttributes = null;
 
 	@Transient
 	@JsonIgnore
 	Locale localeObject = null;
-
-	@JsonIgnore
-	@Column(name = "reset_password_token")
-	private String resetPasswordToken;
-
-	@JsonIgnore
-	@Column(name = "reset_password_token_date")
-	private Date resetPasswordTokenCreated;
-
-	@Column(name = "password_changed")
-	private Date lastPassWordChangeDate;
 
 	@Column(name = "email", unique = true, nullable = false)
 	private String email;
@@ -185,21 +171,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	@Column(name = "last_visit")
 	private Date lastVisit;
 
-	@Column(name = "last_login")
-	private Date lastLogin;
-
-	@Column(name = "login_attempts")
-	private Short loginAttempts = 0;
-
-	@Column(name = "active")
-	private Boolean active = true;
-
-	@Column(name = "inactivation_reason")
-	private String inactivationReason;
-
-	@Column(name = "inactivation_date")
-	private Date inactivationDate;
-
 	@Column(name = "locale", nullable = false)
 	private String locale = "en";
 
@@ -209,21 +180,24 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	@Formula(" (select count(*) from stomp_session s where s.user = id) ")
 	private Integer stompSessionCount;
 
-	
-	//	@OneToOne(optional = true, fetch=FetchType.LAZY)
-	//	@MapsId
-	//	private LocalRegionMailingAddress mailingAddress;
+	@JsonIgnore
+	@OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+	UserCredentials credentials;
 
-	//@JsonIgnore
+	// @OneToOne(optional = true, fetch=FetchType.LAZY)
+	// @MapsId
+	// private LocalRegionMailingAddress mailingAddress;
+
+	// @JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_roles", joinColumns = { @JoinColumn(name = "role_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "user_id") })
 	private List<Role> roles = new ArrayList<Role>(0);
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "id.owner")
 	private List<Friendship> friendships;
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private List<StompSession> stompSessions;
@@ -291,23 +265,34 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).appendSuper(super.toString())
-				.append("username", this.getUsername())
-				.append("firstName", this.getFirstName())
-				.append("lastName", this.getLastName())
-				.append("email", this.getEmail())
-				.append("password", this.getPassword())
-				.append("new", this.isNew())
-				.append("roles", this.getRoles())
+		return new ToStringBuilder(this).appendSuper(super.toString()).append("username", this.getUsername())
+				.append("firstName", this.getFirstName()).append("lastName", this.getLastName())
+				.append("email", this.getEmail()).append("new", this.isNew()).append("roles", this.getRoles())
 				.toString();
 	}
 
-	/**
-	 * @see gr.abiss.calipso.userDetails.integration.LocalUser#getRedirectUrl()
-	 */
-	@Override
-	public String getRedirectUrl() {
-		return redirectUrl;
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public String getInactivationReason() {
+		return inactivationReason;
+	}
+
+	public void setInactivationReason(String inactivationReason) {
+		this.inactivationReason = inactivationReason;
+	}
+
+	public Date getInactivationDate() {
+		return inactivationDate;
+	}
+
+	public void setInactivationDate(Date inactivationDate) {
+		this.inactivationDate = inactivationDate;
 	}
 
 	public void setRedirectUrl(String redirectUrl) {
@@ -323,9 +308,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	}
 
 	/**
-	 * Called by Hibernate  <code>@PreUpdate</code>
-	 * to
-	 * keep the email hash of the user up-to date
+	 * Called by Hibernate <code>@PreUpdate</code> to keep the email hash of the
+	 * user up-to date
 	 */
 	@PreUpdate
 	public void onBeforeUpdate() {
@@ -333,23 +317,22 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 	}
 
 	/**
-	 * Called by Hibernate <code>@PrePersist</code> >
-	 * to
-	 * keep the email hash of the user up-to date
+	 * Called by Hibernate <code>@PrePersist</code> > to keep the email hash of
+	 * the user up-to date
 	 */
 	@PrePersist
 	public void onBeforeCreate() {
 		this.onBeforeSave();
 	}
-	
+
 	protected void onBeforeSave() {
-		if(!StringUtils.isNotBlank(this.getUsername())){
+		if (!StringUtils.isNotBlank(this.getUsername())) {
 			this.setUsername(this.getEmail());
 		}
-		if(!StringUtils.isNotBlank(this.getLocale())){
+		if (!StringUtils.isNotBlank(this.getLocale())) {
 			this.setLocale("en");
 		}
-		// create the email hash, 
+		// create the email hash,
 		// use email as username if latter is empty
 		if (this.getEmail() != null) {
 
@@ -358,22 +341,15 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 			// update the hash
 			this.setEmailHash(MD5Utils.md5Hex(this.getEmail()));
 
-			// if usernames are not exposed the email has been used to set its value
+			// if usernames are not exposed the email has been used to set its
+			// value
 			// in that case it must follow the email value change
 			if (this.getUsername() == null || this.getUsername().contains("@")) {
 				this.setUsername(this.getEmail());
 			}
 		}
-
-		// clear or set the token creation date  if needed
-		if (this.getResetPasswordToken() == null) {
-			this.setResetPasswordTokenCreated(null);
-		} else if (this.getResetPasswordTokenCreated() == null) {
-			this.setResetPasswordTokenCreated(new Date());
-		}
-		
-		// fallback to gravatar 
-		if(StringUtils.isBlank(this.getAvatarUrl())){
+		// fallback to gravatar
+		if (StringUtils.isBlank(this.getAvatarUrl())) {
 			initDefaultAvatarUrl();
 		}
 
@@ -389,7 +365,9 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	/**
 	 * Add a role to this principal.
-	 * @param role the role to add
+	 * 
+	 * @param role
+	 *            the role to add
 	 */
 	public void addRole(Role role) {
 		if (this.roles == null) {
@@ -400,7 +378,9 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	/**
 	 * Remove a role from this principal.
-	 * @param role the role to remove
+	 * 
+	 * @param role
+	 *            the role to remove
 	 */
 	public void removeRole(Role role) {
 		if (!CollectionUtils.isEmpty(roles)) {
@@ -416,13 +396,11 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		this.name = name;
 	}
 
-	@Override
 	public String getFirstName() {
 		return firstName;
 	}
 
 	@JsonGetter("fullName")
-	@Override
 	public String getFullName() {
 		StringBuffer s = new StringBuffer("");
 		if (StringUtils.isNotBlank(this.getFirstName())) {
@@ -438,72 +416,30 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 	}
 
-	@Override
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
-	@Override
 	public String getLastName() {
 		return lastName;
 	}
 
-	@Override
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
 
-	@Override
 	public String getUsername() {
 		return username;
 	}
 
-	@Override
 	public void setUsername(String userName) {
 		this.username = userName;
 	}
 
-	@Override
-	public String getPassword() {
-		return password;
-	}
-
-	@Override
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getResetPasswordToken() {
-		return resetPasswordToken;
-	}
-
-	@Override
-	public void setResetPasswordToken(String resetPasswordToken) {
-		this.resetPasswordToken = resetPasswordToken;
-	}
-
-	public Date getResetPasswordTokenCreated() {
-		return resetPasswordTokenCreated;
-	}
-
-	public void setResetPasswordTokenCreated(Date resetPasswordTokenCreated) {
-		this.resetPasswordTokenCreated = resetPasswordTokenCreated;
-	}
-
-	public Date getLastPassWordChangeDate() {
-		return lastPassWordChangeDate;
-	}
-
-	public void setLastPassWordChangeDate(Date lastPassWordChangeDate) {
-		this.lastPassWordChangeDate = lastPassWordChangeDate;
-	}
-
-	@Override
 	public String getEmail() {
 		return email;
 	}
 
-	@Override
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -564,48 +500,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		this.lastVisit = lastVisit;
 	}
 
-	public Date getLastLogin() {
-		return lastLogin;
-	}
-
-	public void setLastLogin(Date lastLogin) {
-		this.lastLogin = lastLogin;
-	}
-
-	public Short getLoginAttempts() {
-		return loginAttempts;
-	}
-
-	public void setLoginAttempts(Short loginAttempts) {
-		this.loginAttempts = loginAttempts;
-	}
-
-	@Override
-	public Boolean getActive() {
-		return active;
-	}
-
-	@Override
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
-	public String getInactivationReason() {
-		return inactivationReason;
-	}
-
-	public void setInactivationReason(String inactivationReason) {
-		this.inactivationReason = inactivationReason;
-	}
-
-	public Date getInactivationDate() {
-		return inactivationDate;
-	}
-
-	public void setInactivationDate(Date inactivationDate) {
-		this.inactivationDate = inactivationDate;
-	}
-
 	public String getLocale() {
 		return locale;
 	}
@@ -614,7 +508,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		this.locale = locale;
 	}
 
-	@Override
 	public List<? extends GrantedAuthority> getRoles() {
 		return this.roles;
 	}
@@ -651,6 +544,21 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		this.country = country;
 	}
 
+	/**
+	 * @return the credentials
+	 */
+	public UserCredentials getCredentials() {
+		return credentials;
+	}
+
+	/**
+	 * @param credentials
+	 *            the credentials to set
+	 */
+	public void setCredentials(UserCredentials credentials) {
+		this.credentials = credentials;
+	}
+
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
 	}
@@ -677,12 +585,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		private String firstName;
 		private String lastName;
 		private String username;
-		private String password;
 		private List<String> changedAttributes;
 		private Locale localeObject;
-		private String resetPasswordToken;
-		private Date resetPasswordTokenCreated;
-		private Date lastPassWordChangeDate;
 		private String email;
 		private String emailHash;
 		private String avatarUrl;
@@ -694,11 +598,7 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		private Country country;
 		private Date birthDay;
 		private Date lastVisit;
-		private Date lastLogin;
 		private Short loginAttempts;
-		private Boolean active;
-		private String inactivationReason;
-		private Date inactivationDate;
 		private String locale;
 		private String redirectUrl;
 		private List<Role> roles;
@@ -730,7 +630,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		}
 
 		public Builder password(String password) {
-			this.password = password;
 			return this;
 		}
 
@@ -741,21 +640,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 
 		public Builder localeObject(Locale localeObject) {
 			this.localeObject = localeObject;
-			return this;
-		}
-
-		public Builder resetPasswordToken(String resetPasswordToken) {
-			this.resetPasswordToken = resetPasswordToken;
-			return this;
-		}
-
-		public Builder resetPasswordTokenCreated(Date resetPasswordTokenCreated) {
-			this.resetPasswordTokenCreated = resetPasswordTokenCreated;
-			return this;
-		}
-
-		public Builder lastPassWordChangeDate(Date lastPassWordChangeDate) {
-			this.lastPassWordChangeDate = lastPassWordChangeDate;
 			return this;
 		}
 
@@ -773,7 +657,7 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 			this.avatarUrl = avatarUrl;
 			return this;
 		}
-		
+
 		public Builder bannerUrl(String bannerUrl) {
 			this.bannerUrl = bannerUrl;
 			return this;
@@ -814,28 +698,12 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 			return this;
 		}
 
-		public Builder lastLogin(Date lastLogin) {
-			this.lastLogin = lastLogin;
-			return this;
-		}
-
 		public Builder loginAttempts(Short loginAttempts) {
 			this.loginAttempts = loginAttempts;
 			return this;
 		}
 
 		public Builder active(Boolean active) {
-			this.active = active;
-			return this;
-		}
-
-		public Builder inactivationReason(String inactivationReason) {
-			this.inactivationReason = inactivationReason;
-			return this;
-		}
-
-		public Builder inactivationDate(Date inactivationDate) {
-			this.inactivationDate = inactivationDate;
 			return this;
 		}
 
@@ -870,12 +738,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		this.firstName = builder.firstName;
 		this.lastName = builder.lastName;
 		this.username = builder.username;
-		this.password = builder.password;
 		this.changedAttributes = builder.changedAttributes;
 		this.localeObject = builder.localeObject;
-		this.resetPasswordToken = builder.resetPasswordToken;
-		this.resetPasswordTokenCreated = builder.resetPasswordTokenCreated;
-		this.lastPassWordChangeDate = builder.lastPassWordChangeDate;
 		this.email = builder.email;
 		this.emailHash = builder.emailHash;
 		this.avatarUrl = builder.avatarUrl;
@@ -887,36 +751,30 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Loca
 		this.country = builder.country;
 		this.birthDay = builder.birthDay;
 		this.lastVisit = builder.lastVisit;
-		this.lastLogin = builder.lastLogin;
-		this.loginAttempts = builder.loginAttempts;
-		this.active = builder.active;
-		this.inactivationReason = builder.inactivationReason;
-		this.inactivationDate = builder.inactivationDate;
 		this.locale = builder.locale;
 		this.redirectUrl = builder.redirectUrl;
 		this.roles = builder.roles;
 		this.friendships = builder.friendships;
 	}
-	
+
 	/**
-	 * Use Gravatar only if application is running on port 80 
+	 * Use Gravatar only if application is running on port 80
+	 * 
 	 * @see http://en.gravatar.com/site/implement/images/#default-image
 	 */
 	protected void initDefaultAvatarUrl() {
 		try {
 			// only enable gravatar if on port 80
-			if(Constants.ON_CUSTOM_PORT){
+			if (Constants.ON_CUSTOM_PORT) {
 				this.setAvatarUrl(Constants.DEFAULT_AVATAR_URL);
-			}
-			else{
-				this.setAvatarUrl(new StringBuffer(Constants.GRAVATAR_BASE_IMG_URL)
-						.append(this.getEmailHash())
-						.append("?d=")
-						.append(URLEncoder.encode(Constants.DEFAULT_AVATAR_URL, CharEncoding.UTF_8))
+			} else {
+				this.setAvatarUrl(new StringBuffer(Constants.GRAVATAR_BASE_IMG_URL).append(this.getEmailHash())
+						.append("?d=").append(URLEncoder.encode(Constants.DEFAULT_AVATAR_URL, CharEncoding.UTF_8))
 						.toString());
 			}
 		} catch (UnsupportedEncodingException e) {
 			LOGGER.error("Failed encoding avatar url");
 		}
 	}
+
 }

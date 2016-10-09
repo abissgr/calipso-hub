@@ -17,14 +17,6 @@
  */
 package gr.abiss.calipso.userDetails.util;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
-import gr.abiss.calipso.userDetails.integration.LocalUserService;
-import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.UserDetails;
-import gr.abiss.calipso.userDetails.service.UserDetailsService;
-
 import java.util.Optional;
 
 import javax.servlet.http.Cookie;
@@ -36,10 +28,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.codec.Base64;
+
+import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.model.UserDetails;
+import gr.abiss.calipso.userDetails.service.UserDetailsService;
 
 
 /**
@@ -50,7 +47,7 @@ public class SecurityUtil {
 	// TODO: move to config
 	private static final String COOKIE_NAME_SESSION = "JSESSIONID";
 
-	public static void login(HttpServletRequest request, HttpServletResponse response, LocalUser user, 
+	public static void login(HttpServletRequest request, HttpServletResponse response, User user, 
 			UserDetailsConfig userDetailsConfig, UserDetailsService userDetailsService) {
 		ICalipsoUserDetails userDetails = UserDetails.fromUser(user);
 		login(request, response, userDetails, userDetailsConfig, userDetailsService);

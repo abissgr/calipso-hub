@@ -17,9 +17,8 @@
  */
 package gr.abiss.calipso.userDetails.service;
 
-import gr.abiss.calipso.userDetails.integration.LocalUser;
+import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
 import org.resthub.common.service.CrudService;
@@ -33,12 +32,12 @@ public interface UserDetailsService extends CrudService<ICalipsoUserDetails, Str
 
 //	ICalipsoUserDetails confirmPrincipal(String confirmationToken);
 
-	ICalipsoUserDetails createForImplicitSignup(LocalUser user)
+	ICalipsoUserDetails createForImplicitSignup(User user)
 			throws DuplicateEmailException;
 
 	ICalipsoUserDetails getPrincipal();
 
-	LocalUser getPrincipalLocalUser();
+	User getPrincipalLocalUser();
 
 	void updateLastLogin(ICalipsoUserDetails u);
 }

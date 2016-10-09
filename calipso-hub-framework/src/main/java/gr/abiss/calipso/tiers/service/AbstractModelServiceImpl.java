@@ -36,16 +36,14 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.thymeleaf.util.ListUtils;
 
-import gr.abiss.calipso.model.Role;
+import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
@@ -92,9 +90,9 @@ implements ModelService<T, ID>{
 	}
 	
 	@Override
-	public LocalUser getPrincipalLocalUser() {
+	public User getPrincipalLocalUser() {
 		ICalipsoUserDetails principal = getPrincipal();
-		LocalUser user = null;
+		User user = null;
 		if (principal != null) {
 			String username = principal.getUsername();
 			if(StringUtils.isBlank(username)){

@@ -44,7 +44,7 @@
 <!--     </logger> -->
 
     <!-- other -->
-    <logger name="gr.abiss.calipso.friends">
+    <logger name="gr.abiss.calipso">
         <level value="DEBUG" />
     </logger>
 <!--     <logger name="org.springframework"> -->

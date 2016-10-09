@@ -109,11 +109,13 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		// --------------------------------
 		LOGGER.info("Create a friendship request");
 		Friendship friendship = given().spec(adminRequestSpec)
+			.log().all()
 			.body(new Friendship(new User(adminLoginContext.userId), new User(operatorLoginContext.userId)))
 			.post("/calipso/api/rest/" + Friendship.API_PATH)
 			.then().assertThat()
 			// test assertions
 			.body("status", notNullValue())
+			.log().all()
 			// get model
 			.extract().as(Friendship.class);
 

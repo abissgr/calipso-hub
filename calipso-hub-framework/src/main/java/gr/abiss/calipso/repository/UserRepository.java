@@ -48,7 +48,7 @@ public interface UserRepository extends ModelRepository<User, String> {
 //	@Query("select u from User u where u.confirmationToken = ?1")
 //	public User findByConfirmationToken(String token);
 
-	@Query("select u from User u where (UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) and u.password = ?2 and u.active = true")
+	@Query("select u from User u where (UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) and u.credentials.password = ?2 and u.active = true")
 	public User findByCredentials(String usernameOrEmail, String password);
 
 	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
@@ -68,12 +68,12 @@ public interface UserRepository extends ModelRepository<User, String> {
 	
 	
 	@Modifying
-	@Query("UPDATE User AS u SET u.lastLogin = CURRENT_TIMESTAMP() WHERE u.id = ?1")
+	@Query("UPDATE UserCredentials AS c SET c.lastLogin = CURRENT_TIMESTAMP() WHERE c.user.id = ?1")
 	public void updateLastLogin(String userId);
 	
 	@Modifying
-	@Query("UPDATE User AS u SET u.resetPasswordTokenCreated = NULL, u.resetPasswordToken = NULL "
-			+ "WHERE u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < ?1")
+	@Query("UPDATE User AS u SET u.credentials.resetPasswordTokenCreated = NULL, u.credentials.resetPasswordToken = NULL "
+			+ "WHERE u.credentials.resetPasswordTokenCreated IS NOT NULL and u.credentials.resetPasswordTokenCreated  < ?1")
 	public void expireResetPasswordTokens(Date yesterday);
 	
 }

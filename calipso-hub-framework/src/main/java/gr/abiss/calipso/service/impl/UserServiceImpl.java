@@ -45,6 +45,7 @@ import org.springframework.util.CollectionUtils;
 
 import gr.abiss.calipso.model.Role;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserCredentials;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
 import gr.abiss.calipso.model.dto.UserInvitationsDTO;
@@ -53,8 +54,8 @@ import gr.abiss.calipso.model.metadata.UserMetadatum;
 import gr.abiss.calipso.repository.RoleRepository;
 import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.UserService;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 
@@ -68,12 +69,19 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	private final StringKeyGenerator generator = KeyGenerators.string();
 	
 	private RoleRepository roleRepository;
+	private ModelRepository<UserCredentials, String> credentialsRepository;
 
 	@Autowired
 	public void setRoleRepository(RoleRepository roleRepository) {
 		this.roleRepository = roleRepository;
 	}
 
+	
+	@Autowired
+	public void setCredentialsRepository(ModelRepository<UserCredentials, String> credentialsRepository) {
+		this.credentialsRepository = credentialsRepository;
+	}
+	
 	@Override
 	@Transactional(readOnly = false)
 	public void updateLastLogin(ICalipsoUserDetails u){
@@ -109,15 +117,19 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User create(User resource) {
-		LOGGER.debug("create, PRE_AUTHORIZE_CREATE: {}", resource.PRE_AUTHORIZE_CREATE);
+
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
-		resource.setResetPasswordToken(generator.generateKey());
-		LOGGER.debug("create, PRE_AUTHORIZE_CREATE1: {}", resource.PRE_AUTHORIZE_CREATE);
 		resource = super.create(resource);
-		LOGGER.debug("create, PRE_AUTHORIZE_CREATE2: {}", resource.PRE_AUTHORIZE_CREATE);
+		
+		resource.setCredentials(
+				this.credentialsRepository.save(
+					new UserCredentials.Builder()
+					.user(resource)
+					.resetPasswordToken(generator.generateKey()).build()));
+
 		emailService.sendAccountConfirmation(resource);
-		LOGGER.debug("create, PRE_AUTHORIZE_CREATE3: {}", resource.PRE_AUTHORIZE_CREATE);
+
 		return resource;
 	}
 
@@ -152,11 +164,20 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	
 	@Override
 	@Transactional(readOnly = false)
-	public User createActive(User resource) {
+	public User createTest(User resource) {
+		LOGGER.warn("createActive, credentials: {}", resource.getCredentials());
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
-		resource.setResetPasswordToken(generator.generateKey());
 		resource = super.create(resource);
+		
+
+		UserCredentials credentials = new UserCredentials();
+		credentials.setUser(resource);
+		credentials.setPassword(resource.getUsername());
+		credentials = this.credentialsRepository.save(credentials);
+		
+		resource.setCredentials(credentials);
+		
 		return resource;
 	}
 
@@ -168,8 +189,8 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
-		user.setResetPasswordToken(null);
-		user.setPassword(newPassword);
+		user.getCredentials().setResetPasswordToken(null);
+		user.getCredentials().setPassword(newPassword);
 		user = this.update(user);
 
 		LOGGER.info("handlePasswordResetToken returning local user: " + user);
@@ -185,8 +206,8 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			throw new UsernameNotFoundException("Could not match username to an active user: " + userNameOrEmail);
 		}
 		// keep any existing token
-		if(user.getResetPasswordToken() == null){
-			user.setResetPasswordToken(this.generator.generateKey());
+		if(user.getCredentials().getResetPasswordToken() == null){
+			user.getCredentials().setResetPasswordToken(this.generator.generateKey());
 			user = this.userRepository.save(user);
 		}
 		emailService.sendPasswordResetLink(user);
@@ -227,17 +248,17 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public User createForImplicitSignup(LocalUser userAccountData) throws DuplicateEmailException {
+	public User createForImplicitSignup(User userAccountData) throws DuplicateEmailException {
 		LOGGER.info("createForImplicitSignup, localUser: " + userAccountData);
 		User user = new User();
 		user.setEmail(userAccountData.getEmail());
 		user.setUsername(userAccountData.getUsername());
 		user.setFirstName(userAccountData.getFirstName());
 		user.setLastName(userAccountData.getLastName());
-		user.setPassword(userAccountData.getPassword());
+		user.getCredentials().setPassword(userAccountData.getCredentials().getPassword());
 		
 		
-		LocalUser existing = this.getPrincipalLocalUser();
+		User existing = this.getPrincipalLocalUser();
 		if(existing == null){
 			existing = this.repository.findByUsernameOrEmail(user.getEmail());
 		}
@@ -245,7 +266,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			existing = this.repository.findByUsernameOrEmail(user.getUsername());
 		}
 		
-		return existing != null ? (User) existing : createActive(user);
+		return existing != null ? (User) existing : createTest(user);
 	}
 	
 	/**
@@ -268,8 +289,8 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		Assert.notNull(u, "Failed updating user pass: A user could not be found with the given credentials");
 		
 		// update password and return user
-		u.setPassword(newPassword);
-		u.setLastPassWordChangeDate(new Date());
+		u.getCredentials().setPassword(newPassword);
+		u.getCredentials().setLastPassWordChangeDate(new Date());
 		u = this.update(u);
 		return u;
 	}

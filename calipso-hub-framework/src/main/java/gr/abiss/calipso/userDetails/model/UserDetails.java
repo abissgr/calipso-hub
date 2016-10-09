@@ -39,10 +39,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 //import com.wordnik.swagger.annotations.ApiModel;
 
+import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertyDeserializer;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
-import gr.abiss.calipso.userDetails.integration.LocalUser;
 
 
 //@ApiModel
@@ -114,24 +114,24 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private String resetPasswordToken;
 	
 	@JsonIgnore
-	private LocalUser user;
+	private User user;
 
 	private Boolean isResetPasswordReguest = false;
 
-	public static ICalipsoUserDetails fromUser(LocalUser user) {
+	public static ICalipsoUserDetails fromUser(User user) {
 		UserDetails details = null;
 		if (user != null) {
 			details = new UserDetails();
 			BeanUtils.copyProperties(user, details);
+			BeanUtils.copyProperties(user.getCredentials(), details);
 			if(user.getId() != null){
 				details.setId(user.getId().toString());
 			}
 			details.setUsername(user.getUsername());
-			details.setPassword(user.getPassword());
+			details.setPassword(user.getCredentials().getPassword());
 			details.setEmail(user.getEmail());
 			details.setFirstName(user.getFirstName());
 			details.setLastName(user.getLastName());
-			details.setActive(user.getActive());
 			details.setAuthorities(user.getRoles());
 
 			// init metadata
@@ -689,11 +689,11 @@ public class UserDetails implements  ICalipsoUserDetails{
 	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getUser()
 	 */
 	@Override
-	public LocalUser getUser() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUser(LocalUser user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 

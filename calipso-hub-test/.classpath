@@ -79,6 +79,11 @@
       <attribute value="jar:file:/home/manos/.m2/repository/commons-io/commons-io/2.4/commons-io-2.4-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" sourcepath="M2_REPO/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/manos/.m2/repository/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/imgscalr/imgscalr-lib/4.2/imgscalr-lib-4.2.jar" sourcepath="M2_REPO/org/imgscalr/imgscalr-lib/4.2/imgscalr-lib-4.2-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/imgscalr/imgscalr-lib/4.2/imgscalr-lib-4.2-javadoc.jar!/" name="javadoc_location"/>
@@ -989,11 +994,6 @@
   <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-configuration2/2.0/commons-configuration2-2.0.jar" sourcepath="M2_REPO/org/apache/commons/commons-configuration2/2.0/commons-configuration2-2.0-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/manos/.m2/repository/org/apache/commons/commons-configuration2/2.0/commons-configuration2-2.0-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" sourcepath="M2_REPO/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/home/manos/.m2/repository/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/asciidoctor/asciidoctorj/1.5.4/asciidoctorj-1.5.4.jar" sourcepath="M2_REPO/org/asciidoctor/asciidoctorj/1.5.4/asciidoctorj-1.5.4-sources.jar">
