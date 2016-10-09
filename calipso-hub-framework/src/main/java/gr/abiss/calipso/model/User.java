@@ -629,10 +629,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 			return this;
 		}
 
-		public Builder password(String password) {
-			return this;
-		}
-
 		public Builder changedAttributes(List<String> changedAttributes) {
 			this.changedAttributes = changedAttributes;
 			return this;

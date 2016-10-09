@@ -21,6 +21,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToOne;
@@ -73,7 +74,7 @@ public class UserCredentials extends AbstractSystemUuidPersistable implements Ca
 	@Column(name = "login_attempts")
 	private Short loginAttempts = 0;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private User user;
 
 	public UserCredentials() {
