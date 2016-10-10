@@ -47,6 +47,7 @@ public class EnumStringPredicateFactory implements IPredicateFactory<Enum> {
 	 *      javax.persistence.criteria.CriteriaBuilder, java.lang.String,
 	 *      java.lang.Class, java.lang.String[])
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Predicate getPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<Enum> fieldType,
 			String[] propertyValues) {
@@ -54,18 +55,25 @@ public class EnumStringPredicateFactory implements IPredicateFactory<Enum> {
 			LOGGER.warn("Non-Enum type for property '" + propertyName + "': " + fieldType.getName() + ", class: " + fieldType.getClass());
 		}
 
-		ArrayList<Enum> choices = new ArrayList<Enum>(propertyValues.length);
-		for (int i = 0; i < propertyValues.length; i++) {
-			try{
-			choices.add(Enum.valueOf((Class<Enum>) this.type, propertyValues[i]));
-			}catch(Exception e){
-				LOGGER.warn(
-						"Invalid Enum entry '" + propertyValues[i] + "' for property '" + propertyName + "' and class "
-								+ fieldType.getName(), e);
-			}
+		Predicate predicate;
+		
+		if(propertyValues.length == 1){
+			predicate = cb.equal(root.<Enum> get(propertyName), Enum.valueOf((Class<Enum>) this.type, propertyValues[0]));
 		}
-		Expression<? extends Enum> exp = root.<Enum> get(propertyName);
-		Predicate predicate = exp.in(choices.toArray());
+		else{
+			ArrayList<Enum> choices = new ArrayList<Enum>(propertyValues.length);
+			for (int i = 0; i < propertyValues.length; i++) {
+				try{
+					choices.add(Enum.valueOf((Class<Enum>) this.type, propertyValues[i]));
+				}catch(Exception e){
+					LOGGER.warn(
+							"Invalid Enum entry '" + propertyValues[i] + "' for property '" + propertyName + "' and class "
+									+ fieldType.getName(), e);
+				}
+			}
+			
+			predicate = cb.isTrue(root.<Enum> get(propertyName).in(choices));
+		}
 		return predicate;
 	}
 }

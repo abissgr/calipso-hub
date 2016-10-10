@@ -45,7 +45,7 @@ public class Friendship implements CalipsoPersistable<FriendshipId> {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
-	private FriendshipStatus status = FriendshipStatus.NEW;
+	private FriendshipStatus status = FriendshipStatus.SENT;
 
 	@JsonIgnore
 	@Formula(" (status) ")

@@ -31,6 +31,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -237,9 +238,10 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 		// if
 		if (pageable instanceof ParameterMapBackedPageRequest) {
 			@SuppressWarnings("unchecked")
-
-			Specification<T> spec = this.specificationsBuilder.getMatchAll(getDomainClass(), 
-					((ParameterMapBackedPageRequest) pageable).getParameterMap());
+			Map<String, String[]> params = ((ParameterMapBackedPageRequest) pageable).getParameterMap();
+			LOGGER.warn("findAll, params: {}", params);
+			MapUtils.verbosePrint(System.out, "ParameterMapBackedPageRequest", params);
+			Specification<T> spec = this.specificationsBuilder.getMatchAll(getDomainClass(), params);
 
 			return super.findAll(spec, pageable);
 		} else {

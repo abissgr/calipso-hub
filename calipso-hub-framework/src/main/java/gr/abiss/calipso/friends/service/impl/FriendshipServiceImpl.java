@@ -146,29 +146,29 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		this.saveRelationship(resource);
 	}
 
-	@Override
-	@PreAuthorize("hasRole('ROLE_USER')")
-	public Page<Friendship> findAll(Pageable pageRequest) {
-//		return this.repository.findAll
-		// get current principal
-		ICalipsoUserDetails userDetails = this.getPrincipal();
-		String validUserId = userDetails.getId();
-
-		// make sure only a user ownedare searched
-		Map<String, String[]> params = ((ParameterMapBackedPageRequest) pageRequest).getParameterMap();
-		
-		String[] attrsToCheck = { "id.","id.owner","id.owner.id", "id.friend", "id.friend.id", "status" };
-		// by checking sender
-		for (String attrToCheck : attrsToCheck) {
-			params.remove(attrToCheck);
-		}
-//		http://stackoverflow.com/questions/24441411/spring-data-jpa-find-by-embedded-object-property
-//			http://stackoverflow.com/questions/10649691/using-embeddedid-with-jparepository
-		params.put("id.owner.id", new String[]{validUserId});
-		params.put("status", new String[]{FriendshipStatus.CONFIRMED.toString()});
-	
-		return super.findAll(pageRequest);
-	}
+//	@Override
+//	@PreAuthorize("hasRole('ROLE_USER')")
+//	public Page<Friendship> findAll(Pageable pageRequest) {
+////		return this.repository.findAll
+//		// get current principal
+//		ICalipsoUserDetails userDetails = this.getPrincipal();
+//		String validUserId = userDetails.getId();
+//
+//		// make sure only a user ownedare searched
+//		Map<String, String[]> params = ((ParameterMapBackedPageRequest) pageRequest).getParameterMap();
+//		
+//		String[] attrsToCheck = { "id.","id.owner","id.owner.id", "id.friend", "id.friend.id", "status" };
+//		// by checking sender
+//		for (String attrToCheck : attrsToCheck) {
+//			params.remove(attrToCheck);
+//		}
+////		http://stackoverflow.com/questions/24441411/spring-data-jpa-find-by-embedded-object-property
+////			http://stackoverflow.com/questions/10649691/using-embeddedid-with-jparepository
+//		params.put("id.owner.id", new String[]{validUserId});
+//		params.put("status", new String[]{FriendshipStatus.CONFIRMED.toString()});
+//	
+//		return super.findAll(pageRequest);
+//	}
 
 	@Override
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -176,11 +176,11 @@ public class FriendshipServiceImpl extends AbstractModelServiceImpl<Friendship, 
 		return repository.findAllFriends(this.getPrincipal().getId());
 	}
 
-	@Override
-	@PreAuthorize("hasRole('ROLE_USER')")
-	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest) {
-		return repository.findAllFriendsPaginated(this.getPrincipal().getId(), pageRequest);
-	}
+//	@Override
+//	@PreAuthorize("hasRole('ROLE_USER')")
+//	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest) {
+//		return repository.findAllFriendsPaginated(this.getPrincipal().getId(), pageRequest);
+//	}
 
 	@Override
 	@PreAuthorize("hasRole('ROLE_USER')")

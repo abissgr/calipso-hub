@@ -120,7 +120,35 @@ public class FriendsControllerIT extends AbstractControllerIT {
 			.extract().as(Friendship.class);
 
 		// validate result
-		validateFriendship(friendship, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.NEW);
+		validateFriendship(friendship, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.SENT);
+
+		// Validate admin's outbox (SENT)
+	    JsonNode friendshipsNode =  given().spec(adminRequestSpec)
+				.log().all()
+				.param("status", "SENT")
+				.get("/calipso/api/rest/friends/my")
+				.then().assertThat()
+				.body("content[0].id", notNullValue())
+				// test assertions
+//				.log().all()
+				// get model
+				.extract().as(JsonNode.class);
+		LOGGER.debug("Outbox: \n{}", JacksonUtils.prettyPrint(friendshipsNode));
+	    Assert.assertEquals(operatorLoginContext.userId, friendshipsNode.get("content").get(0).get("id").asText());
+	    
+		// Validate inbox (PENDING)
+	    friendshipsNode =  given().spec(operatorRequestSpec)
+				.log().all()
+				.param("status", "PENDING")
+				.get("/calipso/api/rest/friends/my")
+				.then().assertThat()
+				.body("content[0].id", notNullValue())
+				// test assertions
+//				.log().all()
+				// get model
+				.extract().as(JsonNode.class);
+	    Assert.assertEquals(adminLoginContext.userId, friendshipsNode.get("content").get(0).get("id").asText());
+	    
 	    
 	    // validate oprator/inverse result
 	    FriendshipDTO ioperatorFriendRequestNotification = operatorFriendshipsQueueBlockingQueue.poll(5, SECONDS);

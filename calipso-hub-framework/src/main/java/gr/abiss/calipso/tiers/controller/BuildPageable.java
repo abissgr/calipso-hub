@@ -13,7 +13,7 @@ import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 
 public interface BuildPageable {
 	
-	public default Pageable buildPageable(Integer page, Integer size, String sort,
+	public default ParameterMapBackedPageRequest buildPageable(Integer page, Integer size, String sort,
 			String direction, Map<String, String[]> paramsMap) {
 		Assert.isTrue(page >= 0, "Page index must be greater than, or equal to, 0");
 
@@ -27,7 +27,7 @@ public interface BuildPageable {
 			orders.add(order);
 			pageableSort = new Sort(orders);
 		}
-		Pageable pageable = new ParameterMapBackedPageRequest(paramsMap, page /*- 1*/, size, pageableSort);
+		ParameterMapBackedPageRequest pageable = new ParameterMapBackedPageRequest(paramsMap, page /*- 1*/, size, pageableSort);
 		return pageable;
 	}
 }

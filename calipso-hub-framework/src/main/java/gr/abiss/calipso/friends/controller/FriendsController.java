@@ -18,6 +18,7 @@
 package gr.abiss.calipso.friends.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,7 @@ import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
 import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.tiers.controller.BuildPageable;
+import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -86,8 +89,9 @@ public class FriendsController implements BuildPageable{
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
 			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
 			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
-		
-		return this.findFriendsPaginated(this.friendshipService.getPrincipal().getId(), page, size, sort, direction);
+		// validate status
+		status = getValidatedStatus(status, new FriendshipStatus[]{FriendshipStatus.SENT, FriendshipStatus.PENDING, FriendshipStatus.CONFIRMED, FriendshipStatus.BLOCK});
+		return this.findFriendsPaginated(this.friendshipService.getPrincipal().getId(), status, page, size, sort, direction);
 	}	
 	
 	@RequestMapping(value = { "", "{friendId}" }, method = RequestMethod.GET)
@@ -111,12 +115,16 @@ public class FriendsController implements BuildPageable{
 			throw new IllegalArgumentException("Unauthorized");
 		}
 		
-		return this.findFriendsPaginated(friendId, page, size, sort, direction);
+		// validate status
+		status = getValidatedStatus(status, new FriendshipStatus[]{FriendshipStatus.CONFIRMED});
+		
+		return this.findFriendsPaginated(friendId, status, page, size, sort, direction);
 	}	
 
 	
 	protected Page<UserDTO> findFriendsPaginated(
 			String ownerId,
+			String[] status,
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
 			@RequestParam(value = "properties", required = false, defaultValue = "id") String sort,
@@ -124,13 +132,14 @@ public class FriendsController implements BuildPageable{
 		
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("id.owner.id", new String[]{ownerId});
-		
-		String[] status = getValidatedStatus();
 		parameters.put("status", status);
 
-		Pageable pageable = buildPageable(page, size, sort, direction, parameters);
-		Page<Friendship> friendshipPage = this.friendshipService.findAll(pageable);
+		ParameterMapBackedPageRequest pageable = buildPageable(page, size, sort, direction, parameters);
 		
+		LOGGER.debug("Build pageable {}", pageable.getParameterMap());		
+		MapUtils.verbosePrint(System.out, "pageable", pageable.getParameterMap());
+		Page<Friendship> friendshipPage = this.friendshipService.findAll(pageable);
+		LOGGER.debug("Found {} friendships for status {}", friendshipPage.getTotalElements(), status);
 		// TODO: move DTO selection to query
 		List<UserDTO> frieds = new ArrayList<UserDTO>(friendshipPage.getNumberOfElements());
 		for(Friendship friendship : friendshipPage){
@@ -145,10 +154,9 @@ public class FriendsController implements BuildPageable{
 	/**
 	 * @return
 	 */
-	protected String[] getValidatedStatus() {
-		String[] status = request.getParameterValues("status");
+	protected String[] getValidatedStatus(String[] status, FriendshipStatus[] allowed) {
 		// validate status
-		if(status == null){
+		if(status == null || status.length == 0){
 			status = new String[]{FriendshipStatus.CONFIRMED.toString()};
 		}
 		else{

@@ -32,7 +32,7 @@ public interface FriendshipService extends ModelService<Friendship, FriendshipId
 
 	public Iterable<UserDTO> findAllMyFriends();
 
-	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest);
+//	public Page<UserDTO> findAllMyFriendsPaginated(Pageable pageRequest);
 
 	public void sendStompActivityMessageToOnlineFriends(ActivityNotificationMessage msg);
 }
