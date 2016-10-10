@@ -239,8 +239,6 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 		if (pageable instanceof ParameterMapBackedPageRequest) {
 			@SuppressWarnings("unchecked")
 			Map<String, String[]> params = ((ParameterMapBackedPageRequest) pageable).getParameterMap();
-			LOGGER.warn("findAll, params: {}", params);
-			MapUtils.verbosePrint(System.out, "ParameterMapBackedPageRequest", params);
 			Specification<T> spec = this.specificationsBuilder.getMatchAll(getDomainClass(), params);
 
 			return super.findAll(spec, pageable);
