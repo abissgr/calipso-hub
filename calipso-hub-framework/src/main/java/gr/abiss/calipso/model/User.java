@@ -579,14 +579,34 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		this.stompSessions = stompSessions;
 	}
 
+	/**
+	 * Use Gravatar only if application is running on port 80
+	 * 
+	 * @see http://en.gravatar.com/site/implement/images/#default-image
+	 */
+	protected void initDefaultAvatarUrl() {
+		try {
+			// only enable gravatar if on port 80
+			if (Constants.ON_CUSTOM_PORT) {
+				this.setAvatarUrl(Constants.DEFAULT_AVATAR_URL);
+			} else {
+				this.setAvatarUrl(new StringBuffer(Constants.GRAVATAR_BASE_IMG_URL).append(this.getEmailHash())
+						.append("?d=").append(URLEncoder.encode(Constants.DEFAULT_AVATAR_URL, CharEncoding.UTF_8))
+						.toString());
+			}
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.error("Failed encoding avatar url");
+		}
+	}
+
 	public static class Builder {
 		private String id;
-		private String name;
+		private Boolean active;
+		private String inactivationReason;
+		private Date inactivationDate;
 		private String firstName;
 		private String lastName;
 		private String username;
-		private List<String> changedAttributes;
-		private Locale localeObject;
 		private String email;
 		private String emailHash;
 		private String avatarUrl;
@@ -598,19 +618,25 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		private Country country;
 		private Date birthDay;
 		private Date lastVisit;
-		private Short loginAttempts;
 		private String locale;
-		private String redirectUrl;
-		private List<Role> roles;
-		private List<Friendship> friendships;
 
 		public Builder id(String id) {
 			this.id = id;
 			return this;
 		}
 
-		public Builder name(String name) {
-			this.name = name;
+		public Builder active(Boolean active) {
+			this.active = active;
+			return this;
+		}
+
+		public Builder inactivationReason(String inactivationReason) {
+			this.inactivationReason = inactivationReason;
+			return this;
+		}
+
+		public Builder inactivationDate(Date inactivationDate) {
+			this.inactivationDate = inactivationDate;
 			return this;
 		}
 
@@ -629,21 +655,11 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 			return this;
 		}
 
-		public Builder changedAttributes(List<String> changedAttributes) {
-			this.changedAttributes = changedAttributes;
-			return this;
-		}
-
-		public Builder localeObject(Locale localeObject) {
-			this.localeObject = localeObject;
-			return this;
-		}
-
 		public Builder email(String email) {
 			this.email = email;
 			return this;
 		}
-
+		
 		public Builder emailHash(String emailHash) {
 			this.emailHash = emailHash;
 			return this;
@@ -694,32 +710,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 			return this;
 		}
 
-		public Builder loginAttempts(Short loginAttempts) {
-			this.loginAttempts = loginAttempts;
-			return this;
-		}
-
-		public Builder active(Boolean active) {
-			return this;
-		}
-
 		public Builder locale(String locale) {
 			this.locale = locale;
-			return this;
-		}
-
-		public Builder redirectUrl(String redirectUrl) {
-			this.redirectUrl = redirectUrl;
-			return this;
-		}
-
-		public Builder roles(List<Role> roles) {
-			this.roles = roles;
-			return this;
-		}
-
-		public Builder friendships(List<Friendship> friendships) {
-			this.friendships = friendships;
 			return this;
 		}
 
@@ -730,12 +722,12 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	private User(Builder builder) {
 		this.setId(builder.id);
-		this.name = builder.name;
+		this.active = builder.active;
+		this.inactivationReason = builder.inactivationReason;
+		this.inactivationDate = builder.inactivationDate;
 		this.firstName = builder.firstName;
 		this.lastName = builder.lastName;
 		this.username = builder.username;
-		this.changedAttributes = builder.changedAttributes;
-		this.localeObject = builder.localeObject;
 		this.email = builder.email;
 		this.emailHash = builder.emailHash;
 		this.avatarUrl = builder.avatarUrl;
@@ -748,29 +740,5 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		this.birthDay = builder.birthDay;
 		this.lastVisit = builder.lastVisit;
 		this.locale = builder.locale;
-		this.redirectUrl = builder.redirectUrl;
-		this.roles = builder.roles;
-		this.friendships = builder.friendships;
 	}
-
-	/**
-	 * Use Gravatar only if application is running on port 80
-	 * 
-	 * @see http://en.gravatar.com/site/implement/images/#default-image
-	 */
-	protected void initDefaultAvatarUrl() {
-		try {
-			// only enable gravatar if on port 80
-			if (Constants.ON_CUSTOM_PORT) {
-				this.setAvatarUrl(Constants.DEFAULT_AVATAR_URL);
-			} else {
-				this.setAvatarUrl(new StringBuffer(Constants.GRAVATAR_BASE_IMG_URL).append(this.getEmailHash())
-						.append("?d=").append(URLEncoder.encode(Constants.DEFAULT_AVATAR_URL, CharEncoding.UTF_8))
-						.toString());
-			}
-		} catch (UnsupportedEncodingException e) {
-			LOGGER.error("Failed encoding avatar url");
-		}
-	}
-
 }
