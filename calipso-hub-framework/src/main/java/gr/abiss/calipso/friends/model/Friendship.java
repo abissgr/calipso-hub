@@ -36,7 +36,6 @@ public class Friendship implements CalipsoPersistable<FriendshipId> {
 
 	public static final String API_PATH = "friendships";
 	
-	
 	@NotNull
 	@ApiModelProperty(required = true)
 	@EmbeddedId	

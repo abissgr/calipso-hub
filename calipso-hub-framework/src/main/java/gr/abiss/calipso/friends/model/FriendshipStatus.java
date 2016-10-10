@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum FriendshipStatus {
-	NEW, DELETE, PENDING, CONFIRMED, BLOCK, BLOCK_INVERSE;
+	SENT, DELETE, PENDING, CONFIRMED, BLOCK, BLOCK_INVERSE;
 	
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FriendshipStatus.class);
@@ -23,13 +23,15 @@ public enum FriendshipStatus {
 		
 	static {
 		
-		allowedNext.put(null, new HashSet<FriendshipStatus>(Arrays.asList(NEW, BLOCK)));
-		allowedNext.put(NEW, new HashSet<FriendshipStatus>(Arrays.asList(DELETE)));
+		// allowed "next" choices per status
+		allowedNext.put(null, new HashSet<FriendshipStatus>(Arrays.asList(SENT, BLOCK)));
+		allowedNext.put(SENT, new HashSet<FriendshipStatus>(Arrays.asList(DELETE)));
 		allowedNext.put(PENDING, new HashSet<FriendshipStatus>(Arrays.asList(CONFIRMED, DELETE, BLOCK)));
 		allowedNext.put(CONFIRMED, new HashSet<FriendshipStatus>(Arrays.asList(DELETE, BLOCK)));
 		allowedNext.put(BLOCK, new HashSet<FriendshipStatus>(Arrays.asList(DELETE)));
-
-		applicableInverse.put(NEW, PENDING);
+		
+		// applied "inverse" value per selected status 
+		applicableInverse.put(SENT, PENDING);
 		applicableInverse.put(CONFIRMED, CONFIRMED);
 		applicableInverse.put(DELETE, DELETE);
 		applicableInverse.put(BLOCK, BLOCK_INVERSE);
