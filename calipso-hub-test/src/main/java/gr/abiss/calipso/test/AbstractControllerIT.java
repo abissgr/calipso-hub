@@ -120,7 +120,7 @@ public class AbstractControllerIT {
 		
 		
 		try {
-			ownerSession = getWebSocketStompClient().connect(url, handshakeHeaders, connectHeaders, sessionHandler).get(10, SECONDS);
+			ownerSession = getWebSocketStompClient().connect(url, handshakeHeaders, connectHeaders, sessionHandler).get(5, SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new RuntimeException(e);
 		}
@@ -197,11 +197,11 @@ public class AbstractControllerIT {
 		loginSubmission.put("password", password);
 
 		// attempt login and test for a proper result
-		Response rs = given().accept(JSON_UTF8).contentType(JSON_UTF8).log().all().body(loginSubmission).when()
+		Response rs = given().accept(JSON_UTF8).contentType(JSON_UTF8).body(loginSubmission).when()
 				.post("/calipso/apiauth/userDetails");
 
 		// validate login
-		rs.then().log().all().assertThat().statusCode(200).content("id", notNullValue());
+		rs.then().assertThat().statusCode(200).content("id", notNullValue());
 
 		// Get result cookie and user id
 		lctx.ssoToken = rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME);
