@@ -201,7 +201,7 @@ public class AbstractControllerIT {
 				.post("/calipso/apiauth/userDetails");
 
 		// validate login
-		rs.then().assertThat().statusCode(200).content("id", notNullValue());
+		rs.then().log().all().assertThat().statusCode(200).content("id", notNullValue());
 
 		// Get result cookie and user id
 		lctx.ssoToken = rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME);
