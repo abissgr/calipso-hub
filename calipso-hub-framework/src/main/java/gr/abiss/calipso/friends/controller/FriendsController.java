@@ -107,13 +107,13 @@ public class FriendsController implements BuildPageable{
 			@RequestParam(value = "direction", required = false, defaultValue = "ASC") String direction) {
 		
 		// validate targget friend
-		FriendshipId friendshipId = new FriendshipId(this.friendshipService.getPrincipal().getId(), friendId);
-		Friendship friendship = this.friendshipService.findById(friendshipId);
-		if(friendship == null 
-				|| !(FriendshipStatus.CONFIRMED.equals(friendship.getStatus())
-						|| FriendshipStatus.PENDING.equals(friendship.getStatus()))){
-			throw new IllegalArgumentException("Unauthorized");
-		}
+//		FriendshipId friendshipId = new FriendshipId(this.friendshipService.getPrincipal().getId(), friendId);
+//		Friendship friendship = this.friendshipService.findById(friendshipId);
+//		if(friendship == null 
+//				|| !(FriendshipStatus.CONFIRMED.equals(friendship.getStatus())
+//						|| FriendshipStatus.PENDING.equals(friendship.getStatus()))){
+//			throw new IllegalArgumentException("Unauthorized");
+//		}
 		
 		// validate status
 		status = getValidatedStatus(status, new FriendshipStatus[]{FriendshipStatus.CONFIRMED});
