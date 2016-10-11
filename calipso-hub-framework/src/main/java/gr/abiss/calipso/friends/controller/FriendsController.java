@@ -79,7 +79,7 @@ public class FriendsController implements BuildPageable{
 	UserService userService;
 
 
-	@RequestMapping(value = { "", "my" }, method = RequestMethod.GET)
+	@RequestMapping(value = {"my" }, method = RequestMethod.GET)
 	@ResponseBody
 	@ApiOperation(value = "Find all friends (paginated)", notes = "Find all friends of the current user. Returns paginated results")
 	public Page<UserDTO> findMyFriendsPaginated(
@@ -94,7 +94,7 @@ public class FriendsController implements BuildPageable{
 		return this.findFriendsPaginated(this.friendshipService.getPrincipal().getId(), status, page, size, sort, direction);
 	}	
 	
-	@RequestMapping(value = { "", "{friendId}" }, method = RequestMethod.GET)
+	@RequestMapping(value = {"{friendId}" }, method = RequestMethod.GET)
 	@ResponseBody
 	@ApiOperation(value = "Find all friends of a friend (paginated)", notes = "Find all friends of a friend. Returns paginated results")
 	public Page<UserDTO> findAFriendsFriendsPaginated(
