@@ -119,10 +119,10 @@ public class FriendsControllerIT extends AbstractControllerIT {
 			// get model
 			.extract().as(Friendship.class);
 
-		// validate result
+		LOGGER.info("validate result");
 		validateFriendship(friendship, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.SENT);
 
-		// Validate admin's outbox (SENT)
+		LOGGER.info("Validate admin's outbox (SENT)");
 	    JsonNode friendshipsNode =  given().spec(adminRequestSpec)
 				.log().all()
 				.param("status", "SENT")
@@ -136,7 +136,7 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		LOGGER.debug("Outbox: \n{}", JacksonUtils.prettyPrint(friendshipsNode));
 	    Assert.assertEquals(operatorLoginContext.userId, friendshipsNode.get("content").get(0).get("id").asText());
 	    
-		// Validate inbox (PENDING)
+	    LOGGER.info("Validate inbox (PENDING)");
 	    friendshipsNode =  given().spec(operatorRequestSpec)
 				.log().all()
 				.param("status", "PENDING")
