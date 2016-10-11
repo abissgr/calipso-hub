@@ -19,6 +19,7 @@ package gr.abiss.calipso.controller;
 
 import javax.inject.Inject;
 
+import org.resthub.web.exception.NotImplementedClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,16 +29,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import gr.abiss.calipso.fs.FilePersistenceService;
 import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
-import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
-import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
 import gr.abiss.calipso.tiers.controller.IFilesModelController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 
 @Api(tags = "Users", description = "User management operations")
@@ -65,6 +68,8 @@ public class UserController extends AbstractNoDeleteModelController<User, String
 	public User getByUserNameOrEmail(@PathVariable String userNameOrEmail) {
 		return this.service.findByUserNameOrEmail(userNameOrEmail);
 	}
+	
+	
 
 	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
 	@ResponseBody
@@ -74,5 +79,16 @@ public class UserController extends AbstractNoDeleteModelController<User, String
 		service.addMetadatum(subjectId, dto);
 	}
 	
+    /*
+     * Disallow complete PUT as clients keep updating properties to null etc.
+     */
+	@Override
+	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    @ApiOperation(value = "Update a resource",hidden = true)
+	@JsonView(AbstractSystemUuidPersistable.ItemView.class) 
+	public User update(@ApiParam(name = "id", required = true, value = "string") @PathVariable String id, @RequestBody User resource) {
+		throw new NotImplementedClientException("PUT is not supported; use PATCH");
+	}
     
 }
