@@ -212,30 +212,6 @@ public class FriendsControllerIT extends AbstractControllerIT {
 	    Assert.assertNotNull(reconnectUpdate);
 	}
 
-	@Test(description = "Test logging in with correct credentials")
-	public void testFindUserFriends() throws Exception {
-
-		// Chapperwocky login
-		Loggedincontext chapperwockyLoginContext = this.getLoggedinContext("Chapperwocky", "Chapperwocky");
-		RequestSpecification chapperwockyRequestSpec = chapperwockyLoginContext.requestSpec;
-
-		// get No-Tec's user id
-		Loggedincontext noTecLoginContext = this.getLoggedinContext("No-Tec", "No-Tec");
-		
-		// find No-Tec's friends
-		LOGGER.info("Find No-Tec's friends");
-	    JsonNode friendshipsNode =  given().spec(chapperwockyRequestSpec)
-				.log().all()
-				.get("/calipso/api/rest/friends/" + noTecLoginContext.userId)
-				.then()
-				.assertThat().statusCode(200)
-				.body("content[0].id", notNullValue())
-				// test assertions
-				.log().all()
-				// get model
-				.extract().as(JsonNode.class);
-	}
-	
 	protected void validateFriendship(Friendship friendship, String one,  String other, FriendshipStatus status) {
 		this.validateFriendship(new FriendshipDTO(friendship), one, other, status);
 	}
