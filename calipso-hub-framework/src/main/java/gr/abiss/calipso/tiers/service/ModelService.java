@@ -20,10 +20,11 @@ package gr.abiss.calipso.tiers.service;
 
 import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
 
 import java.io.Serializable;
 
+import gr.abiss.calipso.websocket.message.IActivityNotificationMessage;
+import gr.abiss.calipso.websocket.message.IMessageResource;
 import org.springframework.data.domain.Persistable;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +51,11 @@ extends GenericService<T, ID>{
 	 */
 	public User getPrincipalLocalUser();
 
-	public void sendStompActivityMessage(ActivityNotificationMessage msg, Iterable<String> useernames);
+	public void sendStompActivityMessage(IActivityNotificationMessage msg, String useername);
+
+	public void sendStompActivityMessage(IActivityNotificationMessage msg, Iterable<String> useernames);
+
+	public void sendStompStateChangeMessage(IMessageResource msg, String useername);
+
+	public void sendStompStateChangeMessage(IMessageResource msg, Iterable<String> useernames);
 }

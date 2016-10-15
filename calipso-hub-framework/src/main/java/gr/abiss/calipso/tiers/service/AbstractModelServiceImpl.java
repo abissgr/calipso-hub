@@ -25,6 +25,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 
+import gr.abiss.calipso.websocket.message.IActivityNotificationMessage;
+import gr.abiss.calipso.websocket.message.IMessageResource;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -111,13 +113,36 @@ implements ModelService<T, ID>{
 
 	@Override
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public void sendStompActivityMessage(ActivityNotificationMessage msg, Iterable<String> useernames) {
-		// notify users
+	public void sendStompActivityMessage(IActivityNotificationMessage msg, Iterable<String> useernames) {
 		LOGGER.debug("sendStompActivityMessage, useernames: {}", useernames);
 		for(String useername : useernames){
 			this.messagingTemplate.convertAndSendToUser(useername, Destinations.USERQUEUE_UPDATES_ACTIVITY, msg);
-			
+
 		}
+	}
+
+	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public void sendStompActivityMessage(IActivityNotificationMessage msg, String useername) {
+		LOGGER.debug("sendStompActivityMessage, useername: {}", useername);
+		this.messagingTemplate.convertAndSendToUser(useername, Destinations.USERQUEUE_UPDATES_ACTIVITY, msg);
+	}
+
+	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public void sendStompStateChangeMessage(IMessageResource msg, Iterable<String> useernames) {
+		LOGGER.debug("sendStompStateChangeMessage, useernames: {}", useernames);
+		for(String useername : useernames){
+			this.messagingTemplate.convertAndSendToUser(useername, Destinations.USERQUEUE_UPDATES_STATE, msg);
+
+		}
+	}
+
+	@Override
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public void sendStompStateChangeMessage(IMessageResource msg, String useername) {
+		LOGGER.debug("sendStompStateChangeMessage, useername: {}", useername);
+		this.messagingTemplate.convertAndSendToUser(useername, Destinations.USERQUEUE_UPDATES_STATE, msg);
 	}
 
 	/**

@@ -21,15 +21,12 @@ import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.util.concurrent.ListenableFuture;
+import com.fasterxml.jackson.databind.JsonNode;
+import gr.abiss.calipso.websocket.Destinations;
 
-import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +36,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -47,25 +43,17 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.Transport;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
-import org.springframework.web.socket.sockjs.frame.Jackson2SockJsMessageCodec;
 import org.testng.annotations.BeforeClass;
 
-import com.amazonaws.util.Base64;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import gr.abiss.calipso.model.Host;
 import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import gr.abiss.calipso.utils.Constants;
 import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
@@ -137,6 +125,20 @@ public class AbstractControllerIT {
          stompClient.setMessageConverter(new MappingJackson2MessageConverter());
          return stompClient;
     }
+
+	protected BlockingQueue<JsonNode> getActivityQueue(StompSession stompSession) {
+		BlockingQueue<JsonNode> queue = new LinkedBlockingDeque<JsonNode>();
+		StompSession.Subscription subscription = stompSession.subscribe("/user" + Destinations.USERQUEUE_UPDATES_ACTIVITY,
+				new DefaultStompFrameHandler<JsonNode>(stompSession, JsonNode.class, queue));
+		return queue;
+	}
+
+	protected BlockingQueue<JsonNode> getStatusChangeQueue(StompSession stompSession) {
+		BlockingQueue<JsonNode> queue = new LinkedBlockingDeque<JsonNode>();
+		StompSession.Subscription subscription = stompSession.subscribe("/user" + Destinations.USERQUEUE_UPDATES_STATE,
+				new DefaultStompFrameHandler<JsonNode>(stompSession, JsonNode.class, queue));
+		return queue;
+	}
 
 	@BeforeClass
 	public void setup() {

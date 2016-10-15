@@ -4,4 +4,7 @@
 .classpath
 /calipso-hub.sublime-project
 /calipso-hub.sublime-workspace
-/target/
+**/target/
+**/.idea
+**/*.iml
+**/overlays
