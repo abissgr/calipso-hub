@@ -30,6 +30,9 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	
 	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"  use-expressions="true"
 		disable-url-rewriting="true">
+		<sec:headers>
+			<sec:frame-options policy="SAMEORIGIN"/>
+		</sec:headers>
 		<!-- Disable Spring Security CSRF protection since 
 		it requires sessions and we don't really want those 
 		in a stateless app
