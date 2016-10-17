@@ -19,7 +19,7 @@ package gr.abiss.calipso.controller;
 
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -43,16 +43,16 @@ public class UserControllerIT extends AbstractControllerIT {
 	public void testCorrectLogin() throws Exception {
 		this.getLoggedinContext("admin", "admin");
 	}
-	
-	@Test(description = "Test registration")
+
+	@Test(priority = 10, description = "Test registration")
 	public void testRegistration() throws Exception {
 		RequestSpecification spec = this.getRequestSpec(null);
 		User user = given().spec(spec)
 				.body(new User.Builder()
-					.firstName("Firstname")
-					.lastName("LastName")
-					.email("ittestreg@UserControllerIT.evasyst.com")
-					.build())
+						.firstName("Firstname")
+						.lastName("LastName")
+						.email("ittestreg@UserControllerIT.evasyst.com")
+						.build())
 				.post("/calipso/api/rest/users")
 				.then()
 				.log().all()
@@ -62,8 +62,36 @@ public class UserControllerIT extends AbstractControllerIT {
 				// get model
 				.extract().as(User.class);
 	}
+
+	@Test(priority = 20, description = "Test registration")
+	public void testPatch() throws Exception {
+
+		// --------------------------------
+		// Login
+		// --------------------------------
+		Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
+		RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
+
+		// --------------------------------
+		// Patch
+		// --------------------------------
+		User user = given().spec(adminRequestSpec)
+				.body(new User.Builder()
+						.firstName("Adminfirst")
+						.lastName("Adminlast")
+						.build())
+				.log().all()
+				.patch("/calipso/api/rest/users/" + adminLoginContext.userId)
+				.then()
+				.log().all()
+				.assertThat()
+				// test assertions
+				.body("id", equalTo(adminLoginContext.userId))
+				// get model
+				.extract().as(User.class);
+	}
 	
-	@Test(priority = 10, description = "Test C2 use cases")
+	@Test(priority = 30, description = "Test C2 use cases")
 	public void testUploadsPreserveOtherProperties() throws Exception {
 
 		// --------------------------------

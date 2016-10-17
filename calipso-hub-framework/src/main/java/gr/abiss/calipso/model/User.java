@@ -122,9 +122,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	@Column(name = "user_name", unique = true, nullable = false)
 	private String username;
-	@OneToOne
-	@Transient
-	List<String> changedAttributes = null;
 
 	@Transient
 	@JsonIgnore
@@ -173,9 +170,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	@Column(name = "locale", nullable = false)
 	private String locale = "en";
-
-	@Transient
-	private String redirectUrl;
 
 	@Formula(" (select count(*) from stomp_session s where s.user = id) ")
 	private Integer stompSessionCount;
@@ -293,10 +287,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	public void setInactivationDate(Date inactivationDate) {
 		this.inactivationDate = inactivationDate;
-	}
-
-	public void setRedirectUrl(String redirectUrl) {
-		this.redirectUrl = redirectUrl;
 	}
 
 	public Integer getStompSessionCount() {
@@ -512,14 +502,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		return this.roles;
 	}
 
-	public List<String> getChangedAttributes() {
-		return changedAttributes;
-	}
-
-	public void setChangedAttributes(List<String> changedAttributes) {
-		this.changedAttributes = changedAttributes;
-	}
-
 	public String getAddress() {
 		return address;
 	}
@@ -580,9 +562,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 	}
 
 	/**
-	 * Use Gravatar only if application is running on port 80
-	 * 
-	 * @see http://en.gravatar.com/site/implement/images/#default-image
+	 * Use Gravatar only if application is running on port 80.
+	 * See also Gravatar <a href="http://en.gravatar.com/site/implement/images/#default-image">default image</a>
 	 */
 	protected void initDefaultAvatarUrl() {
 		try {
