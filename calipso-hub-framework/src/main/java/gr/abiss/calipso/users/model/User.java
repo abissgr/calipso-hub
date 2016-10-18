@@ -15,50 +15,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.model;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang3.CharEncoding;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.annotations.Formula;
-import org.javers.core.metamodel.annotation.ShallowReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.util.Assert;
+package gr.abiss.calipso.users.model;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.fs.FilePersistence;
 import gr.abiss.calipso.fs.FilePersistencePreview;
+import gr.abiss.calipso.model.Role;
+import gr.abiss.calipso.model.UserCredentials;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.entities.AbstractMetadataSubject;
 import gr.abiss.calipso.model.geography.Country;
@@ -71,6 +36,22 @@ import gr.abiss.calipso.utils.MD5Utils;
 import gr.abiss.calipso.websocket.model.StompSession;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.CharEncoding;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.annotations.Formula;
+import org.javers.core.metamodel.annotation.ShallowReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.Assert;
+
+import javax.persistence.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
  */
@@ -98,17 +79,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 	public static final String PRE_AUTHORIZE_FIND_ALL = "denyAll";
 	public static final String PRE_AUTHORIZE_COUNT = "denyAll";
 
-	@Column(name = "active")
-	private Boolean active = false;
-
-	@Column(name = "inactivation_reason")
-	private String inactivationReason;
-
-	@Column(name = "inactivation_date")
-	private Date inactivationDate;
-
 	@ApiModelProperty(hidden = true)
-	@Formula("concat(first_name, ' ', last_name, ' (', user_name, ')' )")
+	@Formula("concat(first_name, ' ', last_name )")
 	private String searchName;
 
 	@Formula("concat(first_name, ' ', last_name )")
@@ -119,9 +91,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	@Column(name = "last_name", nullable = true)
 	private String lastName;
-
-	@Column(name = "user_name", unique = true, nullable = false)
-	private String username;
 
 	@Transient
 	@JsonIgnore
@@ -203,7 +172,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		this.setId(dto.getId());
 		this.setFirstName(dto.getFirstName());
 		this.setLastName(dto.getLastName());
-		this.username = dto.getUsername();
 		this.email = dto.getEmail();
 		this.emailHash = dto.getEmailHash();
 	}
@@ -259,34 +227,10 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).appendSuper(super.toString()).append("username", this.getUsername())
+		return new ToStringBuilder(this).appendSuper(super.toString())
 				.append("firstName", this.getFirstName()).append("lastName", this.getLastName())
 				.append("email", this.getEmail()).append("new", this.isNew()).append("roles", this.getRoles())
 				.toString();
-	}
-
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
-	public Boolean getActive() {
-		return active;
-	}
-
-	public String getInactivationReason() {
-		return inactivationReason;
-	}
-
-	public void setInactivationReason(String inactivationReason) {
-		this.inactivationReason = inactivationReason;
-	}
-
-	public Date getInactivationDate() {
-		return inactivationDate;
-	}
-
-	public void setInactivationDate(Date inactivationDate) {
-		this.inactivationDate = inactivationDate;
 	}
 
 	public Integer getStompSessionCount() {
@@ -316,9 +260,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 	}
 
 	protected void onBeforeSave() {
-		if (!StringUtils.isNotBlank(this.getUsername())) {
-			this.setUsername(this.getEmail());
-		}
 		if (!StringUtils.isNotBlank(this.getLocale())) {
 			this.setLocale("en");
 		}
@@ -331,12 +272,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 			// update the hash
 			this.setEmailHash(MD5Utils.md5Hex(this.getEmail()));
 
-			// if usernames are not exposed the email has been used to set its
-			// value
-			// in that case it must follow the email value change
-			if (this.getUsername() == null || this.getUsername().contains("@")) {
-				this.setUsername(this.getEmail());
-			}
 		}
 		// fallback to gravatar
 		if (StringUtils.isBlank(this.getAvatarUrl())) {
@@ -416,14 +351,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String userName) {
-		this.username = userName;
 	}
 
 	public String getEmail() {
@@ -582,12 +509,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	public static class Builder {
 		private String id;
-		private Boolean active;
-		private String inactivationReason;
-		private Date inactivationDate;
 		private String firstName;
 		private String lastName;
-		private String username;
 		private String email;
 		private String emailHash;
 		private String avatarUrl;
@@ -600,24 +523,10 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		private Date birthDay;
 		private Date lastVisit;
 		private String locale;
+		private UserCredentials credentials;
 
 		public Builder id(String id) {
 			this.id = id;
-			return this;
-		}
-
-		public Builder active(Boolean active) {
-			this.active = active;
-			return this;
-		}
-
-		public Builder inactivationReason(String inactivationReason) {
-			this.inactivationReason = inactivationReason;
-			return this;
-		}
-
-		public Builder inactivationDate(Date inactivationDate) {
-			this.inactivationDate = inactivationDate;
 			return this;
 		}
 
@@ -628,11 +537,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 		public Builder lastName(String lastName) {
 			this.lastName = lastName;
-			return this;
-		}
-
-		public Builder username(String username) {
-			this.username = username;
 			return this;
 		}
 
@@ -696,6 +600,11 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 			return this;
 		}
 
+		public Builder credentials(UserCredentials credentials) {
+			this.credentials = credentials;
+			return this;
+		}
+
 		public User build() {
 			return new User(this);
 		}
@@ -703,12 +612,8 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 
 	private User(Builder builder) {
 		this.setId(builder.id);
-		this.active = builder.active;
-		this.inactivationReason = builder.inactivationReason;
-		this.inactivationDate = builder.inactivationDate;
 		this.firstName = builder.firstName;
 		this.lastName = builder.lastName;
-		this.username = builder.username;
 		this.email = builder.email;
 		this.emailHash = builder.emailHash;
 		this.avatarUrl = builder.avatarUrl;
@@ -721,5 +626,6 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		this.birthDay = builder.birthDay;
 		this.lastVisit = builder.lastVisit;
 		this.locale = builder.locale;
+		this.credentials = builder.credentials;
 	}
 }

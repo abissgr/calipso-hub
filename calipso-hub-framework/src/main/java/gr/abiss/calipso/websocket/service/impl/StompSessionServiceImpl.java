@@ -1,41 +1,28 @@
 package gr.abiss.calipso.websocket.service.impl;
 
 
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import gr.abiss.calipso.friends.repository.FriendshipRepository;
+import gr.abiss.calipso.model.dto.UserDTO;
+import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.model.UserDetails;
+import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.websocket.Destinations;
+import gr.abiss.calipso.websocket.message.StateUpdateMessage;
+import gr.abiss.calipso.websocket.model.StompSession;
+import gr.abiss.calipso.websocket.repository.StompSessionRepository;
+import gr.abiss.calipso.websocket.service.StompSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
-
-import gr.abiss.calipso.friends.repository.FriendshipRepository;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.dto.UserDTO;
-import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.UserDetails;
-import gr.abiss.calipso.websocket.Destinations;
-import gr.abiss.calipso.websocket.message.StateUpdateMessage;
-import gr.abiss.calipso.websocket.model.StompSession;
-import gr.abiss.calipso.websocket.repository.StompSessionRepository;
-import gr.abiss.calipso.websocket.service.StompSessionService;
+import org.springframework.web.socket.messaging.*;
 
 @Service(StompSessionService.BEAN_ID)
 @Transactional(readOnly = true)

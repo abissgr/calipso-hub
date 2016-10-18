@@ -17,19 +17,16 @@
  */
 package gr.abiss.calipso.repository;
 
-import java.util.Date;
-
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
-
-//#import org.javers.spring.data.JaversSpringDataAuditable;
-
+import gr.abiss.calipso.users.model.User;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.Date;
+
+//#import org.javers.spring.data.JaversSpringDataAuditable;
 
 @JaversSpringDataAuditable
 public interface UserRepository extends ModelRepository<User, String> {
@@ -37,29 +34,45 @@ public interface UserRepository extends ModelRepository<User, String> {
 	public static final String SELECT_USERDTO = "select new gr.abiss.calipso.model.dto.UserDTO(u.id, "
 			+ "		u.firstName, "
 			+ "		u.lastName, "
-			+ "		u.username, "
+			+ "		u.credentials.username, "
 			+ "		u.email, "
 			+ "		u.emailHash,"
 			+ "		u.avatarUrl,"
 			+ "		u.bannerUrl,"
 			+ "		u.stompSessionCount"
 			+ ") ";
-	
-//	@Query("select u from User u where u.confirmationToken = ?1")
-//	public User findByConfirmationToken(String token);
 
-	@Query("select u from User u where (UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) and u.credentials.password = ?2 and u.active = true")
-	public User findByCredentials(String usernameOrEmail, String password);
+	@Query("select u from User u where UPPER(u.email) = UPPER(?1) and u.credentials.password = ?2 and u.credentials.active = true")
+	public User findActiveByEmailAndPassword(String email, String password);
 
-	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
-	@Query("select u from User u where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
-	public User findByUsernameOrEmail(String usernameOrEmail);
-	
-	// @Query("select u from User u LEFT JOIN FETCH u.roles where UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
-	@Query("select u from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
+	@Query("select u from User u where u.id = UPPER(?1) and u.credentials.active = true")
+	public User findActiveById(String id);
+
+	@Query("select u.credentials.username from User u where u.id = ?1 ")
+	public String findUsernameById(String id);
+
+	@Query("select u from User u where UPPER(u.email) = UPPER(?1) and u.credentials.active = true")
+	public User findActiveByEmail(String email);
+
+	@Query("select u from User u where UPPER(u.credentials.username) = UPPER(?1) and u.credentials.password = ?2 and u.credentials.active = true")
+	public User findActiveByUsernameAndPassword(String usernameOrEmail, String password);
+
+	@Query("select u from User u where UPPER(u.credentials.username) = UPPER(?1) and u.credentials.active = true")
+	public User findActiveByUsername(String username);
+
+	@Query("select u from User u where UPPER(u.credentials.username) = UPPER(?1) ")
+	public User findByUsername(String username);
+
+	@Query("select u from User u where UPPER(u.email) = UPPER(?1) ")
+	public User findByEmail(String email);
+
+	@Query("select u from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.credentials.username) = UPPER(?1)) ")
 	public User findByIdOrUsernameOrEmail(String idOrUsernameOrEmail);
 
-	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.username, u.email, u.emailHash, u.avatarUrl, u.bannerUrl, u.stompSessionCount) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.username) = UPPER(?1)) ")
+	@Query("select u from User u where UPPER(u.email) = UPPER(?1) or UPPER(u.credentials.username) = UPPER(?1)) ")
+	public User findByUsernameOrEmail(String idOrUsernameOrEmail);
+
+	@Query("select new gr.abiss.calipso.model.dto.UserDTO(u.id, u.firstName, u.lastName, u.credentials.username, u.email, u.emailHash, u.avatarUrl, u.bannerUrl, u.stompSessionCount) from User u where u.id = ?1 or UPPER(u.email) = UPPER(?1) or UPPER(u.credentials.username) = UPPER(?1)) ")
 	public UserDTO findAsLink(String usernameOrEmailOrId);
 	
 	@Query(SELECT_USERDTO

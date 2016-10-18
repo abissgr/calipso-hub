@@ -1,24 +1,16 @@
 package gr.abiss.calipso.friends.repository;
 
 
-import java.util.List;
-import java.util.Optional;
-
-import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.friends.model.FriendshipId;
 import gr.abiss.calipso.friends.model.FriendshipStatus;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.UserDTO;
-import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
-import gr.abiss.calipso.websocket.model.StompSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 /**
  * Spring Data JPA repository for the Friendship entity.
@@ -30,11 +22,11 @@ public interface FriendshipRepository extends ModelRepository<Friendship,Friends
 	public static final String SELECT_FRIEND_AS_USERDTO = "select new gr.abiss.calipso.model.dto.UserDTO(friendship.id.friend.id, "
 			+ "		friendship.id.friend.firstName, "
 			+ "		friendship.id.friend.lastName, "
-			+ "		friendship.id.friend.username, "
+			+ "		friendship.id.friend.credentials.username, "
 			+ "		friendship.id.friend.email, "
-			+ "		friendship.id.friend.emailHash,"
-			+ "		friendship.id.friend.avatarUrl,"
-			+ "		friendship.id.friend.bannerUrl,"
+			+ "		friendship.id.friend.emailHash, "
+			+ "		friendship.id.friend.avatarUrl, "
+			+ "		friendship.id.friend.bannerUrl, "
 			+ "		friendship.id.friend.stompSessionCount"
 			+ ") ";
 
@@ -47,8 +39,8 @@ public interface FriendshipRepository extends ModelRepository<Friendship,Friends
 	// 
 	static final String FROM__STOMPONLINE_FRIENDS_BY_USERID = " from Friendship friendship where " + IS_FRIEND + " and friendship.id.friend.stompSessionCount > 0 ";
 
-	static final String QUERY_FRIEND_USERNAMES_BY_USERID =  "select friendship.id.friend.username " + FROM__FRIENDS_BY_USERID;
-	static final String QUERY_STOMPONLINE_FRIEND_USERNAMES_BY_USERID =  "select friendship.id.friend.username " + FROM__STOMPONLINE_FRIENDS_BY_USERID;
+	static final String QUERY_FRIEND_USERNAMES_BY_USERID = "select friendship.id.friend.credentials.username " + FROM__FRIENDS_BY_USERID;
+	static final String QUERY_STOMPONLINE_FRIEND_USERNAMES_BY_USERID = "select friendship.id.friend.credentials.username " + FROM__STOMPONLINE_FRIENDS_BY_USERID;
 	
 	static final String QUERY_FRIENDS_BY_USERID = SELECT_FRIEND_AS_USERDTO + FROM__FRIENDS_BY_USERID;
 	

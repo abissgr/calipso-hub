@@ -17,13 +17,11 @@
  */
 package gr.abiss.calipso.userDetails.util;
 
-import java.util.Optional;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.model.UserDetails;
+import gr.abiss.calipso.userDetails.service.UserDetailsService;
+import gr.abiss.calipso.users.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +30,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.codec.Base64;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.UserDetails;
-import gr.abiss.calipso.userDetails.service.UserDetailsService;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 
 /**

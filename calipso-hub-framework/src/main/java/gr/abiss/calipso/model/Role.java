@@ -17,27 +17,19 @@
  */
 package gr.abiss.calipso.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import gr.abiss.calipso.users.model.User;
 import io.swagger.annotations.ApiModel;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  */

@@ -17,24 +17,23 @@
  */
 package gr.abiss.calipso.test;
 
-import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.notNullValue;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import gr.abiss.calipso.model.Host;
+import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.utils.ConfigurationFactory;
+import gr.abiss.calipso.utils.Constants;
 import gr.abiss.calipso.websocket.Destinations;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeoutException;
-
+import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.ObjectMapperConfig;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,22 +47,19 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.testng.annotations.BeforeClass;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeoutException;
 
-import gr.abiss.calipso.model.Host;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.utils.ConfigurationFactory;
-import gr.abiss.calipso.utils.Constants;
-import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
-import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.config.ObjectMapperConfig;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
+import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Base class for rest-assured based controller integration testing

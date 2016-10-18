@@ -19,7 +19,7 @@
 package gr.abiss.calipso.model.acl;
 
 import gr.abiss.calipso.model.entities.AbstractAuditable;
-import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.users.model.User;
 
 import javax.persistence.MappedSuperclass;
 

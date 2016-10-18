@@ -18,20 +18,16 @@
 package gr.abiss.calipso.model.cms;
 
 
-import java.util.LinkedList;
-
-import java.util.List;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.annotations.Formula;
-
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *

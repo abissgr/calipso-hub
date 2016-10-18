@@ -18,17 +18,8 @@
 package gr.abiss.calipso.service;
 
 
-import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.utils.ConfigurationFactory;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
-
-import javax.inject.Inject;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +35,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import javax.inject.Inject;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 
 @Service
 public class EmailService {

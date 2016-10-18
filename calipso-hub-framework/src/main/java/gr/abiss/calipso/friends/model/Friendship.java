@@ -1,25 +1,18 @@
 package gr.abiss.calipso.friends.model;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
+import gr.abiss.calipso.users.model.User;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.tiers.annotation.ModelResource;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * A model representing a directional connection between two users. 

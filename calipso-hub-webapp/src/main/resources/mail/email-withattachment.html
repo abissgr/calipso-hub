@@ -5,11 +5,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
-        <p th:text="#{greeting(${name})}">
+    <p class="greetings" th:text="#{email.greeting(${user.getFirstName()})}"
+       th:unless="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
-        <p th:if="${name.length() gt 10}">
-            Wow! You've got a long name (more than 10 chars)!
+    <p class="greetings" th:text="#{email.greeting(${user.getCredentials().getUsername()})}"
+       th:if="${#strings.isEmpty(user.getFirstName())}">
+        Hello, Peter Static!
         </p>
         <p>
             You have been successfully subscribed to the <b>Fake newsletter</b> on

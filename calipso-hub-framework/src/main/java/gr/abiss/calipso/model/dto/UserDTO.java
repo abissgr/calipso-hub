@@ -17,18 +17,19 @@
  */
 package gr.abiss.calipso.model.dto;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.model.UserCredentials;
+import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.websocket.message.IMessageResource;
 import io.swagger.annotations.ApiModel;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @ApiModel(value = "UserDTO", description = "UserDTO is a lightweight DTO version of User")
 public class UserDTO implements IMessageResource<String> {
 
 	public static UserDTO fromUser(User user){
-		return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), user.getEmailHash(), user.getAvatarUrl(), user.getBannerUrl(), user.getStompSessionCount());
-	}
+        UserCredentials credentials = user.getCredentials();
+        return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), credentials != null ? credentials.getUsername() : null, user.getEmail(), user.getEmailHash(), user.getAvatarUrl(), user.getBannerUrl(), user.getStompSessionCount());
+    }
 	
 	private String id;
 
@@ -76,8 +77,8 @@ public class UserDTO implements IMessageResource<String> {
 	}
 
 	public User toUser() {
-		return new User.Builder().id(this.id).firstName(this.firstName).lastName(this.lastName).username(this.username)
-				.email(this.email).emailHash(this.emailHash).avatarUrl(this.avatarUrl).bannerUrl(bannerUrl).build();
+        return new User.Builder().id(this.id).firstName(this.firstName).lastName(this.lastName).credentials(new UserCredentials.Builder().username(this.username).build())
+                .email(this.email).emailHash(this.emailHash).avatarUrl(this.avatarUrl).bannerUrl(bannerUrl).build();
 	}
 	
 	/**

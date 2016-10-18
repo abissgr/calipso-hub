@@ -17,14 +17,17 @@
  */
 package gr.abiss.calipso.tiers.service;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.persistence.Column;
-
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import gr.abiss.calipso.repository.UserRepository;
+import gr.abiss.calipso.service.EmailService;
+import gr.abiss.calipso.tiers.repository.ModelRepository;
+import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.userDetails.util.SecurityUtil;
+import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
+import gr.abiss.calipso.websocket.Destinations;
 import gr.abiss.calipso.websocket.message.IActivityNotificationMessage;
 import gr.abiss.calipso.websocket.message.IMessageResource;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -40,18 +43,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.ListUtils;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.repository.UserRepository;
-import gr.abiss.calipso.service.EmailService;
-import gr.abiss.calipso.tiers.repository.ModelRepository;
-import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
-import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
-import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
-import gr.abiss.calipso.websocket.Destinations;
-import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
+import javax.persistence.Column;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public abstract class AbstractModelServiceImpl<T extends CalipsoPersistable<ID>, ID extends Serializable, R extends ModelRepository<T, ID>>

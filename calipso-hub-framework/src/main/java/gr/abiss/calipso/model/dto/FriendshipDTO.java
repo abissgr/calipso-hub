@@ -17,18 +17,12 @@
  */
 package gr.abiss.calipso.model.dto;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.friends.model.FriendshipId;
 import gr.abiss.calipso.friends.model.FriendshipStatus;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.User.Builder;
 import io.swagger.annotations.ApiModel;
+
+import java.io.Serializable;
 
 @ApiModel(value = "FriendshipDTO", description = "FriendshipDTO is a lightweight DTO version of Friendship")
 public class FriendshipDTO implements Serializable {

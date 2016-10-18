@@ -17,30 +17,22 @@
  */
 package gr.abiss.calipso.model;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-
-import org.javers.core.metamodel.annotation.ShallowReference;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import gr.abiss.calipso.users.model.User;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.javers.core.metamodel.annotation.ShallowReference;
+
+import javax.persistence.*;
+import java.util.Date;
 
 @ShallowReference
 @Entity
@@ -51,6 +43,19 @@ import io.swagger.annotations.ApiModelProperty;
 public class UserCredentials extends AbstractSystemUuidPersistable implements CalipsoPersistable<String> {
 
 	private static final long serialVersionUID = 1L;
+
+
+    @Column(name = "user_name", unique = true, nullable = false)
+    private String username;
+
+    @Column(name = "active")
+    private Boolean active = false;
+
+    @Column(name = "inactivation_reason")
+    private String inactivationReason;
+
+    @Column(name = "inactivation_date")
+    private Date inactivationDate;
 
 	@ApiModelProperty(hidden = true)
 	@JsonSerialize(using = SkipPropertySerializer.class)
@@ -80,10 +85,15 @@ public class UserCredentials extends AbstractSystemUuidPersistable implements Ca
 	public UserCredentials() {
 	}
 
-	public UserCredentials(String password, String resetPasswordToken, Date resetPasswordTokenCreated,
-			Date lastPassWordChangeDate, Date lastLogin, Short loginAttempts) {
+    public UserCredentials(String username, Boolean active, String inactivationReason, Date inactivationDate,
+                           String password, String resetPasswordToken, Date resetPasswordTokenCreated,
+                           Date lastPassWordChangeDate, Date lastLogin, Short loginAttempts) {
 		super();
-		this.password = password;
+        this.username = username;
+        this.active = active;
+        this.inactivationReason = inactivationReason;
+        this.inactivationDate = inactivationDate;
+        this.password = password;
 		this.resetPasswordToken = resetPasswordToken;
 		this.resetPasswordTokenCreated = resetPasswordTokenCreated;
 		this.lastPassWordChangeDate = lastPassWordChangeDate;
@@ -94,6 +104,18 @@ public class UserCredentials extends AbstractSystemUuidPersistable implements Ca
 	@PreUpdate
 	@PrePersist
 	public void onBeforeSave() {
+
+        // fallback username
+        if (!StringUtils.isNotBlank(this.getUsername())) {
+            String username = this.getUser().getEmail();
+            if (StringUtils.isNotBlank(username)) {
+                username = username.replace("@", "_").replaceAll("\\.", "_");
+            } else {
+                username = this.getUser().getId();
+            }
+            this.setUsername(username);
+        }
+
 		// clear or set the token creation date  if needed
 		if (this.getResetPasswordToken() == null) {
 			this.setResetPasswordTokenCreated(null);
@@ -102,15 +124,53 @@ public class UserCredentials extends AbstractSystemUuidPersistable implements Ca
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		return "UserCredentials [password=" + password + ", resetPasswordToken=" + resetPasswordToken
-				+ ", resetPasswordTokenCreated=" + resetPasswordTokenCreated + ", lastPassWordChangeDate="
-				+ lastPassWordChangeDate + ", lastLogin=" + lastLogin + ", loginAttempts=" + loginAttempts + "]";
-	}
+        return new ToStringBuilder(this).appendSuper(super.toString())
+                .append("username", this.getUsername())
+                .append("active", this.getActive())
+                .append("inactivationReason", this.getInactivationReason())
+                .append("inactivationDate", this.getInactivationDate())
+                .append("resetPasswordTokenCreated", this.resetPasswordTokenCreated)
+                .append("lastPassWordChangeDate", this.lastPassWordChangeDate)
+                .append("lastLogin", this.lastLogin)
+                .append("loginAttempts", this.loginAttempts)
+                .toString();
+    }
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String userName) {
+        this.username = userName;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public String getInactivationReason() {
+        return inactivationReason;
+    }
+
+    public void setInactivationReason(String inactivationReason) {
+        this.inactivationReason = inactivationReason;
+    }
+
+    public Date getInactivationDate() {
+        return inactivationDate;
+    }
+
+    public void setInactivationDate(Date inactivationDate) {
+        this.inactivationDate = inactivationDate;
+    }
+
 
 	public String getPassword() {
 		return password;
@@ -175,13 +235,37 @@ public class UserCredentials extends AbstractSystemUuidPersistable implements Ca
 	}
 
 	public static class Builder {
-		private String password;
+        private String username;
+        private Boolean active;
+        private String inactivationReason;
+        private Date inactivationDate;
+        private String password;
 		private String resetPasswordToken;
 		private Date resetPasswordTokenCreated;
 		private Date lastPassWordChangeDate;
 		private Date lastLogin;
 		private Short loginAttempts;
 		private User user;
+
+        public Builder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder active(Boolean active) {
+            this.active = active;
+            return this;
+        }
+
+        public Builder inactivationReason(String inactivationReason) {
+            this.inactivationReason = inactivationReason;
+            return this;
+        }
+
+        public Builder inactivationDate(Date inactivationDate) {
+            this.inactivationDate = inactivationDate;
+            return this;
+        }
 
 		public Builder password(String password) {
 			this.password = password;
@@ -224,7 +308,11 @@ public class UserCredentials extends AbstractSystemUuidPersistable implements Ca
 	}
 
 	private UserCredentials(Builder builder) {
-		this.password = builder.password;
+        this.username = builder.username;
+        this.active = builder.active;
+        this.inactivationReason = builder.inactivationReason;
+        this.inactivationDate = builder.inactivationDate;
+        this.password = builder.password;
 		this.resetPasswordToken = builder.resetPasswordToken;
 		this.resetPasswordTokenCreated = builder.resetPasswordTokenCreated;
 		this.lastPassWordChangeDate = builder.lastPassWordChangeDate;

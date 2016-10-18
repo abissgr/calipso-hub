@@ -1,13 +1,12 @@
 package gr.abiss.calipso.friends.model;
 
-import java.io.Serializable;
-
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import gr.abiss.calipso.friends.binding.FriendshipIdDeserializer;
+import gr.abiss.calipso.friends.binding.FriendshipIdSerializer;
+import gr.abiss.calipso.users.model.User;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -15,15 +14,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import gr.abiss.calipso.friends.binding.FriendshipIdDeserializer;
-import gr.abiss.calipso.friends.binding.FriendshipIdSerializer;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * Composite primary key for {@Friendship}

@@ -18,15 +18,14 @@
 package gr.abiss.calipso.tiers.service;
 
 
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-
-import java.io.Serializable;
-
+import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.websocket.message.IActivityNotificationMessage;
 import gr.abiss.calipso.websocket.message.IMessageResource;
 import org.springframework.data.domain.Persistable;
 import org.springframework.stereotype.Service;
+
+import java.io.Serializable;
 
 /**
  * Provides SCRUD and utility operations for {@link T} entities

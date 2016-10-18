@@ -1,31 +1,24 @@
 package gr.abiss.calipso.friends.service.impl;
 
-import java.util.Map;
-
-import javax.inject.Named;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
-
 import gr.abiss.calipso.friends.model.Friendship;
 import gr.abiss.calipso.friends.model.FriendshipId;
 import gr.abiss.calipso.friends.model.FriendshipStatus;
 import gr.abiss.calipso.friends.repository.FriendshipRepository;
 import gr.abiss.calipso.friends.service.FriendshipService;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
+import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
 import gr.abiss.calipso.websocket.Destinations;
 import gr.abiss.calipso.websocket.message.ActivityNotificationMessage;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Named;
 
 @Named(FriendshipService.BEAN_ID)
 @Transactional(readOnly = true)

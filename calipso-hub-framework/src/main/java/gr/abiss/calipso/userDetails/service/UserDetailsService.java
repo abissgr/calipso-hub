@@ -17,10 +17,9 @@
  */
 package gr.abiss.calipso.userDetails.service;
 
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
-
+import gr.abiss.calipso.users.model.User;
 import org.resthub.common.service.CrudService;
 
 

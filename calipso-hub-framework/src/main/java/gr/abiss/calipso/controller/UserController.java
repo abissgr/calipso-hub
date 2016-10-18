@@ -17,30 +17,24 @@
  */
 package gr.abiss.calipso.controller;
 
-import javax.inject.Inject;
-
-import org.resthub.web.exception.NotImplementedClientException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.annotation.JsonView;
-
 import gr.abiss.calipso.fs.FilePersistenceService;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.dto.MetadatumDTO;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
 import gr.abiss.calipso.tiers.controller.IFilesModelController;
+import gr.abiss.calipso.users.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.resthub.web.exception.NotImplementedClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.*;
+
+import javax.inject.Inject;
 
 
 @Api(tags = "Users", description = "User management operations")
@@ -66,8 +60,8 @@ public class UserController extends AbstractNoDeleteModelController<User, String
 	@ResponseBody
 	@ApiOperation(value = "Get one by username or email", notes = "Get the single user with the given username or email.")
 	public User getByUserNameOrEmail(@PathVariable String userNameOrEmail) {
-		return this.service.findByUserNameOrEmail(userNameOrEmail);
-	}
+        return this.service.findOneByUserNameOrEmail(userNameOrEmail);
+    }
 	
 	
 

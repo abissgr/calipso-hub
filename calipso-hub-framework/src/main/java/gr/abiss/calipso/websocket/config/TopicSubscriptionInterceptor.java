@@ -1,16 +1,14 @@
 package gr.abiss.calipso.websocket.config;
 
+import gr.abiss.calipso.users.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-
-import gr.abiss.calipso.model.User;
 
 //TODO. setup for secirity in WebSocketConfig
 public class TopicSubscriptionInterceptor extends ChannelInterceptorAdapter {
@@ -34,7 +32,7 @@ public class TopicSubscriptionInterceptor extends ChannelInterceptorAdapter {
 
     private boolean validateSubscription(User principal, String topicDestination)
     {
-    	LOGGER.debug("Validate subscription for {} to topic {}",principal.getUsername(),topicDestination);
+        LOGGER.debug("Validate subscription for {} to topic {}", principal, topicDestination);
         //Validation logic coming here
         return true;
     }

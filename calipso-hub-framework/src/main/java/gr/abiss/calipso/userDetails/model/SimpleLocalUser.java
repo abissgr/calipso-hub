@@ -17,16 +17,7 @@
  */
 package gr.abiss.calipso.userDetails.model;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.interfaces.Metadatum;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.security.core.GrantedAuthority;
+import gr.abiss.calipso.users.model.User;
 
 @Deprecated
 public class SimpleLocalUser  extends User{

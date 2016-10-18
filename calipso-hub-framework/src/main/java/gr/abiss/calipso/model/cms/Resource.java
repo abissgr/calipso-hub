@@ -17,27 +17,17 @@
  */
 package gr.abiss.calipso.model.cms;
 
-import static org.apache.commons.lang.CharEncoding.UTF_8;
-
 import gr.abiss.calipso.model.Host;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.types.ResourceProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 /**
  */

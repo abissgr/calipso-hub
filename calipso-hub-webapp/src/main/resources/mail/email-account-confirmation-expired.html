@@ -9,11 +9,11 @@
     </head>
     <body>
         <p class="greetings" th:text="#{email.greeting(${user.getFirstName()})}"
-        	th:unless="${#strings.isEmpty(user.getFirstName())}">
+           th:unless="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
-        <p class="greetings" th:text="#{email.greeting(${user.getUsername()})}"
-        	th:if="${#strings.isEmpty(user.getFirstName())}">
+        <p class="greetings" th:text="#{email.greeting(${user.getCredentials().getUsername()})}"
+           th:if="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
         <p th:text="#{email.accountconfirmation.expired.clicklinktoconfirm}">

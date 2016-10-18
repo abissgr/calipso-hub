@@ -17,14 +17,14 @@
  */
 package gr.abiss.calipso.userDetails.model;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import gr.abiss.calipso.model.interfaces.Metadatum;
+import gr.abiss.calipso.model.serializers.SkipPropertyDeserializer;
+import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import gr.abiss.calipso.users.model.User;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
@@ -33,16 +33,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-//import com.wordnik.swagger.annotations.ApiModel;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.*;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.interfaces.Metadatum;
-import gr.abiss.calipso.model.serializers.SkipPropertyDeserializer;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+//import com.wordnik.swagger.annotations.ApiModel;
 
 
 //@ApiModel
@@ -59,8 +53,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private String id;
 	
 	private String username;
-	
-	private Long notificationCount;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	private String password;
@@ -127,8 +119,11 @@ public class UserDetails implements  ICalipsoUserDetails{
 			if(user.getId() != null){
 				details.setId(user.getId().toString());
 			}
-			details.setUsername(user.getUsername());
-			details.setPassword(user.getCredentials().getPassword());
+            if (user.getCredentials() != null) {
+                details.setUsername(user.getCredentials().getUsername());
+                details.setPassword(user.getCredentials().getPassword());
+            }
+
 			details.setEmail(user.getEmail());
 			details.setFirstName(user.getFirstName());
 			details.setLastName(user.getLastName());
@@ -208,23 +203,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@Override
 	public String getFirstName() {
 		return firstName;
-	}
-
-
-	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setNotificationCount()
-	 */
-	@Override
-	public Long getNotificationCount() {
-		return notificationCount;
-	}
-
-	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setNotificationCount(Long)
-	 */
-	@Override
-	public void setNotificationCount(Long notificationCount) {
-		this.notificationCount = notificationCount;
 	}
 
 	/**
@@ -611,8 +589,8 @@ public class UserDetails implements  ICalipsoUserDetails{
 	}
 
 	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setAuthorities(java.util.Collection)
-	 */
+     * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setAuthorities(List)
+     */
 	@Override
 	public void setAuthorities(
 			List<? extends GrantedAuthority> authorities) {
@@ -698,16 +676,16 @@ public class UserDetails implements  ICalipsoUserDetails{
 	}
 
 	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getOldPassword()
-	 */
+     * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#getCurrentPassword()
+     */
 	@Override
 	public String getCurrentPassword() {
 		return currentPassword;
 	}
 
 	/**
-	 * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setOldPassword(String)
-	 */
+     * @see gr.abiss.calipso.userDetails.model.ICalipsoUserDetails#setCurrentPassword(String)
+     */
 	@Override
 	public void setCurrentPassword(String currentPassword) {
 		this.currentPassword = currentPassword;

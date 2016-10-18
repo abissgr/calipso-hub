@@ -1,15 +1,15 @@
 package gr.abiss.calipso.websocket.model;
 
+import gr.abiss.calipso.model.base.AbstractAssignedidPersistable;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
+import gr.abiss.calipso.users.model.User;
+import io.swagger.annotations.ApiModel;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.base.AbstractAssignedidPersistable;
-import gr.abiss.calipso.tiers.annotation.ModelResource;
-import io.swagger.annotations.ApiModel;
 
 /**
  * Persistent class corresponding to a websocket STOMP session. The entities are only 

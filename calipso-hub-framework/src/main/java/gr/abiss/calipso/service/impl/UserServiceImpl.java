@@ -17,34 +17,7 @@
  */
 package gr.abiss.calipso.service.impl;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.hibernate.LockMode;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
-import org.hibernate.Session;
-import org.hibernate.StatelessSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.keygen.KeyGenerators;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import gr.abiss.calipso.model.Role;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.UserCredentials;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
@@ -58,6 +31,28 @@ import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
+import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.keygen.KeyGenerators;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 //@Named("userService")
 public class UserServiceImpl extends AbstractModelServiceImpl<User, String, UserRepository> 
@@ -90,16 +85,15 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 
 	/**
 	 * {@inheritDoc}
-	 * @see gr.abiss.calipso.userDetails.integration.LocalUserService#findByCredentials(java.lang.String, java.lang.String, java.util.Map)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public User findByCredentials(String userNameOrEmail, String password, Map metadata) {
+	public User findActiveByCredentials(String userNameOrEmail, String password, Map metadata) {
 		LOGGER.debug("findByCredentials, userNameOrEmail: {}, password: {}", userNameOrEmail, password);
 		
 		User user = null;
 		try {
-			user = this.repository.findByCredentials(userNameOrEmail, password);
+			user = this.findActiveByCredentials(userNameOrEmail, password);
 			LOGGER.debug("findByCredentials, user: {}", user);
 			if (user != null) {
 				if (!CollectionUtils.isEmpty(metadata)) {
@@ -120,15 +114,25 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Transactional(readOnly = false)
 	public User create(User resource) {
 
+		// note any credential info
+		UserCredentials credentials = resource.getCredentials();
+		resource.setCredentials(null);
+
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
 		resource = super.create(resource);
-		
-		resource.setCredentials(
-				this.credentialsRepository.save(
-					new UserCredentials.Builder()
-					.user(resource)
-					.resetPasswordToken(generator.generateKey()).build()));
+
+		// init credentials if empty
+		if (credentials == null) {
+			credentials = new UserCredentials();
+		}
+		credentials.setActive(false);
+		credentials.setUser(resource);
+		credentials.setResetPasswordToken(generator.generateKey());
+
+		// attach credentials
+		resource.setCredentials(this.credentialsRepository.save(credentials));
+
 
 		emailService.sendAccountConfirmation(resource);
 
@@ -144,10 +148,10 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		Date yesterday = DateUtils.addDays(new Date(), -1);
 		
 		// send email notifications for account confirmation tokens that expired
-        org.hibernate.Query query = session.createQuery("SELECT new " + USERDTO_CLASS 
-        		+ "(u.id, u.firstName, u.lastName,u.username, u.email, u.emailHash, u.avatarUrl) FROM User u "
-        		+ "WHERE u.password IS NULL and u.resetPasswordTokenCreated IS NOT NULL and u.resetPasswordTokenCreated  < :yesterday");
-        query.setParameter("yesterday", yesterday);
+        org.hibernate.Query query = session.createQuery("SELECT new " + USERDTO_CLASS
+				+ "(u.id, u.firstName, u.lastName,u.credentials.username, u.email, u.emailHash, u.avatarUrl) FROM User u "
+				+ "WHERE u.credentials.password IS NULL and u.credentials.resetPasswordTokenCreated IS NOT NULL and u.credentials.resetPasswordTokenCreated  < :yesterday");
+		query.setParameter("yesterday", yesterday);
         query.setFetchSize(Integer.valueOf(1000));
         query.setReadOnly(true);
         query.setLockMode("a", LockMode.NONE);
@@ -168,14 +172,25 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Transactional(readOnly = false)
 	public User createTest(User resource) {
 		LOGGER.warn("createActive, credentials: {}", resource.getCredentials());
+
+		// note any credential info
+		UserCredentials credentials = resource.getCredentials();
+		resource.setCredentials(null);
+
 		Role userRole = roleRepository.findByName(Role.ROLE_USER);
 		resource.addRole(userRole);
 		resource = super.create(resource);
-		
 
-		UserCredentials credentials = new UserCredentials();
+		// init credentials if empty
+		if (credentials == null) {
+			credentials = new UserCredentials();
+		}
+
 		credentials.setUser(resource);
-		credentials.setPassword(resource.getUsername());
+		if (credentials.getActive() && credentials.getPassword() == null) {
+			throw new UniqueConstraintViolationException("User to create is active but has no password set");
+		}
+
 		credentials = this.credentialsRepository.save(credentials);
 		
 		resource.setCredentials(credentials);
@@ -187,13 +202,18 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Transactional(readOnly = false)
 	public User handlePasswordResetToken(String userNameOrEmail, String token, String newPassword) {
 		Assert.notNull(userNameOrEmail);
-		User user = this.findByUserNameOrEmail(userNameOrEmail);
+		User user = this.findOneByUserNameOrEmail(userNameOrEmail);
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
-		user.getCredentials().setResetPasswordToken(null);
-		user.getCredentials().setPassword(newPassword);
-		user = this.update(user);
+		UserCredentials credentials = user.getCredentials();
+		if (credentials == null) {
+			credentials = new UserCredentials();
+			credentials.setUser(user);
+		}
+		credentials.setResetPasswordToken(null);
+		credentials.setPassword(newPassword);
+		credentials = this.credentialsRepository.save(credentials);
 
 		LOGGER.info("handlePasswordResetToken returning local user: " + user);
 		return user;
@@ -203,9 +223,9 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Transactional(readOnly = false)
 	public void handlePasswordResetRequest(String userNameOrEmail) {
 		Assert.notNull(userNameOrEmail);
-		User user = this.findByUserNameOrEmail(userNameOrEmail);
-		if (user == null || !user.getActive()) {
-			throw new UsernameNotFoundException("Could not match username to an active user: " + userNameOrEmail);
+		User user = this.findActiveByUserNameOrEmail(userNameOrEmail);
+		if (user == null) {
+			throw new UsernameNotFoundException("Could not match username/email to an active user: " + userNameOrEmail);
 		}
 		// keep any existing token
 		if(user.getCredentials().getResetPasswordToken() == null){
@@ -240,8 +260,72 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	 * {@inheritDoc}
 	 */
 	@Override
-	public User findByUserNameOrEmail(String userNameOrEmail) {
-		return this.repository.findByUsernameOrEmail(userNameOrEmail);
+	public User findOneByUserNameOrEmail(String... tokens) {
+		User found = null;
+		if (tokens != null) {
+			String userNameOrEmail;
+			for (int i = 0; found == null && i < tokens.length; i++) {
+				userNameOrEmail = tokens[i];
+				if (StringUtils.isNotBlank(userNameOrEmail)) {
+					found = userNameOrEmail.contains("@")
+							? this.repository.findByEmail(userNameOrEmail)
+							: this.repository.findByUsername(userNameOrEmail);
+				}
+			}
+		}
+		return found;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User findActiveByCredentials(String userNameOrEmail, String password) {
+		User found = null;
+		if (StringUtils.isNotBlank(userNameOrEmail) && StringUtils.isNotBlank(password)) {
+			found = userNameOrEmail.contains("@")
+					? this.repository.findActiveByEmailAndPassword(userNameOrEmail, password)
+					: this.repository.findActiveByUsernameAndPassword(userNameOrEmail, password);
+		}
+		return found;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User findActiveByUsername(String username) {
+		return this.repository.findActiveByUsername(username);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User findActiveByEmail(String email) {
+		return this.repository.findActiveByEmail(email);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User findActiveById(String id) {
+		return this.repository.findActiveById(id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public User findActiveByUserNameOrEmail(String userNameOrEmail) {
+		User found = null;
+		if (StringUtils.isNotBlank(userNameOrEmail)) {
+			found = userNameOrEmail.contains("@")
+					? this.findActiveByEmail(userNameOrEmail)
+					: this.findActiveByUsername(userNameOrEmail);
+		}
+		return found;
 	}
 
 
@@ -252,23 +336,29 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Transactional(readOnly = false)
 	public User createForImplicitSignup(User userAccountData) throws DuplicateEmailException {
 		LOGGER.info("createForImplicitSignup, localUser: " + userAccountData);
-		User user = new User();
-		user.setEmail(userAccountData.getEmail());
-		user.setUsername(userAccountData.getUsername());
-		user.setFirstName(userAccountData.getFirstName());
-		user.setLastName(userAccountData.getLastName());
-		user.getCredentials().setPassword(userAccountData.getCredentials().getPassword());
 		
 		
 		User existing = this.getPrincipalLocalUser();
-		if(existing == null){
-			existing = this.repository.findByUsernameOrEmail(user.getEmail());
+		if (existing == null) {
+			existing = this.repository.findByEmail(userAccountData.getEmail());
 		}
-		if(existing == null){
-			existing = this.repository.findByUsernameOrEmail(user.getUsername());
+		if (existing == null) {
+			String email = userAccountData.getCredentials() != null ? userAccountData.getCredentials().getUsername() : null;
+			if (StringUtils.isNotBlank(email) && email.contains("@")) {
+				existing = this.repository.findByEmail(email);
+			}
+		}
+		if (existing == null) {
+			if (userAccountData.getCredentials() == null) {
+				userAccountData.setCredentials(new UserCredentials());
+			}
+
+			userAccountData.getCredentials().setPassword(this.generator.generateKey());
+			userAccountData.getCredentials().setActive(true);
+			existing = this.createTest(userAccountData);
 		}
 		
-		return existing != null ? (User) existing : createTest(user);
+		return existing;
 	}
 	
 	/**
@@ -287,7 +377,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		Assert.isTrue(newPassword.equals(newPasswordConfirm), "Failed updating user pass: New password and new password confirmation must be equal");
 		
 		// make sure a user matching the credentials is found
-		User u = this.findByCredentials(userNameOrEmail, oldPassword, null);
+		User u = this.findActiveByCredentials(userNameOrEmail, oldPassword);
 		Assert.notNull(u, "Failed updating user pass: A user could not be found with the given credentials");
 		
 		// update password and return user

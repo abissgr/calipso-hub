@@ -17,21 +17,20 @@
  */
 package gr.abiss.calipso.controller;
 
-import static io.restassured.RestAssured.given;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.*;
-
+import gr.abiss.calipso.test.AbstractControllerIT;
+import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.utils.Constants;
+import io.restassured.builder.MultiPartSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.utils.Constants;
-import io.restassured.builder.MultiPartSpecBuilder;
-import io.restassured.specification.RequestSpecification;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 @Test(/*singleThreaded = true, */description = "User entity tests")
 @SuppressWarnings("unused")

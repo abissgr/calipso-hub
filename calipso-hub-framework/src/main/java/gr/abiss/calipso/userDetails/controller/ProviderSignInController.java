@@ -17,54 +17,31 @@
  */
 package gr.abiss.calipso.userDetails.controller;
 
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.UserCredentials;
 import gr.abiss.calipso.userDetails.controller.form.RegistrationForm;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.SimpleLocalUser;
-import gr.abiss.calipso.userDetails.model.UserDetails;
 import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
 import gr.abiss.calipso.userDetails.util.SocialMediaService;
+import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import io.swagger.annotations.Api;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionFactory;
-import org.springframework.social.connect.ConnectionFactoryLocator;
-import org.springframework.social.connect.ConnectionKey;
-import org.springframework.social.connect.UserProfile;
-import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.*;
 import org.springframework.social.connect.web.ProviderSignInAttempt;
-import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.social.connect.web.SignInAdapter;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.view.RedirectView;
+
+import javax.inject.Inject;
 
 
 //@Controller
@@ -187,12 +164,12 @@ public class ProviderSignInController extends org.springframework.social.connect
 
 		try {
 			User user = new User();
-			user.setEmail(userAccountData.getEmail());
+            user.setCredentials(new UserCredentials());
+            user.setEmail(userAccountData.getEmail());
 			user.setFirstName(userAccountData.getFirstName());
 			user.setLastName(userAccountData.getLastName());
-			user.setUsername(userAccountData.getUserName());
-			user.setCredentials(new UserCredentials());
-			user.getCredentials().setPassword(userAccountData.getPassword());
+            user.getCredentials().setUsername(userAccountData.getUserName());
+            user.getCredentials().setPassword(userAccountData.getPassword());
 
 			registered = userService.createForImplicitSignup(user);
 		} catch (DuplicateEmailException ex) {

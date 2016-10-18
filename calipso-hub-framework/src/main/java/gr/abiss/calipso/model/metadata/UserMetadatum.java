@@ -18,7 +18,7 @@
 package gr.abiss.calipso.model.metadata;
 
 import gr.abiss.calipso.model.entities.AbstractMetadatum;
-import gr.abiss.calipso.model.User;
+import gr.abiss.calipso.users.model.User;
 
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;

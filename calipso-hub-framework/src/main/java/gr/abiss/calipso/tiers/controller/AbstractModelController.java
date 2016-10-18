@@ -18,17 +18,18 @@
 package gr.abiss.calipso.tiers.controller;
 
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.annotation.JsonView;
+import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
+import gr.abiss.calipso.tiers.service.ModelService;
+import gr.abiss.calipso.uischema.model.UiSchema;
+import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
+import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -40,33 +41,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
-import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
-import gr.abiss.calipso.tiers.service.ModelService;
-import gr.abiss.calipso.uischema.model.UiSchema;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
-import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * RESTful controller providing SCRUD and utility calls for {@link T} entities

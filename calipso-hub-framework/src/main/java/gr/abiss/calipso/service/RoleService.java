@@ -18,8 +18,8 @@
 package gr.abiss.calipso.service;
 
 import gr.abiss.calipso.model.Role;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.tiers.service.ModelService;
+import gr.abiss.calipso.users.model.User;
 
 public interface RoleService extends ModelService<Role, String> {
 

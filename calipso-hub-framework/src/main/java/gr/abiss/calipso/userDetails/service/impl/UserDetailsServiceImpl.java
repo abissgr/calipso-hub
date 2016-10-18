@@ -17,7 +17,6 @@
  */
 package gr.abiss.calipso.userDetails.service.impl;
 
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
 import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
@@ -26,16 +25,7 @@ import gr.abiss.calipso.userDetails.service.UserDetailsService;
 import gr.abiss.calipso.userDetails.util.DuplicateEmailException;
 import gr.abiss.calipso.userDetails.util.SecurityUtil;
 import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import gr.abiss.calipso.users.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,19 +38,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionData;
 import org.springframework.social.connect.ConnectionSignUp;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.SignInAdapter;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.social.linkedin.api.LinkedIn;
-import org.springframework.social.linkedin.api.LinkedInProfile;
-import org.springframework.social.linkedin.api.impl.LinkedInTemplate;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.context.request.NativeWebRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 //@Named("userDetailsService")
@@ -108,7 +98,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("loadUserByUsername using: " + findByUsernameOrEmail);
 		}
-		User user = this.userService.findByUserNameOrEmail(findByUsernameOrEmail);
+        User user = this.userService.findActiveByUserNameOrEmail(findByUsernameOrEmail);
 
 
 		if(LOGGER.isDebugEnabled()){
@@ -156,8 +146,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 					// ask for the corresponding persisted user
 					User user = this.userService
-							.findByCredentials(usernameOrEmail, password,
-									metadata);
+                            .findActiveByCredentials(usernameOrEmail, password,
+                                    metadata);
 					if(LOGGER.isDebugEnabled()){
 						LOGGER.debug("create, Matched local user: "+user);
 					}
@@ -235,8 +225,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 				username = principal.getEmail();
 			}
 			if(StringUtils.isNotBlank(username) && !"anonymous".equals(username)){
-				user = this.userService.findByUserNameOrEmail(username);
-			}
+                user = this.userService.findActiveByUserNameOrEmail(username);
+            }
 		}
 
 		if(LOGGER.isDebugEnabled()){
@@ -245,12 +235,12 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		return user;
 	}
 
+
 	@Override
 	@Transactional(readOnly = false)
 	public ICalipsoUserDetails update(ICalipsoUserDetails resource) {
-		User user = this.userService.changePassword(resource.getEmailOrUsername(), resource.getCurrentPassword(), resource.getPassword(), resource.getPasswordConfirmation());
-		return UserDetails.fromUser(user);
-	}
+        return this.resetPassword(resource);
+    }
 
 	@Override
 	public void delete(ICalipsoUserDetails resource) {
@@ -301,15 +291,11 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		ICalipsoUserDetails userDetails = null;
 
 		// LOGGER.info("loadUserByUserId using: " + userId);
-		User user = this.userService.findByUserNameOrEmail(userId);
+        User user = this.userService.findActiveById(userId);
 
 		// LOGGER.info("loadUserByUserId user: " + user);
-		if (user != null) {
-			// LOGGER.info("loadUserByUserId about to copy user.roles: " +
-			// user.getRoles());
-			// Role userRole = new Role(Role.ROLE_USER);
-			// user.addRole(userRole);
-			userDetails = UserDetails.fromUser(user);
+        if (user != null && user.getCredentials().getActive()) {
+            userDetails = UserDetails.fromUser(user);
 		}
 
 		if (user == null) {
@@ -336,8 +322,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		User user = this.getPrincipalLocalUser();
 		
 		if (!StringUtils.isBlank(socialEmail)) {
-			user = userService.findByUserNameOrEmail(socialEmail);
-			// 
+            user = userService.findOneByUserNameOrEmail(socialEmail);
+            //
 
 			if (user == null) {
 				if(LOGGER.isDebugEnabled()){
@@ -346,7 +332,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 				user = new User();
 				user.setEmail(socialEmail);
-				user.setUsername(socialEmail);
 				user.setFirstName(socialFirstName);
 				user.setLastName(socialLastName);
 				try {
@@ -380,10 +365,10 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	public String signIn(String userId, Connection<?> connection, NativeWebRequest request) {
 		LOGGER.info("signIn, userId: " + userId);
 
-		User user = this.userService.findById(userId);
-		if(user == null){
-			user = this.userService.findByUserNameOrEmail(userId);
-		}
+        User user = this.userService.findActiveById(userId);
+        if(user == null){
+            user = this.userService.findActiveByUserNameOrEmail(userId);
+        }
 		//if(LOGGER.isDebugEnabled()){
 			LOGGER.info("SignInAdapter#signIn userId: " + userId + ", connection: " + connection.getKey() + ", mached user: " + user);
 		//}

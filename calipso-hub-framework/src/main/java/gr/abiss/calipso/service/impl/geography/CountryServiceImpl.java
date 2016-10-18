@@ -18,15 +18,12 @@
 package gr.abiss.calipso.service.impl.geography;
 
 import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.repository.geography.CountryRepository;
 import gr.abiss.calipso.service.geography.CountryService;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Named;
 
 
 @Named("countryService")

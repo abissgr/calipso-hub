@@ -17,18 +17,19 @@
  */
 package gr.abiss.calipso.controller;
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.*;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JacksonUtils;
+import gr.abiss.calipso.friends.model.Friendship;
+import gr.abiss.calipso.friends.model.FriendshipStatus;
+import gr.abiss.calipso.model.dto.FriendshipDTO;
+import gr.abiss.calipso.model.dto.UserDTO;
+import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
+import gr.abiss.calipso.model.dto.UserInvitationsDTO;
+import gr.abiss.calipso.test.AbstractControllerIT;
+import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.websocket.Destinations;
+import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
+import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,29 +38,12 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JacksonUtils;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
-import gr.abiss.calipso.friends.model.Friendship;
-import gr.abiss.calipso.friends.model.FriendshipId;
-import gr.abiss.calipso.friends.model.FriendshipStatus;
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.dto.FriendshipDTO;
-import gr.abiss.calipso.model.dto.UserDTO;
-import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
-import gr.abiss.calipso.model.dto.UserInvitationsDTO;
-import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.test.AbstractControllerIT.DefaultStompFrameHandler;
-import gr.abiss.calipso.test.AbstractControllerIT.Loggedincontext;
-import gr.abiss.calipso.userDetails.model.LoginSubmission;
-import gr.abiss.calipso.utils.Constants;
-import gr.abiss.calipso.websocket.Destinations;
-import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
-import gr.abiss.calipso.websocket.message.StateUpdateMessage;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
+import static io.restassured.RestAssured.given;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.notNullValue;
 
 @Test(/*singleThreaded = true, */description = "Test dynamic JPA specifications used in default search stack")
 @SuppressWarnings("unused")

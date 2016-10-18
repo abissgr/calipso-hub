@@ -17,28 +17,7 @@
  */
 package gr.abiss.calipso.init;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Date;
-
-import javax.inject.Named;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.resthub.common.util.PostInitialize;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import gr.abiss.calipso.model.Role;
-import gr.abiss.calipso.model.User;
 import gr.abiss.calipso.model.UserCredentials;
 import gr.abiss.calipso.model.geography.Continent;
 import gr.abiss.calipso.model.geography.Country;
@@ -47,11 +26,26 @@ import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.repository.geography.ContinentRepository;
 import gr.abiss.calipso.repository.geography.CountryRepository;
 import gr.abiss.calipso.service.EmailService;
-import gr.abiss.calipso.service.RoleService;
 import gr.abiss.calipso.service.UserService;
-import gr.abiss.calipso.service.cms.TextService;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
+import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.utils.ConfigurationFactory;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.resthub.common.util.PostInitialize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Date;
 
 
 @Component
@@ -123,37 +117,12 @@ public class CalipsoDataInitializer {
 			
 			Date now = new Date();
 
-			// Host h1 = new Host("www.abiss.gr");
-			// h1.addAlias("abiss.gr");
-			// h1 = hostService.create(h1);
-			// Host h2 = new Host("dev.abiss.gr");
-			// h2 = hostService.create(h2);
-			// Host h3 = new Host("calipso.abiss.gr");
-			// h3 = hostService.create(h3);
-			// Text t1 = new Text("test2");
-
-			// t1.setHost(h2);
-			// t1.setSource("test2");
-			// t1.setSourceContentType(Text.MIME_MARKDOWN);
-			// textService.create(t1);
-			// Text t2 = new Text("test2");
-			// t2.setHost(h1);
-			// t2.setSource("test2");
-			// t2.setSourceContentType(Text.MIME_MARKDOWN);
-			// textService.create(t2);
-			// Text t3 = new Text("test3");
-			// t3.setHost(h1);
-			// t3.setSource("test3");
-			// t3.setSourceContentType(Text.MIME_MARKDOWN);
-			// textService.create(t3);
-
 			User system = new User();
-			system.setActive(false);
 			system.setEmail("system@abiss.gr");
 			system.setFirstName("System");
 			system.setLastName("User");
-			system.setUsername("system");
-			system.setLastVisit(now);
+            system.setCredentials(new UserCredentials.Builder().active(false).username("system").password("system").build());
+            system.setLastVisit(now);
 			system = userService.createTest(system);
 
 			// login
@@ -161,24 +130,22 @@ public class CalipsoDataInitializer {
 					new UsernamePasswordAuthenticationToken(system, system.getCredentials().getPassword(), system.getRoles()));
 
 			User adminUser = new User();
-			adminUser.setActive(true);
 			adminUser.setEmail("info@abiss.gr");
 			adminUser.setFirstName("Admin");
 			adminUser.setLastName("User");
-			adminUser.setUsername("admin");
 			adminUser.setLastVisit(now);
 			adminUser.addRole(adminRole);
+            adminUser.setCredentials(new UserCredentials.Builder().active(true).username("admin").password("admin").build());
 //			adminUser.setCreatedBy(system);
 			adminUser = userService.createTest(adminUser);
 
 			User opUser = new User();
-			opUser.setActive(true);
 			opUser.setEmail("operator@abiss.gr");
 			opUser.setFirstName("Operator");
 			opUser.setLastName("User");
-			opUser.setUsername("operator");
-			opUser.setLastVisit(now);
-			opUser.addRole(adminRole);
+            opUser.setCredentials(new UserCredentials.Builder().active(true).username("operator").password("operator").build());
+            opUser.setLastVisit(now);
+            opUser.addRole(operatorRole);
 //			opUser.setCreatedBy(system);
 			opUser = userService.createTest(opUser);
 
@@ -188,12 +155,11 @@ public class CalipsoDataInitializer {
 				for (String fullName : this.getTenNames()) {
 					String userName = fullName.toLowerCase().replace(" ", "") + usersCreated;
 					User u = new User();
-					u.setActive(true);
 					u.setEmail(userName + "@abiss.gr");
 					u.setFirstName(fullName.substring(0, fullName.indexOf(" ")));
 					u.setLastName(fullName.substring(fullName.indexOf(" ") + 1));
-					u.setUsername(userName);
-					u.setLastVisit(now);
+                    u.setCredentials(new UserCredentials.Builder().active(true).username(userName).password(userName).build());
+                    u.setLastVisit(now);
 //					u.setCreatedBy(system);
 					u = userService.createTest(u);
 					
@@ -211,8 +177,8 @@ public class CalipsoDataInitializer {
 		if(config.getBoolean(ConfigurationFactory.TEST_EMAIL_ENABLE, false)){
 			String testEmailUsername = config.getString(ConfigurationFactory.TEST_EMAIL_USER, "system");
 			if(StringUtils.isNotBlank(testEmailUsername)){
-				User u = this.userService.findByUserNameOrEmail(testEmailUsername);
-				this.emailService.sendTest(u);
+                User u = this.userService.findOneByUserNameOrEmail(testEmailUsername);
+                this.emailService.sendTest(u);
 			}
 		}
 		

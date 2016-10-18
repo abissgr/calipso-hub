@@ -17,16 +17,13 @@
  */
 package gr.abiss.calipso.model.base;
 
-import java.io.Serializable;
-
-import javax.persistence.MappedSuperclass;
-
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import gr.abiss.calipso.users.model.User;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.domain.Persistable;
 
-import gr.abiss.calipso.model.User;
-import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 
 /**
  * Abstract base class for all persistent entities.

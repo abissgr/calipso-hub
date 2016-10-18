@@ -17,17 +17,15 @@
  */
 package gr.abiss.calipso.userDetails.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import gr.abiss.calipso.users.model.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.social.security.SocialUserDetails;
+
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.social.security.SocialUserDetails;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import gr.abiss.calipso.model.User;
 
 @JsonDeserialize(as=UserDetails.class)
 public interface ICalipsoUserDetails extends SocialUserDetails, Principal {
@@ -132,10 +130,6 @@ public interface ICalipsoUserDetails extends SocialUserDetails, Principal {
 	public void setCurrentPassword(String password);
 
 	public void setAuthorities(List<? extends GrantedAuthority> authorities);
-
-	public Long getNotificationCount();
-	
-	public void setNotificationCount(Long notificationCount);
 
 	User getUser();
 
