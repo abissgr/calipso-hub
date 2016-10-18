@@ -38,6 +38,7 @@
 		<module>calipso-hub-test</module>
 		<module>calipso-hub-framework</module>
 		<module>calipso-hub-webapp</module>
+<!-- 		<module>calipso-hub-boot</module> -->
 	</modules>
 
 	<profiles>
