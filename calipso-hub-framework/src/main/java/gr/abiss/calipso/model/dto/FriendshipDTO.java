@@ -17,9 +17,9 @@
  */
 package gr.abiss.calipso.model.dto;
 
-import gr.abiss.calipso.friends.model.Friendship;
-import gr.abiss.calipso.friends.model.FriendshipId;
-import gr.abiss.calipso.friends.model.FriendshipStatus;
+import com.restdude.app.friends.model.Friendship;
+import com.restdude.app.friends.model.FriendshipId;
+import com.restdude.app.friends.model.FriendshipStatus;
 import io.swagger.annotations.ApiModel;
 
 import java.io.Serializable;

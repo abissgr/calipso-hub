@@ -17,8 +17,8 @@
  */
 package gr.abiss.calipso.model.dto;
 
-import gr.abiss.calipso.model.UserCredentials;
-import gr.abiss.calipso.users.model.User;
+import com.restdude.app.users.model.User;
+import com.restdude.app.users.model.UserCredentials;
 import gr.abiss.calipso.websocket.message.IMessageResource;
 import io.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.builder.ToStringBuilder;

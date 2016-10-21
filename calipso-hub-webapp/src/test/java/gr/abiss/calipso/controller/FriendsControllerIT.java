@@ -19,14 +19,14 @@ package gr.abiss.calipso.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JacksonUtils;
-import gr.abiss.calipso.friends.model.Friendship;
-import gr.abiss.calipso.friends.model.FriendshipStatus;
+import com.restdude.app.friends.model.Friendship;
+import com.restdude.app.friends.model.FriendshipStatus;
+import com.restdude.app.users.model.User;
 import gr.abiss.calipso.model.dto.FriendshipDTO;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
 import gr.abiss.calipso.model.dto.UserInvitationsDTO;
 import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.websocket.Destinations;
 import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
 import io.restassured.specification.RequestSpecification;

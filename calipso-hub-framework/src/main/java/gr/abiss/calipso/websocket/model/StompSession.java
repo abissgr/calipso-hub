@@ -1,8 +1,8 @@
 package gr.abiss.calipso.websocket.model;
 
+import com.restdude.app.users.model.User;
 import gr.abiss.calipso.model.base.AbstractAssignedidPersistable;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
-import gr.abiss.calipso.users.model.User;
 import io.swagger.annotations.ApiModel;
 
 import javax.persistence.Entity;

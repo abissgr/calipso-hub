@@ -44,10 +44,10 @@
 <!--     </logger> -->
 
     <!-- other -->
-    <logger name="gr.abiss.calipso.controller">
+    <logger name="gr.abiss.calipso">
         <level value="DEBUG" />
     </logger>
-    <logger name="gr.abiss.calipso.friends">
+    <logger name="com.restdude">
         <level value="DEBUG" />
     </logger>
 <!--     <logger name="org.springframework"> -->

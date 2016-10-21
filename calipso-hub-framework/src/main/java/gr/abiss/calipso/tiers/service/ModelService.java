@@ -18,8 +18,8 @@
 package gr.abiss.calipso.tiers.service;
 
 
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.users.model.User;
+import com.restdude.app.users.model.User;
+import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.websocket.message.IActivityNotificationMessage;
 import gr.abiss.calipso.websocket.message.IMessageResource;
 import org.springframework.data.domain.Persistable;

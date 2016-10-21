@@ -17,25 +17,23 @@
  */
 package gr.abiss.calipso.web.filters;
 
-import gr.abiss.calipso.userDetails.integration.UserDetailsConfig;
-import gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig;
+import com.restdude.auth.userdetails.integration.UserDetailsConfig;
+import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
 import gr.abiss.calipso.utils.Constants;
-
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
 
 @Component("restRequestNormalizerFilter")
 public class RestRequestNormalizerFilter extends OncePerRequestFilter {
@@ -82,8 +80,9 @@ public class RestRequestNormalizerFilter extends OncePerRequestFilter {
 				", authorizationHeader: " + authorizationHeader + ", cookieToken: " + cookieToken);
 		response.setContentType(JSON_UTF8);
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("doFilterInternal, path: " + request.getContextPath() + ", method override: " + requestMethodOverride  + ", authToken: " + cookieToken );
-		}
+            String method = requestMethodOverride != null ? requestMethodOverride : request.getMethod();
+            LOGGER.debug("doFilterInternal, method: " + method + ", path: " + request.getRequestURI() + ", contextPath: " + request.getContextPath() + ", method override: " + requestMethodOverride + ", authToken: " + cookieToken);
+        }
 		if (!StringUtils.isEmpty(requestMethodOverride) || !StringUtils.isEmpty(cookieToken) ) {
 			HttpServletRequest wrapper = new RestRequestNormalizerRequestWrapper(request, requestMethodOverride, cookieToken);
 			filterChain.doFilter(wrapper, response);

@@ -24,6 +24,7 @@ build.calipso.initData=true
 build.calipso.domain=localhost
 build.calipso.cookies.httpOnly=false
 build.calipso.cookies.secure=false
+build.calipso.registration.forceCodes=false
 build.log.rootlevel=warn
 
 # Email

@@ -19,22 +19,20 @@ package gr.abiss.calipso.tiers.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.restdude.app.users.model.User;
+import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
 import gr.abiss.calipso.tiers.annotation.CurrentPrincipalField;
 import gr.abiss.calipso.tiers.service.ModelService;
 import gr.abiss.calipso.uischema.model.UiSchema;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.users.model.User;
-import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.resthub.common.exception.NotFoundException;
-import org.resthub.common.model.RestError;
 import org.resthub.web.controller.ServiceBasedRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -283,8 +281,8 @@ public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, 
 	/**
      * Find the set of resources matching the given identifiers.
      *
-     * @param id The identifier of the resouce to find
-     * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
+	 * @param ids The identifier of the resouce to find
+	 * @return OK http status code if the request has been correctly processed, with resource found enclosed in the body
      * @throws NotFoundException
      */
 	@Override
@@ -332,14 +330,4 @@ public abstract class AbstractModelController<T extends CalipsoPersistable<ID>, 
 		return this.getSchema();
 	}
 
-	@ExceptionHandler(UniqueConstraintViolationException.class)
-	@ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-	public RestError handleEUniqueConstraintViolationException(HttpServletRequest request, Exception e){
-
-		UniqueConstraintViolationException ex = (UniqueConstraintViolationException) e;
-        RestError.Builder builder = new RestError.Builder();
-        builder.setMessage(ex.getMessage()).setCode(HttpStatus.BAD_REQUEST.value()).setStatus(HttpStatus.BAD_REQUEST.getReasonPhrase()).setThrowable(ex);
-        return builder.build();
-	}	
 }

@@ -17,30 +17,7 @@
  */
 package gr.abiss.calipso.tiers.service.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.resthub.common.service.CrudServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.method.P;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
+import com.restdude.auth.userdetails.util.SecurityUtil;
 import gr.abiss.calipso.model.acl.AclClass;
 import gr.abiss.calipso.model.acl.AclObject;
 import gr.abiss.calipso.model.acl.AclObjectIdentity;
@@ -57,7 +34,23 @@ import gr.abiss.calipso.repository.acl.AclSidRepository;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.tiers.service.GenericService;
 import gr.abiss.calipso.tiers.util.EntityUtil;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
+import org.resthub.common.service.CrudServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.method.P;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * JPA Entity CRUD and search service that uses a Spring Data repository implementation.

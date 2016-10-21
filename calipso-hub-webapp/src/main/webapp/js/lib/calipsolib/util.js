@@ -465,7 +465,7 @@ Calipso.cloneSpecificValue = function(val) {
 		}
 		// target='SignIn'
 		var formHtml = "<form class='social-signin-form' action='" + Calipso.getBaseUrl() +
-			"/api-oauth/signin/" + providerName + "' method='POST' role='form'>" +
+            "/api/auth/oauth/signin/" + providerName + "' method='POST' role='form'>" +
 		//"<input type='hidden' name='scope' value='email' />" +
 		//"<input type='hidden' name='scope' value='emailure' />" +
 		//"<input type='hidden' name='topWindowDomain' value='" + window.location.hostname + "' />" +

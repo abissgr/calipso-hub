@@ -17,15 +17,13 @@
  */
 package gr.abiss.calipso.job;
 
-import gr.abiss.calipso.controller.UserController;
-import gr.abiss.calipso.service.UserService;
-
-import javax.inject.Inject;
-
+import com.restdude.app.users.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
 
 @Component("userTasks")
 public class UserTasks {

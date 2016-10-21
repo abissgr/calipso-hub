@@ -17,10 +17,10 @@
  */
 package gr.abiss.calipso.web.spring;
 
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.service.UserDetailsService;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
-import gr.abiss.calipso.users.model.User;
+import com.restdude.app.users.model.User;
+import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
+import com.restdude.auth.userdetails.service.UserDetailsService;
+import com.restdude.auth.userdetails.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -17,18 +17,18 @@
  */
 package gr.abiss.calipso.init;
 
-import gr.abiss.calipso.model.Role;
-import gr.abiss.calipso.model.UserCredentials;
+import com.restdude.app.users.model.Role;
+import com.restdude.app.users.model.User;
+import com.restdude.app.users.model.UserCredentials;
+import com.restdude.app.users.repository.RoleRepository;
+import com.restdude.app.users.repository.UserRepository;
+import com.restdude.app.users.service.UserService;
 import gr.abiss.calipso.model.geography.Continent;
 import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.repository.RoleRepository;
-import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.repository.geography.ContinentRepository;
 import gr.abiss.calipso.repository.geography.CountryRepository;
 import gr.abiss.calipso.service.EmailService;
-import gr.abiss.calipso.service.UserService;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
-import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;

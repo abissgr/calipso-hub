@@ -1,8 +1,6 @@
 package gr.abiss.calipso.websocket.config;
 
-import java.security.Principal;
-import java.util.Map;
-
+import com.restdude.auth.userdetails.util.SecurityUtil;
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
@@ -24,7 +22,8 @@ import org.springframework.web.socket.server.RequestUpgradeStrategy;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
+import java.security.Principal;
+import java.util.Map;
 
 @Configuration
 @EnableWebSocketMessageBroker

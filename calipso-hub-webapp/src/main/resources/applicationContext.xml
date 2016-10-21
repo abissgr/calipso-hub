@@ -1,22 +1,19 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util" 
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:task="http://www.springframework.org/schema/task" 
-    xmlns:tx="http://www.springframework.org/schema/tx"
-    xmlns:mvc="http://www.springframework.org/schema/mvc" 
-    xmlns:aop="http://www.springframework.org/schema/aop"
-    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
-    xmlns:p="http://www.springframework.org/schema/p" 
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:task="http://www.springframework.org/schema/task"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
         http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context-3.2.xsd
         http://www.springframework.org/schema/util      http://www.springframework.org/schema/util/spring-util.xsd
         http://www.springframework.org/schema/task      http://www.springframework.org/schema/task/spring-task.xsd
-        http://www.springframework.org/schema/tx        http://www.springframework.org/schema/tx/spring-tx.xs
+
         http://www.springframework.org/schema/mvc       http://www.springframework.org/schema/mvc/spring-mvc.xsd
-        http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd
+
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
     
     <!-- needed by javers -->    
@@ -38,7 +35,7 @@
     </bean>
     
     <!-- Setup default file storage adapter -->
-    <bean class="gr.abiss.calipso.fs.FilePersistenceConfigPostProcessor">
+	<bean class="com.restdude.app.fs.FilePersistenceConfigPostProcessor">
     </bean>
     
     <!-- Generate controllers, services and repositories for entities with @ModelResource -->
@@ -82,14 +79,14 @@
 			<set>
 				<!-- converters is a set of both converters and converterfactories -->
 				<bean class="gr.abiss.calipso.model.serializers.CustomEnumConverterFactory" />
-				<bean class="gr.abiss.calipso.friends.binding.FriendshipIdDeserializer" />
+				<bean class="com.restdude.app.friends.binding.FriendshipIdDeserializer"/>
 			</set>
 		</property>
 	</bean>
     
     <!-- auth config -->
     <bean id="userDetailsConfig"
-        class="gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig">
+		  class="com.restdude.auth.userdetails.util.SimpleUserDetailsConfig">
         <constructor-arg value="calipso-sso" />
         <constructor-arg value="${calipso.domain}" />
         <constructor-arg value="/" />
@@ -112,10 +109,12 @@
 <!-- 	<jpa:auditing auditor-aware-ref="auditorBean"/> -->
 	
 	<context:component-scan base-package="
-    	**.calipso, 
+    	**.calipso,
+    	com.restdude,
     	org.resthub" />
 	<jpa:repositories base-package="
-    	**.calipso, 
+    	**.calipso,
+    	com.restdude,
     	org.resthub"
 		factory-class="gr.abiss.calipso.tiers.repository.ModelRepositoryFactoryBean" />
 
@@ -180,7 +179,7 @@
 	<!--import resource="applicationContext-swagger.xml" /-->
 
 
-	<bean id="userService" class="gr.abiss.calipso.service.impl.UserServiceImpl">
+	<bean id="userService" class="com.restdude.app.users.service.impl.UserServiceImpl">
 	</bean>
 	<alias name="userService" alias="localUserService" />
 	

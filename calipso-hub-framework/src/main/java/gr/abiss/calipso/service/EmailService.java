@@ -18,7 +18,7 @@
 package gr.abiss.calipso.service;
 
 
-import gr.abiss.calipso.users.model.User;
+import com.restdude.app.users.model.User;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

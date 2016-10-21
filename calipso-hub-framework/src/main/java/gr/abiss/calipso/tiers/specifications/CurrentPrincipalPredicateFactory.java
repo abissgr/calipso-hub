@@ -17,20 +17,17 @@
  */
 package gr.abiss.calipso.tiers.specifications;
 
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
-
-import java.io.Serializable;
+import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
+import com.restdude.auth.userdetails.util.SecurityUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import java.io.Serializable;
 
 /**
  * A predicate that automatically enforces the current principal (i.e. loggedin user) id

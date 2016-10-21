@@ -22,10 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.persistence.CascadeType;
-
-import gr.abiss.calipso.model.Role;
-
 /**
  * Used to enforce a criterion based on the current session userDetails, 
  * i.e. the loggedin in user. Enforced at service/specification level. For enforcing 

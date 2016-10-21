@@ -1,20 +1,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:twitter="http://www.springframework.org/schema/social/twitter"
-       xmlns:github="http://www.springframework.org/schema/social/github"
-       xmlns:linkedin="http://www.springframework.org/schema/social/linkedin"
-       xmlns:social="http://www.springframework.org/schema/social"
-       xmlns:facebook="http://www.springframework.org/schema/social/facebook"
-    xmlns:aop="http://www.springframework.org/schema/aop" 
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
-http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
-http://www.springframework.org/schema/social http://www.springframework.org/schema/social/spring-social-1.1.xsd
-http://www.springframework.org/schema/social/twitter http://www.springframework.org/schema/social/spring-social-twitter.xsd
-http://www.springframework.org/schema/social/linkedin http://www.springframework.org/schema/social/spring-social-linkedin.xsd 
-http://www.springframework.org/schema/social/github http://www.springframework.org/schema/social/spring-social-github.xsd 
-http://www.springframework.org/schema/social/facebook http://www.springframework.org/schema/social/spring-social-facebook.xsd
-http://www.springframework.org/schema/aop       http://www.springframework.org/schema/aop/spring-aop.xsd">
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:social="http://www.springframework.org/schema/social"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+
+http://www.springframework.org/schema/social http://www.springframework.org/schema/social/spring-social-1.1.xsd">
 
 
      <!--
@@ -94,8 +83,8 @@ http://www.springframework.org/schema/aop       http://www.springframework.org/s
 		autowire="constructor">
 		</bean> -->
 		<!-- public ProviderSignInController(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository, SignInAdapter signInAdapter) {-->
-	
-	<bean class="gr.abiss.calipso.userDetails.controller.ProviderSignInController">
+
+	<bean class="com.restdude.auth.social.controller.ProviderSignInController">
 		<constructor-arg ref="dataSource" />
 		<!--  
 			Sets the URL to redirect the user to if no local user account can be mapped when signing in using a provider.
@@ -110,7 +99,7 @@ http://www.springframework.org/schema/aop       http://www.springframework.org/s
 	    <!--property name="applicationUrl" value="${calipso.baseurl}" /-->
 	    <property name="signInInterceptors">
 	        <list>
-	            <bean class="gr.abiss.calipso.userDetails.util.FacebookConnectInterceptor" />
+				<bean class="com.restdude.auth.userdetails.util.FacebookConnectInterceptor"/>
 	        </list>
 	    </property>
 	</bean>

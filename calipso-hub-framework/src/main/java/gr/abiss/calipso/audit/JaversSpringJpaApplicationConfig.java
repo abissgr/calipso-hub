@@ -1,11 +1,7 @@
 package gr.abiss.calipso.audit;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.sql.DataSource;
-
+import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
+import com.restdude.auth.userdetails.util.SecurityUtil;
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
@@ -23,15 +19,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 //@ComponentScan(basePackages = "**.calipso")

@@ -95,6 +95,7 @@
         <filter-name>UrlRewriteFilter</filter-name>
         <url-pattern>/client/*</url-pattern>
         <url-pattern>/api/*</url-pattern>
+        <url-pattern>/apiauth/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
     
@@ -114,7 +115,7 @@
 	
 	<filter-mapping>
 		<filter-name>springSecurityFilterChain</filter-name>
-        <url-pattern>/api/rest/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
         <url-pattern>/apiauth/*</url-pattern>
         <url-pattern>/ws/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>

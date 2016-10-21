@@ -17,8 +17,9 @@
  */
 package gr.abiss.calipso.controller;
 
+import com.restdude.app.users.model.User;
+import com.restdude.auth.userAccount.model.UserAccountRegistration;
 import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.utils.Constants;
 import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -47,13 +48,14 @@ public class UserControllerIT extends AbstractControllerIT {
 	public void testRegistration() throws Exception {
 		RequestSpecification spec = this.getRequestSpec(null);
 		User user = given().spec(spec)
-				.body(new User.Builder()
-						.firstName("Firstname")
+                .log().all()
+                .body(new UserAccountRegistration.Builder()
+                        .firstName("Firstname")
 						.lastName("LastName")
 						.email("ittestreg@UserControllerIT.evasyst.com")
 						.build())
-				.post("/calipso/api/rest/users")
-				.then()
+                .post("/calipso/api/auth/account")
+                .then()
 				.log().all()
 				.assertThat()
 				// test assertions

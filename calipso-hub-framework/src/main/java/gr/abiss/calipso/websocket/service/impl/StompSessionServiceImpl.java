@@ -1,12 +1,12 @@
 package gr.abiss.calipso.websocket.service.impl;
 
 
-import gr.abiss.calipso.friends.repository.FriendshipRepository;
+import com.restdude.app.friends.repository.FriendshipRepository;
+import com.restdude.app.users.model.User;
+import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
+import com.restdude.auth.userdetails.model.UserDetails;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.model.UserDetails;
-import gr.abiss.calipso.users.model.User;
 import gr.abiss.calipso.websocket.Destinations;
 import gr.abiss.calipso.websocket.message.StateUpdateMessage;
 import gr.abiss.calipso.websocket.model.StompSession;

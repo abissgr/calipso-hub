@@ -54,7 +54,7 @@ It requires you to implement `LocalUserService` to integrate you your local User
 For an overview of what the module provides, consider the interfaces implemented by the `userDetailsService` 
 provided in this module:
 
- - `gr.abiss.calipso.userDetails.service.UserDetailsService` (provided, own signature interface)
+ - `UserDetailsService` (provided, own signature interface)
  - `gr.abiss.calipso.userDetails.integration.LocalUserService` (implement to integrate with local user store)
  - `org.springframework.social.security.SocialUserDetailsService` (provided, used for social signin)
  - `org.springframework.social.connect.ConnectionSignUp` (provided, used for social signin)
@@ -64,11 +64,11 @@ provided in this module:
 ### UserDetails Config
 
 Configuration options can be accessed through a `userDetailsConfig` bean implementation of 
-`gr.abiss.calipso.userDetails.integration.UserDetailsConfig` interface, such as the included simple 
+`UserDetailsConfig` interface, such as the included simple
 implementation:
 
 ```xml
-    <bean id="userDetailsConfig" class="gr.abiss.calipso.userDetails.util.SimpleUserDetailsConfig">
+    <bean id="userDetailsConfig" class="SimpleUserDetailsConfig">
         <constructor-arg value="${cookiesBasicAuthTokenName}" />
         <constructor-arg value="${cookiesDomain}" />
         <constructor-arg value="/" />
@@ -89,7 +89,7 @@ is enabled and the package is in scope:
 ```java
     package my.package;
 
-    import gr.abiss.calipso.userDetails.service.impl.UserDetailsServiceImpl;
+    import UserDetailsServiceImpl;
 
     import javax.inject.Named;
 
@@ -108,13 +108,13 @@ is enabled and the package is in scope:
 Alternatively you can use the provided userDetailsService implementation directly:
 
 ```xml
-    <bean id="userDetailsService" class="gr.abiss.calipso.userDetails.service.impl.UserDetailsServiceImpl" autowire="byType" />
+    <bean id="userDetailsService" class="UserDetailsServiceImpl" autowire="byType" />
 ```
 
 Or by similarly declaring your custom subclass. The following dependencies will be autowired from the Spring beans in 
 context during classpath scanning or must otherwise be provided in config:
 
- - [userDetailsConfig](#userDetailsConfig) (optional): an implementation of `gr.abiss.calipso.userDetails.integration.UserDetailsConfig`, see above
+ - [userDetailsConfig](#userDetailsConfig) (optional): an implementation of `UserDetailsConfig`, see above
  - [localUserService](#localUserService) (required): An implementation of `gr.abiss.calipso.userDetails.integration.LocalUserService`, see bellow
 
 #### Adapter to local user persistence
@@ -142,7 +142,7 @@ have it picked up by Spring classpath scanning:
 ```java
    package my.package;
 	
-   import gr.abiss.calipso.userDetails.controller.UserDetailsController;
+   import UserDetailsController;
 	
    @Controller
    @RequestMapping(value = "/myapiauth", produces = { "application/json", "application/xml" })
@@ -158,7 +158,7 @@ and alternatively you can declare B) such a subclass or D) the provided implemen
 ```xml
     <!--
         Your controller subclass or the one provided as
-	gr.abiss.calipso.userDetails.controller.UserDetailsController
+	UserDetailsController
     -->
     <bean class="my.package.MyUserDetailsController" autowire="byType" />
 ```
@@ -166,8 +166,8 @@ and alternatively you can declare B) such a subclass or D) the provided implemen
 The following bean dependencies will be autowired from the Spring beans in 
 context during classpath scanning or must otherwise be provided in config:
 
- - [userDetailsConfig](#userDetailsConfig) (optional): an implementation of `gr.abiss.calipso.userDetails.integration.UserDetailsConfig`, see above
- - [UserDetailsService](#UserDetailsService) (required): the `gr.abiss.calipso.userDetails.service.UserDetailsService`, see bellow
+ - [userDetailsConfig](#userDetailsConfig) (optional): an implementation of `UserDetailsConfig`, see above
+ - [UserDetailsService](#UserDetailsService) (required): the `UserDetailsService`, see bellow
 
 
 #### UserDetails Controller RequestMappings

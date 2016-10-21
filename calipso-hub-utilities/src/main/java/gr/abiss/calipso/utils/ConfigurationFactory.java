@@ -17,15 +17,7 @@
  */
 package gr.abiss.calipso.utils;
 
-import java.net.URI;
-import java.net.URL;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.EnvironmentConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.SystemConfiguration;
+import org.apache.commons.configuration.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +35,8 @@ public class ConfigurationFactory {
 	public static final String BASE_URL = "calipso.baseurl";
 	public static final String DOMAIN = "calipso.domain";
 	public static final String PORT = "calipso.port";
-	public static final String SCRIPT_MAIN = "scriptMain";
+    public static final String FORCE_CODES = "calipso.registration.forceCodes";
+    public static final String SCRIPT_MAIN = "scriptMain";
 	
 	public static final String INIT_DATA = "calipso.initData";
 	public static final String FILES_DIR = "calipso.files.dir";
@@ -61,10 +54,9 @@ public class ConfigurationFactory {
 	public static final String TEST_EMAIL_USER = "mail.test.user";
 	
 	public static final String FS_IMPL_CLASS = "fs.filePersistenceService";
-	
-	
-	
-	private static CompositeConfiguration config = new CompositeConfiguration();
+
+
+    private static CompositeConfiguration config = new CompositeConfiguration();
 	
 	static {
 		// add default and custom calipso properties

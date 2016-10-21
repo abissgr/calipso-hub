@@ -18,9 +18,8 @@
 package gr.abiss.calipso.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import gr.abiss.calipso.model.UserCredentials;
+import com.restdude.auth.userAccount.model.UserAccountRegistration;
 import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.users.model.User;
 import io.restassured.specification.RequestSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +39,12 @@ public class UniqueConstraintControllerIT extends AbstractControllerIT {
 	public void testUniqueConstraintsn() throws Exception {
 		RequestSpecification spec = this.getRequestSpec(null);
 		JsonNode json = given().spec(spec)
-				.body(new User.Builder()
-					.email("system@abiss.gr")
-                        .credentials(new UserCredentials.Builder().username("system").build())
+                .body(new UserAccountRegistration.Builder()
+                        .email("system@abiss.gr")
+                        .username("system")
                         .build())
-				.post("/calipso/api/rest/users")
-				.then().assertThat().statusCode(400)
+                .post("/calipso/api/auth/account")
+                .then().assertThat().statusCode(400)
 				// test assertions
 				.body("status", notNullValue())
 				// get model

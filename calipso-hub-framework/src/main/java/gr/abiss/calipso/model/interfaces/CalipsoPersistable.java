@@ -17,9 +17,9 @@
  */
 package gr.abiss.calipso.model.interfaces;
 
-import java.io.Serializable;
-
 import org.springframework.data.domain.Persistable;
+
+import java.io.Serializable;
 
 /**
  * Base interface for persistable entities
@@ -31,10 +31,10 @@ public interface CalipsoPersistable<ID extends Serializable> extends Persistable
 	public static final String PRE_AUTHORIZE_UPDATE = "isAuthenticated()";
 	public static final String PRE_AUTHORIZE_PATCH = "isAuthenticated()";
 	public static final String PRE_AUTHORIZE_VIEW = "isAuthenticated()";
-	public static final String PRE_AUTHORIZE_DELETE = "isAuthenticated()";
-	
+    public static final String PRE_AUTHORIZE_DELETE = "denyAll";
 
-	public static final String PRE_AUTHORIZE_DELETE_BY_ID = "denyAll";
+
+    public static final String PRE_AUTHORIZE_DELETE_BY_ID = "denyAll";
 	public static final String PRE_AUTHORIZE_DELETE_ALL = "denyAll";
 	public static final String PRE_AUTHORIZE_DELETE_WITH_CASCADE = "denyAll";
 	public static final String PRE_AUTHORIZE_FIND_BY_IDS = "denyAll";

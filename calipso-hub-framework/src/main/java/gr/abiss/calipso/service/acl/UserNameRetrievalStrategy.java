@@ -17,8 +17,7 @@
  */
 package gr.abiss.calipso.service.acl;
 
-import gr.abiss.calipso.userDetails.model.UserDetails;
-
+import com.restdude.auth.userdetails.model.UserDetails;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy;

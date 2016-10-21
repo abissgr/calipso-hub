@@ -18,12 +18,11 @@
 package gr.abiss.calipso.tiers.controller;
 
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.restdude.app.fs.FilePersistence;
+import com.restdude.app.fs.FilePersistenceService;
+import gr.abiss.calipso.tiers.service.ModelService;
+import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +33,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import gr.abiss.calipso.fs.FilePersistence;
-import gr.abiss.calipso.fs.FilePersistenceService;
-import gr.abiss.calipso.tiers.service.ModelService;
-import gr.abiss.calipso.tiers.specifications.GenericSpecifications;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.Iterator;
 
 /**
  * Adds file uploading capabilities to ModelControllers.
  * To use, simply add <code> implements IFilesModelController<MyEntity, MyId, MyService></code>
- * to your controller, inject a {@link gr.abiss.calipso.fs.FilePersistenceService} and make it accessible 
+ * to your controller, inject a {@link FilePersistenceService} and make it accessible
  * by implementing {@link #getFilePersistenceService()}. No other coding is needed.
  */
 public interface IFilesModelController<T extends Persistable<ID>, ID extends Serializable, S extends ModelService<T, ID>> 

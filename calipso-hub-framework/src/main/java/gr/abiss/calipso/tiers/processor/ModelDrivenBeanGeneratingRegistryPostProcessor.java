@@ -17,11 +17,6 @@
  */
 package gr.abiss.calipso.tiers.processor;
 
-import gr.abiss.calipso.controller.geography.CountryController;
-import gr.abiss.calipso.model.geography.Country;
-import gr.abiss.calipso.service.geography.CountryService;
-import gr.abiss.calipso.tiers.annotation.ModelResource;
-import gr.abiss.calipso.tiers.controller.AbstractModelController;
 import gr.abiss.calipso.tiers.controller.ModelController;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.tiers.repository.ModelRepositoryFactoryBean;
@@ -33,18 +28,8 @@ import gr.abiss.calipso.tiers.util.JavassistUtil;
 import gr.abiss.calipso.tiers.util.ModelContext;
 import gr.abiss.calipso.utils.ClassUtils;
 import io.swagger.annotations.Api;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javassist.CannotCompileException;
 import javassist.NotFoundException;
-
-import javax.inject.Named;
-
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -63,10 +48,12 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.inject.Named;
+import java.util.*;
 
 /**
  * Generates <code>Repository</code>, <code>Service</code> and
@@ -100,8 +87,8 @@ public class ModelDrivenBeanGeneratingRegistryPostProcessor implements BeanDefin
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 
 		try {
-			findModels("**.calipso.**.model");
-			findExistingBeans(registry);
+            findModels("**.calipso.**.model", "**.restdude.**.model");
+            findExistingBeans(registry);
 			createBeans(registry);
 			LOGGER.info("Completed generation");
 		} catch (Exception e) {
@@ -385,13 +372,15 @@ public class ModelDrivenBeanGeneratingRegistryPostProcessor implements BeanDefin
 	}
 
 	// @Override
-	protected void findModels(String basePackage) throws Exception {
-		Set<BeanDefinition> entityBeanDefs = EntityUtil.findAnnotatedClasses(basePackage);
-		for (BeanDefinition beanDef : entityBeanDefs) {
-			Class<?> entity = ClassUtils.getClass(beanDef.getBeanClassName());
-			LOGGER.info("Found resource model class {}", entity.getCanonicalName());
-			entityModelContextsMap.put(entity, ModelContext.from(entity));
-		}
+    protected void findModels(String... basePackages) throws Exception {
+        for (String basePackage : basePackages) {
+            Set<BeanDefinition> entityBeanDefs = EntityUtil.findAnnotatedClasses(basePackage);
+            for (BeanDefinition beanDef : entityBeanDefs) {
+                Class<?> entity = ClassUtils.getClass(beanDef.getBeanClassName());
+                LOGGER.info("Found resource model class {}", entity.getCanonicalName());
+                entityModelContextsMap.put(entity, ModelContext.from(entity));
+            }
+        }
 	}
 
 	@Override

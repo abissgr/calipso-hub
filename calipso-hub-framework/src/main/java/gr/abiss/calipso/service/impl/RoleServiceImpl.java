@@ -17,11 +17,11 @@
  */
 package gr.abiss.calipso.service.impl;
 
-import gr.abiss.calipso.model.Role;
-import gr.abiss.calipso.repository.RoleRepository;
-import gr.abiss.calipso.service.RoleService;
+import com.restdude.app.users.model.Role;
+import com.restdude.app.users.model.User;
+import com.restdude.app.users.repository.RoleRepository;
+import com.restdude.app.users.service.RoleService;
 import gr.abiss.calipso.tiers.service.AbstractModelServiceImpl;
-import gr.abiss.calipso.users.model.User;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Named;

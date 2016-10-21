@@ -17,22 +17,10 @@
  */
 package gr.abiss.calipso.controller;
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
-
-import java.math.BigDecimal;
-import java.util.Map;
-
-import org.junit.Assert;
+import gr.abiss.calipso.test.AbstractControllerIT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
-
-import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.userDetails.model.LoginSubmission;
-import gr.abiss.calipso.utils.Constants;
-import io.restassured.response.Response;
 
 @Test(/*singleThreaded = true, */description = "Test dynamic JPA specifications used in default search stack")
 @SuppressWarnings("unused")

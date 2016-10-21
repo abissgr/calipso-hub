@@ -17,8 +17,8 @@
  */
 package gr.abiss.calipso.model.base;
 
+import com.restdude.app.users.model.User;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.users.model.User;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

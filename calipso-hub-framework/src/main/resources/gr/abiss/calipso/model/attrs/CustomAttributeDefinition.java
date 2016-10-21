@@ -20,7 +20,7 @@ package gr.abiss.calipso.model.attrs;
 
 
 import gr.abiss.calipso.model.entities.AbstractAuditable;
-import gr.abiss.calipso.users.model.User;
+import com.restdude.app.users.model.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

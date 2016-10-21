@@ -17,16 +17,16 @@
  */
 package gr.abiss.calipso.tiers.service;
 
+import com.restdude.app.users.model.User;
+import com.restdude.app.users.repository.UserRepository;
+import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
+import com.restdude.auth.userdetails.util.SecurityUtil;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
-import gr.abiss.calipso.repository.UserRepository;
 import gr.abiss.calipso.service.EmailService;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.tiers.service.impl.AbstractAclAwareServiceImpl;
-import gr.abiss.calipso.userDetails.model.ICalipsoUserDetails;
-import gr.abiss.calipso.userDetails.util.SecurityUtil;
-import gr.abiss.calipso.users.model.User;
+import gr.abiss.calipso.web.spring.BadRequestException;
 import gr.abiss.calipso.web.spring.ParameterMapBackedPageRequest;
-import gr.abiss.calipso.web.spring.UniqueConstraintViolationException;
 import gr.abiss.calipso.websocket.Destinations;
 import gr.abiss.calipso.websocket.message.IActivityNotificationMessage;
 import gr.abiss.calipso.websocket.message.IMessageResource;
@@ -177,7 +177,7 @@ implements ModelService<T, ID>{
 			}
 			ICalipsoUserDetails ud = this.getPrincipal();
 			boolean complete = ud != null && ud.isAdmin();
-			throw new UniqueConstraintViolationException(message.toString(), errors, complete);
+			throw new BadRequestException(message.toString(), errors, complete);
 		}
 		
 	}
