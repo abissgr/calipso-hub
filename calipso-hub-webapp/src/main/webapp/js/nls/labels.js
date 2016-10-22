@@ -188,6 +188,49 @@ define({
 					"label" : "Description"
 				}
 			},
+			"registrationCodeBatches": {
+				"singular": {
+					"label": "Registration code batch"
+				},
+				"plural": {
+					"label": "Registration code batches"
+				},
+				"name": {
+					"label": "Name"
+				},
+				"description": {
+					"label": "Description"
+				},
+				"batchSize": {
+					"label": "Size"
+				},
+				"available": {
+					"label": "Available"
+				},
+				"createdDate": {
+					"label": "Created"
+				},
+				"expirationDate": {
+					"label": "Expires"
+				},
+			},
+			"userRegistrationCodes": {
+				"singular": {
+					"label": "Registration code"
+				},
+				"plural": {
+					"label": "Registration codes"
+				},
+				"id": {
+					"label": "Code"
+				},
+				"available": {
+					"label": "Available"
+				},
+				"batch": {
+					"label": "Batch"
+				},
+			},
 			"hosts" : {
 				"singular" : {
 					"label" : "Host"

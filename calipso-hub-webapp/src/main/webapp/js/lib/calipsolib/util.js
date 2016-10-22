@@ -898,7 +898,8 @@ Calipso.cloneSpecificValue = function(val) {
 	{
 		mode : "server",
 		data : {},
-		/**
+
+        /**
 		 * Initial pagination states
 		 */
 		state : {

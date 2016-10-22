@@ -17,10 +17,10 @@
  */
 package gr.abiss.calipso.init;
 
-import com.restdude.app.users.model.Role;
-import com.restdude.app.users.model.User;
-import com.restdude.app.users.model.UserCredentials;
+import com.restdude.app.users.model.*;
 import com.restdude.app.users.repository.RoleRepository;
+import com.restdude.app.users.repository.UserRegistrationCodeBatchRepository;
+import com.restdude.app.users.repository.UserRegistrationCodeRepository;
 import com.restdude.app.users.repository.UserRepository;
 import com.restdude.app.users.service.UserService;
 import gr.abiss.calipso.model.geography.Continent;
@@ -32,6 +32,7 @@ import gr.abiss.calipso.tiers.repository.ModelRepository;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.resthub.common.util.PostInitialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @Component
@@ -60,6 +63,8 @@ public class CalipsoDataInitializer {
 	private RoleRepository roleRepository;
 	private UserRepository userRepository;
 	private ModelRepository<UserCredentials, String> credentialsRepository;
+	private UserRegistrationCodeRepository userRegistrationCodeRepository;
+	private UserRegistrationCodeBatchRepository userRegistrationCodeBatchRepository;
 
 	@Autowired
 	public void setUserService(UserService userService) {
@@ -95,7 +100,16 @@ public class CalipsoDataInitializer {
 	public void setCredentialsRepository(ModelRepository<UserCredentials, String> credentialsRepository) {
 		this.credentialsRepository = credentialsRepository;
 	}
-	
+
+	@Autowired
+	public void setUserRegistrationCodeRepository(UserRegistrationCodeRepository userRegistrationCodeRepository) {
+		this.userRegistrationCodeRepository = userRegistrationCodeRepository;
+	}
+
+	@Autowired
+	public void setUserRegistrationCodeBatchRepository(UserRegistrationCodeBatchRepository userRegistrationCodeBatchRepository) {
+		this.userRegistrationCodeBatchRepository = userRegistrationCodeBatchRepository;
+	}
 	
 
 	@PostInitialize(order = 10)
@@ -170,6 +184,23 @@ public class CalipsoDataInitializer {
 					}
 				}
 			}
+
+			// sample registration codes batch
+			UserRegistrationCodeBatch batch = new UserRegistrationCodeBatch();
+			batch.setCreatedBy(system);
+			batch.setBatchSize(20);
+			batch.setName("INITDATATEST01");
+			batch.setDescription("Sample batch created as initial test data");
+			batch.setExpirationDate(DateUtils.addMonths(batch.getCreatedDate(), 1));
+			batch = this.userRegistrationCodeBatchRepository.save(batch);
+			// create codes
+			List<UserRegistrationCode> codes = new ArrayList<UserRegistrationCode>(batch.getBatchSize());
+			for (int i = 0; i < batch.getBatchSize(); i++) {
+				codes.add(new UserRegistrationCode(batch));
+			}
+			this.userRegistrationCodeRepository.save(codes);
+
+
 
 		}
 		

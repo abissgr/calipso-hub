@@ -19,22 +19,28 @@ package com.restdude.app.users.model;
 
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import gr.abiss.calipso.tiers.annotation.ModelResource;
+import gr.abiss.calipso.tiers.controller.AbstractReadOnlyModelController;
 import io.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Formula;
 import org.javers.core.metamodel.annotation.ShallowReference;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @ShallowReference
 @Entity
 @ApiModel(description = "UserRegistrationCode")
+@ModelResource(path = "userRegistrationCodes", controllerSuperClass = AbstractReadOnlyModelController.class,
+        apiName = "UserRegistrationCode", apiDescription = "User registration codes (read-only)")
 @Table(name = "registration_code")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class UserRegistrationCode extends AbstractSystemUuidPersistable implements CalipsoPersistable<String> {
 
     private static final long serialVersionUID = 1L;
+
+    public static final String PRE_AUTHORIZE_SEARCH = "hasAnyRole('" + Role.ROLE_ADMIN + "', '" + Role.ROLE_SITE_OPERATOR + "')";
+    public static final String PRE_AUTHORIZE_VIEW = PRE_AUTHORIZE_SEARCH;
 
     @Formula(" (credentials_id IS NULL) ")
     private Boolean available;
@@ -43,7 +49,6 @@ public class UserRegistrationCode extends AbstractSystemUuidPersistable implemen
     @JoinColumn(name = "credentials_id", unique = true)
     private UserCredentials credentials;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "batch_id", referencedColumnName = "id", nullable = false, updatable = false)
     private UserRegistrationCodeBatch batch;

@@ -17,10 +17,10 @@
  */
 package gr.abiss.calipso.model.base;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
 
 
 /**
@@ -31,10 +31,6 @@ public abstract class AbstractNamedResource extends AbstractSystemUuidPersistabl
 
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * The HTTP URL of the resource, excluding the protocol, domain and port.
-	 * Starts with a slash.
-	 */
 	@Column(name = "name", length = 500, nullable = false)
 	private String name;
 

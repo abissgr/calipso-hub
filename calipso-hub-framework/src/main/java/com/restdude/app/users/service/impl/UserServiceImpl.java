@@ -140,8 +140,9 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 
 		// note any registration code info
 		UserRegistrationCode code = credentials.getRegistrationCode();
-		if (code != null) {
-			code = this.userRegistrationCodeRepository.getOne(code.getId());
+        credentials.setRegistrationCode(null);
+        if (code != null && code.getId() != null) {
+            code = this.userRegistrationCodeRepository.getOne(code.getId());
 			if (!code.getAvailable()) {
 				throw new BadRequestException("Invalid registration code");
 			}
@@ -151,8 +152,8 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		resource.setCredentials(this.credentialsRepository.save(credentials));
 
 		// update code
-		if (code != null) {
-			code.setCredentials(resource.getCredentials());
+        if (code != null && code.getId() != null) {
+            code.setCredentials(resource.getCredentials());
 			this.userRegistrationCodeRepository.save(code);
 		}
 

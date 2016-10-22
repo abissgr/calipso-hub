@@ -213,10 +213,17 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				collection : _self.collection,
 			});
 
-			var gridContainer = this.$el.find('.backgrid-table-container:first');
-			gridContainer.append(this.backgrid.render().$el);
-
+			this.$el.append(this.backgrid.render().$el);
+			var paginator = new Backgrid.Extension.Paginator({
+				windowSize: 10, // Default is 10
+				slideScale: 0.25, // Default is 0.5
+				goBackFirstOnSort: false, // Default is true
+				collection: _self.collection
+			});
+			this.$el.append('<div class="card-block backgrid-paginator-container"> </div>');
+			this.$el.find('.backgrid-paginator-container:first').append(paginator.render().el);
 			this.onGridRendered();
+
 			if (this.callCollectionFetch) {
 				var fetchOptions = {
 					reset : true,
@@ -382,6 +389,9 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				} else {
 					// Case: search
 					var newData = this.form.toJson();
+					if (newData) {
+
+					}
 					this.searchResultsCollection.data = newData;
 					this.searchResultsCollection.fetch({
 						reset : true,

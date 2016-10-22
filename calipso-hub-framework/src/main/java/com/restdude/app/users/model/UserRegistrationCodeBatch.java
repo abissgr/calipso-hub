@@ -20,6 +20,7 @@ package com.restdude.app.users.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import gr.abiss.calipso.tiers.annotation.CurrentPrincipal;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -29,6 +30,7 @@ import org.hibernate.annotations.Formula;
 import org.javers.core.metamodel.annotation.ShallowReference;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -60,9 +62,10 @@ public class UserRegistrationCodeBatch extends AbstractSystemUuidPersistable imp
 
     @NotNull
     @Min(1)
-    @ApiModelProperty(value = "The number of codes to generate, non-updatable.", required = true, example = "10")
+    @Max(20)
+    @ApiModelProperty(value = "The number of codes to generate (1 to 20), non-updatable.", required = true, example = "10")
     @Column(nullable = false, updatable = false)
-    private Integer size;
+    private Integer batchSize;
 
     @ApiModelProperty(value = "The number of available codes in the batch", readOnly = true)
     @Formula(" (select count(*) from registration_code where registration_code.batch_id = id and registration_code.credentials_id IS NULL) ")
@@ -78,6 +81,7 @@ public class UserRegistrationCodeBatch extends AbstractSystemUuidPersistable imp
     private Date expirationDate;
 
     @JsonIgnore
+    @CurrentPrincipal
     @NotNull
     @ApiModelProperty(value = "The batch creator", readOnly = true, hidden = true)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -95,7 +99,7 @@ public class UserRegistrationCodeBatch extends AbstractSystemUuidPersistable imp
                 .append("id", this.getId())
                 .append("name", this.getName())
                 .append("description", this.getDescription())
-                .append("size", this.getSize())
+                .append("size", this.getBatchSize())
                 .append("createdDate", this.getCreatedDate())
                 .append("expirationDate", this.getExpirationDate())
                 .toString();
@@ -141,12 +145,12 @@ public class UserRegistrationCodeBatch extends AbstractSystemUuidPersistable imp
         this.description = description;
     }
 
-    public Integer getSize() {
-        return size;
+    public Integer getBatchSize() {
+        return batchSize;
     }
 
-    public void setSize(Integer size) {
-        this.size = size;
+    public void setBatchSize(Integer batchSize) {
+        this.batchSize = batchSize;
     }
 
     public Integer getAvailable() {

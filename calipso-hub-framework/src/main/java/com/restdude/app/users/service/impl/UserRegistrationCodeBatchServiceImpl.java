@@ -57,8 +57,8 @@ public class UserRegistrationCodeBatchServiceImpl extends AbstractModelServiceIm
         resource = super.create(resource);
 
         // create codes
-        List<UserRegistrationCode> codes = new ArrayList<UserRegistrationCode>(resource.getSize());
-        for (int i = 0; i < resource.getSize(); i++) {
+        List<UserRegistrationCode> codes = new ArrayList<UserRegistrationCode>(resource.getBatchSize());
+        for (int i = 0; i < resource.getBatchSize(); i++) {
             codes.add(new UserRegistrationCode(resource));
         }
 
@@ -66,7 +66,7 @@ public class UserRegistrationCodeBatchServiceImpl extends AbstractModelServiceIm
         this.userRegistrationCodeRepository.save(codes);
 
         // int formula property
-        resource.setAvailable(resource.getSize());
+        resource.setAvailable(resource.getBatchSize());
 
         return resource;
     }

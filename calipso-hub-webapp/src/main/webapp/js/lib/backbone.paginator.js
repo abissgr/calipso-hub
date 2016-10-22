@@ -570,7 +570,7 @@
         pageSize = finiteInt(pageSize, "pageSize");
         currentPage = finiteInt(currentPage, "currentPage");
         firstPage = finiteInt(firstPage, "firstPage");
-
+          console.log("pageSize: " + pageSize);
         if (pageSize < 1) {
           throw new RangeError("`pageSize` must be >= 1");
         }
