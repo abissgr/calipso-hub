@@ -53,6 +53,9 @@
     <logger name="com.restdude.app.users.controller.UserRegistrationCodeBatchController">
         <level value="DEBUG"/>
     </logger>
+    <logger name="com.restdude.app.users.service.impl.UserRegistrationCodeBatchServiceImpl">
+        <level value="DEBUG"/>
+    </logger>
 
     <!--     <logger name="org.springframework"> -->
 <!--         <level value="debug" /> -->

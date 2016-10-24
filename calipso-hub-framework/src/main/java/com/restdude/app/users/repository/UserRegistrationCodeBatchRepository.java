@@ -28,8 +28,11 @@ import java.util.List;
 @Repository
 public interface UserRegistrationCodeBatchRepository extends ModelRepository<UserRegistrationCodeBatch, String> {
 
-    @Query("select new com.restdude.app.users.model.UserRegistrationCodeInfo(code.id, code.available, code.credentials, code.batch) from UserRegistrationCode code where code.batch.id = ?1")
+    @Query("select new com.restdude.app.users.model.UserRegistrationCodeInfo(code) from UserRegistrationCode code where code.batch.id  = ?1")
     List<UserRegistrationCodeInfo> findBatchCodes(String batchId);
+
+    @Query("select new com.restdude.app.users.model.UserRegistrationCodeInfo(code) from UserRegistrationCode code")
+    List<UserRegistrationCodeInfo> findBatchCodes();
 
     @Query("select batch.name from UserRegistrationCodeBatch batch where batch.id = ?1")
     String findBatchName(String batchId);

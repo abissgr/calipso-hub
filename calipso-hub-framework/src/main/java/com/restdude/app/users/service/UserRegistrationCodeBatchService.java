@@ -34,6 +34,8 @@ public interface UserRegistrationCodeBatchService extends ModelService<UserRegis
      */
     List<UserRegistrationCodeInfo> findBatchCodes(String batchId);
 
+    List<UserRegistrationCodeInfo> findBatchCodes();
+
     String findBatchName(String batchId);
 
 }

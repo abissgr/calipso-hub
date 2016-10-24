@@ -324,13 +324,15 @@ define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util
 				labelIcon: "fa fa-server fa-fw",
 				pathFragment: "registrationCodeBatches",
 				typeName: "Calipso.model.UserRegistrationCodeBatchModel",
+				/*
 				menuConfig: {
 					rolesIncluded: ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
 					rolesExcluded: null,
 				},
+				 */
 				useCases: {
 					search: {
-						fieldIncludes: ["name", "description", "batchSize", "available", "createdDate", "expirationDate"],
+						fieldIncludes: ["name", "description", "batchSize", "available", "createdDate", "expirationDate", "csvExport", "edit"],
 						rolesIncluded: ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
 					},
 					create: {
@@ -361,6 +363,12 @@ define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util
 					expirationDate: {
 						fieldType: "Date",
 					},
+					csvExport: {
+						fieldType: "CsvExport",
+					},
+					edit: {
+						fieldType: "Edit",
+					},
 				},
 			});
 
@@ -375,10 +383,12 @@ define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util
 				labelIcon: "fa fa-server fa-fw",
 				pathFragment: "userRegistrationCodes",
 				typeName: "Calipso.model.UserRegistrationCodeBatchModel",
+				/*
 				menuConfig: {
 					rolesIncluded: ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
 					rolesExcluded: null,
 				},
+				 */
 				useCases: {
 					search: {
 						fieldIncludes: ["batch", "id", "available"],

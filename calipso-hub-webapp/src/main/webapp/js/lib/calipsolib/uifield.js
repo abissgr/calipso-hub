@@ -226,6 +226,16 @@ define(["lib/calipsolib/form", "lib/calipsolib/backgrid", 'underscore', 'handleb
 				validators: [Calipso.backboneform.validators.digitsOnly]
 			}
 		});
+		Calipso.fields.CsvExport = Calipso.fields.csvExport = Calipso.fields.Base.extend({}, {
+			"backgrid": {
+				editable: false,
+				sortable: false,
+				cell: Calipso.components.backgrid.CsvExportCell,
+				headerCell: Calipso.components.backgrid.IconHeaderCell.extend({
+					icon: "fa fa-file-excel-o",
+				})
+			},
+		});
 
 		Calipso.fields.Link = Calipso.fields.link = Calipso.fields.String.extend({}, {});
 

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -47,16 +48,16 @@ public class CsvControllerIT extends AbstractControllerIT {
                 .get("/calipso/api/rest/registrationCodeBatches")
                 .then().assertThat()
                 .body("content[0].id", notNullValue())
-                // test assertions
-//				.log().all()
-                // get model
                 .extract().as(JsonNode.class);
         String id = batches.get("content").get(0).get("id").asText();
 
         // export code batch to CSV
         RequestSpecification reqSpec = this.getRequestSpec(lctx.ssoToken, "text/csv", "text/csv");
-        RestAssured.given().spec(reqSpec)
-                .log().all().get("/calipso/api/rest/registrationCodeBatches/" + id + "/csv").then().log().all().statusCode(200);
+        String csv = RestAssured.given().spec(reqSpec)
+                .log().all().get("/calipso/api/rest/registrationCodeBatches/" + id + "/csv").then().log().all().statusCode(200).extract().response().getBody().print();
+
+        // verify multiple lines
+        Assert.assertTrue(csv.split("\\r?\\n").length > 1);
     }
 
 }

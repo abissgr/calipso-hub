@@ -253,6 +253,18 @@ define(
 				}
 			});
 
+		Calipso.components.backgrid.CsvExportCell = Backgrid.Cell.extend(
+			/** @lends Calipso.components.backgrid.CsvExportCell.prototype */
+			{
+				className: "modal-button-cell renderable",
+				render: function () {
+					var url = Calipso.getBaseUrl() + "/api/rest/" + this.model.getPathFragment() + "/" + this.model.get("id") + "/csv";
+					this.$el.html("<a class='btn btn-xs btn-link' href='" + url + "'title='Export as Spreadsheet'><i class='fa fa-download'></i></a>");
+					//this.delegateEvents();
+					return this;
+				}
+			});
+
 		Calipso.components.backgrid.EditRowCell = Backgrid.Cell.extend(
 			/** @lends Calipso.components.backgrid.EditRowCell.prototype */
 			{
@@ -346,13 +358,19 @@ define(
 			}
 		});
 
-		Calipso.components.backgrid.ActionsIconCell = Backgrid.HeaderCell.extend({
+		Calipso.components.backgrid.IconHeaderCell = Backgrid.HeaderCell.extend({
 			className: "actions",
+			icon: "fa fa-cog",
 			render: function () {
-				this.$el.html("<i class='fa fa-cog'></i>");
+				this.$el.html("<i class='" + this.icon + "'></i>");
 				return this;
 			}
 		});
+
+		Calipso.components.backgrid.ActionsIconCell = Calipso.components.backgrid.IconHeaderCell.extend({
+			icon: "fa fa-cog",
+		});
+
 		Calipso.components.backgrid.CreateNewInModalHeaderCell = Calipso.components.backgrid.CreateNewHeaderCell.extend({
 			createNewForManualEdit: function (e) {
 				Calipso.stopEvent(e);

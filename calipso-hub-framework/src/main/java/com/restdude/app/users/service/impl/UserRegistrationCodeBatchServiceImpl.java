@@ -72,13 +72,32 @@ public class UserRegistrationCodeBatchServiceImpl extends AbstractModelServiceIm
         return resource;
     }
 
+
     /**
      * {@inheritDoc}
      */
     @Override
     @PreAuthorize(UserRegistrationCodeBatch.PRE_AUTHORIZE_SEARCH)
     public List<UserRegistrationCodeInfo> findBatchCodes(String batchId) {
-        return this.repository.findBatchCodes(batchId);
+
+        LOGGER.info("findBatchCodes, id: {}", batchId);
+        List<UserRegistrationCodeInfo> rows = this.repository.findBatchCodes(batchId);
+        LOGGER.info("findBatchCodes, rows: {}", rows);
+
+        return rows;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @PreAuthorize(UserRegistrationCodeBatch.PRE_AUTHORIZE_SEARCH)
+    public List<UserRegistrationCodeInfo> findBatchCodes() {
+
+        List<UserRegistrationCodeInfo> rows = this.repository.findBatchCodes();
+        LOGGER.info("findBatchCodes, rows: {}", rows);
+
+        return rows;
     }
 
     /**
@@ -87,6 +106,10 @@ public class UserRegistrationCodeBatchServiceImpl extends AbstractModelServiceIm
     @Override
     @PreAuthorize(UserRegistrationCodeBatch.PRE_AUTHORIZE_SEARCH)
     public String findBatchName(String batchId) {
-        return this.repository.findBatchName(batchId);
+        UserRegistrationCodeBatch batch = this.repository.getOne(batchId);
+        LOGGER.debug("findBatchName, batchId: {}, batch: {}", batchId, batch);
+        String name = this.repository.findBatchName(batchId);
+        LOGGER.debug("findBatchName, batchId: {}, name: {}", batchId, name);
+        return name;
     }
 }

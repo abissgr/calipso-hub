@@ -17,11 +17,9 @@
  */
 package com.restdude.app.users.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.restdude.app.users.model.UserRegistrationCodeBatch;
 import com.restdude.app.users.model.UserRegistrationCodeInfo;
 import com.restdude.app.users.service.UserRegistrationCodeBatchService;
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,27 +44,46 @@ public class UserRegistrationCodeBatchController extends AbstractNoDeleteModelCo
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserRegistrationCodeBatchController.class);
 	private static final String DATE_FORMAT = "yyyyMMddHHmmss";
+
 	@RequestMapping(value = "{id}/csv", method = RequestMethod.GET, produces = "text/csv")
 	@ResponseBody
 	@ApiOperation(value = "Export batch to a spreadsheet (CSV) report", notes = "The filename will be [batch name]_[date: yyyyMMddHHmmss].csv")
-	@JsonView(AbstractSystemUuidPersistable.ItemView.class)
 	public List<UserRegistrationCodeInfo> exportToCsv(@ApiParam(name = "id", required = true, value = "string") @PathVariable String id, HttpServletResponse response) {
-
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		// get batch name ot name file
 		String csvFileName = new StringBuffer(this.service.findBatchName(id))
 				.append('_')
 				.append(sdf.format(new Date()))
 				.append(".csv").toString();
+		LOGGER.debug("exportToCsv, filename: {}", csvFileName);
+		// tell browser to launch spreadsheet
+		String headerKey = "Content-Disposition";
+		String headerValue = String.format("attachment; filename=\"%s\"",
+				csvFileName);
+		response.setHeader(headerKey, headerValue);
+		response.setContentType("text/csv;charset=utf-8");
+
+		// return results
+		return this.service.findBatchCodes(id);
+	}
+
+	@RequestMapping(value = "csv", method = RequestMethod.GET, produces = "text/csv")
+	@ResponseBody
+	@ApiOperation(value = "Export batch to a spreadsheet (CSV) report", notes = "The filename will be [batch name]_[date: yyyyMMddHHmmss].csv")
+	public List<UserRegistrationCodeInfo> exportToCsv(HttpServletResponse response) {
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		// get batch name ot name file
+		String csvFileName = "foobar.csv";
 
 		// tell browser to launch spreadsheet
 		String headerKey = "Content-Disposition";
 		String headerValue = String.format("attachment; filename=\"%s\"",
 				csvFileName);
 		response.setHeader(headerKey, headerValue);
+		response.setContentType("text/csv;charset=utf-8");
 
 		// return results
-		return this.service.findBatchCodes(id);
+		return this.service.findBatchCodes();
 	}
 
 }
