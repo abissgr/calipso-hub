@@ -19,8 +19,21 @@ package com.restdude.app.users.service;
 
 
 import com.restdude.app.users.model.UserRegistrationCodeBatch;
+import com.restdude.app.users.model.UserRegistrationCodeInfo;
 import gr.abiss.calipso.tiers.service.ModelService;
 
+import java.util.List;
+
 public interface UserRegistrationCodeBatchService extends ModelService<UserRegistrationCodeBatch, String> {
+
+    /**
+     * Find the codes of the given batch (ID)
+     *
+     * @param batchId
+     * @return
+     */
+    List<UserRegistrationCodeInfo> findBatchCodes(String batchId);
+
+    String findBatchName(String batchId);
 
 }

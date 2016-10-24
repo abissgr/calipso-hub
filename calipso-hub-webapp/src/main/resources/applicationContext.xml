@@ -71,7 +71,8 @@
         <property name="modulesToInstall" ref="jacksonModules"/>
         <property name="objectMapper" ref="xmlMapper" />
     </bean>
-    <bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
+	<bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
+	<bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
 <!-- 	<bean id="conversionService" -->
 <!-- 		class="org.springframework.context.support.ConversionServiceFactoryBean"> -->
   <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" >
@@ -147,7 +148,14 @@
 	<!-- Configuration for the Runtime -->
 	<task:annotation-driven executor="asyncExecutor" />
 
-	<!--mvc:annotation-driven/ -->
+	<util:list id="messageConverters">
+		<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
+			  p:objectMapper-ref="jsonObjectMapperFactory"/>
+		<bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter"
+			  p:objectMapper-ref="xmlObjectMapperFactory"/>
+		<bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+		<bean class="com.restdude.app.binding.CsvMessageConverter"/>
+	</util:list>
 
 	<mvc:resources mapping="/static/**" location="/static/" />
 

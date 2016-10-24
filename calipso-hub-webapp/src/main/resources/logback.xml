@@ -44,13 +44,17 @@
 <!--     </logger> -->
 
     <!-- other -->
-    <logger name="gr.abiss.calipso">
+    <logger name="gr.abiss.calipso.controller">
         <level value="DEBUG" />
     </logger>
-    <logger name="com.restdude">
+    <logger name="com.restdude.app.binding">
         <level value="DEBUG" />
     </logger>
-<!--     <logger name="org.springframework"> -->
+    <logger name="com.restdude.app.users.controller.UserRegistrationCodeBatchController">
+        <level value="DEBUG"/>
+    </logger>
+
+    <!--     <logger name="org.springframework"> -->
 <!--         <level value="debug" /> -->
 <!--     </logger> -->
     <root level="WARN">

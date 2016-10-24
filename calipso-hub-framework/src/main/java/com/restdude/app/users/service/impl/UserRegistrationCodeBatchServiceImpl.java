@@ -19,6 +19,7 @@ package com.restdude.app.users.service.impl;
 
 import com.restdude.app.users.model.UserRegistrationCode;
 import com.restdude.app.users.model.UserRegistrationCodeBatch;
+import com.restdude.app.users.model.UserRegistrationCodeInfo;
 import com.restdude.app.users.repository.UserRegistrationCodeBatchRepository;
 import com.restdude.app.users.repository.UserRegistrationCodeRepository;
 import com.restdude.app.users.service.UserRegistrationCodeBatchService;
@@ -69,5 +70,23 @@ public class UserRegistrationCodeBatchServiceImpl extends AbstractModelServiceIm
         resource.setAvailable(resource.getBatchSize());
 
         return resource;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @PreAuthorize(UserRegistrationCodeBatch.PRE_AUTHORIZE_SEARCH)
+    public List<UserRegistrationCodeInfo> findBatchCodes(String batchId) {
+        return this.repository.findBatchCodes(batchId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @PreAuthorize(UserRegistrationCodeBatch.PRE_AUTHORIZE_SEARCH)
+    public String findBatchName(String batchId) {
+        return this.repository.findBatchName(batchId);
     }
 }

@@ -18,8 +18,8 @@
 package com.restdude.app.users.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.restdude.app.users.model.UserRegistrationCode;
 import com.restdude.app.users.model.UserRegistrationCodeBatch;
+import com.restdude.app.users.model.UserRegistrationCodeInfo;
 import com.restdude.app.users.service.UserRegistrationCodeBatchService;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.tiers.controller.AbstractNoDeleteModelController;
@@ -34,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -42,14 +45,28 @@ import java.util.List;
 public class UserRegistrationCodeBatchController extends AbstractNoDeleteModelController<UserRegistrationCodeBatch, String, UserRegistrationCodeBatchService> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserRegistrationCodeBatchController.class);
-
+	private static final String DATE_FORMAT = "yyyyMMddHHmmss";
 	@RequestMapping(value = "{id}/csv", method = RequestMethod.GET, produces = "text/csv")
 	@ResponseBody
-	@ApiOperation(value = "Export batch to a spreadsheet (CSV) report")
+	@ApiOperation(value = "Export batch to a spreadsheet (CSV) report", notes = "The filename will be [batch name]_[date: yyyyMMddHHmmss].csv")
 	@JsonView(AbstractSystemUuidPersistable.ItemView.class)
-	public List<UserRegistrationCode> exportToCsv(@ApiParam(name = "id", required = true, value = "string") @PathVariable String id) {
-		// TODO
-		return null;
+	public List<UserRegistrationCodeInfo> exportToCsv(@ApiParam(name = "id", required = true, value = "string") @PathVariable String id, HttpServletResponse response) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		// get batch name ot name file
+		String csvFileName = new StringBuffer(this.service.findBatchName(id))
+				.append('_')
+				.append(sdf.format(new Date()))
+				.append(".csv").toString();
+
+		// tell browser to launch spreadsheet
+		String headerKey = "Content-Disposition";
+		String headerValue = String.format("attachment; filename=\"%s\"",
+				csvFileName);
+		response.setHeader(headerKey, headerValue);
+
+		// return results
+		return this.service.findBatchCodes(id);
 	}
 
 }

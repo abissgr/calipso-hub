@@ -18,9 +18,20 @@
 package com.restdude.app.users.repository;
 
 import com.restdude.app.users.model.UserRegistrationCodeBatch;
+import com.restdude.app.users.model.UserRegistrationCodeInfo;
 import gr.abiss.calipso.tiers.repository.ModelRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface UserRegistrationCodeBatchRepository extends ModelRepository<UserRegistrationCodeBatch, String> {
+
+    @Query("select new com.restdude.app.users.model.UserRegistrationCodeInfo(code.id, code.available, code.credentials, code.batch) from UserRegistrationCode code where code.batch.id = ?1")
+    List<UserRegistrationCodeInfo> findBatchCodes(String batchId);
+
+    @Query("select batch.name from UserRegistrationCodeBatch batch where batch.id = ?1")
+    String findBatchName(String batchId);
+
 }
