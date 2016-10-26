@@ -107,8 +107,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			var isArray = schemaType == "backgrid", schema = null;
 
 			var fields = this.fields ||this.useCaseContext.getFields();
-			console.log("buildSchema, fields: ");
-			console.log(fields);
 			if (fields) {
 				var schemaEntry, baseSchemaEntry, overrideSchemaEntry;
 
@@ -131,7 +129,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 							(baseSchemaEntry || {}),
 							(overrideSchemaEntry || {}));
 
-						console.log("schemaEntry.pathFragment 1: " + schemaEntry.pathFragment);
 						//TODO: also labelPropertyCopy
 						if (_this.keyPropertyCopy) {
 							schemaEntry[_this.keyPropertyCopy] = key;
@@ -151,8 +148,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				});
 			}
-			console.log("buildSchema returns:");
-			console.log(schema);
 			return schema;
 		},
 	}, {
@@ -300,7 +295,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.form.renderLazyField(fieldKey);
 		},
 		initialize : function(options) {
-			console.log("Calipso.view.UseCaseFormView#initialize");
 			Calipso.view.UseCaseItemView.prototype.initialize.apply(this, arguments);
 			this.searchResultsCollection = this.model.wrappedCollection;
 			// get the form/field templates
@@ -421,9 +415,7 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		onRender : function() {
 			var _self = this;
 			// get appropriate schema
-			console.log("Calipso.view.UseCaseFormView#onRender, formSchema: " + formSchema);
 			var formSchema = this.schema;
-
 			// TODO: add a property in generic model to flag view behavior (i.e. get add http:.../form-schema to the model before rendering)
 			if (formSchema) {
 				_self.renderForm(formSchema);

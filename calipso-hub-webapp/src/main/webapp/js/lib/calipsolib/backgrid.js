@@ -293,14 +293,9 @@ define(
 			{
 				editEntry: function (e) {
 					Calipso.stopEvent(e);
-					console.log("EditRowInModalCell this.model:");
-					console.log(this.model);
 					var useCaseContext = this.model.getUseCaseContext({
 						key: "update"
 					});
-
-					console.log("EditRowInModalCell useCaseContext:");
-					console.log(useCaseContext);
 					Calipso.vent.trigger("modal:showUseCaseContext", useCaseContext);
 				}
 			});

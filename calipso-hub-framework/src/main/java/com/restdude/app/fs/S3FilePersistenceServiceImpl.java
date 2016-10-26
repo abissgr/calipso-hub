@@ -83,7 +83,7 @@ public class S3FilePersistenceServiceImpl implements FilePersistenceService {
 		// set the URL to return
 		url = s3Client.getUrl(nameCardBucket, path).toString();
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("File saved: " + path  + ", size: " + contentLength + ", contentType: " + contentType);
+			LOGGER.debug("File saved, url: " + url + ", path: " + path + ", size: " + contentLength + ", contentType: " + contentType);
 		}
 		return url;
 	}

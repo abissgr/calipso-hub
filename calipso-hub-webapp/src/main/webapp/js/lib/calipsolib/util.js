@@ -707,8 +707,6 @@ Calipso.cloneSpecificValue = function(val) {
 		});
 
 		Calipso.vent.on('modal:showUseCaseContext', function(useCaseContext) {
-			console.log("on modal:showUseCaseContext:");
-			console.log(useCaseContext);
 			var layoutProperties = {
 				useCaseContext : useCaseContext,
 				childView : useCaseContext.createView({modal : true}),
@@ -788,14 +786,11 @@ Calipso.cloneSpecificValue = function(val) {
 	  onBeforeStart: function(onBeforeStartOptions) {
 			onBeforeStartOptions || (onBeforeStartOptions = {});
 			var options = onBeforeStartOptions.options || {};
-			console.log("Calipso.App.onBeforeStart, options: ");
-			console.log(options);
 			//Marionette.Application.prototype.onBeforeStart.apply(this, arguments);
 			var _this = this;
 			// set routers map
 			_(options.routers).each(function(routerClass) {
 				var router = new routerClass();
-				console.log("Calipso.App.onBeforeStart, adding router " + routerClass.getTypeName() + ": " + router);
 				_this.routers[routerClass.getTypeName()] = router;
 			});
 

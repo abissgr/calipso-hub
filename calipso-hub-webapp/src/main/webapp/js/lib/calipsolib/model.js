@@ -65,6 +65,7 @@ define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util
 					return this.constructor.isPublic(this);
 				},
 				getUseCaseContext: function (options) {
+					options.model = this;
 					return this.constructor.getUseCaseContext(options);
 				},
 				hasUseCase: function (key) {
@@ -206,11 +207,12 @@ define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util
 					var useCaseConfig = this._getUseCaseConfig(options.key);
 					Calipso.deepExtend(useCaseConfig.viewOptions, options.viewOptions);
 					// setup a model instance if needed
-					useCaseConfig.model = this.create({
+					useCaseConfig.model = options.model ? options.model : this.create({
 						id: options.modelId
 					}, {
 						httpParams: options.httpParams
 					});
+
 					useCaseConfig.factory = this;
 					useCaseConfig.addToCollection = options.addToCollection;
 					useCaseConfig.key = options.key;
