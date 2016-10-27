@@ -17,12 +17,11 @@
  */
 package gr.abiss.calipso.model.base;
 
-import javax.persistence.Column;
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Abstract base class for persistent entities with a System UUID primary key
@@ -35,7 +34,6 @@ public abstract class AbstractSystemUuidPersistable extends AbstractPersistable<
 	@Id
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
-	@Column(name = "id", unique = true)
 	private String id;
 	
 

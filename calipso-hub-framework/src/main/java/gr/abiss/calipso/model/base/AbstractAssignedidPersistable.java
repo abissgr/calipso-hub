@@ -17,17 +17,12 @@
  */
 package gr.abiss.calipso.model.base;
 
-import java.io.Serializable;
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import org.hibernate.annotations.Formula;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.GenericGenerator;
-
-import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import java.io.Serializable;
 
 /**
  * Abstract base class for persistent entities with assigned id
@@ -39,10 +34,9 @@ public abstract class AbstractAssignedidPersistable<ID extends Serializable>  im
 	private static final long serialVersionUID = 4340156130534111231L;
 
 	@Id
-	@Column(name = "id", unique = true)
 	private ID id;
-	
-	@Formula("id")
+
+	@Formula(" (id) ")
 	private ID savedId;
 
 	public AbstractAssignedidPersistable(){

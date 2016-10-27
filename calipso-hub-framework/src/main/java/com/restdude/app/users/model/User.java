@@ -58,7 +58,7 @@ import java.util.*;
 @ShallowReference
 @Entity
 @ApiModel(description = "Human users")
-@Table(name = "user")
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractMetadataSubject<UserMetadatum> implements CalipsoPersistable<String> {
 
@@ -139,7 +139,7 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 	@Column(name = "locale", nullable = false)
 	private String locale = "en";
 
-	@Formula(" (select count(*) from stomp_session s where s.user = id) ")
+	@Formula(" (select count(*) from stomp_session as stmpSess where stmpSess.user_id = id) ")
 	private Integer stompSessionCount;
 
 	@JsonIgnore

@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
  * 
  */
 @Entity
-@Table(name = "friendship")
+@Table(name = "friendships")
 @ModelResource(path = Friendship.API_PATH, apiName = "Friendships", apiDescription = "Operations about friendships")
 @ApiModel(value = "Friendship", description = "A model representing a directional connection between two users. ")
 public class Friendship implements CalipsoPersistable<FriendshipId> {
@@ -37,11 +37,11 @@ public class Friendship implements CalipsoPersistable<FriendshipId> {
 	@ApiModelProperty(required = true, allowableValues = "NEW, CONFIRMED, BLOCK, DELETE")
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(name = "status", nullable = false)
+	@Column(name = "current_status", nullable = false)
 	private FriendshipStatus status = FriendshipStatus.SENT;
 
 	@JsonIgnore
-	@Formula(" (status) ")
+	@Formula(" (current_status) ")
 	private String previousStatus;
 
 	public Friendship() {

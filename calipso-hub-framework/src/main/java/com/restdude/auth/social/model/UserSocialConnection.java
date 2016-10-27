@@ -26,13 +26,13 @@ import java.io.Serializable;
 public class UserSocialConnection implements Serializable{
 
 	@Id 
-	@Column(length = 255, nullable = false)
 	private String userId;
-	@Id 
-	@Column(length = 255, nullable = false)
-	private String providerId;
-	@Id 
-	private Integer rank;
+
+    @Id
+    private String providerId;
+
+    @Id
+    private Integer rank;
 	private String providerUserId;
 	@Column(nullable = false)
 	private String displayName;

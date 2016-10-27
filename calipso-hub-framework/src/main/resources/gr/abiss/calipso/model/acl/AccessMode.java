@@ -38,7 +38,6 @@ public class AccessMode implements Persistable<Short> {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
 	private Short id;
 
 	@Column(name = "name", unique = true, nullable = false)

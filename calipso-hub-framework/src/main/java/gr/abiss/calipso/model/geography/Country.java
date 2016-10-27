@@ -17,18 +17,10 @@
  */
 package gr.abiss.calipso.model.geography;
 
-import gr.abiss.calipso.model.base.AbstractAssignedidPersistable;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import io.swagger.annotations.ApiModel;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Class to represent a country, including ISO 3166-1 alpha-2 code, name,
@@ -61,11 +53,11 @@ public class Country extends AbstractFormalRegion<Continent> {
 	public static final String PRE_AUTHORIZE_FIND_ALL = "hasAnyRole('ROLE_ADMIN', 'ROLE_SITE_OPERATOR')";
 	public static final String PRE_AUTHORIZE_COUNT = "denyAll";
 
-	@Column(unique = true, nullable = true, length = 50)
-	private String nativeName;
+    @Column(name = "native_name", unique = true, nullable = true, length = 50)
+    private String nativeName;
 
-	@Column(unique = false, nullable = true, length = 15)
-	private String callingCode;
+    @Column(name = "calling_code", unique = false, nullable = true, length = 15)
+    private String callingCode;
 
 	@Column(unique = false, nullable = true, length = 50)
 	private String capital;

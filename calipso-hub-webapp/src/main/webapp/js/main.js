@@ -49,6 +49,8 @@ require.config({
 	paths : {
 		'cookie' : 'lib/jquery.cookie',
 		'jquery' : 'lib/jquery',
+        'pace': 'lib/pace',
+        'coreui-app': 'lib/coreui-app',
 		'jquery-color' : 'lib/jquery.color.plus-names',
 		"intlTelInput" : 'lib/intlTelInput',
 		"intlTelInputUtil" : 'lib/intlTelInputUtil',

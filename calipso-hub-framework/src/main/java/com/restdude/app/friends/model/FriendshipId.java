@@ -43,13 +43,13 @@ public class FriendshipId implements Serializable {
 
 	@NotNull
 	@ApiModelProperty(required = true, example = "{id: '[id]'}")
-	@JoinColumn(name = "owner", nullable = false, updatable = false)
+	@JoinColumn(name = "owner_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private User owner;
 
 	@NotNull
 	@ApiModelProperty(required = true, example = "{id: '[id]'}")
-	@JoinColumn(name = "user", nullable = false, updatable = false)
+	@JoinColumn(name = "friend_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private User friend;
 

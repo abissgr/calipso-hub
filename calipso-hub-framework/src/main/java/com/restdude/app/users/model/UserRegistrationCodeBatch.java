@@ -64,7 +64,7 @@ public class UserRegistrationCodeBatch extends AbstractSystemUuidPersistable imp
     @Min(1)
     @Max(20)
     @ApiModelProperty(value = "The number of codes to generate (1 to 20), non-updatable.", required = true, example = "10")
-    @Column(nullable = false, updatable = false)
+    @Column(name = "batch_size", nullable = false, updatable = false)
     private Integer batchSize;
 
     @ApiModelProperty(value = "The number of available codes in the batch", readOnly = true)

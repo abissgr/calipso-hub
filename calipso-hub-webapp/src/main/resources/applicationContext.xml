@@ -99,9 +99,8 @@
     <bean id="jpaProperties" parent="resthubCoreJpaProperties">
 	    <property name="sourceMap">
 	        <map merge="true">
-	           <entry key="jadira.usertype.autoRegisterUserTypes" value="true" />
-	            <entry key="jboss.as.jpa.providerModule" value="application" />
-	            <entry key="jboss.as.jpa.managed" value="false" />
+				<entry key="jadira.usertype.autoRegisterUserTypes" value="true"/>
+				<!---entry key="hibernate.globally_quoted_identifiers" value="true" /-->
 	        </map>
 	    </property>
 	</bean>

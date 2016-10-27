@@ -17,21 +17,14 @@
  */
 package gr.abiss.calipso.model.acl;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import org.javers.core.metamodel.annotation.ShallowReference;
-import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
-import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+import javax.persistence.*;
 
 @ShallowReference
 @Entity
@@ -42,7 +35,6 @@ public class AclSid implements CalipsoPersistable<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", unique = true)
 	private Long id;
 
 	@Column(name = "principal")

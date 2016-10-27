@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 define(
-[ "lib/calipsolib/view-collection", 'underscore', 'handlebars', 'backbone', 'marionette', 'moment', 'backbone-forms', 'backgrid' ],
-function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneForms, Backgrid) {
+    ["lib/calipsolib/view-collection", 'underscore', 'handlebars', 'backbone', 'marionette', 'moment', 'backbone-forms', 'backgrid', 'coreui-app'],
+    function (Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneForms, Backgrid, CoreUiApp) {
 
 	var Marionette = Backbone.Marionette;
 

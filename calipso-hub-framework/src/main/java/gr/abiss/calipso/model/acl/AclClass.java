@@ -17,16 +17,9 @@
  */
 package gr.abiss.calipso.model.acl;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.springframework.data.domain.Persistable;
-
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "acl_class")
@@ -36,7 +29,6 @@ public class AclClass implements CalipsoPersistable<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", unique = true)
 	private Long id;
 
 	@Column(name = "class", unique = true)

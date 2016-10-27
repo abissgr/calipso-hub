@@ -17,26 +17,16 @@
  */
 package gr.abiss.calipso.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
-
-import org.javers.core.metamodel.annotation.ShallowReference;
-
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.geography.Country;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
 import gr.abiss.calipso.tiers.controller.AbstractModelController;
+import org.javers.core.metamodel.annotation.ShallowReference;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  */
@@ -74,10 +64,9 @@ public class Host extends AbstractSystemUuidPersistable  {
 	private Country country;
 
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-	@CollectionTable(name = "host_aliases", joinColumns = @JoinColumn(name = "host_id"), uniqueConstraints = {
-			@UniqueConstraint(columnNames = { "host_alias" }) })
-	@Column(name = "host_alias")
-	Set<String> aliases = new HashSet<String>();
+    @CollectionTable(name = "host_aliases", joinColumns = @JoinColumn(name = "host_id"))
+    //, uniqueConstraints = {	@UniqueConstraint(columnNames = { "host_alias" }) }
+            Set<String> aliases = new HashSet<String>();
 
 	public Host() {
 		super();

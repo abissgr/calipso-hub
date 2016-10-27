@@ -17,27 +17,11 @@
  */
 package gr.abiss.calipso.model;
 
-import java.util.Date;
-
-import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.GenericGenerator;
-import org.joda.time.LocalDate;
 import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Represents a row in the calendar table
@@ -48,11 +32,10 @@ import org.springframework.data.domain.Persistable;
 public class CalendarDate implements Persistable<Date> {
 	
 	@Id
-	@Column(name = "id", nullable = false, unique = true)
-    @Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.DATE)
 	private Date id;
-	
-	@Formula(" id ")
+
+	@Formula(" (id) ")
 	private Date date;
 	
 	@Column(name = "is_weekday", nullable = true)
