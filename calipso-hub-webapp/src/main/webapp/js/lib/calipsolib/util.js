@@ -1364,7 +1364,7 @@ Calipso.cloneSpecificValue = function(val) {
 			fieldMasks : null,
 			view : null,
 			viewOptions : {},
-			mergableOptions: ['key', 'pathFragment', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model', 'factory',
+			mergableOptions: ['key', 'pathFragment', 'className', 'title', 'titleHtml', 'description', 'descriptionHtml', 'defaultNext', 'model', 'factory',
 				'view', 'viewOptions', 'childViewOptions',
 				'roleIncludes', 'roleExcludes',
 				"template", "formTemplate", "formFieldTemplate", "formControlSize",
@@ -1462,7 +1462,10 @@ Calipso.cloneSpecificValue = function(val) {
 				}
 				// Luke... I am your father
 				childOptions.parentContext = this;
-
+				console.log("getChildContext, regionName: " + regionName + ", regions overrides: ");
+				console.log(_this.overrides[regionName])
+				console.log("getChildContext, childOptions: ");
+				console.log(childOptions);
 				return new Calipso.UseCaseContext(childOptions);
 			}
 

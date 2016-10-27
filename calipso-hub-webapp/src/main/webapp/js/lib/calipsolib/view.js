@@ -36,8 +36,86 @@ define(
 			modalRegion : Calipso.view.ModalRegion,
 			footerRegion : "#calipsoFooterRegion"
 		},
+			events: {
+				"click .navbar-toggler": "navbarToggle",
+				"click .sidebar-close": "sidebarClose",
+				"click .aside-toggle": "asideToggle",
+				"click nav > ul.nav a": "toggleDropDown",
+			},
+			resizeBroadcast: function () {
+
+				var timesRun = 0;
+				var interval = setInterval(function () {
+					timesRun += 1;
+					if (timesRun === 5) {
+						clearInterval(interval);
+					}
+					window.dispatchEvent(new Event('resize'));
+				}, 62.5);
+			},
+			asideToggle: function (e) {
+				$('body').toggleClass('aside-menu-open');
+
+				//resize charts
+				this.resizeBroadcast();
+			},
+			sidebarClose: function (e) {
+				$('body').toggleClass('sidebar-opened').parent().toggleClass('sidebar-opened');
+			},
+			navbarToggle: function (e) {
+
+				var bodyClass = localStorage.getItem('body-class');
+				var $link = $(e.currentTarget);
+				if ($link.hasClass('layout-toggler') && $('body').hasClass('sidebar-off-canvas')) {
+					$('body').toggleClass('sidebar-opened').parent().toggleClass('sidebar-opened');
+					//resize charts
+					this.resizeBroadcast();
+
+				} else if ($link.hasClass('layout-toggler') && ($('body').hasClass('sidebar-nav') || bodyClass == 'sidebar-nav')) {
+					$('body').toggleClass('sidebar-nav');
+					localStorage.setItem('body-class', 'sidebar-nav');
+					if (bodyClass == 'sidebar-nav') {
+						localStorage.clear();
+					}
+					//resize charts
+					this.resizeBroadcast();
+				} else {
+					$('body').toggleClass('mobile-open');
+				}
+			},
+			toggleDropDown: function (e) {
+
+				var $link = $(e.currentTarget);
+				if ($link.hasClass('nav-dropdown-toggle')) {
+					$link.parent().removeClass('nt').toggleClass('open');
+				}
+
+			},
 		onRender : function() {
 			var _this = this;
+			/*
+			 $('a[href="#"][data-top!=true]').click(function(e){
+			 e.preventDefault();
+			 });
+			 */
+			// Add class .active to current link
+			this.$el.find('nav > ul.nav a').each(function () {
+
+				var cUrl = String(window.location);
+
+				if (cUrl.substr(cUrl.length - 1) == '#') {
+					cUrl = cUrl.slice(0, -1);
+				}
+
+				if ($($(this))[0].href == cUrl) {
+					$(this).addClass('active');
+
+					$(this).parents('ul').add(this).each(function () {
+						$(this).parent().addClass('nt').addClass('open');
+					});
+				}
+			});
+
 		}
 	},
 	// static members

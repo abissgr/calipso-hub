@@ -193,6 +193,18 @@ define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util
 						view: Calipso.view.UseCaseSearchLayout,
 						viewOptions: {
 							formTemplatesKey: "vertical",
+						},
+						overrides: {
+							formRegion: {
+								viewOptions: {
+									className: "card"
+								}
+							},
+							contentRegion: {
+								viewOptions: {
+									className: "card"
+								}
+							},
 						}
 					},
 				},

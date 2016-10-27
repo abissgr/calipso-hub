@@ -207,8 +207,11 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 				columns : _self.schema,
 				collection : _self.collection,
 			});
-
-			this.$el.append(this.backgrid.render().$el);
+			var $container = this.$el.find(".backgrid-table-container");
+			if ($container.length == 0) {
+				$container = this.$el;
+			}
+			$container.append(this.backgrid.render().$el);
 			var paginator = new Backgrid.Extension.Paginator({
 				windowSize: 10, // Default is 10
 				slideScale: 0.25, // Default is 0.5
