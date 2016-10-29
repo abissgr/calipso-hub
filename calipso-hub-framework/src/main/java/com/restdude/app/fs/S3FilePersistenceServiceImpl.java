@@ -20,6 +20,7 @@ package com.restdude.app.fs;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.slf4j.Logger;
@@ -64,11 +65,11 @@ public class S3FilePersistenceServiceImpl implements FilePersistenceService {
 		LOGGER.debug("Created S3 client");
 	}
 
-	
+
 	/**
 	 * Save file in S3
-     * @see FilePersistenceService#saveFile(java.io.InputStream, long, java.lang.String, java.lang.String)
-     */
+	 * @see FilePersistenceService#saveFile(java.io.InputStream, long, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public String saveFile(InputStream in, long contentLength, String contentType, String path) {
 		String url;
@@ -86,6 +87,17 @@ public class S3FilePersistenceServiceImpl implements FilePersistenceService {
 			LOGGER.debug("File saved, url: " + url + ", path: " + path + ", size: " + contentLength + ", contentType: " + contentType);
 		}
 		return url;
+	}
+
+	/**
+	 * Delete files from S3
+	 *
+	 * @see FilePersistenceService#deleteFiles(String...)
+	 */
+	@Override
+	public void deleteFiles(String... paths) {
+		// delete from bucket
+		s3Client.deleteObjects(new DeleteObjectsRequest(nameCardBucket).withKeys(paths));
 	}
 
 }

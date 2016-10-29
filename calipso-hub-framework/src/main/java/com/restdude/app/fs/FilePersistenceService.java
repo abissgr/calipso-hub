@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,12 +77,23 @@ public interface FilePersistenceService {
         return this.saveFile(fileField, file);
     }
 
+    public default void deleteFile(Field fileField, MultipartFile multipartFile, String filename) {
+        FileDTO file;
+        try {
+            file = new FileDTO.Builder()
+                    .path(filename).build();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed deleting file", e);
+        }
+        this.deleteFile(fileField, file);
+    }
+
     /**
      * The method saves the given multipart file to the path specified, ignoring the original file name.
      * @param fileField
-     * @param multipartFile
-     * @param path
-     * @return the UR: for the saved file
+     * @param file
+     * @return the URL for the saved file
      */
     public default String saveFile(Field fileField, FileDTO file) {
         String url = null;
@@ -116,6 +129,34 @@ public interface FilePersistenceService {
 
         return url;
     }
+
+    /**
+     * The method saves the given multipart file to the path specified, ignoring the original file name.
+     *
+     * @param fileField
+     * @param file
+     * @return the URL for the saved file
+     */
+    public default void deleteFile(Field fileField, FileDTO file) {
+
+        FilePersistence config = fileField.getAnnotation(FilePersistence.class);
+
+        // delete file
+        List<String> keys = new LinkedList<String>();
+        keys.add(file.getPath());
+
+        // generate previews?
+        Map<String, FilePersistencePreview> previews = getPreviews(fileField);
+        if (isImage(file.getContentType()) && MapUtils.isNotEmpty(previews)) {
+            for (String key : previews.keySet()) {
+                keys.add(file.getPath() + "_" + key);
+            }
+        }
+
+        deleteFiles(keys.toArray(new String[keys.size()]));
+
+    }
+
 
     public default String saveScaled(BufferedImage file, String contentType, int maxWidth, int maxHeight, String path) throws IOException {
         String url;
@@ -175,5 +216,7 @@ public interface FilePersistenceService {
     }
 
     public String saveFile(InputStream in, long contentLength, String contentType, String path);
+
+    public void deleteFiles(String... path);
 
 }

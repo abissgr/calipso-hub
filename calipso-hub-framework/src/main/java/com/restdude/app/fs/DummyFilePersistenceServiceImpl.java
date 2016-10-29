@@ -47,4 +47,8 @@ public class DummyFilePersistenceServiceImpl implements FilePersistenceService {
 		return path;
 	}
 
+    public void deleteFiles(String... path) {
+        LOGGER.warn("File not deleted, please configure another bean for id FilePersistenceService to delete: " + path);
+    }
+
 }

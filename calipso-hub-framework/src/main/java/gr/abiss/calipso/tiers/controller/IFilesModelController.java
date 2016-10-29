@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Adds file uploading capabilities to ModelControllers.
@@ -92,5 +94,32 @@ public interface IFilesModelController<T extends Persistable<ID>, ID extends Ser
 
         LOGGER.debug("Entity after uploading files: {}", entity);
         return entity;
+	}
+
+	/**
+	 * Utility method to be called by implementations
+	 *
+	 * @param id
+	 * @param filenames
+	 */
+	public default void deleteFiles(ID id, String... filenames) {
+		Logger logger = LoggerFactory.getLogger(IFilesModelController.class);
+		String basePath = new StringBuffer(this.getService().getDomainClass().getSimpleName())
+				.append('/').append(id).append('/').toString();
+		List<String> keys = new LinkedList<String>();
+
+		for (String propertyName : filenames) {
+			// verify the property exists
+			Field fileField = GenericSpecifications.getField(this.getService().getDomainClass(), propertyName);
+			if (fileField == null || !fileField.isAnnotationPresent(FilePersistence.class)) {
+				throw new IllegalArgumentException("No FilePersistence annotation found for member: " + propertyName);
+			}
+
+			// store the file key
+			keys.add(basePath + propertyName);
+		}
+
+		// delete files
+		this.getFilePersistenceService().deleteFiles(keys.toArray(new String[keys.size()]));
 	}
 }
