@@ -279,6 +279,8 @@ define(
 			Calipso.stopEvent(e);
 			Calipso.changeLocale($(e.currentTarget).data("locale"));
 		},
+		/*
+		 TODO
 		onRender : function() {
 
 			if (Calipso.util.isAuthenticated()) {
@@ -303,6 +305,7 @@ define(
 			}
 
 		},
+		 */
 	}, {
 		typeName : "Calipso.view.HeaderView"
 	});

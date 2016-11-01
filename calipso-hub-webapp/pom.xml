@@ -104,14 +104,13 @@
 			<plugin>
 				<groupId>com.github.phasebash</groupId>
 				<artifactId>jsdoc3-maven-plugin</artifactId>
-				<version>1.0.7</version>
 				<configuration>
 					<lenient>true</lenient>
 					<recursive>true</recursive>
-					<sourceFiles>
+					<directoryRoots>
 						<!--sourceFile>${basedir}/src/main/webapp/js/app.js</sourceFile> <sourceFile>${basedir}/src/main/webapp/js/main.js</sourceFile -->
-						<sourceFile>${basedir}/src/main/webapp/js/lib/calipso.js</sourceFile>
-					</sourceFiles>
+						<directoryRoot>${basedir}/src/main/webapp/js/lib/calipsolib</directoryRoot>
+					</directoryRoots>
 				</configuration>
 			</plugin>
 

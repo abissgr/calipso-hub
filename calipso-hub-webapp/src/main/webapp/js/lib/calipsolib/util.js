@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * @exports module:Calipso
+ */
 define(
 		[ "i18n!nls/labels",  "i18n!nls/labels-custom", 'underscore', 'handlebars', 'calipso-hbs', 'moment', 'backbone', 'backbone.paginator',
 		'backbone-forms',
@@ -30,20 +33,47 @@ define(
 	 * @namespace
 	 */
 	var Calipso = {
+		/**
+		 * @namespace
+		 */
 		config : {
 		},
+		/**
+		 * @namespace
+		 */
 		util : {
 			getLocale : function(){
 				var locale = localStorage.getItem('locale');
 				return locale;
 			},
 		},
+		/**
+		 * @namespace
+		 */
 		components : {},
+		/**
+		 * @namespace
+		 */
 		collection : {},
+		/**
+		 * @namespace
+		 */
 		model : {},
+		/**
+		 * @namespace
+		 */
 		customModel : {},
+		/**
+		 * @namespace
+		 */
 		view : {},
+		/**
+		 * @namespace
+		 */
 		controller : {},
+		/**
+		 * @namespace
+		 */
 		hbs : {},
 		labels : $.extend(true, {}, labels, labelsCustom)
 	};
@@ -941,6 +971,8 @@ Calipso.cloneSpecificValue = function(val) {
 		initialize : function(attributes, options) {
 			PageableCollection.prototype.initialize.apply(this, arguments);
 			options || (options = {});
+			console.log("initialize, model:");
+			console.log(options.model);
 			if (options.model && options.model.getTypeName()) {
 				this.model = options.model;
 			} else {
