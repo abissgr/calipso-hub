@@ -6,8 +6,11 @@
   <li class="nav-item">
       <a class="nav-link navbar-toggler layout-toggler" href="#">&#9776;</a>
   </li>
+
+
+  {{#if false}}
   {{#ifUserInRole "ROLE_ADMIN" "ROLE_SITE_OPERATOR"}}
-  <li class="nav-item dropdown">
+  <li class="nav-item dropdown" style=>
     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
       <i class="fa fa-cog fa-fw" aria-hidden="true"></i>
       {{labels.tmpl.header.tools}} <!--span class="caret"></span-->
@@ -32,6 +35,9 @@
     </div>
   </li>
   {{/if}}
+  {{/if}}
+
+
     <!--li class="nav-item p-x-1">
         <a class="nav-link" href="#">Dashboard</a>
     </li>

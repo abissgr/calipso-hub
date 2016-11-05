@@ -99,28 +99,12 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			String findByUsernameOrEmail) throws UsernameNotFoundException {
 		ICalipsoUserDetails userDetails = null;
 
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("loadUserByUsername using: " + findByUsernameOrEmail);
-		}
         User user = this.userService.findActiveByUserNameOrEmail(findByUsernameOrEmail);
-
-
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("loadUserByUsername user: " + user);
-		}
-
-		userDetails = UserDetails.fromUser(user);
-
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("loadUserByUsername returns userDetails: " + userDetails
-					+ ",	 with roles: " + userDetails.getAuthorities());
-		}
 		if (user == null) {
 			throw new UsernameNotFoundException("Could not match username: " + findByUsernameOrEmail);
 		}
-		
-		
-		return userDetails;
+
+		return UserDetails.fromUser(user);
 	}
 
 	/**
@@ -130,9 +114,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	public ICalipsoUserDetails create(final ICalipsoUserDetails tryUserDetails) {
 
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("create, Trying to login with: "+tryUserDetails);
-		}
 		ICalipsoUserDetails userDetails = null;
 		if (tryUserDetails != null) {
 			try {
@@ -150,15 +131,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 					// ask for the corresponding persisted user
 					User user = this.userService
-                            .findActiveByCredentials(usernameOrEmail, password,
-                                    metadata);
-					if(LOGGER.isDebugEnabled()){
-						LOGGER.debug("create, Matched local user: "+user);
-					}
+							.findActiveByCredentials(usernameOrEmail, password, metadata);
 					if(user != null && user.getId() != null){
-						if(LOGGER.isDebugEnabled()){
-							LOGGER.debug("create, Creating user details from user...");
-						}
 						// convert to UserDetails if not null
 						userDetails = UserDetails.fromUser(user);
 					}
@@ -172,21 +146,6 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		return userDetails;
 	}
 
-//	@Override
-//	@Transactional(readOnly = false)
-//	public ICalipsoUserDetails confirmPrincipal(String confirmationToken) {
-//		LOGGER.debug("confirmPrincipal confirmationToken: " +  confirmationToken);
-//		Assert.notNull(confirmationToken);
-//		ICalipsoUserDetails userDetails = null;
-//		User user = this.userService.confirmPrincipal(confirmationToken);
-//		// convert to UserDetals if not null
-//		userDetails = UserDetails.fromUser(user);
-//		userDetails.setNotificationCount(this.baseNotificationService.countUnseen(userDetails));
-//		if(LOGGER.isDebugEnabled()){
-//			LOGGER.debug("confirmPrincipal returning loggedInUserDetails: " +  userDetails);
-//		}
-//		return userDetails;
-//	}
 
 	@Override
 	@Transactional(readOnly = false)

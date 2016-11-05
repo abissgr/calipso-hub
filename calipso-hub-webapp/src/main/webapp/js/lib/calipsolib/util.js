@@ -779,7 +779,7 @@ Calipso.cloneSpecificValue = function(val) {
 			appName : "Calipso",
 			footer : "Copyright 2016 Geekologue",
 			contextPath : "/",
-			apiAuthPath: "/api/auth",
+            //apiAuthPath: "/api/auth",
 			headerViewType : Calipso.view.HeaderView,
 			sidebarViewType: Calipso.view.SidebarView,
 			footerViewType : Calipso.view.FooterView,

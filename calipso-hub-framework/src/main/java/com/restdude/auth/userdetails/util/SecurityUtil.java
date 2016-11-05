@@ -53,11 +53,7 @@ public class SecurityUtil {
 
 	public static void login(HttpServletRequest request, HttpServletResponse response, ICalipsoUserDetails userDetails,
 			UserDetailsConfig userDetailsConfig, UserDetailsService userDetailsService) {
-		if(LOGGER.isDebugEnabled()){
-			if (userDetails != null){
-				LOGGER.debug(request.getMethod() + " login, userDetails email: "+userDetails.getEmail()+", un: "+userDetails.getUsername()+", non-blank pw: "+StringUtils.isNotBlank(userDetails.getPassword()));
-			}
-		}
+
         if (userDetails != null && StringUtils.isNoneBlank(userDetails.getId(), userDetails.getUsername(), userDetails.getPassword())) {
             String token = new String(Base64.encode((userDetails.getUsername()
 					+ ":" + userDetails.getPassword()).getBytes()));
@@ -77,13 +73,9 @@ public class SecurityUtil {
 		addCookie(request, response, COOKIE_NAME_SESSION, null, true, userDetailsConfig);
 		HttpSession session = request.getSession();
 		if (session == null) {
-			if(LOGGER.isDebugEnabled()){
-				LOGGER.debug("logout, no session to clear");
-			}
+			LOGGER.debug("logout, no session to clear");
 		} else {
-			if(LOGGER.isDebugEnabled()){
-				LOGGER.debug("logout, invalidating session");
-			}
+			LOGGER.debug("logout, invalidating session");
 			session.invalidate();
 		}
 	}
@@ -117,21 +109,11 @@ public class SecurityUtil {
 		if (StringUtils.isNotBlank(userDetailsConfig.getCookiesDomain())) {
 			cookie.setDomain('.' + userDetailsConfig.getCookiesDomain());
 		}
-		// maybe not a good idea unless you can trust the proxy
-//		else if (StringUtils.isNotBlank(request.getHeader("X-Forwarded-Host"))) {
-//			cookie.setDomain('.' + request.getHeader("X-Forwarded-Host"));
-//		}
-//		else{
-//			cookie.setDomain('.' + request.getLocalName());
-//			
-//		}
+
 		// set the cookie path
 		if (StringUtils.isNotBlank(userDetailsConfig.getCookiesContextPath())) {
 			cookie.setPath(userDetailsConfig.getCookiesContextPath());
-		} 
-//		else {
-//			cookie.setPath("/");
-//		}
+		}
 		
 		cookie.setSecure(userDetailsConfig.isCookiesSecure());
 		cookie.setHttpOnly(userDetailsConfig.isCookiesHttpOnly());
@@ -151,7 +133,6 @@ public class SecurityUtil {
 		if (SecurityContextHolder.getContext() != null){
 			auth = SecurityContextHolder.getContext().getAuthentication();
 		}
-		LOGGER.debug("getAuthentication: {}", auth);
 		return auth;
 	}
 	
@@ -169,7 +150,6 @@ public class SecurityUtil {
 
 		}
 
-		LOGGER.debug("getPrincipal1 1: {}",  principal);
 		
 		if (principal != null) {
 			if(String.class.isAssignableFrom(principal.getClass())){
@@ -181,16 +161,6 @@ public class SecurityUtil {
 				principal = UserDetails.fromUser((User) principal);
 			}
 		}
-
-		LOGGER.debug("getPrincipal1 2: {}",  principal);
-//		if (principal != null) {
-//			
-//			if (ICalipsoUserDetails.class.isAssignableFrom(principal.getClass())) {
-//				return (ICalipsoUserDetails) principal;
-//			} else if (Authentication.class.isAssignableFrom(principal.getClass())) {
-//				return (ICalipsoUserDetails) authentication.getPrincipal();
-//			}
-//		}
 
 		return (ICalipsoUserDetails) principal;
 	}

@@ -74,7 +74,23 @@ public class UserDetailsController {
     @ResponseBody
     public ICalipsoUserDetails create(@RequestBody LoginSubmission resource) {
         ICalipsoUserDetails userDetails = new UserDetails(resource);
-        return this.login(userDetails, true);
+
+        try {
+            userDetails = this.service.create(userDetails);
+            if (userDetails != null && userDetails.getId() != null) {
+
+                userDetails.setPassword(resource.getPassword());
+                SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
+            } else {
+
+                LOGGER.info("login failed, logging out: " + userDetails);
+                SecurityUtil.logout(request, response, userDetailsConfig);
+                userDetails = new UserDetails();
+            }
+        } catch (Throwable e) {
+            LOGGER.error("login: failed creating new userDetails", e);
+        }
+        return userDetails;
     }
 
     @ApiOperation(value = "Remember",
@@ -101,34 +117,5 @@ public class UserDetailsController {
     }
 
 
-
-    protected ICalipsoUserDetails login(ICalipsoUserDetails userDetails, boolean apply) {
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("login");
-        }
-        try {
-            userDetails = this.service.create(userDetails);
-            if (userDetails != null && userDetails.getId() != null) {
-                if (apply) {
-                    LOGGER.info("login, applying: " + userDetails);
-                    SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
-                } else {
-
-                    LOGGER.info("login, skipping: " + userDetails);
-                }
-            } else {
-                if (apply) {
-                    LOGGER.info("login, logging out: " + userDetails);
-                    SecurityUtil.logout(request, response, userDetailsConfig);
-                }
-                LOGGER.info("login, anew: " + userDetails);
-                userDetails = new UserDetails();
-            }
-        } catch (Throwable e) {
-            LOGGER.error("login: failed creating new userDetails", e);
-        }
-        return userDetails;
-    }
 
 }

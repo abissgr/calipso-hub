@@ -27,9 +27,17 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		        </bean>
 		   </constructor-arg>
 	</bean>
-	
-	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint"  use-expressions="true"
-		disable-url-rewriting="true">
+
+	<!-- Declare an authentication-manager to use custom userDetailsService implementations -->
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider user-service-ref='userDetailsService'>
+			<sec:password-encoder ref="passwordEncoder"/>
+		</sec:authentication-provider>
+		<!--sec:authentication-provider ref="socialAuthenticationProvider"/-->
+	</sec:authentication-manager>
+
+	<sec:http create-session="stateless" entry-point-ref="restAuthenticationEntryPoint" use-expressions="true"
+			  disable-url-rewriting="true" authentication-manager-ref="authenticationManager">
 		<sec:headers>
 			<sec:frame-options policy="SAMEORIGIN"/>
 		</sec:headers>
@@ -38,33 +46,24 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		in a stateless app
          -->
         <sec:csrf disabled="true"/>
-		<!--
-        refactored sec:http-basic as a custom filter to enforce our auth manager and custom userdetails service,
-        see https://github.com/spring-projects/spring-security/issues/3296
-        -->
-		<sec:custom-filter position="BASIC_AUTH_FILTER" ref="basicAuthenticationFilter"/>
-		
-		<!-- REST client login -->
-		<sec:intercept-url pattern="/apiauth/**" access="permitAll"/>
-		<sec:intercept-url pattern="/api/auth/**" access="permitAll"/>
+
+
+		<!-- allow anonymous register/login etc. -->
+		<sec:intercept-url pattern="/apiauth/**" access="permitAll()"/>
+		<sec:intercept-url pattern="/api/auth/**" access="permitAll()"/>
+
 		<!-- for spring social login/signup -->
-        <sec:intercept-url pattern="/login" access="permitAll"/>
-        <sec:intercept-url pattern="/signin/**" access="permitAll"/>
-        <sec:intercept-url pattern="/signup/**" access="permitAll"/>
+		<sec:intercept-url pattern="/login" access="permitAll"/>
+		<sec:intercept-url pattern="/signin/**" access="permitAll"/>
+		<sec:intercept-url pattern="/signup/**" access="permitAll"/>
+
+		<!-- protect REST API  modifying methods-->
 		<sec:intercept-url pattern="/api/rest/**" method="POST" access="isAuthenticated()"/>
 		<sec:intercept-url pattern="/api/rest/**" method="PUT" access="isAuthenticated()"/>
 		<sec:intercept-url pattern="/api/rest/**" method="PATCH" access="isAuthenticated()"/>
 		<sec:intercept-url pattern="/api/rest/**" method="DELETE" access="isAuthenticated()"/>
-		<!-- 
-        <sec:intercept-url pattern="/api/rest/users/**" method="GET" access="hasAuthority('ROLE_USER')" />
-        <sec:intercept-url pattern="/api/rest/users/**" method="POST" access="permitAll" />
-		<sec:intercept-url pattern="/api/rest/users/**" method="PUT" access="hasRole('ROLE_USER')" />
-		<sec:intercept-url pattern="/api/rest/**" method="DELETE" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="OPTIONS" access="hasRole('ROLE_ADMIN')" />
-		<sec:intercept-url pattern="/api/rest/**" method="POST" access="hasRole('ROLE_ADMIN')" />
-        <sec:intercept-url pattern="/api/rest/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
-        <sec:intercept-url pattern="/api/rest/hosts**" method="GET" access="hasRole('ROLE_USER')" />
-		-->
+
+		<sec:http-basic/>
         <sec:logout invalidate-session="true" />
 		
         <!-- Adds social authentication filter to the Spring Security filter chain. 
@@ -72,19 +71,6 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	</sec:http>
 
 
-	<!--
-	again: refactored sec:http-basic as a custom filter to enforce our auth manager and custom userdetails service,
-	see https://github.com/spring-projects/spring-security/issues/3296
-	-->
-	<bean id="basicAuthenticationFilter"
-		  class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-		<constructor-arg name="authenticationManager" ref="authenticationManager"/>
-		<constructor-arg name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
-	</bean>
-	<bean id="basicAuthenticationEntryPoint"
-		  class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
-		<property name="realmName" value="Test Realm"/>
-	</bean>
 	<!-- sec:websocket-message-broker>
 	        <sec:intercept-message type="CONNECT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	        <sec:intercept-message type="UNSUBSCRIBE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
@@ -95,13 +81,8 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	        <sec:intercept-message pattern="/topic/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	        <sec:intercept-message pattern="/user/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	</sec:websocket-message-broker-->
-	
-	<!-- Declare an authentication-manager to use custom userDetailsService implementations -->
-	<sec:authentication-manager id="authenticationManager">
-		<sec:authentication-provider user-service-ref='userDetailsService' />
-		<!--sec:authentication-provider ref="socialAuthenticationProvider"/-->
-	</sec:authentication-manager>
-	
+
+
 	<!-- To enable Method Security Expressions and custom PermissionEvaluator
         we need to add the following 
     -->

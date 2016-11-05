@@ -208,7 +208,6 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User createTest(User resource) {
-		LOGGER.warn("createTest, credentials: {}", resource.getCredentials());
 
 		// note any credential info
 		UserCredentials credentials = resource.getCredentials();
@@ -258,7 +257,6 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		credentials.setPassword(this.passwordEncoder.encode(newPassword));
 		credentials = this.credentialsRepository.save(credentials);
 
-		LOGGER.info("handlePasswordResetToken returning local user: " + user);
 		return user;
 	}
 
@@ -380,7 +378,6 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User createForImplicitSignup(User userAccountData) throws DuplicateEmailException {
-		LOGGER.info("createForImplicitSignup, localUser: " + userAccountData);
 		
 		
 		User existing = this.getPrincipalLocalUser();
