@@ -83,6 +83,9 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                 isSearchModel: function () {
                     return this.wrappedCollection ? true : false;
                 },
+                getLabels: function () {
+                    return this.constructor.getLabels(this);
+                },
                 getBaseFragment: function () {
                     return this.constructor.getBaseFragment(this);
                 },
@@ -169,6 +172,13 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                  */
                 getPathFragment: function (instance) {
                     return this.pathFragment;
+                },
+                getLabels: function (instance) {
+                    if (!this.labels) {
+                        var labels = this.superClass && this.superClass.getLabels ? this.superClass.getLabels() : {};
+                        this.labels = Calipso.deepExtend(labels, Calipso.getPathValue(Calipso.labels, "models." + this.getPathFragment(), {}));
+                    }
+                    return this.labels;
                 },
                 // TODO: refactor view to region names to
                 // allow multiple views config peer layout

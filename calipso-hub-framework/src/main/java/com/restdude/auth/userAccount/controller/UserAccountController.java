@@ -48,7 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @Api(tags = "AuthAccount", description = "User account operations")
-@RequestMapping(value = "/api/auth/account", produces = {"application/json", "application/xml"})
+@RequestMapping(value = {"/api/auth/account", "/api/auth/accounts"}, produces = {"application/json", "application/xml"})
 public class UserAccountController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserAccountController.class);

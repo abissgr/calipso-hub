@@ -486,8 +486,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			this.form = new Calipso.backboneform.Form(formOptions);
 			//this.$el.append(this.form.el);
 			this.form.setElement(this.$el.find("form:first").first()).render();
-			this.$el.find('input, select').filter(':visible:enabled:first').focus();
-			this.onFormRendered();
 
 			// flag changed
 			if(this.enableDrafts){
@@ -504,6 +502,10 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 					collection : _self.collection
 				});
 			});
+		},
+		onDomRefresh: function () {
+			this.$el.find('input, select').filter(':visible:enabled:first').focus();
+			this.onFormRendered();
 		},
 		onFormRendered : function() {
 

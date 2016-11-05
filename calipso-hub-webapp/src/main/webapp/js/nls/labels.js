@@ -190,10 +190,10 @@ define({
 			},
 			"registrationCodeBatches": {
 				"singular": {
-					"label": "Registration code batch"
+					"label": "Beta code pack"
 				},
 				"plural": {
-					"label": "Registration code batches"
+					"label": "Beta code packs"
 				},
 				"name": {
 					"label": "Name"
@@ -216,10 +216,10 @@ define({
 			},
 			"userRegistrationCodes": {
 				"singular": {
-					"label": "Registration code"
+					"label": "Beta code"
 				},
 				"plural": {
-					"label": "Registration codes"
+					"label": "Beta codes"
 				},
 				"id": {
 					"label": "Code"

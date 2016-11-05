@@ -13,7 +13,7 @@
 		4. 'navbar-fixed'		  - Fixed navbar
 	-->
 
-<body class="navbar-fixed sidebar-nav fixed-nav">
+<body class="navbar-fixed fixed-nav">
 
     <!-- Placed at the end of the document so the pages load faster -->
     <script data-main="${basePath}/js/main" id="calipso-script-main" src="${basePath}/js/lib/require.js">

@@ -70,7 +70,7 @@ define(
 			Calipso.session.logout();
 		},
 		register : function() {
-			Calipso.navigate("useCases/users/register", {
+			Calipso.navigate("useCases/accounts/create", {
 				trigger : true
 			});
 		},

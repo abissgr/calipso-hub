@@ -42,6 +42,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                         fw = Calipso.app.fw;
                         Calipso.app.fw = null;
                     }
+
                     // reload the app if locale needs to be changed
                     var userLocale = this.get("locale");
                     var oldLocale = localStorage.getItem("locale");
@@ -124,7 +125,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
             {
                 public: true,
                 pathFragment: "userDetails",
-                baseFragment: '/apiauth/',
+                baseFragment: '/api/auth/',
                 typeName: "Calipso.model.UserDetailsModel",
                 useCases: {
                     login: {
@@ -138,7 +139,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                                     '<div class="btn-group btn-group-sm pull-right" role="group">\
               <a class="btn btn-secondary" href="/userDetails/forgotPassword">' +
                                     Calipso.util.getLabels("useCases.userDetails.login.forgotPassword") + '</a>\
-                  <a class="btn btn-secondary" href="/useCases/users/register">' +
+                  <a class="btn btn-secondary" href="/register">' +
                                     Calipso.util.getLabels("useCases.userDetails.login.newUser") + '</a>\
                 </div>',
                                     message: Calipso.util.getLabels("useCases.userDetails.login.message"),

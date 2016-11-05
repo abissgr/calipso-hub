@@ -88,6 +88,16 @@ define(
 			labels : Calipso.util.getLabels(),
 			useCase : self.useCaseContext,
 		};
+		// inherit labels
+		console.log("mixinTemplateContext: self.model: ");
+		console.log(self.model);
+		if (self.model && self.model.getSuperClass()) {
+			console.log("mixinTemplateContext: self.model.getSuperClass: ");
+			console.log(self.model.getSuperClass());
+			result.labels.models[self.model.getPathFragment()] = self.model.getLabels();
+		}
+
+
 		target = target || {};
 
 		if (_.isFunction(templateContext)) {
@@ -132,12 +142,18 @@ define(
 				},
 				getTypeName : function() {
 					return this.constructor.getTypeName();
+				},
+				getSuperClass: function () {
+					return this.constructor.getSuperClass();
 				}
 			};
 			var extendStaticOptions = {
 				typeName : "Calipso." + packageName + "." + newClassName,
 				getTypeName : function() {
 					return this.typeName;
+				},
+				getSuperClass: function () {
+					return this.superClass;
 				}
 			};
 
@@ -462,7 +478,7 @@ Calipso.cloneSpecificValue = function(val) {
 	 * @return {[type]}
 	 */
 	Calipso.getConfigProperty = function(propertyName) {
-		return Calipso.config[propertyName];
+		return (propertyName.indexOf(".") > -1) ? Calipso.getPathValue(Calipso.config, propertyName) : Calipso.config[propertyName];
 	};
 	Calipso._chartColors = [ "91, 144, 191", "163, 190, 140", "171, 121, 103", "208, 135, 112", "180, 142, 173", "235, 203, 139", "39, 165, 218", "250, 164, 58", "96, 189, 104", "241, 124, 176", "178, 145, 47", "178, 118, 178", "222, 207, 63", "241, 88, 84", "77, 77, 77", "0, 0, 0", ];
 	Calipso.getThemeColor = function(index) {
@@ -763,8 +779,9 @@ Calipso.cloneSpecificValue = function(val) {
 			appName : "Calipso",
 			footer : "Copyright 2016 Geekologue",
 			contextPath : "/",
-			apiAuthPath : "/apiauth",
+			apiAuthPath: "/api/auth",
 			headerViewType : Calipso.view.HeaderView,
+			sidebarViewType: Calipso.view.SidebarView,
 			footerViewType : Calipso.view.FooterView,
 			sessionType : Calipso.util.Session,
 			// URL > Constructor map
@@ -865,6 +882,19 @@ Calipso.cloneSpecificValue = function(val) {
 				new (Calipso.getConfigProperty("headerViewType"))({
 					model : Calipso.session.userDetails
 			}));
+
+			// add/remove navbar
+			if (Calipso.util.isAuthenticated()) {
+				$("body").addClass("sidebar-nav");
+			}
+			else {
+				$("body").removeClass("sidebar-nav");
+			}
+			this.view.showChildView("sidebarRegion",
+				new (Calipso.getConfigProperty("sidebarViewType"))({
+					model: Calipso.session.userDetails
+				}));
+
 			this.view.showChildView("footerRegion",
 				new (Calipso.getConfigProperty("footerViewType"))({
 					model : Calipso.session.userDetails
@@ -1440,6 +1470,7 @@ Calipso.cloneSpecificValue = function(val) {
 			getFields : function(){
 				// if not given, pick them up from model
 				var fields = _.extend({}, this.model.getFields() || {}, this.fields || {});
+				var fieldLabels = this.model.getLabels();
 				var caseFields = {};
 				var _this = this;
 
@@ -1453,6 +1484,9 @@ Calipso.cloneSpecificValue = function(val) {
 							field.datatype = "Hidden";
 						}
 						// resolve label
+						if (!field.label && fieldLabels[key]) {
+							field.label = fieldLabels[key].label;
+						}
 						if(!field.label){
 							var labelKeys = [
 								field.labelKey,
@@ -1494,10 +1528,6 @@ Calipso.cloneSpecificValue = function(val) {
 				}
 				// Luke... I am your father
 				childOptions.parentContext = this;
-				console.log("getChildContext, regionName: " + regionName + ", regions overrides: ");
-				console.log(_this.overrides[regionName])
-				console.log("getChildContext, childOptions: ");
-				console.log(childOptions);
 				return new Calipso.UseCaseContext(childOptions);
 			}
 
