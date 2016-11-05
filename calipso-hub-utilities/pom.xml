@@ -220,7 +220,19 @@
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch-transport-wares</artifactId>
 		</dependency>
-		
+
+        <!--
+        Jasyst Encryption
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt-spring31</artifactId>
+        </dependency>
+        -->
 		<!-- javers auditing -->
 		<dependency>
 		    <groupId>org.javers</groupId>

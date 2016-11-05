@@ -45,6 +45,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -68,6 +69,14 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	private RoleRepository roleRepository;
 	private UserCredentialsRepository credentialsRepository;
 	private UserRegistrationCodeRepository userRegistrationCodeRepository;
+
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
 
 	@Autowired
 	public void setRoleRepository(RoleRepository roleRepository) {
@@ -96,13 +105,12 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
+	@Transactional(readOnly = false)
 	public User findActiveByCredentials(String userNameOrEmail, String password, Map metadata) {
-		LOGGER.debug("findByCredentials, userNameOrEmail: {}, password: {}", userNameOrEmail, password);
 		
 		User user = null;
 		try {
 			user = this.findActiveByCredentials(userNameOrEmail, password);
-			LOGGER.debug("findByCredentials, user: {}", user);
 			if (user != null) {
 				if (!CollectionUtils.isEmpty(metadata)) {
 					List<Metadatum> saved = this.repository.addMetadata(user.getId(), metadata);
@@ -146,6 +154,11 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			if (!code.getAvailable()) {
 				throw new BadRequestException("Invalid registration code");
 			}
+		}
+
+		// encrypt password
+		if (credentials.getPassword() != null) {
+			credentials.setPassword(passwordEncoder.encode(credentials.getPassword()));
 		}
 
 		// attach credentials
@@ -195,7 +208,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	@Override
 	@Transactional(readOnly = false)
 	public User createTest(User resource) {
-		LOGGER.warn("createActive, credentials: {}", resource.getCredentials());
+		LOGGER.warn("createTest, credentials: {}", resource.getCredentials());
 
 		// note any credential info
 		UserCredentials credentials = resource.getCredentials();
@@ -209,10 +222,16 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		if (credentials == null) {
 			credentials = new UserCredentials();
 		}
-
 		credentials.setUser(resource);
+
+		// require password for active
 		if (credentials.getActive() && credentials.getPassword() == null) {
 			throw new BadRequestException("User to create is active but has no password set");
+		}
+
+		// encrypt password
+		if (credentials.getPassword() != null) {
+			credentials.setPassword(passwordEncoder.encode(credentials.getPassword()));
 		}
 
 		credentials = this.credentialsRepository.save(credentials);
@@ -236,7 +255,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			credentials.setUser(user);
 		}
 		credentials.setResetPasswordToken(null);
-		credentials.setPassword(newPassword);
+		credentials.setPassword(this.passwordEncoder.encode(newPassword));
 		credentials = this.credentialsRepository.save(credentials);
 
 		LOGGER.info("handlePasswordResetToken returning local user: " + user);
@@ -307,9 +326,11 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 	public User findActiveByCredentials(String userNameOrEmail, String password) {
 		User found = null;
 		if (StringUtils.isNotBlank(userNameOrEmail) && StringUtils.isNotBlank(password)) {
-			found = userNameOrEmail.contains("@")
-					? this.repository.findActiveByEmailAndPassword(userNameOrEmail, password)
-					: this.repository.findActiveByUsernameAndPassword(userNameOrEmail, password);
+			User unmatched = this.findActiveByUserNameOrEmail(userNameOrEmail);
+			// match password
+			if (passwordEncoder.matches(password, unmatched.getCredentials().getPassword())) {
+				found = unmatched;
+			}
 		}
 		return found;
 	}
@@ -377,7 +398,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 				userAccountData.setCredentials(new UserCredentials());
 			}
 
-			userAccountData.getCredentials().setPassword(this.generator.generateKey());
+			userAccountData.getCredentials().setPassword(this.passwordEncoder.encode(this.generator.generateKey()));
 			userAccountData.getCredentials().setActive(true);
 			existing = this.createTest(userAccountData);
 		}
@@ -394,18 +415,24 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			String newPasswordConfirm) {
 		
 		// make sure we have all params
+
 		String[] params = {userNameOrEmail, oldPassword, newPassword, newPasswordConfirm};
-		Assert.noNullElements(params, "Failed updating user pass: Username/email, old password, new password and new password confirmation must be provided ");
+		if (StringUtils.isAnyBlank(userNameOrEmail, oldPassword, newPassword, newPasswordConfirm)) {
+			throw new BadRequestException("Required parameters: username/email, currentPassword, password, passwordConfirmation");
+		}
 		
 		// make sure new password and confirm match
-		Assert.isTrue(newPassword.equals(newPasswordConfirm), "Failed updating user pass: New password and new password confirmation must be equal");
-		
+		if (!newPassword.equals(newPasswordConfirm)) {
+			throw new BadRequestException("Both password and password confirmation are required and must be equal");
+		}
 		// make sure a user matching the credentials is found
 		User u = this.findActiveByCredentials(userNameOrEmail, oldPassword);
-		Assert.notNull(u, "Failed updating user pass: A user could not be found with the given credentials");
+		if (u == null) {
+			throw new BadRequestException("Failed updating user pass: A user could not be found with the given credentials");
+		}
 		
 		// update password and return user
-		u.getCredentials().setPassword(newPassword);
+		u.getCredentials().setPassword(this.passwordEncoder.encode(newPassword));
 		u.getCredentials().setLastPassWordChangeDate(new Date());
 		u = this.update(u);
 		return u;

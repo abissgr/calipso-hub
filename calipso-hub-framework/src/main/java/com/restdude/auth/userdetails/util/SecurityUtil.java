@@ -58,10 +58,8 @@ public class SecurityUtil {
 				LOGGER.debug(request.getMethod() + " login, userDetails email: "+userDetails.getEmail()+", un: "+userDetails.getUsername()+", non-blank pw: "+StringUtils.isNotBlank(userDetails.getPassword()));
 			}
 		}
-		if (userDetails != null
-				&& StringUtils.isNotBlank(userDetails.getUsername())
-				&& StringUtils.isNotBlank(userDetails.getPassword())) {
-			String token = new String(Base64.encode((userDetails.getUsername()
+        if (userDetails != null && StringUtils.isNoneBlank(userDetails.getId(), userDetails.getUsername(), userDetails.getPassword())) {
+            String token = new String(Base64.encode((userDetails.getUsername()
 					+ ":" + userDetails.getPassword()).getBytes()));
 			addCookie(request, response, userDetailsConfig.getCookiesBasicAuthTokenName(), token, false, userDetailsConfig);
 			userDetailsService.updateLastLogin(userDetails);

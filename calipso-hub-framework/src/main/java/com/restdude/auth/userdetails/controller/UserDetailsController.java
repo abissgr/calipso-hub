@@ -74,25 +74,7 @@ public class UserDetailsController {
     @ResponseBody
     public ICalipsoUserDetails create(@RequestBody LoginSubmission resource) {
         ICalipsoUserDetails userDetails = new UserDetails(resource);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("create, loginSubmission: " + resource);
-            LOGGER.debug("create, userDetails: " + userDetails);
-        }
-        if (resource.getEmailOrUsername() != null) {
-            // change password
-            if (resource.getResetPasswordToken() != null) {
-                userDetails = this.resetPasswordAndLogin(userDetails);
-            }
-            // if login
-            else if (resource.getPassword() != null) {
-                userDetails = this.login(userDetails, true);
-            }
-            // forgot password
-            else {
-                this.service.handlePasswordResetRequest(resource.getEmailOrUsername());
-            }
-        }
-        return userDetails;
+        return this.login(userDetails, true);
     }
 
     @ApiOperation(value = "Remember",
@@ -119,17 +101,6 @@ public class UserDetailsController {
     }
 
 
-    protected ICalipsoUserDetails resetPasswordAndLogin(ICalipsoUserDetails userDetails) {
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("resetPasswordAndLogin");
-        }
-        userDetails = service.resetPassword(userDetails);
-        SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
-
-
-        return userDetails;
-    }
 
     protected ICalipsoUserDetails login(ICalipsoUserDetails userDetails, boolean apply) {
 

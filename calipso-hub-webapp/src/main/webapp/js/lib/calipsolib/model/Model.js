@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * @exports lib/calipsolib/model/Model
+ * @exports Calipso.Model
  */
 define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util", "lib/calipsolib/form",
         "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars'],
@@ -27,12 +27,12 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
          * Provides usecase metadata as a means to declaratively define view
          * hierarchies. that may also map to dynamic (i.e. non-explicit)
          * controller routes.
-         * @alias module:lib/calipsolib/model/Model
+         * @alias module:Calipso.Model
          * @constructor
          * @augments module:Backbone.Model
          */
         Calipso.Model = Calipso.model.Model.extend(
-            /** @lends module:lib/calipsolib/model/Model.prototype */
+            /** @lends module:Calipso.Model.prototype */
             {
                 skipDefaultSearch: false,
 
@@ -125,6 +125,10 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     rolesIncluded: ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
                     rolesExcluded: null,
                 },
+                /**
+                 * Returns whether the model is public
+                 * @returns {boolean}
+                 */
                 isPublic: function () {
                     return this.public || false;
                 },

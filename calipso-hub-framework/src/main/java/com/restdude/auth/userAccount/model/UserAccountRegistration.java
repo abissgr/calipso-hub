@@ -25,10 +25,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Date;
 
-@ApiModel(description = "User registration")
-public class UserAccountRegistration {
+@ApiModel(value = "UserAccountRegistration", description = "User registration")
+public class UserAccountRegistration implements Serializable {
 
 	private static final long serialVersionUID = 5206010308112791343L;
 

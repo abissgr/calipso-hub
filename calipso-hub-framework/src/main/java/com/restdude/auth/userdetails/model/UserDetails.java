@@ -55,14 +55,8 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
 	private String password;
-	
-	@JsonSerialize(using = SkipPropertySerializer.class)
-	private String passwordConfirmation;
-	
-	@JsonSerialize(using = SkipPropertySerializer.class)
-	private String currentPassword;
-	
-	private Date lastPassWordChangeDate;
+
+    private Date lastPassWordChangeDate;
 
 	private String email;
 	private String emailHash;
@@ -100,11 +94,9 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@JsonProperty(value = "roles")
 	private List<? extends GrantedAuthority> authorities;
 	private Map<String, String> metadata;
-	
-	@JsonSerialize(using = SkipPropertySerializer.class)
-	private String resetPasswordToken;
-	
-	@JsonIgnore
+
+
+    @JsonIgnore
 	private User user;
 
 	private Boolean isResetPasswordReguest = false;
@@ -172,8 +164,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 			.append("id", id)
 			.append("username", username)
 			.append("email", email)
-			.append("passwordConfirmation", this.passwordConfirmation)
-			.append("currentPassword", this.currentPassword)
 			.append("password", this.password)
 			.append("metadata", metadata)
 			.append("authorities", authorities)
@@ -525,14 +515,7 @@ public class UserDetails implements  ICalipsoUserDetails{
 		return this.redirectUrl;
 	}
 
-	/**
-     * @see ICalipsoUserDetails#setResetPasswordToken(java.lang.String)
-     */
-	@Override
-	public void setResetPasswordToken(String resetPasswordToken) {
-		this.resetPasswordToken = resetPasswordToken;
 
-	}
 
 	/**
      * @see ICalipsoUserDetails#getMetadata()
@@ -563,13 +546,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 		this.metadata.put(predicate, object);
 	}
 
-	/**
-     * @see ICalipsoUserDetails#getResetPasswordToken()
-     */
-	@Override
-	public String getResetPasswordToken() {
-		return resetPasswordToken;
-	}
 
 	/**
      * @see ICalipsoUserDetails#setUsername(java.lang.String)
@@ -672,38 +648,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	/**
-     * @see ICalipsoUserDetails#getCurrentPassword()
-     */
-	@Override
-	public String getCurrentPassword() {
-		return currentPassword;
-	}
-
-	/**
-     * @see ICalipsoUserDetails#setCurrentPassword(String)
-     */
-	@Override
-	public void setCurrentPassword(String currentPassword) {
-		this.currentPassword = currentPassword;
-	}
-
-	/**
-     * @see ICalipsoUserDetails#getPasswordConfirmation()
-     */
-	@Override
-	public String getPasswordConfirmation() {
-		return passwordConfirmation;
-	}
-
-	/**
-     * @see ICalipsoUserDetails#setPasswordConfirmation(String)
-     */
-	@Override
-	public void setPasswordConfirmation(String passwordConfirmation) {
-		this.passwordConfirmation = passwordConfirmation;
 	}
 
 	@Override

@@ -713,6 +713,21 @@
 				<artifactId>spring-security-test</artifactId>
 				<version>${spring-security.version}</version>
 			</dependency>
+			<!--
+			Jasyst Encryption
+			<dependency>
+				<groupId>org.jasypt</groupId>
+				<artifactId>jasypt</artifactId>
+				<version>1.9.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jasypt</groupId>
+				<artifactId>jasypt-spring31</artifactId>
+				<version>1.9.2</version>
+			</dependency>
+			-->
+
 			<dependency>
 				<groupId>org.resthub</groupId>
 				<artifactId>resthub-test</artifactId>

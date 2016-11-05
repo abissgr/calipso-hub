@@ -19,6 +19,7 @@ package com.restdude.auth.userdetails.service.impl;
 
 import com.restdude.app.users.model.User;
 import com.restdude.app.users.service.UserService;
+import com.restdude.auth.userAccount.model.PasswordResetRequest;
 import com.restdude.auth.userdetails.integration.UserDetailsConfig;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import com.restdude.auth.userdetails.model.UserDetails;
@@ -26,6 +27,7 @@ import com.restdude.auth.userdetails.service.UserDetailsService;
 import com.restdude.auth.userdetails.util.DuplicateEmailException;
 import com.restdude.auth.userdetails.util.SecurityUtil;
 import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
+import gr.abiss.calipso.web.spring.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,6 @@ import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.inject.Named;
@@ -70,7 +71,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	private StringKeyGenerator keyGenerator = KeyGenerators.string();
 
 	private UserService userService;
-	
+
 	@Autowired(required = false)
 	public void setUserDetailsConfig(UserDetailsConfig userDetailsConfig) {
 		this.userDetailsConfig = userDetailsConfig;
@@ -190,27 +191,44 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	@Transactional(readOnly = false)
 	public void handlePasswordResetRequest(String usernameOrEmail) {
+		// require user handle
+		if (StringUtils.isBlank(usernameOrEmail)) {
+			throw new BadRequestException("Unauthorised request must provide a username or email");
+		}
 		this.userService.handlePasswordResetRequest(usernameOrEmail);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
-	public ICalipsoUserDetails resetPassword(ICalipsoUserDetails userDetails) {
-		String userNameOrEmail = userDetails.getEmailOrUsername();
-		String token = userDetails.getResetPasswordToken();
-		String newPassword = userDetails.getPassword();
-		Assert.notNull(userNameOrEmail);
-		User user = this.userService.handlePasswordResetToken(
-				userNameOrEmail, token, newPassword);
-		if (user == null) {
-			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
+	public ICalipsoUserDetails resetPassword(PasswordResetRequest passwordResetRequest) {
+		ICalipsoUserDetails userDetails = this.getPrincipal();
+		User u = null;
+
+		// Case 1: if authorized as current user, require current password
+		if (userDetails != null && StringUtils.isNotBlank(passwordResetRequest.getCurrentPassword())) {
+			u = this.userService.changePassword(
+					userDetails.getUsername(),
+					passwordResetRequest.getCurrentPassword(),
+					passwordResetRequest.getPassword(),
+					passwordResetRequest.getPasswordConfirmation());
 		}
-		user.getCredentials().setResetPasswordToken(null);
-		user.getCredentials().setPassword(newPassword);
-		userDetails = UserDetails.fromUser(user);
-		// LOGGER.info("create returning loggedInUserDetails: " +
-		// loggedInUserDetails);
-		return userDetails;
+		// Case 2: if authorized using reset token
+		else if (!StringUtils.isAnyBlank(passwordResetRequest.getEmailOrUsername(), passwordResetRequest.getPassword(), passwordResetRequest.getResetPasswordToken())) {
+			// password and password confirmation must match
+			if (!passwordResetRequest.getPassword().equals(passwordResetRequest.getPasswordConfirmation())) {
+				throw new BadRequestException("Both password and password confirmation are required and must be equal");
+			}
+			// update matching user credentials
+			u = this.userService.handlePasswordResetToken(passwordResetRequest.getEmailOrUsername(), passwordResetRequest.getResetPasswordToken(), passwordResetRequest.getPassword());
+		}
+		// Case 3: forgotten password
+		else {
+			String usernameOrEmail = userDetails != null ? userDetails.getUsername() : passwordResetRequest.getEmailOrUsername();
+			this.handlePasswordResetRequest(usernameOrEmail);
+		}
+
+		// return userdetails
+		return UserDetails.fromUser(u);
 	}
 
 	@Override
@@ -242,8 +260,8 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	@Override
 	@Transactional(readOnly = false)
 	public ICalipsoUserDetails update(ICalipsoUserDetails resource) {
-        return this.resetPassword(resource);
-    }
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public void delete(ICalipsoUserDetails resource) {

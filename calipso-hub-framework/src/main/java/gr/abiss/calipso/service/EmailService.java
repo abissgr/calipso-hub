@@ -156,15 +156,16 @@ public class EmailService {
 	
 			// Send email
 			if(StringUtils.isNotBlank(ConfigurationFactory.getConfiguration().getString("mail.server.host"))){
-				this.mailSender.send(mimeMessage);}
+				this.mailSender.send(mimeMessage);
+			}
 			else{
 				LOGGER.warn("Skipped sending email as mail.server.host property is empty");
 			}
 		} catch (Exception e) {
 			LOGGER.error("Failed to send email: ", e);
 		}
-		
-		
+
+
 	}
 
     

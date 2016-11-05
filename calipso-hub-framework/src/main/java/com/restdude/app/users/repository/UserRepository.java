@@ -42,9 +42,6 @@ public interface UserRepository extends ModelRepository<User, String> {
 			+ "		u.stompSessionCount"
 			+ ") ";
 
-	@Query("select u from User u where UPPER(u.email) = UPPER(?1) and u.credentials.password = ?2 and u.credentials.active = true")
-	public User findActiveByEmailAndPassword(String email, String password);
-
 	@Query("select u from User u where u.id = UPPER(?1) and u.credentials.active = true")
 	public User findActiveById(String id);
 
@@ -53,9 +50,6 @@ public interface UserRepository extends ModelRepository<User, String> {
 
 	@Query("select u from User u where UPPER(u.email) = UPPER(?1) and u.credentials.active = true")
 	public User findActiveByEmail(String email);
-
-	@Query("select u from User u where UPPER(u.credentials.username) = UPPER(?1) and u.credentials.password = ?2 and u.credentials.active = true")
-	public User findActiveByUsernameAndPassword(String usernameOrEmail, String password);
 
 	@Query("select u from User u where UPPER(u.credentials.username) = UPPER(?1) and u.credentials.active = true")
 	public User findActiveByUsername(String username);

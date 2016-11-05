@@ -52,7 +52,7 @@ public class UserControllerIT extends AbstractControllerIT {
                 .body(new UserAccountRegistration.Builder()
                         .firstName("Firstname")
 						.lastName("LastName")
-						.email("ittestreg@UserControllerIT.evasyst.com")
+						.email("ittestreg@UserControllerIT.com")
 						.build())
                 .post("/calipso/api/auth/account")
                 .then()

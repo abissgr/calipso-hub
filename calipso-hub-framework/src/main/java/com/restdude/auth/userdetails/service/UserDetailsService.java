@@ -18,6 +18,7 @@
 package com.restdude.auth.userdetails.service;
 
 import com.restdude.app.users.model.User;
+import com.restdude.auth.userAccount.model.PasswordResetRequest;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import com.restdude.auth.userdetails.util.DuplicateEmailException;
 import org.resthub.common.service.CrudService;
@@ -25,7 +26,7 @@ import org.resthub.common.service.CrudService;
 
 public interface UserDetailsService extends CrudService<ICalipsoUserDetails, String> {
 
-	ICalipsoUserDetails resetPassword(ICalipsoUserDetails userDetails);
+    ICalipsoUserDetails resetPassword(PasswordResetRequest resource);
 
 	void handlePasswordResetRequest(String userNameOrEmail);
 
