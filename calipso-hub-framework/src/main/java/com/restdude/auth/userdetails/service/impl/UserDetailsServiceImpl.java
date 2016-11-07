@@ -187,7 +187,13 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 		}
 
 		// return userdetails
-		return UserDetails.fromUser(u);
+		userDetails = UserDetails.fromUser(u);
+		// use unencoded password for proper cookie update
+		if (userDetails != null && userDetails.getId() != null) {
+			userDetails.setPassword(passwordResetRequest.getPassword());
+		}
+
+		return userDetails;
 	}
 
 	@Override

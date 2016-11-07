@@ -112,7 +112,8 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				schema = isArray ? [] : {};
 				_.each(fields, function(field, key) {
-
+					console.log("buildSchema, key: " + key + ", field: ");
+					console.log(field);
 					// type and instance schemas
 					baseSchemaEntry = _.isObject(field.fieldType)
 						? field.fieldType[schemaType]

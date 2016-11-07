@@ -23,8 +23,8 @@
         Click the following link to confirm your email address and enable your account:
         </p>
         <p>
-            <a th:href="@{#{email.passwordreset.link(${baseUrl}, ${user.getCredentials().getUsername()}, ${user.getCredentials().getResetPasswordToken()})}}"
-               th:text="#{email.passwordreset.link(${baseUrl}, ${user.getCredentials().getUsername()}, ${user.getCredentials().getResetPasswordToken()})}"> </a>
+            <a th:href="@{#{email.passwordreset.link(${baseUrl}, ${user.getEmail()}, ${user.getCredentials().getResetPasswordToken()})}}"
+               th:text="#{email.passwordreset.link(${baseUrl}, ${user.getEmail()}, ${user.getCredentials().getResetPasswordToken()})}"> </a>
         </p>
         <p class="greetings">
         	&emsp;Regards, <br />

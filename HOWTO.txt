@@ -20,7 +20,6 @@ build.calipso.appName=Calipso
 # Note: Google Chrome does not save cookies from localhost
 build.calipso.baseurl=http://localhost:8080/calipso
 build.calipso.initData=true
-# leave empty to use the request's local hostname
 build.calipso.domain=localhost
 build.calipso.cookies.httpOnly=false
 build.calipso.cookies.secure=false
@@ -28,6 +27,7 @@ build.calipso.registration.forceCodes=false
 build.log.rootlevel=warn
 
 # Email
+build.mail.enabled=true
 build.mail.test.enable=true
 build.mail.test.user=system
 build.mail.server.host=

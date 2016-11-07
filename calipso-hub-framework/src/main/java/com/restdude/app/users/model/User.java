@@ -139,6 +139,9 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 	@Column(name = "locale", nullable = false)
 	private String locale = "en";
 
+	@Formula(" (select uc.active from user_credentials as uc where uc.user_id = id) ")
+	private Boolean active;
+
 	@Formula(" (select count(*) from stomp_session as stmpSess where stmpSess.user_id = id) ")
 	private Integer stompSessionCount;
 
@@ -236,6 +239,14 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 				.append("firstName", this.getFirstName()).append("lastName", this.getLastName())
 				.append("email", this.getEmail()).append("new", this.isNew()).append("roles", this.getRoles())
 				.toString();
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	public Integer getStompSessionCount() {

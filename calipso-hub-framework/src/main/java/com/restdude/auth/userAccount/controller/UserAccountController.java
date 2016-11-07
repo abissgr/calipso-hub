@@ -23,6 +23,7 @@ import com.restdude.auth.userAccount.model.PasswordResetRequest;
 import com.restdude.auth.userAccount.model.UserAccountRegistration;
 import com.restdude.auth.userdetails.integration.UserDetailsConfig;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
+import com.restdude.auth.userdetails.model.UserDetails;
 import com.restdude.auth.userdetails.service.UserDetailsService;
 import com.restdude.auth.userdetails.util.SecurityUtil;
 import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
@@ -116,8 +117,14 @@ public class UserAccountController {
 
         ICalipsoUserDetails userDetails = this.userDetailsService.resetPassword(resource);
 
-        SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.userDetailsService);
-        return userDetails;
+		// (re)login if appropriate
+		if (userDetails == null) {
+			userDetails = new UserDetails();
+		}
+		if (userDetails.getId() != null) {
+			SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.userDetailsService);
+		}
+		return userDetails;
 
     }
 

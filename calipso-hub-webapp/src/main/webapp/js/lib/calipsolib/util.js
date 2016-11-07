@@ -1447,7 +1447,7 @@ Calipso.cloneSpecificValue = function(val) {
 						_this.model.trigger("added");
 					});
 				}
-		  },
+            },
 			createView : function(options){
 				options || (options = {});
 				var viewOptions = 	Calipso.deepExtend({}, this.viewOptions || {}, options);

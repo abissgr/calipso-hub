@@ -37,68 +37,22 @@
 		<testResources>
 			<testResource>
 				<directory>src/main/resources</directory>
-				<includes>
-					<include>logback.xml</include>
-				</includes>
+				<filtering>true</filtering>
 			</testResource>
 		</testResources>
 		<plugins>
-			<!-- filter property files before adding to classpath even for jetty:run -->
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>filterto-main-resources</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<overwrite>true</overwrite>
-							<encoding>UTF-8</encoding>
-							<outputDirectory>src/main/resources</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/resources-filterable</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<configuration>
-					<resourceBases>
-						<resourceBase>src/main/webapp</resourceBase>
-						<resourceBase>${project.build.directory}/${project.name}-${project.version}</resourceBase>
-					</resourceBases>
-
-					<!-- We use non NIO connector in order to avoid read only static files 
-						under windows -->
-					<connectors>
-						<connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
-							<port>${jetty.port}</port>
-							<maxIdleTime>60000</maxIdleTime>
-							<requestBufferSize>30000</requestBufferSize>
-							<requestHeaderSize>30000</requestHeaderSize>
-						</connector>
-					</connectors>
-					<webApp>
-						<!-- -->
-						<contextPath>/calipso</contextPath>
-					</webApp>
-					<webAppConfig>
-						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-						<!--extraClasspath>${basedir}/target/classes/;${basedir}/etc/jetty/classes/</extraClasspath -->
-						<!--unpackOverlays>true</unpackOverlays -->
-					</webAppConfig>
-					<!--webAppSourceDirectory>${project.build.directory}/${project.name}${project.version}</webAppSourceDirectory -->
-					<!-- To run the optimized version of the webapp -->
-					<!-- do a 'mvn package -Poptimize' and uncomment the following line -->
-					<!-- webAppSourceDirectory>D:\\Workspaces\\resthub\\resthub-archetypes\\resthub-jpa-backbonejs-multi-archetype/target/resthub-jpa-backbonejs-multi-archetype-2.0-rc4</webAppSourceDirectory -->
+					<httpConnector>
+						<port>${jetty.port}</port>
+					</httpConnector>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<stopPort>8005</stopPort>
+					<stopKey>STOP</stopKey>
+					<waitForChild>false</waitForChild>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -296,16 +250,9 @@
 						<groupId>org.eclipse.jetty</groupId>
 						<artifactId>jetty-maven-plugin</artifactId>
 						<configuration>
-							<!-- We use non NIO connector in order to avoid read-only static files 
-								under windows (don't ask) -->
-							<connectors>
-								<connector implementation="org.eclipse.jetty.server.LocalConnector">
-									<port>${jetty.port}</port>
-<!-- 									<maxIdleTime>60000</maxIdleTime> -->
-<!-- 									<requestBufferSize>30000</requestBufferSize> -->
-<!-- 									<requestHeaderSize>30000</requestHeaderSize> -->
-								</connector>
-							</connectors>
+							<httpConnector>
+								<port>${jetty.port}</port>
+							</httpConnector>
 							<scanIntervalSeconds>10</scanIntervalSeconds>
 							<stopPort>8005</stopPort>
 							<stopKey>STOP</stopKey>
@@ -321,7 +268,6 @@
 								</goals>
 								<configuration>
 									<scanIntervalSeconds>0</scanIntervalSeconds>
-									<daemon>true</daemon>
 								</configuration>
 							</execution>
 							<execution>

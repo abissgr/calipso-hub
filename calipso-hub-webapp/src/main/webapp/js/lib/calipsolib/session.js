@@ -58,7 +58,6 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 			this.userDetails.fetch({
 				//async : false,
 				reset : true,
-                //url : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails",
 
 			});
 
@@ -68,7 +67,6 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 
 			var _self = this;
 			this.userDetails.destroy({
-				url : Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/userDetails",
 
 				success : function(model, response, options) {
 

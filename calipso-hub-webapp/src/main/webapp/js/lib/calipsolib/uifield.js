@@ -276,13 +276,13 @@ define(["lib/calipsolib/form", "lib/calipsolib/backgrid", 'underscore', 'handleb
 				type: 'Password',
 				validators: ['required', function checkPassword(value, formValues) {
 					// verify current password
-					var userDetails = new Calipso.model.UserDetailsModel({
+                    var userDetails = new Calipso.Model({
 						email: Calipso.session.userDetails.get("email"),
 						password: value
 					});
 					userDetails.save(null, {
 						async: false,
-						url: Calipso.getBaseUrl() + Calipso.getConfigProperty("apiAuthPath") + "/verifyPassword",
+                        url: new Calipso.model.UserDetailsModel().url() + "/verification",
 					});
 					var err = {
 						type: 'password',

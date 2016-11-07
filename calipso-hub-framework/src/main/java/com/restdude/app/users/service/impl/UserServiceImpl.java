@@ -187,7 +187,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		// send email notifications for account confirmation tokens that expired
         org.hibernate.Query query = session.createQuery("SELECT new " + USERDTO_CLASS
 				+ "(u.id, u.firstName, u.lastName,u.credentials.username, u.email, u.emailHash, u.avatarUrl) FROM User u "
-				+ "WHERE u.credentials.password IS NULL and u.credentials.resetPasswordTokenCreated IS NOT NULL and u.credentials.resetPasswordTokenCreated  < :yesterday");
+				+ "WHERE u.credentials.resetPasswordTokenCreated IS NOT NULL and u.credentials.resetPasswordTokenCreated  < :yesterday");
 		query.setParameter("yesterday", yesterday);
         query.setFetchSize(Integer.valueOf(1000));
         query.setReadOnly(true);
@@ -253,8 +253,18 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			credentials = new UserCredentials();
 			credentials.setUser(user);
 		}
+
+		// remove token and token date
 		credentials.setResetPasswordToken(null);
+		credentials.setResetPasswordTokenCreated(null);
+
+		// update password
 		credentials.setPassword(this.passwordEncoder.encode(newPassword));
+
+		// activate user
+		credentials.setActive(true);
+
+		// persist
 		credentials = this.credentialsRepository.save(credentials);
 
 		return user;

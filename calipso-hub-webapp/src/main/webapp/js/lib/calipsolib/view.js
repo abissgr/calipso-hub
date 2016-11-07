@@ -160,9 +160,8 @@ define(
 			}
 		},
 		nextUseCase : function() {
-			// TODO: handle from (and reuse) layout
 			if (this.useCaseContext.defaultNext) {
-				Calipso.navigate('/' + this.model.getPathFragment() + '/' + this.useCaseContext.defaultNext, {
+				Calipso.navigate("/useCases/" + this.model.getPathFragment() + '/' + this.useCaseContext.defaultNext, {
 					trigger : true
 				})
 			} else {
@@ -677,6 +676,28 @@ define(
 	{
 		typeName : "Calipso.view.UserDetailsLayout"
 	});
+
+		Calipso.view.UserAccountLayout = Calipso.view.UserDetailsLayout.extend(
+			/** @lends Calipso.view.UserDetailsLayout.prototype */
+			{
+				onModelSync: function (options) {
+
+					// TODO: handle from (and reuse) layout
+					if (this.useCaseContext.defaultNext) {
+						Calipso.navigate("/useCases/" + this.model.getPathFragment() + '/' + this.useCaseContext.defaultNext, {
+							trigger: true
+						})
+					} else {
+						Calipso.session.userDetails.set(this.model.attributes);
+						Calipso.app.fw = "/myProfile";
+						Calipso.session.userDetails.onLogin(Calipso.session.userDetails);
+					}
+				},
+			},
+			// static members
+			{
+				typeName: "Calipso.view.UserAccountLayout"
+			});
 
 
 	Calipso.view.UserInvitationsLayout = Calipso.view.BrowseLayout.extend(

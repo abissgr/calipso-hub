@@ -66,11 +66,18 @@ define(
 				this.showUseCaseView( "users", Calipso.session.userDetails.get("id"), "view", null);
 			}
 		},
+		login: function () {
+			var fw = Calipso.util.isAuthenticated() ? "home" : "userDetails/login";
+			Calipso.navigate(fw, {
+				trigger: true
+			});
+		},
 		logout : function() {
 			Calipso.session.logout();
 		},
 		register : function() {
-			Calipso.navigate("useCases/accounts/create", {
+			var fw = Calipso.util.isAuthenticated() ? "home" : "useCases/accounts/create";
+			Calipso.navigate(fw, {
 				trigger : true
 			});
 		},

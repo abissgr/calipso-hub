@@ -116,6 +116,14 @@ public class UserDetailsController {
         return new UserDetails();
     }
 
+    @RequestMapping(value = "verification", method = RequestMethod.POST)
+    @ApiOperation(value = "Verify",
+            notes = "Validation utility operation, used to verify the user based on current password.")
+    @ResponseBody
+    public ICalipsoUserDetails verify(@RequestBody LoginSubmission resource) {
+        ICalipsoUserDetails userDetails = new UserDetails(resource);
+        return this.service.create(userDetails);
+    }
 
 
 }
