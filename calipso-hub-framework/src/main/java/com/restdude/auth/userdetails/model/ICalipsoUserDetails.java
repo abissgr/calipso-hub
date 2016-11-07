@@ -18,7 +18,6 @@
 package com.restdude.auth.userdetails.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.restdude.app.users.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
 
@@ -120,8 +119,6 @@ public interface ICalipsoUserDetails extends SocialUserDetails, Principal {
 	public void setPassword(String password);
 
 	public void setAuthorities(List<? extends GrantedAuthority> authorities);
-
-	User getUser();
 
 	void setCellphone(String cellphone);
 

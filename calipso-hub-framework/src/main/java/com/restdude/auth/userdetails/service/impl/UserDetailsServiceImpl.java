@@ -162,7 +162,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 	public ICalipsoUserDetails resetPassword(PasswordResetRequest passwordResetRequest) {
 		ICalipsoUserDetails userDetails = this.getPrincipal();
 		User u = null;
-
+		LOGGER.debug("resetPassword, userDetails: {}, currentPassword: {}", userDetails, passwordResetRequest.getCurrentPassword());
 		// Case 1: if authorized as current user, require current password
 		if (userDetails != null && StringUtils.isNotBlank(passwordResetRequest.getCurrentPassword())) {
 			u = this.userService.changePassword(
@@ -170,6 +170,7 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 					passwordResetRequest.getCurrentPassword(),
 					passwordResetRequest.getPassword(),
 					passwordResetRequest.getPasswordConfirmation());
+			//userDetails = this.create(new UserDetails( new LoginSubmission(u.getEmail(), passwordResetRequest.getPassword())));
 		}
 		// Case 2: if authorized using reset token
 		else if (!StringUtils.isAnyBlank(passwordResetRequest.getEmailOrUsername(), passwordResetRequest.getPassword(), passwordResetRequest.getResetPasswordToken())) {
@@ -179,19 +180,16 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 			}
 			// update matching user credentials
 			u = this.userService.handlePasswordResetToken(passwordResetRequest.getEmailOrUsername(), passwordResetRequest.getResetPasswordToken(), passwordResetRequest.getPassword());
+			//userDetails = this.create(new UserDetails( new LoginSubmission(u.getEmail(), passwordResetRequest.getPassword())));
 		}
 		// Case 3: forgotten password
 		else {
 			String usernameOrEmail = userDetails != null ? userDetails.getUsername() : passwordResetRequest.getEmailOrUsername();
 			this.handlePasswordResetRequest(usernameOrEmail);
+			userDetails = new UserDetails();
 		}
-
-		// return userdetails
-		userDetails = UserDetails.fromUser(u);
-		// use unencoded password for proper cookie update
-		if (userDetails != null && userDetails.getId() != null) {
-			userDetails.setPassword(passwordResetRequest.getPassword());
-		}
+		userDetails = u != null ? UserDetails.fromUser(u) : new UserDetails();
+		userDetails.setPassword(passwordResetRequest.getPassword());
 
 		return userDetails;
 	}

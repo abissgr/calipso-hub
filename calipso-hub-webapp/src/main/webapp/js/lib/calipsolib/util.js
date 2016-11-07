@@ -88,12 +88,7 @@ define(
 			labels : Calipso.util.getLabels(),
 			useCase : self.useCaseContext,
 		};
-		// inherit labels
-		console.log("mixinTemplateContext: self.model: ");
-		console.log(self.model);
 		if (self.model && self.model.getSuperClass()) {
-			console.log("mixinTemplateContext: self.model.getSuperClass: ");
-			console.log(self.model.getSuperClass());
 			result.labels.models[self.model.getPathFragment()] = self.model.getLabels();
 		}
 
@@ -477,8 +472,8 @@ Calipso.cloneSpecificValue = function(val) {
 	 * @param  {[String]} the property name
 	 * @return {[type]}
 	 */
-	Calipso.getConfigProperty = function(propertyName) {
-		return (propertyName.indexOf(".") > -1) ? Calipso.getPathValue(Calipso.config, propertyName) : Calipso.config[propertyName];
+	Calipso.getConfigProperty = function (propertyName, defaultValue) {
+		return Calipso.getPathValue(Calipso.config, propertyName, defaultValue);
 	};
 	Calipso._chartColors = [ "91, 144, 191", "163, 190, 140", "171, 121, 103", "208, 135, 112", "180, 142, 173", "235, 203, 139", "39, 165, 218", "250, 164, 58", "96, 189, 104", "241, 124, 176", "178, 145, 47", "178, 118, 178", "222, 207, 63", "241, 88, 84", "77, 77, 77", "0, 0, 0", ];
 	Calipso.getThemeColor = function(index) {
@@ -831,33 +826,33 @@ Calipso.cloneSpecificValue = function(val) {
 		}),
 		routers : {},
 	  onBeforeStart: function(onBeforeStartOptions) {
-			onBeforeStartOptions || (onBeforeStartOptions = {});
-			var options = onBeforeStartOptions.options || {};
-			//Marionette.Application.prototype.onBeforeStart.apply(this, arguments);
-			var _this = this;
-			// set routers map
-			_(options.routers).each(function(routerClass) {
-				var router = new routerClass();
-				_this.routers[routerClass.getTypeName()] = router;
-			});
+		  onBeforeStartOptions || (onBeforeStartOptions = {});
+		  var options = onBeforeStartOptions.options || {};
+		  //Marionette.Application.prototype.onBeforeStart.apply(this, arguments);
+		  var _this = this;
+		  // set routers map
+		  _(options.routers).each(function (routerClass) {
+			  var router = new routerClass();
+			  _this.routers[routerClass.getTypeName()] = router;
+		  });
 
-			// set model types map
-			Calipso.useCaseFactoriesMap = _.extend({}, Calipso.config.useCaseFactories || {});
-			var allModelLabels = Calipso.util.getLabels("models");
-			var parseModel = function(ModelType) {
-				// setup model-based usecase factories
-				if (ModelType.getTypeName() != "Calipso.model.Model" &&
-					ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
-					ModelType.getTypeName() != "Calipso.model.GenericModel") {
-					Calipso.useCaseFactoriesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
-				}
-			};
-			_(Calipso.model).each(parseModel);
-			_(Calipso.customModel).each(parseModel);
+		  // set model types map
+		  Calipso.useCaseFactoriesMap = _.extend({}, Calipso.config.useCaseFactories || {});
+		  var allModelLabels = Calipso.util.getLabels("models");
+		  var parseModel = function (ModelType) {
+			  // setup model-based usecase factories
+			  if (ModelType.getTypeName() != "Calipso.model.Model" &&
+				  ModelType.getTypeName() != "Calipso.model.UserRegistrationModel" &&
+				  ModelType.getTypeName() != "Calipso.model.GenericModel") {
+				  Calipso.useCaseFactoriesMap[ModelType.viewFragment ? ModelType.viewFragment : ModelType.getPathFragment()] = ModelType;
+			  }
+		  };
+		  _(Calipso.model).each(parseModel);
+		  _(Calipso.customModel).each(parseModel);
 	  },
 	  onStart: function() {
 			this.view = new Calipso.view.AppRootView();
-	    this.showView(this.view);
+		  this.showView(this.view);
 			//console.log("Calipso.app started");
 			this.updateHeaderFooter();
 			// setup vent
@@ -884,11 +879,13 @@ Calipso.cloneSpecificValue = function(val) {
 			}));
 
 			// add/remove navbar
-			if (Calipso.util.isAuthenticated()) {
+			if (Calipso.util.isAuthenticated() && Calipso.session.userDetails.get("browseMenu")) {
 				$("body").addClass("sidebar-nav");
+				$(".layout-toggler").show();
 			}
 			else {
 				$("body").removeClass("sidebar-nav");
+				$(".layout-toggler").hide();
 			}
 			this.view.showChildView("sidebarRegion",
 				new (Calipso.getConfigProperty("sidebarViewType"))({
@@ -1001,8 +998,6 @@ Calipso.cloneSpecificValue = function(val) {
 		initialize : function(attributes, options) {
 			PageableCollection.prototype.initialize.apply(this, arguments);
 			options || (options = {});
-			console.log("initialize, model:");
-			console.log(options.model);
 			if (options.model && options.model.getTypeName()) {
 				this.model = options.model;
 			} else {

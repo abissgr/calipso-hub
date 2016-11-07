@@ -17,12 +17,11 @@
  */
 package com.restdude.auth.userdetails.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.restdude.app.users.model.Role;
 import com.restdude.app.users.model.User;
-import gr.abiss.calipso.model.interfaces.Metadatum;
 import gr.abiss.calipso.model.serializers.SkipPropertyDeserializer;
 import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
 import org.apache.commons.lang.BooleanUtils;
@@ -79,7 +78,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 
 	private String redirectUrl = null;
 
-	@JsonIgnore//Serialize(using = SkipPropertySerializer.class)
 	private Boolean active = false;
 
 	@JsonSerialize(using = SkipPropertySerializer.class)
@@ -96,8 +94,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 	private Map<String, String> metadata;
 
 
-    @JsonIgnore
-	private User user;
 
 	private Boolean isResetPasswordReguest = false;
 
@@ -106,42 +102,25 @@ public class UserDetails implements  ICalipsoUserDetails{
 		if (user != null) {
 			details = new UserDetails();
 			BeanUtils.copyProperties(user, details);
-			BeanUtils.copyProperties(user.getCredentials(), details);
 			if(user.getId() != null){
 				details.setId(user.getId().toString());
 			}
-            if (user.getCredentials() != null) {
-                details.setUsername(user.getCredentials().getUsername());
-                details.setPassword(user.getCredentials().getPassword());
-            }
-
-			details.setEmail(user.getEmail());
-			details.setFirstName(user.getFirstName());
-			details.setLastName(user.getLastName());
-			details.setAuthorities(user.getRoles());
-
-			// init metadata
-			if (!CollectionUtils.isEmpty(user.getMetadata())) {
-				for (Metadatum metadatum : user.getMetadata().values()) {
-					details.addMetadatum(metadatum.getPredicate(),
-							metadatum.getObject());
-				}
+			if (user.getCredentials() != null) {
+				BeanUtils.copyProperties(user.getCredentials(), details, "id");
 			}
 			// init global roles
 			if (!CollectionUtils.isEmpty(user.getRoles())) {
+				details.setAuthorities(user.getRoles());
 				for (GrantedAuthority authority : user.getRoles()) {
-					if (authority.getAuthority().equals("ROLE_ADMIN")) {
+					if (authority.getAuthority().equals(Role.ROLE_ADMIN)) {
 						details.isAdmin = true;
 					} else if (authority.getAuthority()
-							.equals("ROLE_SITEADMIN")) {
+							.equals(Role.ROLE_SITE_OPERATOR)) {
 						details.isSiteAdmin = true;
 					}
 				}
 			}
-			
-			// add user
-			details.setUser(user);
-			
+
 			
 		}
 		return details;
@@ -164,7 +143,8 @@ public class UserDetails implements  ICalipsoUserDetails{
 			.append("id", id)
 			.append("username", username)
 			.append("email", email)
-			.append("password", this.password)
+				.append("password", this.password)
+				.append("active", this.active)
 			.append("metadata", metadata)
 			.append("authorities", authorities)
 			.toString();
@@ -636,18 +616,6 @@ public class UserDetails implements  ICalipsoUserDetails{
 	@Override
 	public String getUserId() {
 		return this.id;
-	}
-
-	/**
-     * @see ICalipsoUserDetails#getUser()
-     */
-	@Override
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 	@Override

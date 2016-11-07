@@ -17,6 +17,7 @@
  */
 package com.restdude.app.users.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gr.abiss.calipso.model.base.AbstractSystemUuidPersistable;
 import gr.abiss.calipso.model.interfaces.CalipsoPersistable;
 import gr.abiss.calipso.tiers.annotation.ModelResource;
@@ -45,6 +46,7 @@ public class UserRegistrationCode extends AbstractSystemUuidPersistable implemen
     @Formula(" (credentials_id IS NULL) ")
     private Boolean available;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "credentials_id", unique = true)
     private UserCredentials credentials;

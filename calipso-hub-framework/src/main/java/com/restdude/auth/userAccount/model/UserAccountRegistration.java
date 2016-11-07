@@ -39,8 +39,8 @@ public class UserAccountRegistration implements Serializable {
 	private String username;
 	private String password;
 	private String passwordConfirmation;
-	private String email;
-	private String firstName;
+    private String registrationEmail;
+    private String firstName;
 	private String lastName;
 	private String telephone;
 	private String cellphone;
@@ -59,15 +59,15 @@ public class UserAccountRegistration implements Serializable {
 		User newUser = new User.Builder()
 				.credentials(new UserCredentials.Builder().username(this.username).password(this.password)
 						.registrationCode(new UserRegistrationCode(this.registrationCode)).build())
-				.email(this.email).firstName(this.firstName).lastName(this.lastName).telephone(this.telephone)
-				.cellphone(this.cellphone).locale(this.locale).birthDay(this.birthDay).build();
+                .email(this.registrationEmail).firstName(this.firstName).lastName(this.lastName).telephone(this.telephone)
+                .cellphone(this.cellphone).locale(this.locale).birthDay(this.birthDay).build();
 		return newUser;
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("username", username).append("email", email).toString();
-	}
+        return new ToStringBuilder(this).append("username", username).append("registrationEmail", registrationEmail).toString();
+    }
 
 	public String getRegistrationCode() {
 		return registrationCode;
@@ -101,13 +101,13 @@ public class UserAccountRegistration implements Serializable {
 		this.passwordConfirmation = passwordConfirmation;
 	}
 
-	public String getEmail() {
-		return email;
-	}
+    public String getRegistrationEmail() {
+        return registrationEmail;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setRegistrationEmail(String registrationEmail) {
+        this.registrationEmail = registrationEmail;
+    }
 
 	public String getFirstName() {
 		return firstName;
@@ -170,8 +170,8 @@ public class UserAccountRegistration implements Serializable {
 		private String username;
 		private String password;
 		private String passwordConfirmation;
-		private String email;
-		private String firstName;
+        private String registrationEmail;
+        private String firstName;
 		private String lastName;
 		private String telephone;
 		private String cellphone;
@@ -199,9 +199,9 @@ public class UserAccountRegistration implements Serializable {
 			return this;
 		}
 
-		public Builder email(String email) {
-			this.email = email;
-			return this;
+        public Builder registrationEmail(String registrationEmail) {
+            this.registrationEmail = registrationEmail;
+            return this;
 		}
 
 		public Builder firstName(String firstName) {
@@ -249,8 +249,8 @@ public class UserAccountRegistration implements Serializable {
 		this.username = builder.username;
 		this.password = builder.password;
 		this.passwordConfirmation = builder.passwordConfirmation;
-		this.email = builder.email;
-		this.firstName = builder.firstName;
+        this.registrationEmail = builder.registrationEmail;
+        this.firstName = builder.firstName;
 		this.lastName = builder.lastName;
 		this.telephone = builder.telephone;
 		this.cellphone = builder.cellphone;

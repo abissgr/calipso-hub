@@ -162,7 +162,8 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		}
 
 		// attach credentials
-		resource.setCredentials(this.credentialsRepository.save(credentials));
+		credentials = this.credentialsRepository.save(credentials);
+		resource.setCredentials(credentials);
 
 		// update code
         if (code != null && code.getId() != null) {
@@ -230,6 +231,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 
 		// encrypt password
 		if (credentials.getPassword() != null) {
+			LOGGER.debug("createTest, new password: " + credentials.getPassword());
 			credentials.setPassword(passwordEncoder.encode(credentials.getPassword()));
 		}
 
@@ -249,9 +251,8 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			throw new UsernameNotFoundException("Could not match username: " + userNameOrEmail);
 		}
 		UserCredentials credentials = user.getCredentials();
-		if (credentials == null) {
-			credentials = new UserCredentials();
-			credentials.setUser(user);
+		if (!token.equals(credentials.getResetPasswordToken())) {
+			throw new UsernameNotFoundException("Could not match token: " + userNameOrEmail);
 		}
 
 		// remove token and token date
@@ -259,6 +260,7 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		credentials.setResetPasswordTokenCreated(null);
 
 		// update password
+		LOGGER.debug("handlePasswordResetToken, new password: " + newPassword);
 		credentials.setPassword(this.passwordEncoder.encode(newPassword));
 
 		// activate user
@@ -266,7 +268,8 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 
 		// persist
 		credentials = this.credentialsRepository.save(credentials);
-
+		//this.credentialsRepository.flush();
+		user.setCredentials(credentials);
 		return user;
 	}
 
@@ -279,9 +282,12 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 			throw new UsernameNotFoundException("Could not match username/email to an active user: " + userNameOrEmail);
 		}
 		// keep any existing token
-		if(user.getCredentials().getResetPasswordToken() == null){
-			user.getCredentials().setResetPasswordToken(this.generator.generateKey());
-			user = this.userRepository.save(user);
+		UserCredentials credentials = user.getCredentials();
+		if (credentials.getResetPasswordToken() == null) {
+			credentials.setResetPasswordToken(this.generator.generateKey());
+			credentials.setResetPasswordTokenCreated(new Date());
+			credentials = this.credentialsRepository.save(credentials);
+			user.setCredentials(credentials);
 		}
 		emailService.sendPasswordResetLink(user);
 		
@@ -437,11 +443,14 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 		if (u == null) {
 			throw new BadRequestException("Failed updating user pass: A user could not be found with the given credentials");
 		}
-		
+		UserCredentials credentials = u.getCredentials();
 		// update password and return user
-		u.getCredentials().setPassword(this.passwordEncoder.encode(newPassword));
-		u.getCredentials().setLastPassWordChangeDate(new Date());
-		u = this.update(u);
+		LOGGER.debug("changePassword, new password: " + newPassword);
+		credentials.setPassword(this.passwordEncoder.encode(newPassword));
+		credentials.setLastPassWordChangeDate(new Date());
+		credentials = this.credentialsRepository.save(credentials);
+		//this.credentialsRepository.flush();
+		u.setCredentials(credentials);
 		return u;
 	}
 

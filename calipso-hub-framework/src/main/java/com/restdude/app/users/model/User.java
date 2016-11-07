@@ -140,7 +140,7 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 	private String locale = "en";
 
 	@Formula(" (select uc.active from user_credentials as uc where uc.user_id = id) ")
-	private Boolean active;
+	private Boolean active = false;
 
 	@Formula(" (select count(*) from stomp_session as stmpSess where stmpSess.user_id = id) ")
 	private Integer stompSessionCount;

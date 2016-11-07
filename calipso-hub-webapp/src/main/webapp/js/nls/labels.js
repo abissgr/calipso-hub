@@ -89,12 +89,13 @@ define({
 					"newUser" : "Create Account"
 				},
 				"forgotPassword" : {
+                    "title": "Reset Password",
 					"message" : "Please enter your email address bellow. You will receive a confirmation email in your inbox with instructions to create a new password.",
 					"submitButton" : "Send Email"
 				},
 				"resetPassword" : {
-					"title" : "New Password",
-					"message" : "Please complete the form below to create a new password.",
+                    "title": "Set Password",
+                    "message": "Please  check your inbox to find the reset password token and click on the email link or complete the form below to set your password.",
 					"submitButton" : "Update Password"
 				},
 			},
@@ -271,6 +272,23 @@ define({
 					"label" : "Languages"
 				}
 			},
+            "accounts": {
+                "registrationEmail": {
+                    "label": "Email"
+                },
+                "passwordConfirmation": {
+                    "label": "Confirm Password"
+                },
+                "resetPasswordToken": {
+                    "label": "Reset Token"
+                },
+                "currentPassword": {
+                    "label": "Current Password"
+                },
+                "registrationCode": {
+                    "label": "Registration Code"
+                },
+            },
 			"userDetails" : {
 				"id" : {},
 				"isResetPasswordReguest" : {},
@@ -278,11 +296,9 @@ define({
 					"label" : "Email"
 				},
 				"resetPasswordToken" : {},
-				"currentPassword" : {},
 				"password" : {
 					"label" : "Password"
 				},
-				"passwordConfirmation" : {}
 			},
 			"userProfile" : {
 				"firstName" : {

@@ -688,9 +688,12 @@ define(
 							trigger: true
 						})
 					} else {
-						Calipso.session.userDetails.set(this.model.attributes);
-						Calipso.app.fw = "/myProfile";
-						Calipso.session.userDetails.onLogin(Calipso.session.userDetails);
+						Calipso.session.userDetails = Calipso.model.UserDetailsModel.create(this.model.attributes);
+
+						Calipso.app.updateHeaderFooter();
+						Calipso.navigate("/myProfile", {
+							trigger: true
+						});
 					}
 				},
 			},
@@ -704,7 +707,6 @@ define(
 	/** @lends Calipso.view.UserInvitationsLayout.prototype */
 	{
 		onModelSync : function(options) {
-			console.log("UserInvitationsLayout onModelSync")
 			var pageView = new Calipso.view.TemplateBasedItemView({
 				template : Calipso.getTemplate("UserInvitationResults"),
 				tagName : "div",

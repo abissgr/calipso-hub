@@ -86,7 +86,7 @@ public class UserAccountController {
 		boolean forceCodes = config.getBoolean(ConfigurationFactory.FORCE_CODES, false);
 
 		// require email
-		if (StringUtils.isBlank(resource.getEmail())) {
+		if (StringUtils.isBlank(resource.getRegistrationEmail())) {
 			throw new BadRequestException("Email is required");
 		}
 		// force registration codes?
@@ -120,8 +120,11 @@ public class UserAccountController {
 		// (re)login if appropriate
 		if (userDetails == null) {
 			userDetails = new UserDetails();
-		}
-		if (userDetails.getId() != null) {
+		} else if (userDetails.getId() != null) {
+			userDetails.setPassword(resource.getPassword());
+			//userDetails = this.userDetailsService.create(userDetails);
+			//userDetails.setPassword(resource.getPassword());
+			LOGGER.debug("update, loggin-in userDetails: {}", userDetails);
 			SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.userDetailsService);
 		}
 		return userDetails;

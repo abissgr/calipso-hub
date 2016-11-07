@@ -40,7 +40,7 @@ public class UniqueConstraintControllerIT extends AbstractControllerIT {
 		RequestSpecification spec = this.getRequestSpec(null);
 		JsonNode json = given().spec(spec)
                 .body(new UserAccountRegistration.Builder()
-                        .email("system@abiss.gr")
+                        .registrationEmail("system@abiss.gr")
                         .username("system")
                         .build())
                 .post("/calipso/api/auth/account")

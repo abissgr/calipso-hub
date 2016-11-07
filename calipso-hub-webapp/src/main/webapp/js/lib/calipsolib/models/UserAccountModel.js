@@ -23,20 +23,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
             /** @lends Calipso.model.UserAccountModel.prototype */
             {
                 isNew: function () {
-                    var bNew = true;
-                    // if authenticated
-                    if (Calipso.util.isAuthenticated()) {
-                        bNew = false;
-                    }
-                    // if reset request
-                    else if (this.get("email") && !this.get("password")) {
-                        bNew = false;
-                    }
-                    // if resetting password
-                    else if (this.get("resetPasswordToken")) {
-                        bNew = false;
-                    }
-                    return bNew;
+                    return this.get("registrationEmail") ? true : false;
                 },
                 url: function () {
                     var sUrl = Calipso.getBaseUrl() + this.getBaseFragment() + this.getPathFragment();
@@ -55,24 +42,27 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                 baseFragment: '/api/auth/',
                 typeName: "Calipso.model.UserAccountModel",
                 useCases: {
-                    create: {
-                        view: Calipso.view.UserAccountLayout,
-                        fieldIncludes: Calipso.getConfigProperty("registration.forceCodes") ? ["firstName", "lastName", "email", "registrationCode"] : ["firstName", "lastName", "email"],
-                        overrides: {
-                            contentRegion: {
-                                viewOptions: {
-                                    template: Calipso.getTemplate("UseCaseCardFormView"),
-                                    title: Calipso.util.getLabels("tmpl.userRegistration.titleNewAccount") +
-                                    '<a href="#" class="btn btn-secondary btn-sm btn-social btn-facebook  pull-right" title="' +
-                                    Calipso.util.getLabels("tmpl.login.fbLinkAlt") +
-                                    '"> &nbsp; &nbsp; &nbsp; &nbsp;' + Calipso.util.getLabels("tmpl.login.fbLink") + '</a>',
-                                    message: Calipso.util.getLabels("tmpl.userRegistration.formHelpNewAccount"),
-                                    placeHolderLabelsOnly: true,
-                                    formControlSize: "lg",
-                                    submitButton: '<i class="fa fa-user-plus" aria-hidden="true"></i> ' + Calipso.util.getLabels("calipso.words.register")
+                    create: function () {
+                        return {
+                            view: Calipso.view.UserAccountLayout,
+                            fieldIncludes: Calipso.getConfigProperty("registration.forceCodes") ? ["firstName", "lastName", "registrationEmail", "registrationCode"] : ["firstName", "lastName", "registrationEmail"],
+                            defaultNext: "resetPassword",
+                            overrides: {
+                                contentRegion: {
+                                    viewOptions: {
+                                        template: Calipso.getTemplate("UseCaseCardFormView"),
+                                        title: Calipso.util.getLabels("tmpl.userRegistration.titleNewAccount") +
+                                        '<a href="#" class="btn btn-secondary btn-sm btn-social btn-facebook  pull-right" title="' +
+                                        Calipso.util.getLabels("tmpl.login.fbLinkAlt") +
+                                        '"> &nbsp; &nbsp; &nbsp; &nbsp;' + Calipso.util.getLabels("tmpl.login.fbLink") + '</a>',
+                                        message: Calipso.util.getLabels("tmpl.userRegistration.formHelpNewAccount"),
+                                        placeHolderLabelsOnly: true,
+                                        formControlSize: "lg",
+                                        submitButton: '<i class="fa fa-user-plus" aria-hidden="true"></i> ' + Calipso.util.getLabels("calipso.words.register")
+                                    },
                                 },
                             },
-                        },
+                        }
                     },
                     forgotPassword: { // request reset token and link by email
                         view: Calipso.view.UserAccountLayout,
@@ -125,11 +115,25 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     },
                 },
                 fields: {
+                    registrationEmail: {
+                        fieldType: "String",
+                        form: {
+                            type: "Text",
+                            validators: ['required', 'email'],
+                        },
+                    },
                     email: {
                         fieldType: "String",
+                        form: {
+                            type: "Text",
+                            validators: ['required', 'email'],
+                        },
                     },
                     registrationCode: {
                         fieldType: "String",
+                        form: {
+                            validators: ['required'],
+                        }
                     },
                     resetPasswordToken: {
                         fieldType: "String",

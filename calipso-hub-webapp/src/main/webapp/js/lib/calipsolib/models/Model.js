@@ -229,7 +229,11 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     // get superclass config
                     var useCaseConfig = this.superClass && this.superClass._getUseCaseConfig ? this.superClass._getUseCaseConfig(key) : {};
                     // apply own config
-                    this.useCases && Calipso.deepExtend(useCaseConfig, this.useCases[key]);
+                    var ownConfig = $.isFunction(this.useCases) ? this.useCases()[key] : this.useCases[key];
+                    if ($.isFunction(ownConfig)) {
+                        ownConfig = ownConfig();
+                    }
+                    ownConfig && Calipso.deepExtend(useCaseConfig, ownConfig);
                     return useCaseConfig;
                 },
                 getUseCaseContext: function (options) {
@@ -258,7 +262,13 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                 getFields: function () {
 
                     var fields = this.superClass && this.superClass.getFields ? this.superClass.getFields() : {};
-                    var ownFields = this.fields ? _.clone(this.fields) : {};
+                    var ownFields = this.fields || {};
+                    if ($.isFunction(ownFields)) {
+                        ownFields = this.fields();
+                    }
+                    else {
+                        ownFields = _.clone(this.fields);
+                    }
                     Calipso.deepExtend(fields, ownFields);
                     return fields;
                 },

@@ -23,7 +23,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
         Calipso.model.UserDetailsModel = Calipso.Model.extend(
             /** @lends Calipso.model.UserDetailsModel.prototype */
             {
-                browseMenu: {},
+                browseMenu: null,
                 initialize: function () {
                     Calipso.Model.prototype.initialize.apply(this, arguments);
                     var _this = this;
@@ -40,6 +40,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     return sUrl;
                 },
                 onLogin: function (model, response, options) {
+                    console.log("onLogin")
                     // send logged in user on their way
                     var fw = "home";
                     if (Calipso.app.fw) {
@@ -61,6 +62,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     } else {
                         // is the application started?
                         if (Calipso.app.isStarted()) {
+                            this.browseMenu = null;
                             if (this.get("id")) {
                                 Calipso.app.updateHeaderFooter();
                                 Calipso.navigate(fw, {

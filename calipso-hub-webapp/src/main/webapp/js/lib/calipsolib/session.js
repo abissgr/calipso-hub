@@ -30,7 +30,7 @@ define([ "lib/calipsolib/util", 'underscore', 'handlebars', 'moment', 'backbone'
 		},
 		// Returns true if the user is authenticated.
 		isAuthenticated : function() {
-			return this.userDetails && this.userDetails.get && this.userDetails.get("id");
+			return this.userDetails && this.userDetails.get && this.userDetails.get("id") && this.userDetails.get("active");
 		},
 		ensureLoggedIn : function() {
 			if (!this.isAuthenticated()) {
