@@ -84,7 +84,7 @@ define(["lib/calipsolib/form", "lib/calipsolib/backgrid", 'underscore', 'handleb
 				cell: Calipso.components.backgrid.TextCell,
 			},
 			"form": {
-				type: "Text",
+				type: "TextArea",
 				validators: [/*'required'*/],
 			}
 		});
@@ -195,7 +195,12 @@ define(["lib/calipsolib/form", "lib/calipsolib/backgrid", 'underscore', 'handleb
 				type : Backbone.Form.editors.ModelSelect2,
 			}
 		});
-		Calipso.fields.Lov = Calipso.fields.lov = Calipso.fields.Base.extend({}, {});
+		Calipso.fields.Lov = Calipso.fields.lov = Calipso.fields.Base.extend({}, {
+			form: {
+				type: 'List',
+				itemType: 'NestedModel',
+			}
+		});
 
 		Calipso.fields.List = Calipso.fields.list = Calipso.fields.Base.extend({}, {
 			"form": {

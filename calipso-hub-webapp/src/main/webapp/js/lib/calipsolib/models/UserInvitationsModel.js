@@ -16,8 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util", "lib/calipsolib/form",
-        "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', "lib/calipsolib/models/Model"],
-    function ($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars) {
+        "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', "lib/calipsolib/models/Model", "lib/calipsolib/models/UserModel"],
+    function ($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, Model, UserModel) {
+
+        var RecipientModel = Backbone.Model.extend({
+            schema: {
+                name: {
+                    type: 'Text',
+                },
+                email: {
+                    type: 'Text',
+                    validators: ['required', 'email']
+                },
+            },
+            //To string is how models in the list will appear in the "editor".
+            toString: function () {
+                return this.attributes.name + '&lt;' + this.attributes.email + '&gt;';
+            }
+        });
+
 
         Calipso.model.UserInvitationsModel = Calipso.Model.extend(
             /** @lends Calipso.model.RoleModel.prototype */
@@ -36,20 +53,30 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                 },
                 useCases: {
                     create: {
-                        view: Calipso.view.UserInvitationsLayout
+                        view: Calipso.view.UserInvitationsLayout,
+                        overrides: {
+                            contentRegion: {
+                                viewOptions: {
+                                    template: Calipso.getTemplate("UseCaseCardFormView"),
+                                }
+                            }
+                        }
                     }
                 },
-                fields: {
-                    addressLines: {
-                        fieldType: "Text",
-                    },
-                    recepients: {
-                        form: {
-                            type: 'List',
-                            itemType: 'NestedModel',
-                            model: Calipso.util.UserInvitationRecepientModel
-                        }
-                    },
+                fields: function () {
+                    return {
+                        addressLines: {
+                            fieldType: "Text",
+                        },
+                        recepients: {
+                            fieldType: "Lov",
+                            form: {
+                                type: 'List',
+                                itemType: 'NestedModel',
+                                model: RecipientModel
+                            }
+                        },
+                    };
                 },
             });
 

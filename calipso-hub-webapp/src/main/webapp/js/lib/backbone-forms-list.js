@@ -623,6 +623,8 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms', 'backbone-bootstra
   Form.editors.List.Object = Form.editors.List.Modal.extend({
     initialize: function () {
       Form.editors.List.Modal.prototype.initialize.apply(this, arguments);
+      console.log("Form.editors.List.Object##initialize, schema:");
+      console.log(this.schema);
 
       var schema = this.schema;
 
@@ -636,7 +638,8 @@ define(['jquery', 'underscore', 'backbone', 'backbone-forms', 'backbone-bootstra
   Form.editors.List.NestedModel = Form.editors.List.Modal.extend({
     initialize: function() {
       Form.editors.List.Modal.prototype.initialize.apply(this, arguments);
-
+      console.log("Form.editors.List.NestedModel##initialize, schema:");
+      console.log(this.schema);
       var schema = this.schema;
 
       if (!schema.model) throw new Error('Missing required option "schema.model"');

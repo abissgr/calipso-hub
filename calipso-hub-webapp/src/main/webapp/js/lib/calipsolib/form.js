@@ -165,7 +165,7 @@ define(
 				this.fieldsInitiallyShown = options.fieldsInitiallyShown;
 				this.placeHolderLabelsOnly = options.placeHolderLabelsOnly || false;
 				// add search mode if missing
-				if (!options.schema["_searchmode"]) {
+				if (options.schema && !options.schema["_searchmode"]) {
 					options.schema["_searchmode"] = {
 						type: Calipso.backboneform.SearchMode,
 						isHidden: true,
