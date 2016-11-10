@@ -53,7 +53,7 @@ public class AuthenticationException extends HttpException {
     @Override
     public Map<String, String> getResponseHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("location", "Authorization");
+        headers.put("WWW-Authenticate", "X-Calipso-Token header or calipso-sso token cookie");
         return headers;
     }
 }
