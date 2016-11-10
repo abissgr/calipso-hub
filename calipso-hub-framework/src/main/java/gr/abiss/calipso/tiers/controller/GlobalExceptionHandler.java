@@ -1,8 +1,10 @@
 package gr.abiss.calipso.tiers.controller;
 
 
+import com.restdude.exception.http.HttpException;
 import gr.abiss.calipso.tiers.dto.ErrorInfo;
 import gr.abiss.calipso.web.spring.BadRequestException;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,6 +33,29 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .errors(ex.getErrors())
                 .throwable(ex);
+        return builder.build();
+    }
+
+    @ExceptionHandler(HttpException.class)
+    @ResponseBody
+    public ErrorInfo handleHttpException(HttpServletRequest request, HttpServletResponse response, HttpException ex) {
+        HttpStatus status = ex.getStatus();
+
+        // build error info
+        ErrorInfo.Builder builder = new ErrorInfo.Builder()
+                .message(ex.getMessage())
+                .code(status.value())
+                .status(status.getReasonPhrase());
+
+        // update response
+        response.setStatus(status.value());
+        Map<String, String> headers = ex.getResponseHeaders();
+        if (MapUtils.isNotEmpty(headers)) {
+            for (String key : headers.keySet()) {
+                response.addHeader(key, headers.get(key));
+            }
+        }
+
         return builder.build();
     }
 }

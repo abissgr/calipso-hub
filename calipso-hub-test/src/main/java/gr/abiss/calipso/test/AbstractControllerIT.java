@@ -196,7 +196,7 @@ public class AbstractControllerIT {
 
 		// attempt login and test for a proper result
 		Response rs = given().accept(JSON_UTF8).contentType(JSON_UTF8).body(loginSubmission).when()
-				.post("/calipso/apiauth/userDetails");
+				.post("/calipso/api/auth/userDetails");
 
 		// validate login
 		rs.then().log().all().assertThat().statusCode(200).content("id", notNullValue());

@@ -28,6 +28,7 @@ import com.restdude.app.users.repository.UserRepository;
 import com.restdude.app.users.service.UserService;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import com.restdude.auth.userdetails.util.DuplicateEmailException;
+import com.restdude.exception.http.InvalidCredentialsException;
 import gr.abiss.calipso.model.dto.UserDTO;
 import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
 import gr.abiss.calipso.model.dto.UserInvitationsDTO;
@@ -120,9 +121,9 @@ public class UserServiceImpl extends AbstractModelServiceImpl<User, String, User
 
 				}
 			}
-		} catch (RuntimeException e) {
-			LOGGER.error("failed finding user by credentials", e);
-		}
+        } catch (Throwable e) {
+            throw new InvalidCredentialsException();
+        }
 		return user;
 	}
 

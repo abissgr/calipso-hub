@@ -17,10 +17,7 @@
 # CONFIG PROPERTIES
 # ----------------------------------------------
 build.calipso.appName=Calipso
-# Note: Google Chrome does not save cookies from localhost
-build.calipso.baseurl=http://localhost:8080/calipso
 build.calipso.initData=true
-build.calipso.domain=localhost
 build.calipso.cookies.httpOnly=false
 build.calipso.cookies.secure=false
 build.calipso.registration.forceCodes=false

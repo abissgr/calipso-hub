@@ -44,7 +44,7 @@
 <!--     </logger> -->
 
     <!-- other -->
-    <logger name="gr.abiss.calipso">
+    <logger name="gr.abiss.calipso.web.filters">
         <level value="DEBUG" />
     </logger>
     <logger name="com.restdude">

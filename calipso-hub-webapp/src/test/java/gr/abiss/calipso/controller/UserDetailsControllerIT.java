@@ -18,9 +18,18 @@
 package gr.abiss.calipso.controller;
 
 import gr.abiss.calipso.test.AbstractControllerIT;
+import gr.abiss.calipso.utils.Constants;
+import io.restassured.response.Response;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 @Test(/*singleThreaded = true, */description = "Test dynamic JPA specifications used in default search stack")
 @SuppressWarnings("unused")
@@ -28,9 +37,29 @@ public class UserDetailsControllerIT extends AbstractControllerIT {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsControllerIT.class);
 
-	@Test(description = "Test logging in with correct credentials")
-	public void testCorrectLogin() throws Exception {
+    @Test(description = "Test login attempt with correct credentials")
+    public void testCorrectLogin() throws Exception {
 		this.getLoggedinContext("admin", "admin");
-	}
+    }
+
+    @Test(description = "Test login attempt with incorrect credentials")
+    public void testIncorrectLogin() throws Exception {
+        LOGGER.info("testIncorrectLogin");
+        Loggedincontext lctx = new Loggedincontext();
+        // create a login request body
+        Map<String, String> loginSubmission = new HashMap<String, String>();
+        loginSubmission.put("username", "foo");
+        loginSubmission.put("password", "bar^%Y%#DC");
+
+        // attempt login and test for a proper result
+        Response rs = given().accept(JSON_UTF8).contentType(JSON_UTF8).body(loginSubmission).when()
+                .post("/calipso/api/auth/userDetails");
+
+        // validate login
+        rs.then().log().all().assertThat().statusCode(401).content("code", equalTo(401));
+
+        // ensure cookie is cleared
+        Assert.assertNull(rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME));
+    }
 
 }

@@ -116,30 +116,26 @@ public class UserDetailsServiceImpl implements UserDetailsService,
 
 		ICalipsoUserDetails userDetails = null;
 		if (tryUserDetails != null) {
-			try {
-				String usernameOrEmail = tryUserDetails.getUsername();
-				if (StringUtils.isBlank(usernameOrEmail)) {
-					usernameOrEmail = tryUserDetails.getEmail();
-				}
-				String password = tryUserDetails.getPassword();
-				// TODO
-				Map<String, String> metadata = tryUserDetails.getMetadata();
+			String usernameOrEmail = tryUserDetails.getUsername();
+			if (StringUtils.isBlank(usernameOrEmail)) {
+				usernameOrEmail = tryUserDetails.getEmail();
+			}
+			String password = tryUserDetails.getPassword();
+			// TODO
+			Map<String, String> metadata = tryUserDetails.getMetadata();
 
-				// make sure we have credentials to send
-				if (StringUtils.isNotBlank(usernameOrEmail)
-						&& StringUtils.isNotBlank(password)) {
+			// make sure we have credentials to send
+			if (StringUtils.isNotBlank(usernameOrEmail)
+					&& StringUtils.isNotBlank(password)) {
 
-					// ask for the corresponding persisted user
-					User user = this.userService
-							.findActiveByCredentials(usernameOrEmail, password, metadata);
-					if(user != null && user.getId() != null){
-						// convert to UserDetails if not null
-						userDetails = UserDetails.fromUser(user);
-					}
-					
+				// ask for the corresponding persisted user
+				User user = this.userService
+						.findActiveByCredentials(usernameOrEmail, password, metadata);
+				if (user != null && user.getId() != null) {
+					// convert to UserDetails if not null
+					userDetails = UserDetails.fromUser(user);
 				}
-			} catch (RuntimeException e) {
-				LOGGER.error("create, failed creating user details object", e);
+
 			}
 
 		}

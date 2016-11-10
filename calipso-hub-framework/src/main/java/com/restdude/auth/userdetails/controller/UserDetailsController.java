@@ -74,21 +74,17 @@ public class UserDetailsController {
     @ResponseBody
     public ICalipsoUserDetails create(@RequestBody LoginSubmission resource) {
         ICalipsoUserDetails userDetails = new UserDetails(resource);
+        LOGGER.debug("create, LoginSubmission: {}", resource);
+        userDetails = this.service.create(userDetails);
+        if (userDetails != null && userDetails.getId() != null) {
 
-        try {
-            userDetails = this.service.create(userDetails);
-            if (userDetails != null && userDetails.getId() != null) {
+            userDetails.setPassword(resource.getPassword());
+            SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
+        } else {
 
-                userDetails.setPassword(resource.getPassword());
-                SecurityUtil.login(request, response, userDetails, userDetailsConfig, this.service);
-            } else {
-
-                LOGGER.info("login failed, logging out: " + userDetails);
-                SecurityUtil.logout(request, response, userDetailsConfig);
-                userDetails = new UserDetails();
-            }
-        } catch (Throwable e) {
-            LOGGER.error("login: failed creating new userDetails", e);
+            LOGGER.info("login failed, logging out: " + userDetails);
+            SecurityUtil.logout(request, response, userDetailsConfig);
+            userDetails = new UserDetails();
         }
         return userDetails;
     }

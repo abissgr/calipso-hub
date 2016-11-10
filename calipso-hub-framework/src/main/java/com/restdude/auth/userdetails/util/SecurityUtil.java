@@ -22,6 +22,7 @@ import com.restdude.auth.userdetails.integration.UserDetailsConfig;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import com.restdude.auth.userdetails.model.UserDetails;
 import com.restdude.auth.userdetails.service.UserDetailsService;
+import gr.abiss.calipso.utils.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,10 +96,11 @@ public class SecurityUtil {
 			throw new RuntimeException("Was given a blank cookie value but allowClear is false for cookie name: " + cookieName);
 		}
 
+		String server = (String) request.getAttribute(Constants.DOMAIN_KEY);
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("addCookie, cookieName: " + cookieName + 
 				", cookie value: " + cookieValue+
-				", domain: "+userDetailsConfig.getCookiesDomain() +
+					", domain: " + server +
 				", secure: "+userDetailsConfig.isCookiesSecure() +
 				", http-only: "+userDetailsConfig.isCookiesHttpOnly() +
 				", path: "+userDetailsConfig.getCookiesContextPath());
@@ -106,8 +108,8 @@ public class SecurityUtil {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		
 		// set the cookie domain
-		if (StringUtils.isNotBlank(userDetailsConfig.getCookiesDomain())) {
-			cookie.setDomain('.' + userDetailsConfig.getCookiesDomain());
+		if (StringUtils.isNotBlank(server)) {
+			cookie.setDomain('.' + server);
 		}
 
 		// set the cookie path
