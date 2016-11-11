@@ -20,7 +20,18 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
     function ($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, Model, UserModel) {
 
         var RecipientModel = Backbone.Model.extend({
+            initialize: function () {
+                Backbone.Model.prototype.initialize.apply(this, arguments);
+                this.set("@class", "gr.abiss.calipso.model.dto.UserDTO");
+            },
             schema: {
+                "@class": {
+                    type: 'Hidden',
+                    defaultValue: "gr.abiss.calipso.model.dto.UserDTO",
+                    editorAttrs: {
+                        value: "gr.abiss.calipso.model.dto.UserDTO"
+                    },
+                },
                 name: {
                     type: 'Text',
                 },
