@@ -55,10 +55,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                 labelIcon: "fa fa-envelope-o fa-fw",
                 pathFragment: "invitations",
                 typeName: "Calipso.model.UserInvitationsModel",
-                menuConfig: {
-                    rolesIncluded: ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
-                    rolesExcluded: null,
-                },
+                menuConfig: null,
                 useCases: {
                     create: {
                         view: Calipso.view.UserInvitationsLayout,

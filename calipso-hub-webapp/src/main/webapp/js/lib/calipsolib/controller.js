@@ -25,7 +25,6 @@ define(
 	var Marionette = Backbone.Marionette;
 	Calipso.Controller = Marionette.Object.extend({
 		showView : function(view){
-			console.log("Calipso.Controller#showView: " + view.getTypeName());
 			Calipso.app.view.showChildView("mainContentRegion", view);
 		},
 		toHome : function() {

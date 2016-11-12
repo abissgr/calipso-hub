@@ -233,28 +233,32 @@ define(
                 },
                 onRender: function () {
                     var _this = this;
-                    /*
-                     $('a[href="#"][data-top!=true]').click(function(e){
-                     e.preventDefault();
-                     });
-                     */
+					var cUrl = String(window.location);
+					cUrl = cUrl.substring((Calipso.getBaseUrl() + "/client").length);
+
+					// ignore anchor
+					if (cUrl.substr(cUrl.length - 1) == '#') {
+						cUrl = cUrl.slice(0, -1);
+					}
+					// ignore params
+					var q = cUrl.indexOf("?");
+					if (q > 0) {
+						cUrl = cUrl.substring(0, q);
+					}
                     // Add class .active to current link
+					// TODO
+					/*
                     this.$el.find('ul.nav a').each(function () {
 
-                        var cUrl = String(window.location);
 
-                        if (cUrl.substr(cUrl.length - 1) == '#') {
-                            cUrl = cUrl.slice(0, -1);
-                        }
 
                         if ($($(this))[0].href == cUrl) {
                             $(this).addClass('active');
 
-                            $(this).parents('ul').add(this).each(function () {
-                                $(this).parent().addClass('nt').addClass('open');
-                            });
+					 $(this).parents('ul').parent().addClass('open');
                         }
                     });
+					 */
 
                 }
             }

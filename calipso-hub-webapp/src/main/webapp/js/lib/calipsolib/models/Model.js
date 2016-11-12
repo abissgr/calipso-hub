@@ -42,6 +42,9 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                 toString: function () {
                     return this.get(this.constructor.nameProperty) || this.get("name") || this.get("id");
                 },
+                toHtmlSafeString: function () {
+                    return Calipso.stripHtml(this.toString());
+                },
                 /**
                  * Returns the URL for this model, giving precedence  to the collection URL if the model belongs to one,
                  * or a URL based on the model path fragment otherwise.
@@ -174,16 +177,13 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     return this.pathFragment;
                 },
                 getLabels: function (instance) {
-                    if (!this.labels) {
-                        var labels = this.superClass && this.superClass.getLabels ? this.superClass.getLabels() : {};
-                        this.labels = Calipso.deepExtend(labels, Calipso.getPathValue(Calipso.labels, "models." + this.getPathFragment(), {}));
-                    }
-                    return this.labels;
+                    var labels = this.superClass && this.superClass.getLabels ? this.superClass.getLabels() : {};
+                    labels = Calipso.deepExtend(labels, Calipso.getPathValue(Calipso.labels, "models." + this.getPathFragment(), {}));
+                    return labels;
                 },
                 // TODO: refactor view to region names to
                 // allow multiple views config peer layout
                 fields: {},
-                fieldNames: [],
                 useCases: {
                     view: {
                         view: Calipso.view.BrowseLayout,
@@ -273,13 +273,11 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     return fields;
                 },
                 getFieldNames: function () {
-                    var _this = this;
-                    if (!this.fieldNames) {
-                        _.each(this.fields, function (field, key) {
-                            _this.fieldNames.push(key);
-                        });
-                    }
-                    return this.fieldNames;
+                    var fieldNames = [];
+                    _.each(this.fields, function (field, key) {
+                        fieldNames.push(key);
+                    });
+                    return fieldNames;
                 },
                 getTypeaheadSource: function (options) {
                     var _this = this;

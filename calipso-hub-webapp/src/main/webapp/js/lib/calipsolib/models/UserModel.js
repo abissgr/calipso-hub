@@ -63,7 +63,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                         view: Calipso.view.UseCaseSearchLayout,
                         viewOptions: {
                             formTemplatesKey: "vertical",
-                            fieldsSearchBox: ["username", "firstName", "lastName", "email"],
+                            //fieldsSearchBox: ["username", "firstName", "lastName", "email"],
                         },
                         overrides: {
                             backgrid: {

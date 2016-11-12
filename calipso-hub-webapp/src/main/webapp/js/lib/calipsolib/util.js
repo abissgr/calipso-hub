@@ -815,6 +815,10 @@ Calipso.cloneSpecificValue = function(val) {
 		});
 	}
 
+			Calipso.stripHtml = function (s) {
+				return s ? s.replace(/<[^>]+>/g, "") : s;
+			};
+
 	Calipso.Application = Marionette.Application.extend({
 		config : {},
 		started : false,

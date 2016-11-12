@@ -112,8 +112,6 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 
 				schema = isArray ? [] : {};
 				_.each(fields, function(field, key) {
-					console.log("buildSchema, key: " + key + ", field: ");
-					console.log(field);
 					// type and instance schemas
 					baseSchemaEntry = _.isObject(field.fieldType)
 						? field.fieldType[schemaType]
@@ -176,6 +174,16 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 		template : Calipso.getTemplate('UseCaseGridView'),
 		events : {
 			"click button.btn-windowcontrols-destroy" : "back"
+		},
+		templateContext: {
+			viewTitle: function () {
+				var title = this.model.labelIcon || this.model.constructor.labelIcon || "";
+				if (title) {
+					title = "<i class=\"" + Calipso.stripHtml(title) + "\" aria-hidden=\"true\"> </i> ";
+				}
+				title += Calipso.getPathValue(this.model.getLabels(), "plural.label", Calipso.util.getLabel("calipso.words.results"));
+				return title;
+			}
 		},
 		back : function(e) {
 			Calipso.stopEvent(e);
@@ -293,6 +301,32 @@ function(Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneF
 			"keypress input[type=password]" : "commitOnEnter",
 			"keypress input[type=text]" : "commitOnEnter",
 			"click .addLazyField" : "addLazyField",
+		},
+		templateContext: {
+			viewTitle: function () {
+				var title = "";
+				if (this.options.title) {
+					title = this.options.title;
+				}
+				else {
+					title = "<i class=\"fa fa-search\" aria-hidden=\"true\"></i>";
+					if (this.useCaseContext.key.indexOf("search") == 0) {
+						title += Calipso.util.getLabel("calipso.words.searchFor");
+					}
+					else if (this.useCaseContext.key.indexOf("create") == 0) {
+						title += Calipso.util.getLabel("calipso.words.new") + " " + Calipso.getPathValue(this.model.getLabels(), "singular.label", "");
+					}
+					else if (this.useCaseContext.key.indexOf("update") == 0) {
+						title += Calipso.util.getLabel("calipso.words.edit") + " " + this.model.toHtmlSafeString();
+					}
+					else {
+						title += this.model.toHtmlSafeString();
+					}
+				}
+
+
+				return title;
+			}
 		},
 		addLazyField : function(e){
 			var fieldKey = $(e.currentTarget).data("field");

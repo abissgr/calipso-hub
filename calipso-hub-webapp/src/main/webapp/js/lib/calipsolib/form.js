@@ -702,7 +702,6 @@ define(
 		});
 		Calipso.backboneform.TypeaheadObject = Calipso.backboneform.Typeahead.extend({
 			initialize: function (options) {
-				console.log("Calipso.backboneform.TypeaheadObject#initialize");
 				Calipso.backboneform.Typeahead.prototype.initialize.call(this, options);
 				this.$el.removeAttr("id class name type autocomplete");
 				this.$el.html('<input type="hidden" id="' + this.id + '" name="' + this.getName() + '" />' + '<input type="text" class="form-control" id="' + this.id + 'Typeahead" name="' + this.getName() + 'Typeahead" autocomplete="off" ' + this.placeholder + '/>');
@@ -711,7 +710,6 @@ define(
 			 * Adds the editor to the DOM
 			 */
 			onFormAttach: function () {
-				console.log("Calipso.backboneform.TypeaheadObject#onFormAttach");
 				var _this = this;
 				var $hidden = _this.$el.find("#" + _this.id);
 				var $el = _this.$el.find("#" + _this.id + "Typeahead");
@@ -961,7 +959,7 @@ define(
 
 			},
 			onFormClose : function() {
-				this.$el.select2('destroy');
+				this.$el.find(".select2").select2('destroy');
 				if (this.onBeforeClose) {
 					this.onBeforeClose();
 				}
