@@ -8,7 +8,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	
     <!-- choose the default user controller-->
      <bean id="userController"
-		   class="com.restdude.app.users.controller.UserController"/>
+           class="com.restdude.domain.users.controller.UserController"/>
     <!-- choose the default userDetails controller -->
      <bean id="userDetailsController"
 		   class="com.restdude.auth.userdetails.controller.UserDetailsController"/>
@@ -43,7 +43,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		</sec:headers>
 		<!-- Disable Spring Security CSRF protection since 
 		it requires sessions and we don't really want those 
-		in a stateless app
+		in a stateless domain
          -->
         <sec:csrf disabled="true"/>
 
@@ -77,7 +77,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	        <sec:intercept-message type="DISCONNECT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	        <sec:intercept-message type="MESSAGE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	        <sec:intercept-message type="SUBSCRIBE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
-	        <sec:intercept-message pattern="/app/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+	        <sec:intercept-message pattern="/domain/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	        <sec:intercept-message pattern="/topic/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	        <sec:intercept-message pattern="/user/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 	</sec:websocket-message-broker-->

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Calipso. If not, see http://www.gnu.org/licenses/agpl.html
  */
-define([ 'app', 'backbone-forms', 'backgrid', 'bootstrap-markdown','backbone-forms-bootstrap3' ],
+define(['domain', 'backbone-forms', 'backgrid', 'bootstrap-markdown', 'backbone-forms-bootstrap3'],
 function( CalipsoApp, BackboneForm, Backgrid, Markdown) {
 
 	var EditInTabCell = Backgrid.Cell.extend({

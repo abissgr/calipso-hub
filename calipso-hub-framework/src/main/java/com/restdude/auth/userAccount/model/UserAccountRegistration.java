@@ -17,9 +17,9 @@
  */
 package com.restdude.auth.userAccount.model;
 
-import com.restdude.app.users.model.User;
-import com.restdude.app.users.model.UserCredentials;
-import com.restdude.app.users.model.UserRegistrationCode;
+import com.restdude.domain.users.model.User;
+import com.restdude.domain.users.model.UserCredentials;
+import com.restdude.domain.users.model.UserRegistrationCode;
 import io.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;

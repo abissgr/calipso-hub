@@ -22,12 +22,12 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
         var RecipientModel = Backbone.Model.extend({
             initialize: function () {
                 Backbone.Model.prototype.initialize.apply(this, arguments);
-                this.set("@class", "gr.abiss.calipso.model.dto.UserDTO");
+                this.set("@class", "gr.abiss.calipso.model.model.UserDTO");
             },
             schema: {
                 "@class": {
                     type: Calipso.backboneform.ClassName,
-                    defaultValue: "gr.abiss.calipso.model.dto.UserDTO",
+                    defaultValue: "gr.abiss.calipso.model.model.UserDTO",
                 },
                 name: {
                     type: 'Text',

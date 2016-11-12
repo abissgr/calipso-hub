@@ -297,7 +297,7 @@ form schemata at
 
 	http://localhost:8080/api/[entity, e.g. user]/form-schema?mode=[one of create, update, search]
 
-The form schemas produced are annotation-based (see gr.abiss.calipso.uischema.annotation.FormSchemaEntry) 
+The form schemas produced are annotation-based (see com.restdude.mdd.uischema.annotation.FormSchemaEntry)
 and follow the format described at [https://github.com/powmedia/backbone-forms].
 
 [calipso-hub]:../

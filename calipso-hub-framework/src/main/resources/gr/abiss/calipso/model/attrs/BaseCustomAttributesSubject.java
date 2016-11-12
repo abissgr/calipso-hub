@@ -19,7 +19,7 @@
 package gr.abiss.calipso.model.attrs;
 
 import gr.abiss.calipso.model.entities.AbstractAuditable;
-import com.restdude.app.users.model.User;
+import com.restdude.domain.users.model.User;
 
 import java.io.Serializable;
 import java.util.Map;

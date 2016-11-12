@@ -242,5 +242,5 @@ require.config({
 		}
 	},
 });
-//Load our app module and pass it to our definition function
+//Load our domain module and pass it to our definition function
 require([ 'app' ]);

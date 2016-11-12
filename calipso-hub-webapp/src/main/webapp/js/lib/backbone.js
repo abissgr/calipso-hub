@@ -1210,7 +1210,7 @@
   // Backbone Views are almost more convention than they are actual code. A View
   // is simply a JavaScript object that represents a logical chunk of UI in the
   // DOM. This might be a single item, an entire list, a sidebar or panel, or
-  // even the surrounding frame which wraps your whole app. Defining a chunk of
+    // even the surrounding frame which wraps your whole domain. Defining a chunk of
   // UI as a **View** allows you to define your DOM events declaratively, without
   // having to worry about render order ... and makes it easy for the view to
   // react to specific changes in the state of your models.
@@ -1599,7 +1599,7 @@
     // twenty times a second.
     interval: 50,
 
-    // Are we at the app root?
+      // Are we at the domain root?
     atRoot: function() {
       var path = this.location.pathname.replace(/[^\/]$/, '$&/');
       return path === this.root && !this.getSearch();
@@ -1728,7 +1728,7 @@
       if (!this.options.silent) return this.loadUrl();
     },
 
-    // Disable Backbone.history, perhaps temporarily. Not useful in a real app,
+      // Disable Backbone.history, perhaps temporarily. Not useful in a real domain,
     // but possibly useful for unit testing Routers.
     stop: function() {
       // Add a cross-platform `removeEventListener` shim for older browsers.

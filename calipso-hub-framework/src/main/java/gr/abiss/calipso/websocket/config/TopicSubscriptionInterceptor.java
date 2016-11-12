@@ -1,6 +1,6 @@
 package gr.abiss.calipso.websocket.config;
 
-import com.restdude.app.users.model.User;
+import com.restdude.domain.users.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;

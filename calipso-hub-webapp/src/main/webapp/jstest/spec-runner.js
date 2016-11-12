@@ -3,7 +3,7 @@ require([
 'jquery', 'underscore', 'underscore-inflection', 'backbone', 'bootstrap',
 // Main App Object
 'chai',
-'../jstestapp/src/app.js',
+        '../jstestapp/src/domain.js',
 '../jstestapp/src/models/user.js',
 '../jstest/models/user.test.js',
 ],

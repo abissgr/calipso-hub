@@ -19,7 +19,7 @@
 define(['marionette', 'calipso', 'controllers/MainController'], function (Marionette, Calipso, MainController) {
 
 	/**
-	 * This is an example of extending Calipso.Approuter in your app. 
+     * This is an example of extending Calipso.Approuter in your domain.
 	 *  Any appRoutes you define here will be merged with 
 	 * the super type routes.
 	 */

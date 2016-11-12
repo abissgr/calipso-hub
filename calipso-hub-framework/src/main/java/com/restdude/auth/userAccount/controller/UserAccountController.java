@@ -17,8 +17,6 @@
  */
 package com.restdude.auth.userAccount.controller;
 
-import com.restdude.app.users.model.User;
-import com.restdude.app.users.service.UserService;
 import com.restdude.auth.userAccount.model.PasswordResetRequest;
 import com.restdude.auth.userAccount.model.UserAccountRegistration;
 import com.restdude.auth.userdetails.integration.UserDetailsConfig;
@@ -27,8 +25,10 @@ import com.restdude.auth.userdetails.model.UserDetails;
 import com.restdude.auth.userdetails.service.UserDetailsService;
 import com.restdude.auth.userdetails.util.SecurityUtil;
 import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
+import com.restdude.domain.users.model.User;
+import com.restdude.domain.users.service.UserService;
+import com.restdude.util.exception.BadRequestException;
 import gr.abiss.calipso.utils.ConfigurationFactory;
-import gr.abiss.calipso.web.spring.BadRequestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.configuration.Configuration;

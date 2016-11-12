@@ -1,15 +1,11 @@
 package gr.abiss.calipso.actuate;
 
-import java.util.Collection;
-
+import com.restdude.websocket.actuate.MessageMappingEndPoint;
+import com.restdude.websocket.actuate.WebSocketEndPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.HealthIndicatorAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.ManagementServerPropertiesAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.PublicMetricsAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.*;
 import org.springframework.boot.actuate.endpoint.BeansEndpoint;
 import org.springframework.boot.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.actuate.endpoint.InfoEndpoint;
@@ -24,8 +20,7 @@ import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.socket.config.WebSocketMessageBrokerStats;
 
-import gr.abiss.calipso.websocket.actuate.MessageMappingEndPoint;
-import gr.abiss.calipso.websocket.actuate.WebSocketEndPoint;
+import java.util.Collection;
 
 /**
  * Actuator config. Endpoint paths are set in calipso.(defaults.)properties (see endpoints.actuator.*).

@@ -17,8 +17,6 @@
  */
 package com.restdude.auth.social.controller;
 
-import com.restdude.app.users.model.User;
-import com.restdude.app.users.model.UserCredentials;
 import com.restdude.auth.userdetails.controller.form.RegistrationForm;
 import com.restdude.auth.userdetails.integration.UserDetailsConfig;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
@@ -26,6 +24,8 @@ import com.restdude.auth.userdetails.service.UserDetailsService;
 import com.restdude.auth.userdetails.util.DuplicateEmailException;
 import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
 import com.restdude.auth.userdetails.util.SocialMediaService;
+import com.restdude.domain.users.model.User;
+import com.restdude.domain.users.model.UserCredentials;
 import gr.abiss.calipso.utils.ConfigurationFactory;
 import io.swagger.annotations.Api;
 import org.apache.commons.configuration.Configuration;

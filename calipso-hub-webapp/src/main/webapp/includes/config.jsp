@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.restdude.util.HttpUtil" %>
 <%@ page import="gr.abiss.calipso.utils.ConfigurationFactory" %>
-<%@ page import="gr.abiss.calipso.web.HttpUtil" %>
 <%@ page import="org.apache.commons.configuration.Configuration" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>

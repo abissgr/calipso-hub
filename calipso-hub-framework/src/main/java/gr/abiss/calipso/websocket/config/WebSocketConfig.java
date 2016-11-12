@@ -37,9 +37,9 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	/**
 	 * Registers the "/ws" endpoint, enabling SockJS fallback options so that alternative 
 	 * messaging options may be used if WebSocket is not available. 
-	 * 
-	 * This endpoint, when prefixed with "/app", is the endpoint that the 
-	 * controller methods are mapped to handle.
+	 *
+     * This endpoint, when prefixed with "/domain", is the endpoint that the
+     * controller methods are mapped to handle.
 	 * 
 	 * @see org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer#registerStompEndpoints(org.springframework.web.socket.config.annotation.StompEndpointRegistry)
 	 */
@@ -53,16 +53,16 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 	/**  
 	 * Configure the message broker with eenableSimpleBroker(), to enablee a simple memory-based message broker 
 	 * to carry messages back to the client on destinations prefixed with "/topic". 
-	 * 
-	 * The "/app" prefix is designated for messages that are bound for @MessageMapping-annotated methods.
-	 * 
+	 *
+     * The "/domain" prefix is designated for messages that are bound for @MessageMapping-annotated methods.
+     *
 	 * @see org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer#configureMessageBroker(org.springframework.messaging.simp.config.MessageBrokerRegistry)
 	 */
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry messageBrokerRegistry) {
 
 		messageBrokerRegistry.enableSimpleBroker("/queue", "/topic").setTaskScheduler(heartbeatTaskScheduler());
-		messageBrokerRegistry.setApplicationDestinationPrefixes("/app");
+        messageBrokerRegistry.setApplicationDestinationPrefixes("/domain");
 //		messageBrokerRegistry.setUserDestinationPrefix("/user"); 
 	}
 	

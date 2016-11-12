@@ -17,10 +17,10 @@
  */
 package com.restdude.auth.userdetails.service;
 
-import com.restdude.app.users.model.User;
 import com.restdude.auth.userAccount.model.PasswordResetRequest;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import com.restdude.auth.userdetails.util.DuplicateEmailException;
+import com.restdude.domain.users.model.User;
 import org.resthub.common.service.CrudService;
 
 

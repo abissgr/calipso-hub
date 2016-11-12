@@ -19,16 +19,16 @@ package gr.abiss.calipso.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JacksonUtils;
-import com.restdude.app.friends.model.Friendship;
-import com.restdude.app.friends.model.FriendshipStatus;
-import com.restdude.app.users.model.User;
-import gr.abiss.calipso.model.dto.FriendshipDTO;
-import gr.abiss.calipso.model.dto.UserDTO;
-import gr.abiss.calipso.model.dto.UserInvitationResultsDTO;
-import gr.abiss.calipso.model.dto.UserInvitationsDTO;
+import com.restdude.domain.friends.model.Friendship;
+import com.restdude.domain.friends.model.FriendshipDTO;
+import com.restdude.domain.friends.model.FriendshipStatus;
+import com.restdude.domain.users.model.User;
+import com.restdude.domain.users.model.UserDTO;
+import com.restdude.domain.users.model.UserInvitationResultsDTO;
+import com.restdude.domain.users.model.UserInvitationsDTO;
+import com.restdude.websocket.Destinations;
+import com.restdude.websocket.client.DefaultStompSessionHandler;
 import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.websocket.Destinations;
-import gr.abiss.calipso.websocket.client.DefaultStompSessionHandler;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -163,8 +163,8 @@ public class FriendsControllerIT extends AbstractControllerIT {
 		// Create bulk friendship requests (invitations
 		// --------------------------------
 		UserInvitationsDTO invitations = new UserInvitationsDTO.Builder()
-				.addressLines("manos, info@abiss.gr\nabc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@app.com,abc@xyz.com,asd@dsa.com")
-				.recepient(new UserDTO.Builder().email("test@pick.com").build()).build();
+                .addressLines("manos, info@abiss.gr\nabc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@domain.com,abc@xyz.com,asd@dsa.com")
+                .recepient(new UserDTO.Builder().email("test@pick.com").build()).build();
 		
 		UserInvitationResultsDTO userInvitationResults = given().spec(adminRequestSpec)
 				.body(invitations)

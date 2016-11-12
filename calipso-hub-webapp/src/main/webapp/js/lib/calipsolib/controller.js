@@ -152,7 +152,7 @@ define(
 				tagName : "div"
 			});
 			this.showView(pageView);
-			//Calipso.vent.trigger("app:show", pageView);
+            //Calipso.vent.trigger("domain:show", pageView);
 		},
 		tryExplicitRoute : function(pathFragment, secondaryRoutePart) {
 			if (typeof this[pathFragment] == 'function') {

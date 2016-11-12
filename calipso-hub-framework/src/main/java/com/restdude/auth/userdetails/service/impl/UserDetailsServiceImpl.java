@@ -17,8 +17,6 @@
  */
 package com.restdude.auth.userdetails.service.impl;
 
-import com.restdude.app.users.model.User;
-import com.restdude.app.users.service.UserService;
 import com.restdude.auth.userAccount.model.PasswordResetRequest;
 import com.restdude.auth.userdetails.integration.UserDetailsConfig;
 import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
@@ -27,7 +25,9 @@ import com.restdude.auth.userdetails.service.UserDetailsService;
 import com.restdude.auth.userdetails.util.DuplicateEmailException;
 import com.restdude.auth.userdetails.util.SecurityUtil;
 import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
-import gr.abiss.calipso.web.spring.BadRequestException;
+import com.restdude.domain.users.model.User;
+import com.restdude.domain.users.service.UserService;
+import com.restdude.util.exception.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

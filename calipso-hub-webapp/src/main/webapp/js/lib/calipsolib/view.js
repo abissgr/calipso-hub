@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 define(
-    ["lib/calipsolib/view-collection", 'underscore', 'handlebars', 'backbone', 'marionette', 'moment', 'backbone-forms', 'backgrid', 'coreui-app'],
+    ["lib/calipsolib/view-collection", 'underscore', 'handlebars', 'backbone', 'marionette', 'moment', 'backbone-forms', 'backgrid', 'coreui-domain'],
     function (Calipso, _, Handlebars, Backbone, BackboneMarionette, moment, BackboneForms, Backgrid, CoreUiApp) {
 
 	var Marionette = Backbone.Marionette;
@@ -652,8 +652,8 @@ define(
 			// if successful login
 			if (this.model.get("id")) {
 				// TODO: add 'forward' HTTP/URL param in controller cases
-				var fw = Calipso.app.fw || "/home";
-				Calipso.app.fw = null;
+             var fw = Calipso.domain.fw || "/home";
+             Calipso.domain.fw = null;
 				Calipso.navigate(fw, {
 					trigger : true
 				});

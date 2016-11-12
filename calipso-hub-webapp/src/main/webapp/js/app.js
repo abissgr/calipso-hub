@@ -75,7 +75,7 @@ function(
   Backbone.emulateHTTP = true;
 
 	//////////////////////////////////
-	// Start the app
+    // Start the domain
 	//////////////////////////////////
   var initOptions = {
     contextPath: "calipso/",

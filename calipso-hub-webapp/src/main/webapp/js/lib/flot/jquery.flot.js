@@ -64,7 +64,7 @@
                     min: null, // min. value to show, null means set automatically
                     max: null, // max. value to show, null means set automatically
                     autoscaleMargin: null, // margin in % to add if auto-setting min/max
-                    ticks: null, // either [1, 3] or [[1, "a"], 3] or (fn: axis info -> ticks) or app. number of ticks for auto-ticks
+                    ticks: null, // either [1, 3] or [[1, "a"], 3] or (fn: axis info -> ticks) or domain. number of ticks for auto-ticks
                     tickFormatter: null, // fn: number -> string
                     labelWidth: null, // size of tick labels in pixels
                     labelHeight: null,
@@ -1113,8 +1113,8 @@
 
             if (opts.mode == "time") {
                 // pretty handling of time
-                
-                // map of app. size of time units in milliseconds
+
+                // map of domain. size of time units in milliseconds
                 var timeUnitSize = {
                     "second": 1000,
                     "minute": 60 * 1000,

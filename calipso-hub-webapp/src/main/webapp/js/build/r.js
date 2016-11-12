@@ -30557,9 +30557,9 @@ function (args, quit, logger, build) {
                 commonJs.convertDir(args[0], args[1]);
             });
     } else {
-        //Just run an app
+        //Just run an domain
 
-        //Load the bundled libraries for use in the app.
+        //Load the bundled libraries for use in the domain.
         if (commandOption === 'lib') {
             loadLib();
         }

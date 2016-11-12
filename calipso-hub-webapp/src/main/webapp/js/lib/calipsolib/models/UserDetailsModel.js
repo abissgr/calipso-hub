@@ -48,7 +48,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                         Calipso.app.fw = null;
                     }
 
-                    // reload the app if locale needs to be changed
+                    // reload the domain if locale needs to be changed
                     var userLocale = this.get("locale");
                     var oldLocale = localStorage.getItem("locale");
 

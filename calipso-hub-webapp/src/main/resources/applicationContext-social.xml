@@ -23,9 +23,9 @@ http://www.springframework.org/schema/social http://www.springframework.org/sche
     
 
 	<!-- Configures FB and Twitter support.
-	<facebook:config app-id="${facebook.clientId}"      app-secret="${facebook.clientSecret}"  />
-	<twitter:config  app-id="${twitter.consumerKey}"    app-secret="${twitter.consumerSecret}" />
-    <linkedin:config app-id="${linkedin.consumerKey}"   app-secret="${linkedin.consumerSecret}" />
+	<facebook:config domain-id="${facebook.clientId}"      domain-secret="${facebook.clientSecret}"  />
+	<twitter:config  domain-id="${twitter.consumerKey}"    domain-secret="${twitter.consumerSecret}" />
+    <linkedin:config domain-id="${linkedin.consumerKey}"   domain-secret="${linkedin.consumerSecret}" />
 	 -->
 	<!--bean id="connectionFactoryLocator" class="org.springframework.social.security.SocialAuthenticationServiceRegistry"-->
 	<bean id="connectionFactoryLocator" class="org.springframework.social.connect.support.ConnectionFactoryRegistry">
@@ -61,7 +61,7 @@ http://www.springframework.org/schema/social http://www.springframework.org/sche
 	        </list>
 	    </property>
 	</bean>
-	<!--twitter:config  app-id="${twitter.consumer.key}" app-secret="${twitter.consumer.secret}" /-->
+    <!--twitter:config  domain-id="${twitter.consumer.key}" domain-secret="${twitter.consumer.secret}" /-->
 
 	<!-- Configures the connection repository. This application uses JDBC connection 
 		repository which saves connection details to database. This repository uses 

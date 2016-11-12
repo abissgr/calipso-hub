@@ -58,7 +58,7 @@
 <!--     </filter> -->
     <filter>
         <filter-name>restRequestNormalizerFilter</filter-name>
-        <filter-class>gr.abiss.calipso.web.filters.RestRequestNormalizerFilter</filter-class>
+        <filter-class>com.restdude.web.filters.RestRequestNormalizerFilter</filter-class>
     </filter>
 	
 	<filter>

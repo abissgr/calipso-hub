@@ -656,7 +656,7 @@ Calipso.cloneSpecificValue = function(val) {
 	*****************************************************/
 	Calipso._initializeVent = function(){
 		Calipso.vent = Backbone.Radio.channel('calipso');
-		Calipso.vent.on('app:show', function(appView, navigateToUrl) {
+        Calipso.vent.on('domain:show', function (appView, navigateToUrl) {
 
 			var $wrapper = $("#container");
 			if (appView.containerClass && $wrapper && appView.containerClass != $wrapper.attr("class")) {
@@ -794,16 +794,16 @@ Calipso.cloneSpecificValue = function(val) {
 		var pushStateSupported = _.isFunction(history.pushState);
 		var contextPath = Calipso.getConfigProperty("contextPath");
 
-		// console.log("Calipso.app.on start, contextPath: " + contextPath);
+        // console.log("Calipso.domain.on start, contextPath: " + contextPath);
 		if (contextPath.length > 1) {
 			// add leading slash if missing
 			if (contextPath.indexOf("/") != 0) {
-				//console.log("Calipso.app.on start, adding slash prefix");
+                //console.log("Calipso.domain.on start, adding slash prefix");
 				contextPath = "/" + contextPath;
 			}
 			// add ending slash if missing
 			if (contextPath.substr(-1) != '/') {
-				//console.log("Calipso.app.on start, adding slash suffix");
+                //console.log("Calipso.domain.on start, adding slash suffix");
 				contextPath += '/';
 			}
 
@@ -857,7 +857,7 @@ Calipso.cloneSpecificValue = function(val) {
 	  onStart: function() {
 			this.view = new Calipso.view.AppRootView();
 		  this.showView(this.view);
-			//console.log("Calipso.app started");
+          //console.log("Calipso.domain started");
 			this.updateHeaderFooter();
 			// setup vent
 			Calipso._initializeVent();
@@ -909,7 +909,7 @@ Calipso.cloneSpecificValue = function(val) {
 		// init session
 		var SessionType = Calipso.getConfigProperty("sessionType");
 		Calipso.session = new SessionType();
-		// set Calipso.app object
+        // set Calipso.domain object
 		Calipso.app = new Calipso.Application(Calipso.config);
 		// start it
 		Calipso.session.start();

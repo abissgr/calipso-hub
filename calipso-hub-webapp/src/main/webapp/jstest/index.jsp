@@ -47,7 +47,7 @@ pageContext.setAttribute("basePath", basePath);
         <script>
         // load common shim etc. see github.com/requirejs/example-multipage-shim
         require(['${basePath}/js/config.js'], function(config){
-          // load main app
+            // load main domain
           require(['${basePath}/jstest/spec-runner.js']);
         });
         </script>

@@ -18,7 +18,7 @@
 package com.restdude.auth.userAccount.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import gr.abiss.calipso.model.serializers.SkipPropertySerializer;
+import com.restdude.domain.base.binding.SkipPropertySerializer;
 import io.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;

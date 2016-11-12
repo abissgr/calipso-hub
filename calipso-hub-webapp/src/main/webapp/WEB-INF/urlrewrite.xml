@@ -20,8 +20,8 @@
 <!--         <from>^/api/(.*)$</from> -->
 <!--         <set type="content-type">application/json</set> -->
 <!--     </rule> -->
-    
-    <!-- client is single page app -->
+
+    <!-- client is single page domain -->
     <rule>
 		<condition type="attribute" name="forwarded-to-client-index" operator="notequal">true</condition>
 	    <from>^/client/(.*)$</from>
