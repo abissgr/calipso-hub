@@ -293,6 +293,10 @@ public class User extends AbstractMetadataSubject<UserMetadatum> implements Cali
 		if (StringUtils.isBlank(this.getAvatarUrl())) {
 			initDefaultAvatarUrl();
 		}
+		// default banner
+		if (StringUtils.isBlank(this.getBannerUrl())) {
+			this.setBannerUrl(Constants.DEFAULT_BANNER_URL);
+		}
 
 	}
 

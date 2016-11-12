@@ -33,8 +33,9 @@ public class ConfigurationFactory {
 	public static final String APP_NAME = "calipso.appName";
 	public static final String APP_VERSION = "calipso.appVersion";
     public static final String FORCE_CODES = "calipso.registration.forceCodes";
-	
-	public static final String INIT_DATA = "calipso.initData";
+
+    public static final String BASE_URL = "calipso.baseurl";
+    public static final String INIT_DATA = "calipso.initData";
 	public static final String FILES_DIR = "calipso.files.dir";
 	
 
