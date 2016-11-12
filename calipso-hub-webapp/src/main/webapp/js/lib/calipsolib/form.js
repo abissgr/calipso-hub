@@ -385,6 +385,20 @@ define(
 			{
 				isHidden: true,
 			});
+		Calipso.backboneform.ClassName = Backbone.Form.editors.Hidden.extend({
+				initialize: function (options) {
+					Backbone.Form.editors.Hidden.prototype.initialize.call(this, options);
+					options = options || {};
+					console.log("Calipso.backboneform.ClassName#initialize, options: ");
+					console.log(options);
+					if (options.schema && options.schema.defaultValue) {
+						this.value = options.schema.defaultValue;
+					}
+				},
+			},
+			{
+				isHidden: true,
+			});
 
 		Calipso.backboneform.Number = Backbone.Form.editors.Number.extend({
 			defaultValue: null,

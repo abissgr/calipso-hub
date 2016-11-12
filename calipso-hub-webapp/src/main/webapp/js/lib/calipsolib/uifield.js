@@ -54,6 +54,7 @@ define(["lib/calipsolib/form", "lib/calipsolib/backgrid", 'underscore', 'handleb
 				cell: Calipso.components.backgrid.RelatedModelCell
 			},
 		});
+
 		Calipso.fields.Hidden = Calipso.fields.hidden = Calipso.fields.Base.extend({}, {
 			"form": {
 				type: "Hidden",

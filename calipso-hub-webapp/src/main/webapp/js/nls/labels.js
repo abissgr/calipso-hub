@@ -70,16 +70,12 @@ define({
 		"useCases" : {
 			"invitations" : {
 				"title" : "Invite Users",
-				"message" : "Invite users via bulk email addressses and/or structured entries..",
-				"titleResult" : "Invite Users",
+				"message": "Invite users via bulk email addresses and/or structured entries..",
+				"titleResult": "Invitation Results",
 				"invited" : "Invited",
 				"duplicate" : "Duplicates",
 				"existing" : "Existing",
 				"invalid" : "Invalid",
-
-				
-				
-				
 			},
 			"userDetails" : {
 				"login" : {
@@ -116,6 +112,7 @@ define({
 				"hide" : "Hide",
 				"login" : "Login",
 				"register" : "Register",
+				"none": "None",
 			},
 			"grid" : {
 				"emptyText" : "No records found",

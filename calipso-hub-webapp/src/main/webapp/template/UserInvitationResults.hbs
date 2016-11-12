@@ -1,51 +1,49 @@
 <div class="tmpl-hint">start UserInvitationResults.hbs</div>
 <div class="card">
-  <div class="card-header">
-		<i class="fa fa-user-plus"></i>
-		{{labels.useCases.invitations.titleResult}}
-
-  </div>
-  <div class="card-block">
-    <p class="card-text">
-			<strong>{{labels.useCases.invitations.invited}}</strong>
-		</p>
-		<ul class="list">
-		  {{#each invited}}
-		    <li>{{this}}</li>
-			{{else}}
-			  <li>{{labels.calipso.grid.emptyText}}</li>
-		  {{/each}}
-		</ul>
-    <p class="card-text">
-			<strong>{{labels.useCases.invitations.duplicate}}</strong>
-		</p>
-		<ul class="list">
-		  {{#each duplicate}}
-		    <li>{{this}}</li>
-			{{else}}
-			  <li>{{labels.calipso.grid.emptyText}}</li>
-		  {{/each}}
-		</ul>
-    <p class="card-text">
-			<strong>{{labels.useCases.invitations.existing}}</strong>
-		</p>
-		<ul class="list">
-		  {{#each existing}}
-		    <li>{{this}}</li>
-			{{else}}
-			  <li>{{labels.calipso.grid.emptyText}}</li>
-		  {{/each}}
-		</ul>
-    <p class="card-text">
-			<strong>{{labels.useCases.invitations.invalid}}</strong>
-		</p>
-		<ul class="list">
-		  {{#each invalid}}
-		    <li>{{this}}</li>
-			{{else}}
-			  <li>{{labels.calipso.grid.emptyText}}</li>
-		  {{/each}}
-		</ul>
-  </div>
+    <div class="card-header">
+        <i class="fa fa-user-plus"></i>
+        {{labels.useCases.invitations.titleResult}}
+    
+    </div>
+    <div class="card-block">
+        <h3>{{labels.useCases.invitations.invited}}</h3>
+    </div>
+    <ul class="list-group">
+      {{#each invited}}
+        <li class="list-group-item">{{this}}</li>
+        {{else}}
+          <li class="list-group-item">{{labels.calipso.words.none}}</li>
+      {{/each}}
+    </ul>
+    <div class="card-block">
+        <h3>{{labels.useCases.invitations.duplicate}}</h3>
+    </div>
+    <ul class="list-group">
+      {{#each duplicate}}
+        <li class="list-group-item">{{this}}</li>
+        {{else}}
+          <li class="list-group-item">{{labels.calipso.words.none}}</li>
+      {{/each}}
+    </ul>
+    <div class="card-block">
+        <h3>{{labels.useCases.invitations.existing}}</h3>
+    </div>
+    <ul class="list-group">
+      {{#each existing}}
+        <li class="list-group-item">{{this}}</li>
+        {{else}}
+          <li class="list-group-item">{{labels.calipso.words.none}}</li>
+      {{/each}}
+    </ul>
+    <div class="card-block">
+        <h3>{{labels.useCases.invitations.invalid}}</h3>
+    </div>
+    <ul class="list-group">
+      {{#each invalid}}
+        <li class="list-group-item">{{this}}</li>
+        {{else}}
+          <li class="list-group-item">{{labels.calipso.words.none}}</li>
+      {{/each}}
+    </ul>
 </div>
 <div class="tmpl-hint">end UserInvitationResults.hbs</div>

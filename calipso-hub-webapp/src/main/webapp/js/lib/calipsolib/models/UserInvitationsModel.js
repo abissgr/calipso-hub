@@ -26,11 +26,8 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
             },
             schema: {
                 "@class": {
-                    type: 'Hidden',
+                    type: Calipso.backboneform.ClassName,
                     defaultValue: "gr.abiss.calipso.model.dto.UserDTO",
-                    editorAttrs: {
-                        value: "gr.abiss.calipso.model.dto.UserDTO"
-                    },
                 },
                 name: {
                     type: 'Text',
