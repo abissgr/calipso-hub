@@ -193,12 +193,14 @@
 		<dependency>
 			<groupId>gr.abiss.calipso</groupId>
 			<artifactId>calipso-hub-framework</artifactId>
+			<version>${calipso.version}</version>
 		</dependency>
 		
 		
 		<dependency>
 			<groupId>gr.abiss.calipso</groupId>
 			<artifactId>calipso-hub-test</artifactId>
+			<version>${calipso.version}</version>
 			<scope>test</scope>
 		</dependency>
 		
