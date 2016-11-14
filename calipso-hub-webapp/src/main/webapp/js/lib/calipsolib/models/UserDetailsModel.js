@@ -140,7 +140,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                         overrides: {
                             contentRegion: {
                                 viewOptions: {
-                                    template: Calipso.getTemplate("UseCaseCardFormView"),
+                                    template: Calipso.getTemplate("LoginFormView"),
                                     title: '<i class="fa fa-lock"></i> ' + Calipso.util.getLabels("useCases.userDetails.login.title") +
                                     '<div class="btn-group btn-group-sm pull-right" role="group">\
               <a class="btn btn-secondary" href="/useCases/accounts/forgotPassword">' +

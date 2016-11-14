@@ -18,6 +18,13 @@
 package gr.abiss.calipso.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.restdude.auth.userAccount.model.UserAccountRegistration;
+import com.restdude.domain.users.model.User;
+import com.restdude.domain.users.model.UserRegistrationCodeBatch;
+import com.restdude.domain.users.model.UserRegistrationCodeInfo;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
@@ -25,6 +32,9 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
+
+import java.util.Calendar;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -35,9 +45,82 @@ public class CsvControllerIT extends AbstractControllerIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvControllerIT.class);
 
-    @Test(description = "Test CSV output")
-    public void testCorrectLogin() throws Exception {
+    @Test(description = "Test batch management")
+    public void testBatchLyfecycle() throws Exception {
 
+        // login as admin
+        Loggedincontext lctx = this.getLoggedinContext("admin", "admin");
+
+        // create and utilize 5 batches
+        for (int i = 0; i < 5; i++) {
+
+            // create batch
+            //=========================
+            UserRegistrationCodeBatch batch = new UserRegistrationCodeBatch();
+            batch.setName("Integration Test Batch #" + i);
+            batch.setBatchSize(10);
+            batch.setDescription("Sample batch description text #" + i);
+
+            // set expiration to six months
+            //=========================
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.MONTH, 6);
+            batch.setExpirationDate(cal.getTime());
+
+            // save batch
+            //=========================
+            batch = given().spec(lctx.requestSpec)
+                    .log().all()
+                    .body(batch)
+                    .post("/calipso/api/rest/registrationCodeBatches")
+                    .then().assertThat()
+                    .body("id", notNullValue())
+                    .log().all()
+                    .extract().as(UserRegistrationCodeBatch.class);
+
+            // get batch codes as CSV
+            //=========================
+            RequestSpecification reqSpec = this.getRequestSpec(lctx.ssoToken, "text/csv", "text/csv");
+            String csv = RestAssured.given().spec(reqSpec)
+                    .log().all().get("/calipso/api/rest/registrationCodeBatches/" + batch.getId() + "/csv").then().log().all().statusCode(200).extract().response().getBody().print();
+            CsvMapper mapper = new CsvMapper();
+            CsvSchema schema = mapper.schemaFor(UserRegistrationCodeInfo.class).withHeader();
+            MappingIterator<Map<String, String>> it = mapper.readerFor(Map.class)
+                    .with(schema)
+                    .readValues(csv);
+
+            // Register a User for each code
+            //==============================
+            int j = 0;
+            while (it.hasNext()) {
+                Map<String, String> rowAsMap = it.next();
+                // access by column name, as defined in the header row...
+
+                RequestSpecification spec = this.getRequestSpec(null);
+                User user = given().spec(spec)
+                        .log().all()
+                        .body(new UserAccountRegistration.Builder()
+                                .firstName("Firstname")
+                                .lastName("LastName")
+                                .registrationEmail("BetaCodeBatch_" + i + "_" + (j++) + "@" + this.getClass().getSimpleName() + ".com")
+                                .registrationCode(rowAsMap.get("id"))
+                                .build())
+                        .post("/calipso/api/auth/account")
+                        .then()
+                        .log().all()
+                        .assertThat()
+                        // test assertions
+                        .body("id", notNullValue())
+                        // get model
+                        .extract().as(User.class);
+            }
+
+
+        }
+    }
+
+    @Test(description = "Test CSV output")
+    public void testBatchCsv() throws Exception {
         // login as admin
         Loggedincontext lctx = this.getLoggedinContext("admin", "admin");
 
