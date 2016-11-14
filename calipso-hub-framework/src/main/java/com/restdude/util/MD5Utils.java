@@ -15,21 +15,32 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.utils;
+package com.restdude.util;
 
-public class Constants {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	public static final String REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME = "calipso-sso";
+import java.security.MessageDigest;
+public class MD5Utils {
 
-	public static final String BASE_URL_KEY = Constants.class.getName() + "#BASE_URL";
-	public static final String DOMAIN_KEY = Constants.class.getName() + "#DOMAIN";
+	private static final Logger LOGGER = LoggerFactory.getLogger(MD5Utils.class);
 
-	public static final String GRAVATAR_BASE_IMG_URL = "https://www.gravatar.com/avatar/";
+	public static String hex(byte[] array) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < array.length; ++i) {
+			sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+		}
+		return sb.toString();
+	}
 
-	public static final String DEFAULT_AVATAR_URL = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.BASE_URL) + "/img/avatars/default.jpg";
-	public static final String DEFAULT_BANNER_URL = ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.BASE_URL) + "/img/banners/default.png";
-	public static final String HEADER_AUTHORIZATION =  "Authorization";
-	
-	
-	
+	public static String md5Hex(String message) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			return hex(md.digest(message.getBytes("UTF-8")));
+		} catch (Exception e) {
+			LOGGER.error("Failed to create hash for message \"" + message + "\"", e);
+		}
+		return null;
+	}
 }
+

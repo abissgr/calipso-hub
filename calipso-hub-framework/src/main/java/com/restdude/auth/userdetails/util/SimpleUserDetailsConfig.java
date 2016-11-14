@@ -18,7 +18,7 @@
 package com.restdude.auth.userdetails.util;
 
 import com.restdude.auth.userdetails.integration.UserDetailsConfig;
-import gr.abiss.calipso.utils.Constants;
+import com.restdude.util.Constants;
 
 public class SimpleUserDetailsConfig implements UserDetailsConfig {
 

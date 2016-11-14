@@ -15,9 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gr.abiss.calipso.utils;
-
-import java.io.InputStream;
+package com.restdude.util;
 
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
@@ -25,6 +23,8 @@ import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
 
 public class HTMLUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HTMLUtils.class);

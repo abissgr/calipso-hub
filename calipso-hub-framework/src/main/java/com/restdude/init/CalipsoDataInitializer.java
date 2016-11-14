@@ -29,7 +29,7 @@ import com.restdude.domain.users.repository.UserRegistrationCodeRepository;
 import com.restdude.domain.users.repository.UserRepository;
 import com.restdude.domain.users.service.UserService;
 import com.restdude.domain.util.email.service.EmailService;
-import gr.abiss.calipso.utils.ConfigurationFactory;
+import com.restdude.util.ConfigurationFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;

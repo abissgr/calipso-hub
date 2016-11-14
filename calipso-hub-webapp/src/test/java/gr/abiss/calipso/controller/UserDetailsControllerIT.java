@@ -17,8 +17,8 @@
  */
 package gr.abiss.calipso.controller;
 
+import com.restdude.util.Constants;
 import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.utils.Constants;
 import io.restassured.response.Response;
 import org.junit.Assert;
 import org.slf4j.Logger;

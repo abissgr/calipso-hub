@@ -1,3 +1,4 @@
+<%@ page import="com.restdude.util.ConfigurationFactory" %>
 <!DOCTYPE html>
 <%@page contentType="text/html;charset=UTF-8"%>
 <html lang="en">
@@ -7,10 +8,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%
-    String basePath = gr.abiss.calipso.utils.ConfigurationFactory
+    String basePath = ConfigurationFactory
             .getConfiguration()
             .getString(
-                    gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
+                    ConfigurationFactory.BASE_URL);
     pageContext.setAttribute("basePath", basePath);
 %>
 <html>

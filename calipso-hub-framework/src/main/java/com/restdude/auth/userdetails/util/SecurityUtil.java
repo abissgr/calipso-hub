@@ -22,7 +22,7 @@ import com.restdude.auth.userdetails.model.ICalipsoUserDetails;
 import com.restdude.auth.userdetails.model.UserDetails;
 import com.restdude.auth.userdetails.service.UserDetailsService;
 import com.restdude.domain.users.model.User;
-import gr.abiss.calipso.utils.Constants;
+import com.restdude.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

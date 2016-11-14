@@ -19,8 +19,8 @@ package gr.abiss.calipso.controller;
 
 import com.restdude.auth.userAccount.model.UserAccountRegistration;
 import com.restdude.domain.users.model.User;
+import com.restdude.util.Constants;
 import gr.abiss.calipso.test.AbstractControllerIT;
-import gr.abiss.calipso.utils.Constants;
 import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.io.IOUtils;

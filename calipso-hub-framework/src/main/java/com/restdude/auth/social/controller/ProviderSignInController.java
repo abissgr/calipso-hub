@@ -26,7 +26,7 @@ import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
 import com.restdude.auth.userdetails.util.SocialMediaService;
 import com.restdude.domain.users.model.User;
 import com.restdude.domain.users.model.UserCredentials;
-import gr.abiss.calipso.utils.ConfigurationFactory;
+import com.restdude.util.ConfigurationFactory;
 import io.swagger.annotations.Api;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;

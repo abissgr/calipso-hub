@@ -19,8 +19,8 @@ package com.restdude.web.filters;
 
 import com.restdude.auth.userdetails.integration.UserDetailsConfig;
 import com.restdude.auth.userdetails.util.SimpleUserDetailsConfig;
+import com.restdude.util.Constants;
 import com.restdude.util.HttpUtil;
-import gr.abiss.calipso.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -26,7 +26,7 @@ import com.restdude.mdd.util.CreateClassCommand;
 import com.restdude.mdd.util.EntityUtil;
 import com.restdude.mdd.util.JavassistUtil;
 import com.restdude.mdd.util.ModelContext;
-import gr.abiss.calipso.utils.ClassUtils;
+import com.restdude.util.ClassUtils;
 import io.swagger.annotations.Api;
 import javassist.CannotCompileException;
 import javassist.NotFoundException;

@@ -17,11 +17,9 @@
  */
 package gr.abiss.calipso.web.spring;
 
+import com.restdude.util.ConfigurationFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-
-import gr.abiss.calipso.utils.ConfigurationFactory;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;

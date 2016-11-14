@@ -22,7 +22,7 @@ import com.restdude.domain.base.service.ModelService;
 import com.restdude.domain.cms.model.BinaryFile;
 import com.restdude.domain.cms.service.BinaryFileService;
 import com.restdude.mdd.specifications.GenericSpecifications;
-import gr.abiss.calipso.utils.ConfigurationFactory;
+import com.restdude.util.ConfigurationFactory;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.configuration.Configuration;

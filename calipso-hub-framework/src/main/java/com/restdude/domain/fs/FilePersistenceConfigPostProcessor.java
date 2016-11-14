@@ -17,7 +17,7 @@
  */
 package com.restdude.domain.fs;
 
-import gr.abiss.calipso.utils.ConfigurationFactory;
+import com.restdude.util.ConfigurationFactory;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

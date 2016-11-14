@@ -1,7 +1,8 @@
 package com.restdude.util;
 
-import gr.abiss.calipso.utils.Constants;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class HttpUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtil.class);
 
     public static String setBaseUrl(ServletRequest req) {
         HttpServletRequest request = (HttpServletRequest) req;
@@ -23,6 +25,7 @@ public class HttpUtil {
                 baseUrl = baseUrl.replaceFirst("http:", "https:");
             }
             request.setAttribute(Constants.BASE_URL_KEY, baseUrl);
+            LOGGER.debug("Added request attribute '{}': {}", Constants.BASE_URL_KEY, baseUrl);
             request.setAttribute(Constants.DOMAIN_KEY, request.getServerName());
         }
         return baseUrl;

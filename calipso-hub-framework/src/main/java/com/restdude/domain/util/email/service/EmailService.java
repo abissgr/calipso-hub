@@ -19,7 +19,7 @@ package com.restdude.domain.util.email.service;
 
 
 import com.restdude.domain.users.model.User;
-import gr.abiss.calipso.utils.ConfigurationFactory;
+import com.restdude.util.ConfigurationFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

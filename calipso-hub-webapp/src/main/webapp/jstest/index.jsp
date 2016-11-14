@@ -1,12 +1,13 @@
+<%@ page import="com.restdude.util.ConfigurationFactory" %>
 <!DOCTYPE html>
 <%@page contentType="text/html;charset=UTF-8" %>
 <html lang="en">
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%
-String basePath = gr.abiss.calipso.utils.ConfigurationFactory
+    String basePath = ConfigurationFactory
 .getConfiguration()
-.getString(gr.abiss.calipso.utils.ConfigurationFactory.BASE_URL);
+            .getString(ConfigurationFactory.BASE_URL);
 pageContext.setAttribute("basePath", basePath);
  %>
     <!-- Title &amp; Meta -->
