@@ -15,8 +15,33 @@
         http://www.springframework.org/schema/mvc       http://www.springframework.org/schema/mvc/spring-mvc.xsd
 
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
-    
-    <!-- needed by javers -->    
+
+
+	<bean name="handlerAdapter"
+		  class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+				<property name="validator">
+					<bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+				</property>
+			</bean>
+		</property>
+		<property name="messageConverters" ref="messageConverters"/>
+		<property name="responseBodyAdvice">
+			<util:list>
+				<bean id="responseBodyAdvice"
+					  class="org.springframework.web.servlet.mvc.method.annotation.JsonViewResponseBodyAdvice"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<bean id="handlerMapping"
+		  class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+
+	<mvc:default-servlet-handler/>
+
+
+	<!-- needed by javers -->
 <!--     <aop:aspectj-autoproxy /> -->
        
     <!-- read external properties config -->
@@ -42,49 +67,7 @@
     <!-- Generate controllers, services and repositories for entities with @ModelResource -->
 	<bean id="entityPostProcessor" class="com.restdude.mdd.processor.ModelDrivenBeanGeneratingRegistryPostProcessor"/>
     
-    <!-- override resthub's MapperFeature.DEFAULT_VIEW_INCLUSION config -->
-    <bean id="jsonObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
-        <property name="featuresToDisable">
-            <array>
-                <util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
-            </array>
-        </property>
-        <property name="featuresToEnable">
-            <array>
-                <util:constant static-field="com.fasterxml.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION"/>
-            </array>
-        </property>
-        <property name="modulesToInstall" ref="jacksonModules"/>
-    </bean>
-    
-    <!-- jackson config -->
-    <bean id="xmlObjectMapperFactory" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean" p:indentOutput="true" p:failOnEmptyBeans="false">
-        <property name="featuresToDisable">
-            <array>
-                <util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
-            </array>
-        </property>
-        <property name="featuresToEnable">
-            <array>
-                <util:constant static-field="com.fasterxml.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION"/>
-            </array>
-        </property>
-        <property name="modulesToInstall" ref="jacksonModules"/>
-        <property name="objectMapper" ref="xmlMapper" />
-    </bean>
-	<bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
-	<bean class="com.fasterxml.jackson.datatype.joda.JodaModule"></bean>
-<!-- 	<bean id="conversionService" -->
-<!-- 		class="org.springframework.context.support.ConversionServiceFactoryBean"> -->
-  <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" >
-		<property name="converters">
-			<set>
-				<!-- converters is a set of both converters and converterfactories -->
-				<bean class="com.restdude.domain.base.binding.CustomEnumConverterFactory"/>
-				<bean class="com.restdude.domain.friends.binding.FriendshipIdDeserializer"/>
-			</set>
-		</property>
-	</bean>
+
     
     <!-- auth config -->
     <bean id="userDetailsConfig"
@@ -112,7 +95,12 @@
 	<context:component-scan base-package="
     	**.calipso,
     	com.restdude,
-    	org.resthub" />
+    	org.resthub">
+		<!--context:include-filter type="regex" expression="com.concretepage.*.*Util"/>
+		<context:exclude-filter type="assignable" expression="com.concretepage.service.IUserService"/-->
+		<context:exclude-filter type="regex" expression="org.resthub.web.*"/>
+		<context:exclude-filter type="regex" expression="org.resthub.web.*.*"/>
+	</context:component-scan>
 	<jpa:repositories base-package="
     	**.calipso,
     	com.restdude,
@@ -141,7 +129,8 @@
 			</set>
 		</property>
 	</bean>
-	<bean class="org.resthub.web.LoggingHandlerExceptionResolver" />
+	<!--bean class="org.resthub.web.LoggingHandlerExceptionResolver" /-->
+
 	<bean class="org.springframework.orm.hibernate4.HibernateExceptionTranslator" />
 	<!-- Executor for the methods marked with @async annotations -->
 	<task:executor id="asyncExecutor" pool-size="25" />
@@ -179,6 +168,7 @@
 	</bean>
 
 	<!-- imports -->
+	<import resource="applicationContext-jackson.xml"/>
 	<import resource="applicationContext-encrypt.xml"/>
 	<import resource="applicationContext-email.xml" />
 	<import resource="applicationContext-security.xml" />

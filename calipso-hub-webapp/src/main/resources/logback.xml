@@ -47,7 +47,7 @@
     <logger name="com.restdude.web.filters">
         <level value="DEBUG" />
     </logger>
-    <logger name="com.restdude">
+    <logger name="com.restdude.domain.friends">
         <level value="DEBUG" />
     </logger>
 
