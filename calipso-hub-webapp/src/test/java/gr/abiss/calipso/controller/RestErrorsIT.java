@@ -51,7 +51,7 @@ public class RestErrorsIT extends AbstractControllerIT {
                 .log().all()
                 .assertThat()
                 // test assertions
-                .body("code", is(400))
+                .body("httpStatusCode", is(400))
                 // get model
                 .extract().as(User.class);
 

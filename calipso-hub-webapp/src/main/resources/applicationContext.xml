@@ -4,26 +4,45 @@
 	   xmlns:context="http://www.springframework.org/schema/context"
 	   xmlns:task="http://www.springframework.org/schema/task"
 	   xmlns:mvc="http://www.springframework.org/schema/mvc"
-	   xmlns:jpa="http://www.springframework.org/schema/data/jpa"
 	   xmlns:p="http://www.springframework.org/schema/p"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-        http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-        http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context-3.2.xsd
-        http://www.springframework.org/schema/util      http://www.springframework.org/schema/util/spring-util.xsd
-        http://www.springframework.org/schema/task      http://www.springframework.org/schema/task/spring-task.xsd
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
 
-        http://www.springframework.org/schema/mvc       http://www.springframework.org/schema/mvc/spring-mvc.xsd
-
-        http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+        http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/util      http://www.springframework.org/schema/util/spring-util-4.3.xsd
+        http://www.springframework.org/schema/task      http://www.springframework.org/schema/task/spring-task-4.3.xsd
+        http://www.springframework.org/schema/mvc       http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
 
 
+	<!-- read external properties config -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:calipso.defaults.properties</value>
+				<value>classpath:calipso.properties</value>
+			</list>
+		</property>
+		<property name="trimValues" value="true"/>
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+	</bean>
+	<!-- imports -->
+	<import resource="applicationContext-jackson.xml"/>
+	<import resource="applicationContext-jackson.xml"/>
+	<import resource="applicationContext-encrypt.xml"/>
+	<import resource="applicationContext-email.xml"/>
+	<import resource="applicationContext-security.xml"/>
+	<import resource="applicationContext-scheduler.xml"/>
+	<!-- import resource="applicationContext-acl.xml" /-->
+	<import resource="applicationContext-social.xml"/>
+	<!--import resource="applicationContext-swagger.xml" /-->
+
+
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 	<bean name="handlerAdapter"
 		  class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
 		<property name="webBindingInitializer">
 			<bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
-				<property name="validator">
-					<bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
-				</property>
+				<property name="validator" ref="validator"/>
 			</bean>
 		</property>
 		<property name="messageConverters" ref="messageConverters"/>
@@ -43,28 +62,16 @@
 
 	<!-- needed by javers -->
 <!--     <aop:aspectj-autoproxy /> -->
-       
-    <!-- read external properties config -->
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    	<property name="ignoreResourceNotFound" value="true"/>
-        <property name="locations">
-            <list>
-                <value>classpath:calipso.defaults.properties</value>
-                <value>classpath:calipso.properties</value>
-            </list>
-		</property>
-		<property name="trimValues" value="true"/>
-		<property name="ignoreUnresolvablePlaceholders" value="true"/>
-	    <property name="properties">
-	        <value>calipso.initClass.replaced=${calipso.initClass}</value>
-	    </property>
-    </bean>
+
     
     <!-- Setup default file storage adapter -->
 	<bean class="com.restdude.domain.fs.FilePersistenceConfigPostProcessor">
     </bean>
-    
-    <!-- Generate controllers, services and repositories for entities with @ModelResource -->
+
+	<!--  By defining this object as a Bean, Spring Security is exposed as SpEL expressions for creating Sp	ring Data queries.  -->
+	<bean class="org.springframework.security.data.repository.query.SecurityEvaluationContextExtension"/>
+
+	<!-- Generate controllers, services and repositories for entities with @ModelResource -->
 	<bean id="entityPostProcessor" class="com.restdude.mdd.processor.ModelDrivenBeanGeneratingRegistryPostProcessor"/>
     
 
@@ -73,21 +80,8 @@
     <bean id="userDetailsConfig"
 		  class="com.restdude.auth.userdetails.util.SimpleUserDetailsConfig">
         <constructor-arg value="calipso-sso" />
-        <constructor-arg value="${calipso.domain}" />
-        <constructor-arg value="/" />
     </bean>
-    
-    <!--  By defining this object as a Bean, Spring Security is exposed as SpEL expressions for creating Sp	ring Data queries.  -->
-    <bean class="org.springframework.security.data.repository.query.SecurityEvaluationContextExtension" />
-    <!-- extend resthub JPA config databaseProperties -->
-    <bean id="jpaProperties" parent="resthubCoreJpaProperties">
-	    <property name="sourceMap">
-	        <map merge="true">
-				<entry key="jadira.usertype.autoRegisterUserTypes" value="true"/>
-				<!---entry key="hibernate.globally_quoted_identifiers" value="true" /-->
-	        </map>
-	    </property>
-	</bean>
+
 
 	<!-- 	<bean id="auditorBean" class="com.restdude.util.audit.AuditorBean" /> -->
 <!-- 	<jpa:auditing auditor-aware-ref="auditorBean"/> -->
@@ -101,11 +95,6 @@
 		<context:exclude-filter type="regex" expression="org.resthub.web.*"/>
 		<context:exclude-filter type="regex" expression="org.resthub.web.*.*"/>
 	</context:component-scan>
-	<jpa:repositories base-package="
-    	**.calipso,
-    	com.restdude,
-    	org.resthub"
-					  factory-class="com.restdude.domain.base.repository.ModelRepositoryFactoryBean"/>
 
 	<!-- THYMELEAF: Template Resolver for email templates -->
 	<bean id="emailTemplateResolver"
@@ -129,9 +118,9 @@
 			</set>
 		</property>
 	</bean>
-	<!--bean class="org.resthub.web.LoggingHandlerExceptionResolver" /-->
 
 	<bean class="org.springframework.orm.hibernate4.HibernateExceptionTranslator" />
+
 	<!-- Executor for the methods marked with @async annotations -->
 	<task:executor id="asyncExecutor" pool-size="25" />
 	<!-- Configuration for the Runtime -->
@@ -140,8 +129,8 @@
 	<util:list id="messageConverters">
 		<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
 			  p:objectMapper-ref="jsonObjectMapperFactory"/>
-		<bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter"
-			  p:objectMapper-ref="xmlObjectMapperFactory"/>
+		<!--bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter"
+			  p:objectMapper-ref="xmlObjectMapperFactory"/-->
 		<bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
 		<bean class="com.restdude.domain.base.binding.CsvMessageConverter"/>
 	</util:list>
@@ -167,15 +156,6 @@
 			value="org.springframework.web.servlet.view.JstlView" />
 	</bean>
 
-	<!-- imports -->
-	<import resource="applicationContext-jackson.xml"/>
-	<import resource="applicationContext-encrypt.xml"/>
-	<import resource="applicationContext-email.xml" />
-	<import resource="applicationContext-security.xml" />
-    <import resource="applicationContext-scheduler.xml" />
-    <!-- import resource="applicationContext-acl.xml" /-->
-	<import resource="applicationContext-social.xml" />
-	<!--import resource="applicationContext-swagger.xml" /-->
 
 
 	<bean id="userService" class="com.restdude.domain.users.service.impl.UserServiceImpl">

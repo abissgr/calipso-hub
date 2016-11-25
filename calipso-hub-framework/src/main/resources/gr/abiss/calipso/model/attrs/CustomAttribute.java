@@ -30,6 +30,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "custom_attribute")
@@ -39,13 +40,16 @@ public abstract class CustomAttribute<T extends Serializable> extends
 
 	private static final long serialVersionUID = 4008152148196369725L;
 
+	@NotNull
 	@Column(name = "name", nullable = false, updatable = false)
 	private String name;
 
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "subject", referencedColumnName = "id", nullable = false)
 	private BaseCustomAttributesSubject subject;
 
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "definition", referencedColumnName = "id", nullable = false)
 	private CustomAttributeDefinition definition;

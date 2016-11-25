@@ -24,6 +24,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.domain.Persistable;
 
@@ -39,10 +40,12 @@ public class AccessMode implements Persistable<Short> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Short id;
-
+	
+	@NotNull
 	@Column(name = "name", unique = true, nullable = false)
 	private String name;
-
+	
+	@NotNull
 	@Column(name = "weight", unique = true, nullable = false)
 	private Short weight;
 

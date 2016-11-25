@@ -42,16 +42,10 @@
 <!--     <logger name="gr.abiss.calipso.websocket"> -->
 <!--         <level value="debug" /> -->
 <!--     </logger> -->
-
-    <!-- other -->
-    <logger name="com.restdude.web.filters">
-        <level value="DEBUG" />
+    <logger name="gr.abiss.calipso.controller">
+        <level value="debug"/>
     </logger>
-    <logger name="com.restdude.domain.friends">
-        <level value="DEBUG" />
-    </logger>
-
-    <root level="WARN">
+    <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

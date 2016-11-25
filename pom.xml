@@ -197,9 +197,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- Contains all RESThub artifacts and transitive dependencies <repository> 
-			<id>resthub</id> <url>http://nexus.pullrequest.org/content/groups/resthub</url> 
-			</repository> -->
 		<repository>
 			<id>repository.spring.release</id> 
 	        <name>Spring GA Repository</name> 
@@ -264,9 +261,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- Contains all RESThub snasphot artifacts - uncomment to use <repository> 
-			<id>resthub snapshots</id> <url>http://nexus.pullrequest.org/content/repositories/snapshots/</url> 
-			<snapshots> <enabled>true</enabled> </snapshots> </repository> -->
 		<repository>
 			<id>sonatype-snapshot</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>

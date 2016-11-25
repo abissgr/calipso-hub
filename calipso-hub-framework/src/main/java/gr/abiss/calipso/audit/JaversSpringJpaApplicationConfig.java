@@ -24,6 +24,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
+import javax.inject.Named;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,8 @@ public class JaversSpringJpaApplicationConfig {
 	
 	
 	@Autowired
-	DataSource dataSource;
+    @Named("dataSource")
+    DataSource dataSource;
 	
 	@Value("${hibernate.dialect}")
 	private String dialect;

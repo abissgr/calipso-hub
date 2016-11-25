@@ -13,13 +13,13 @@
 		
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath*:resthubContext.xml, classpath*:applicationContext.xml</param-value>
+        <param-value>classpath*:restdudeContext-ds.xml, classpath*:applicationContext.xml</param-value>
 	</context-param>
 	
 	<!-- original -->
 	<context-param>
 		<param-name>spring.profiles.active</param-name>
-		<param-value>resthub-jpa, resthub-web-server, resthub-pool-bonecp</param-value>
+        <param-value>restdude-ds, restdude-pool-bonecp</param-value>
 	</context-param>
 		
 
