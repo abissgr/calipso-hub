@@ -63,7 +63,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		<sec:intercept-url pattern="/api/rest/**" method="PATCH" access="isAuthenticated()"/>
 		<sec:intercept-url pattern="/api/rest/**" method="DELETE" access="isAuthenticated()"/>
 
-		<sec:http-basic/>
+		<sec:http-basic entry-point-ref="restAuthenticationEntryPoint"/>
         <sec:logout invalidate-session="true" />
 		
         <!-- Adds social authentication filter to the Spring Security filter chain. 

@@ -45,7 +45,21 @@
     <logger name="gr.abiss.calipso.controller">
         <level value="debug"/>
     </logger>
-    <root level="info">
+    <logger name="com.restdude.domain.users">
+        <level value="debug"/>
+    </logger>
+    <logger name="com.restdude.auth.userdetails">
+        <level value="debug"/>
+    </logger>
+    <logger name="com.restdude.mdd.processor">
+        <level value="debug"/>
+    </logger>
+    <logger name="com.restdude.init">
+        <level value="debug"/>
+    </logger>
+
+
+    <root level="warn">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

@@ -17,16 +17,28 @@
  */
 package gr.abiss.calipso.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.restdude.auth.userAccount.model.UserAccountRegistration;
+import com.restdude.domain.error.model.ClientError;
+import com.restdude.domain.error.model.SystemError;
+import com.restdude.domain.friends.model.Friendship;
 import com.restdude.domain.users.model.User;
+import com.restdude.util.Constants;
 import gr.abiss.calipso.test.AbstractControllerIT;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 @Test(/*singleThreaded = true, */description = "Test REST error responses")
 @SuppressWarnings("unused")
@@ -34,11 +46,11 @@ public class RestErrorsIT extends AbstractControllerIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestErrorsIT.class);
 
-    @Test(description = "Test duplicate usename subscription attempt")
+    @Test(description = "Test duplicate username subscription attempt", priority = 10)
     public void testDuplicateUsername() throws Exception {
 
         RequestSpecification spec = this.getRequestSpec(null);
-        User user = given().spec(spec)
+        SystemError error = given().spec(spec)
                 .log().all()
                 .body(new UserAccountRegistration.Builder()
                         .username("admin")
@@ -51,10 +63,132 @@ public class RestErrorsIT extends AbstractControllerIT {
                 .log().all()
                 .assertThat()
                 // test assertions
+                .statusCode(400)
                 .body("httpStatusCode", is(400))
                 // get model
-                .extract().as(User.class);
+                .extract().as(SystemError.class);
 
     }
 
+    @Test(description = "Test duplicate email subscription attempt", priority = 20)
+    public void testDuplicateEmail() throws Exception {
+
+        RequestSpecification spec = this.getRequestSpec(null);
+        SystemError error = given().spec(spec)
+                .log().all()
+                .body(new UserAccountRegistration.Builder()
+                        .registrationEmail("operator@abiss.gr")
+                        .build())
+                .post("/calipso/api/auth/account")
+                .then()
+                .log().all()
+                .assertThat()
+                // test assertions
+                .statusCode(400)
+                .body("httpStatusCode", is(400))
+                // get model
+                .extract().as(SystemError.class);
+
+    }
+
+    @Test(description = "Test invalid credentials", priority = 30)
+    public void testInvalidCredentials() throws Exception {
+
+        Loggedincontext lctx = new Loggedincontext();
+        // create a login request body
+        Map<String, String> loginSubmission = new HashMap<String, String>();
+        loginSubmission.put("username", "admin");
+        loginSubmission.put("password", "invalid");
+
+        // attempt login and test for a proper result
+        Response rs = given().accept(JSON_UTF8).contentType(JSON_UTF8).body(loginSubmission).when()
+                .post("/calipso/api/auth/userDetails");
+
+        // validate login
+        rs.then().log().all().assertThat()
+                .statusCode(401)
+                .body("httpStatusCode", is(401));
+
+        Assert.assertFalse(StringUtils.isNotBlank(rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME)));
+
+    }
+
+    @Test(description = "Test not remembered", priority = 40)
+    public void testNotRemembered() throws Exception {
+        LOGGER.info("testNotRemembered");
+        Response rs = given().spec(getRequestSpec("invalid")).log().all()
+                .get("/calipso/api/auth/userDetails");
+        rs.then().log().all().assertThat()
+                // test assertions
+                .statusCode(401)
+                .body("httpStatusCode", is(401));
+
+        Assert.assertFalse(StringUtils.isNotBlank(rs.getCookie(Constants.REQUEST_AUTHENTICATION_TOKEN_COOKIE_NAME)));
+
+    }
+
+    @Test(description = "Test not found", priority = 50)
+    public void testNotFound() throws Exception {
+
+        Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
+        RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
+        // select user
+        SystemError error = given().spec(adminRequestSpec)
+                .get("/calipso/api/rest/users/invalid")
+                .then().assertThat()
+                // test assertions
+                .statusCode(404)
+                .body("httpStatusCode", is(404))
+                .extract().as(SystemError.class);
+    }
+
+    @Test(description = "Test invalid target ", priority = 60)
+    public void testInvalidTarget() throws Exception {
+
+        Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
+        RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
+        // select user
+        SystemError error = given().spec(adminRequestSpec)
+                .log().all()
+                .body(new Friendship(new User(adminLoginContext.userId), new User("3c1cd4dc-05fb-49ef-b929-f08d0f0b7c73")))
+                .post("/calipso/api/rest/" + Friendship.API_PATH)
+                .then().assertThat()
+                // test assertions
+                .statusCode(500)
+                .body("httpStatusCode", is(500))
+                .extract().as(SystemError.class);
+    }
+
+    @Test(description = "Test invalid target ", priority = 70)
+    public void testSearchSystemErrors() throws Exception {
+
+        Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
+        RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
+        // select user
+        JsonNode errorsPage = given().spec(adminRequestSpec)
+                .log().all()
+                .get("/calipso/api/rest/" + SystemError.API_PATH)
+                .then().log().all().assertThat()
+                // test assertions
+                .statusCode(200)
+                .body("content[0].id", notNullValue())
+                .extract().as(JsonNode.class);
+    }
+
+    @Test(description = "Test client error submission", priority = 80)
+    public void testClientErrorSubmission() throws Exception {
+
+        Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
+        RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
+
+        ClientError error = given().spec(adminRequestSpec)
+                .log().all()
+                .body(new ClientError.Builder().description("I have no idea").message("An error occured").errorLog("error stacktrace").build())
+                .post("/calipso/api/rest/" + ClientError.API_PATH)
+                .then().log().all().assertThat()
+                // test assertions
+                .statusCode(201)
+                .body("id", notNullValue())
+                .extract().as(ClientError.class);
+    }
 }

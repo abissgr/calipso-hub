@@ -45,7 +45,7 @@ public class CsvControllerIT extends AbstractControllerIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvControllerIT.class);
 
-    @Test(description = "Test batch management")
+    @Test(description = "Test batch management", priority = 10)
     public void testBatchLyfecycle() throws Exception {
 
         // login as admin
@@ -119,17 +119,17 @@ public class CsvControllerIT extends AbstractControllerIT {
         }
     }
 
-    @Test(description = "Test CSV output")
+    @Test(description = "Test CSV output", priority = 20)
     public void testBatchCsv() throws Exception {
+        LOGGER.debug("Test CSV output");
         // login as admin
         Loggedincontext lctx = this.getLoggedinContext("admin", "admin");
 
         // get initial data batch id
         JsonNode batches = given().spec(lctx.requestSpec)
                 .log().all()
-                .param("status", "SENT")
                 .get("/calipso/api/rest/registrationCodeBatches")
-                .then().assertThat()
+                .then().log().all().assertThat()
                 .body("content[0].id", notNullValue())
                 .extract().as(JsonNode.class);
         String id = batches.get("content").get(0).get("id").asText();

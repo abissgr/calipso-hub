@@ -36,6 +36,14 @@
 	<import resource="applicationContext-social.xml"/>
 	<!--import resource="applicationContext-swagger.xml" /-->
 
+	<!--RESTify errors -->
+	<bean id="restExceptionResolver" class="com.restdude.util.exception.RestExceptionHandler">
+		<property name="order" value="100"></property>
+		<property name="errorResolver">
+			<bean class="com.restdude.util.exception.DefaultRestErrorResolver">
+			</bean>
+		</property>
+	</bean>
 
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 	<bean name="handlerAdapter"

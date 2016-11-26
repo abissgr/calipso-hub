@@ -23,6 +23,9 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
         Calipso.model.UserDetailsModel = Calipso.Model.extend(
             /** @lends Calipso.model.UserDetailsModel.prototype */
             {
+                defaults: {
+                    locale: "en"
+                },
                 browseMenu: null,
                 initialize: function () {
                     Calipso.Model.prototype.initialize.apply(this, arguments);
@@ -32,7 +35,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                         _this.onLogin(model, response, options);
                     });
                     this.on('error', function (model, response, options) {
-                        alert("Authentication failed!");
+                        _this.onLogin(this, response, options);
                     });
                 },
                 url: function () {
@@ -53,15 +56,13 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     var oldLocale = localStorage.getItem("locale");
 
                     // change locale?
-                    if (!oldLocale || (oldLocale && oldLocale != userLocale)) {
-                        localStorage.setItem("locale", this.userDetails.get("locale"));
-                        Calipso.navigate(fw, {
-                            trigger: false
-                        });
-                        window.location.reload();
+                    if (oldLocale && oldLocale != userLocale) {
+                        localStorage.setItem("locale", this.get("locale"));
+                        window.location.href = Calipso.getBaseUrl() + "/client/" + fw;
                     } else {
                         // is the application started?
                         if (Calipso.app.isStarted()) {
+                            console.log("onLogin, app is started")
                             this.browseMenu = null;
                             if (this.get("id")) {
                                 Calipso.app.updateHeaderFooter();
@@ -72,6 +73,7 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                                 alert("Invalid credentials")
                             }
                         } else {
+                            console.log("onLogin, app is NOT started")
                             Calipso.app.start(Calipso.getConfigProperty("startOptions"));
                         }
                     }

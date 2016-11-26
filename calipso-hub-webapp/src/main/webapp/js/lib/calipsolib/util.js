@@ -411,6 +411,11 @@ Calipso.cloneSpecificValue = function(val) {
 		return urlParams;
 	};
 
+
+            $(document).ajaxError(function (event, request, settings, error) {
+                Calipso.stopEvent(event);
+                console.log("Ajax error, url: " + settings.url + ", error: " + error);
+            });
 	Calipso.getDefaultFetchOptions = function() {
 		return {
 			// use traditional HTTP params
@@ -418,19 +423,16 @@ Calipso.cloneSpecificValue = function(val) {
 			// handle status codes
 			statusCode : {
 				401 : function() {
-				//console.log("Backbone.$.ajaxSetup 401");
-					window.alert("Your session has expired");
-					Calipso.navigate("login");
+                    //Calipso.loginIfUnauthorized();
 				},
 				403 : function() {
-				//console.log("Backbone.$.ajaxSetup 403");
-					window.alert("Your session has expired");
-					Calipso.navigate("login");
+                    //Calipso.loginIfUnauthorized();
 				}
 			}
 		};
 
 	}
+
 	/**
 	 * Utility method to stop events.
 	 * @param  {event} e
@@ -822,14 +824,15 @@ Calipso.cloneSpecificValue = function(val) {
 	Calipso.Application = Marionette.Application.extend({
 		config : {},
 		started : false,
-    browseMenu : {},
+        browseMenu: {},
 		region : "body",
-    regionClass : Backbone.Marionette.Region.extend({
-	  	el: 'body',
-	  	replaceElement: true
+        regionClass: Backbone.Marionette.Region.extend({
+            el: 'body',
+            replaceElement: true
 		}),
+        mainRouter: null,
 		routers : {},
-	  onBeforeStart: function(onBeforeStartOptions) {
+        onBeforeStart: function (onBeforeStartOptions) {
 		  onBeforeStartOptions || (onBeforeStartOptions = {});
 		  var options = onBeforeStartOptions.options || {};
 		  //Marionette.Application.prototype.onBeforeStart.apply(this, arguments);
@@ -838,8 +841,12 @@ Calipso.cloneSpecificValue = function(val) {
 		  _(options.routers).each(function (routerClass) {
 			  var router = new routerClass();
 			  _this.routers[routerClass.getTypeName()] = router;
+              if (!_this.mainRouter) {
+                  _this.mainRouter = router;
+              }
 		  });
-
+            console.log("Calipso.Application#onBeforeStart, configured routers: ");
+            console.log(_this.routers);
 		  // set model types map
 		  Calipso.useCaseFactoriesMap = _.extend({}, Calipso.config.useCaseFactories || {});
 		  var allModelLabels = Calipso.util.getLabels("models");
