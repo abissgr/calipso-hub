@@ -45,7 +45,7 @@
     <logger name="gr.abiss.calipso.controller">
         <level value="debug"/>
     </logger>
-    <logger name="com.restdude.domain.users">
+    <logger name="com.restdude.config">
         <level value="debug"/>
     </logger>
     <logger name="com.restdude.auth.userdetails">
