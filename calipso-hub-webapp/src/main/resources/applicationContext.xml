@@ -93,15 +93,8 @@
 
 	<!-- 	<bean id="auditorBean" class="com.restdude.util.audit.AuditorBean" /> -->
 <!-- 	<jpa:auditing auditor-aware-ref="auditorBean"/> -->
-	
-	<context:component-scan base-package="
-    	**.calipso,
-    	com.restdude,
-    	org.resthub">
-		<!--context:include-filter type="regex" expression="com.concretepage.*.*Util"/>
-		<context:exclude-filter type="assignable" expression="com.concretepage.service.IUserService"/-->
-		<context:exclude-filter type="regex" expression="org.resthub.web.*"/>
-		<context:exclude-filter type="regex" expression="org.resthub.web.*.*"/>
+
+	<context:component-scan base-package="**.calipso, **.restdude">
 	</context:component-scan>
 
 	<!-- THYMELEAF: Template Resolver for email templates -->
