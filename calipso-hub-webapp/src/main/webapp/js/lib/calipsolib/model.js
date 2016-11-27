@@ -19,7 +19,8 @@ define([ 'jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util
 		"lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', 'moment',
 		"lib/calipsolib/models/Model", "lib/calipsolib/models/HostModel", "lib/calipsolib/models/UserRegistrationCodeBatchModel", "lib/calipsolib/models/UserRegistrationCodeModel",
 		"lib/calipsolib/models/UserInvitationsModel", "lib/calipsolib/models/RoleModel", "lib/calipsolib/models/UserModel", "lib/calipsolib/models/CountryModel",
-        "lib/calipsolib/models/UserAccountModel", "lib/calipsolib/models/UserDetailsModel"],
+		"lib/calipsolib/models/UserAccountModel", "lib/calipsolib/models/UserDetailsModel",
+		"lib/calipsolib/models/AbstractErrorModel", "lib/calipsolib/models/SystemErrorModel", "lib/calipsolib/models/ClientErrorModel", "lib/calipsolib/models/StackTraceModel"],
 
 	function ($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars, moment) {
 

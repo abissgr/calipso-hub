@@ -143,6 +143,86 @@ define({
 					"label" : "Recepients"
 				},
 			},
+			"allErrors": {
+				"singular": {
+					"label": "Error"
+				},
+				"plural": {
+					"label": "Errors"
+				},
+				"message": {
+					"label": "Message"
+				},
+				"user": {
+					"label": "User"
+				},
+				"createdDate": {
+					"label": "Date"
+				},
+			},
+			"systemErrors": {
+				"singular": {
+					"label": "System Error"
+				},
+				"plural": {
+					"label": "System Errors"
+				},
+				"requestMethod": {
+					"label": "Method"
+				},
+				"httpStatusCode": {
+					"label": "Status"
+				},
+				"requestUrl": {
+					"label": "URL"
+				},
+				"stackTrace": {
+					"label": "StackTrace"
+				},
+			},
+			"clientErrors": {
+				"singular": {
+					"label": "Client Error"
+				},
+				"plural": {
+					"label": "Client Errors"
+				},
+				"description": {
+					"label": "Description"
+				},
+				"httpStatusCode": {
+					"label": "Status"
+				},
+				"screenshotUrl": {
+					"label": "Screenshot"
+				},
+				"errorLog": {
+					"label": "ErrorLog"
+				},
+			},
+			"stackTraces": {
+				"singular": {
+					"label": "Stacktrace"
+				},
+				"plural": {
+					"label": "Stacktraces"
+				},
+				"id": {
+					"label": "Hash"
+				},
+				"rootCauseMessage": {
+					"label": "Root Cause"
+				},
+				"lastOccurred": {
+					"label": "Last Occured"
+				},
+				"errorCount": {
+					"label": "Count"
+				},
+				"stacktrace": {
+					"label": "Stack Trace"
+				},
+			},
 			"users" : {
 				"singular" : {
 					"label" : "User"
