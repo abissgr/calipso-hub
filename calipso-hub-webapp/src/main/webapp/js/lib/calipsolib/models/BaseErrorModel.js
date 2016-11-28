@@ -19,37 +19,38 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
         "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', "lib/calipsolib/models/Model"],
     function ($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars) {
 
-        Calipso.model.StackTraceModel = Calipso.Model.extend(
-            /** @lends Calipso.model.StackTraceModel.prototype */
+        Calipso.model.BaseErrorModel = Calipso.Model.extend(
+            /** @lends Calipso.model.BaseErrorModel.prototype */
             {
                 toString: function () {
-                    return this.get("id");
+                    return this.get("message");
                 }
             }, {
                 // static members
                 labelIcon: "fa fa-user fa-fw",
                 public: true,
-                pathFragment: "stackTraces",
-                typeName: "Calipso.model.AbstractErrorModel",
+                pathFragment: "allErrors",
+                typeName: "Calipso.model.BaseErrorModel",
                 menuConfig: {
                     rolesIncluded: ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
                     rolesExcluded: null,
                 },
                 fields: {
-                    id: {
+                    user: {
+                        fieldType: "RelatedModel",
+                        pathFragment: "users",
+                    },
+                    message: {
                         fieldType: "String",
                     },
-                    rootCauseMessage: {
-                        fieldType: "String",
-                    },
-                    lastOccurred: {
+                    createdDate: {
                         fieldType: "Date",
                     },
-                    errorCount: {
-                        fieldType: "Integer",
+                    remoteAddress: {
+                        fieldType: "String",
                     },
-                    stacktrace: {
-                        fieldType: "Text",
+                    stackTraceId: {
+                        fieldType: "String",
                     },
                 },
             });

@@ -176,7 +176,7 @@ define({
 				"requestUrl": {
 					"label": "URL"
 				},
-				"stackTrace": {
+                "stackTraceId": {
 					"label": "StackTrace"
 				},
 			},

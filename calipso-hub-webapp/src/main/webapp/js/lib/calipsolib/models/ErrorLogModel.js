@@ -19,32 +19,37 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
         "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', "lib/calipsolib/models/Model"],
     function ($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars) {
 
-        Calipso.model.AbstractErrorModel = Calipso.Model.extend(
-            /** @lends Calipso.model.AbstractErrorModel.prototype */
+        Calipso.model.ErrorLogModel = Calipso.Model.extend(
+            /** @lends Calipso.model.ErrorLogModel.prototype */
             {
                 toString: function () {
-                    return this.get("message");
+                    return this.get("id");
                 }
             }, {
                 // static members
                 labelIcon: "fa fa-user fa-fw",
                 public: true,
-                pathFragment: "allErrors",
-                typeName: "Calipso.model.AbstractErrorModel",
+                pathFragment: "errorLogs",
+                typeName: "Calipso.model.ErrorLogModel",
                 menuConfig: {
                     rolesIncluded: ["ROLE_ADMIN", "ROLE_SITE_OPERATOR"],
                     rolesExcluded: null,
                 },
                 fields: {
-                    user: {
-                        fieldType: "RelatedModel",
-                        pathFragment: "users",
-                    },
-                    message: {
+                    id: {
                         fieldType: "String",
                     },
-                    createdDate: {
+                    rootCauseMessage: {
+                        fieldType: "String",
+                    },
+                    lastOccurred: {
                         fieldType: "Date",
+                    },
+                    errorCount: {
+                        fieldType: "Integer",
+                    },
+                    stacktrace: {
+                        fieldType: "Text",
                     },
                 },
             });

@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util", "lib/calipsolib/form",
-        "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', "lib/calipsolib/models/AbstractErrorModel"],
+        "lib/calipsolib/uifield", "lib/calipsolib/backgrid", "lib/calipsolib/view", 'handlebars', "lib/calipsolib/models/BaseErrorModel"],
     function ($, _, Bloodhoud, Typeahead, Calipso, CalipsoForm, CalipsoField, CalipsoGrid, CalipsoView, Handlebars) {
 
-        Calipso.model.SystemErrorModel = Calipso.model.AbstractErrorModel.extend(
+        Calipso.model.SystemErrorModel = Calipso.model.BaseErrorModel.extend(
             /** @lends Calipso.model.SystemErrorModel.prototype */
             {
                 toString: function () {
@@ -44,15 +44,6 @@ define(['jquery', 'underscore', 'bloodhound', 'typeahead', "lib/calipsolib/util"
                     },
                     requestUrl: {
                         fieldType: "Link",
-                    },
-                    stackTrace: {
-                        fieldType: "RelatedModel",
-                        pathFragment: "stackTraces",
-                        form: {
-                            typeaheadSource: {
-                                displayKey: "id",
-                            }
-                        }
                     },
                 },
             });

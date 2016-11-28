@@ -45,13 +45,10 @@
     <logger name="gr.abiss.calipso.controller">
         <level value="debug"/>
     </logger>
-    <logger name="com.restdude.config">
+    <logger name="com.restdude.domain.error">
         <level value="debug"/>
     </logger>
-    <logger name="com.restdude.auth.userdetails">
-        <level value="debug"/>
-    </logger>
-    <logger name="com.restdude.mdd.processor">
+    <logger name="com.restdude.mdd">
         <level value="debug"/>
     </logger>
     <logger name="com.restdude.init">
