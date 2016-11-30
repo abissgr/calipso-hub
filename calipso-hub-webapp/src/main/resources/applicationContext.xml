@@ -27,7 +27,6 @@
 	</bean>
 	<!-- imports -->
 	<import resource="applicationContext-jackson.xml"/>
-	<import resource="applicationContext-jackson.xml"/>
 	<import resource="applicationContext-encrypt.xml"/>
 	<import resource="applicationContext-email.xml"/>
 	<import resource="applicationContext-security.xml"/>
@@ -89,10 +88,6 @@
 		  class="com.restdude.auth.userdetails.util.SimpleUserDetailsConfig">
         <constructor-arg value="calipso-sso" />
     </bean>
-
-
-	<!-- 	<bean id="auditorBean" class="com.restdude.util.audit.AuditorBean" /> -->
-<!-- 	<jpa:auditing auditor-aware-ref="auditorBean"/> -->
 
 	<context:component-scan base-package="**.calipso, **.restdude">
 	</context:component-scan>

@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -63,9 +63,8 @@ public class CsvControllerIT extends AbstractControllerIT {
 
             // set expiration to six months
             //=========================
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.MONTH, 6);
-            batch.setExpirationDate(cal.getTime());
+            LocalDate sixMonthsFromNow = LocalDate.now().plusMonths(6);
+            batch.setExpirationDate(sixMonthsFromNow);
 
             // save batch
             //=========================

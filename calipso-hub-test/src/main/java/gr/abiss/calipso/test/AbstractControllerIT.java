@@ -17,10 +17,10 @@
  */
 package gr.abiss.calipso.test;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.restdude.domain.misc.model.Host;
 import com.restdude.domain.users.model.User;
 import com.restdude.util.ConfigurationFactory;
@@ -168,11 +168,20 @@ public class AbstractControllerIT {
 				new ObjectMapperConfig().jackson2ObjectMapperFactory(new Jackson2ObjectMapperFactory() {
 					@Override
 					public ObjectMapper create(Class aClass, String s) {
-						ObjectMapper objectMapper = new ObjectMapper();
-						// support joda classes<->JSON
-						objectMapper.registerModule(new JodaModule());
-						// ignore unknown properties
+						ObjectMapper objectMapper = new ObjectMapper()
+								.registerModule(new ParameterNamesModule())
+								.registerModule(new Jdk8Module())
+								.registerModule(new JavaTimeModule());
+
+						// Disable features
 						objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+						objectMapper.configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
+						objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
+						objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+						// enable features
+						objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
+
 						return objectMapper;
 					}
 				}));

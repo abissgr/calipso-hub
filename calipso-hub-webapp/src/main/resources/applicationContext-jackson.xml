@@ -35,6 +35,12 @@
             <array>
                 <util:constant
                         static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES"/>
+                <util:constant
+                        static-field="com.fasterxml.jackson.databind.DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS"/>
+                <util:constant
+                        static-field="com.fasterxml.jackson.databind.DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE"/>
+                <util:constant
+                        static-field="com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS"/>
             </array>
         </property>
         <property name="featuresToEnable">
@@ -44,7 +50,10 @@
         </property>
     </bean>
 
-    <bean class="com.fasterxml.jackson.datatype.joda.JodaModule"/>
+    <bean class="com.fasterxml.jackson.module.paramnames.ParameterNamesModule"/>
+    <bean class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
+    <bean class="com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"/>
+
     <!-- 	<bean id="conversionService" -->
     <!-- 		class="org.springframework.context.support.ConversionServiceFactoryBean"> -->
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
