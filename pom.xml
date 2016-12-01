@@ -75,7 +75,7 @@
 			<dependency>
 				<groupId>com.restdude</groupId>
 				<artifactId>restdude-core</artifactId>
-				<version>${calipso.version}</version>
+				<version>2.1.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>gr.abiss.calipso</groupId>

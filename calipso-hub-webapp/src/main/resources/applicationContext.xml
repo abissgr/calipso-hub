@@ -36,10 +36,10 @@
 	<!--import resource="applicationContext-swagger.xml" /-->
 
 	<!--RESTify errors -->
-	<bean id="restExceptionResolver" class="com.restdude.util.exception.RestExceptionHandler">
+	<bean id="restExceptionResolver" class="com.restdude.domain.error.resolver.RestExceptionHandler">
 		<property name="order" value="100"></property>
 		<property name="errorResolver">
-			<bean class="com.restdude.util.exception.DefaultRestErrorResolver">
+			<bean class="com.restdude.domain.error.resolver.DefaultRestErrorResolver">
 			</bean>
 		</property>
 	</bean>

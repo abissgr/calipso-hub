@@ -172,7 +172,8 @@ public class RestErrorsIT extends AbstractControllerIT {
                 .then().log().all().assertThat()
                 // test assertions
                 .statusCode(200)
-                .body("content[0].id", notNullValue())
+                .body("content[0].message", notNullValue())
+                .body("content[1].message", notNullValue())
                 .extract().as(JsonNode.class);
     }
 
@@ -200,7 +201,7 @@ public class RestErrorsIT extends AbstractControllerIT {
                     .then().log().all().assertThat()
                     // test assertions
                     .statusCode(201)
-                    .body("id", notNullValue())
+                    .body("message", notNullValue())
                     .extract().as(ClientError.class);
         }
     }

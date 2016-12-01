@@ -1,17 +1,17 @@
 /**
  * calipso-hub-webapp - A full stack, high level framework for lazy application hackers.
  * Copyright © 2005 Manos Batsis (manosbatsis gmail)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -49,172 +49,185 @@ import static org.hamcrest.Matchers.notNullValue;
 @SuppressWarnings("unused")
 public class FriendsControllerIT extends AbstractControllerIT {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FriendsControllerIT.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FriendsControllerIT.class);
 
-	@Test(description = "Test logging in with correct credentials")
-	public void testFindMy() throws Exception {
+    @Test(description = "Test logging in with correct credentials")
+    public void testFindMy() throws Exception {
 
-		// --------------------------------
-		// Login
-		// --------------------------------
+        // --------------------------------
+        // Login
+        // --------------------------------
 
-		// login and get a request spec for stateless auth
-		// essentially this posts to "/calipso/apiauth/userDetails"
-		// with request body: {username: "admin", password: "admin"}
-		Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
-		RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
-		
-		Loggedincontext operatorLoginContext = this.getLoggedinContext("operator", "operator");
-		RequestSpecification operatorRequestSpec = operatorLoginContext.requestSpec;
-		
+        // login and get a request spec for stateless auth
+        // essentially this posts to "/calipso/apiauth/userDetails"
+        // with request body: {username: "admin", password: "admin"}
+        Loggedincontext adminLoginContext = this.getLoggedinContext("admin", "admin");
+        RequestSpecification adminRequestSpec = adminLoginContext.requestSpec;
 
-		// --------------------------------
-		// subscribe to friendship websocket updates
-		// --------------------------------
-		// 
-		StompSession adminSession = getStompSession(WEBSOCKET_URI, adminLoginContext);
-		StompSession operatorSession = getStompSession(WEBSOCKET_URI, operatorLoginContext);
-		// subsscribe to updates
-		BlockingQueue<FriendshipDTO> adminFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
-		adminSession.subscribe("/user" + Destinations.USERQUEUE_FRIENDSHIPS, 
-			new DefaultStompFrameHandler<FriendshipDTO>(adminSession, FriendshipDTO.class, adminFriendshipsQueueBlockingQueue));
-		
-		// subsscribe to generic state updates and verify user updateof stomsessionCount
-		BlockingQueue<JsonNode> adminStateUpdatesQueueBlockingQueue = new LinkedBlockingDeque<JsonNode>();
-		adminSession.subscribe("/user" + Destinations.USERQUEUE_UPDATES_STATE, 
-			new DefaultStompFrameHandler<JsonNode>(adminSession, JsonNode.class, adminStateUpdatesQueueBlockingQueue));
-				
-		BlockingQueue<FriendshipDTO> operatorFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
-		Subscription operatorFriendshipQueueSubscription = operatorSession.subscribe("/user/queue/friendships", 
-				new DefaultStompFrameHandler<FriendshipDTO>(operatorSession, FriendshipDTO.class, operatorFriendshipsQueueBlockingQueue));
+        Loggedincontext operatorLoginContext = this.getLoggedinContext("operator", "operator");
+        RequestSpecification operatorRequestSpec = operatorLoginContext.requestSpec;
 
-		// --------------------------------
-		// Create a friendship request
-		// --------------------------------
-		LOGGER.info("Create a friendship request");
-		Friendship friendship = given().spec(adminRequestSpec)
-			.log().all()
-			.body(new Friendship(new User(adminLoginContext.userId), new User(operatorLoginContext.userId)))
-			.post("/calipso/api/rest/" + Friendship.API_PATH)
-			.then().assertThat()
-			// test assertions
-			.body("status", notNullValue())
-			.log().all()
-			// get model
-			.extract().as(Friendship.class);
 
-		LOGGER.info("validate result");
-		validateFriendship(friendship, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.SENT);
+        // --------------------------------
+        // subscribe to friendship websocket updates
+        // --------------------------------
+        //
+        StompSession adminSession = getStompSession(WEBSOCKET_URI, adminLoginContext);
+        StompSession operatorSession = getStompSession(WEBSOCKET_URI, operatorLoginContext);
+        // subsscribe to updates
+        BlockingQueue<FriendshipDTO> adminFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
+        adminSession.subscribe("/user" + Destinations.USERQUEUE_FRIENDSHIPS,
+                new DefaultStompFrameHandler<FriendshipDTO>(adminSession, FriendshipDTO.class, adminFriendshipsQueueBlockingQueue));
 
-		LOGGER.info("Validate admin's outbox (SENT)");
-	    JsonNode friendshipsNode =  given().spec(adminRequestSpec)
-				.log().all()
-				.param("status", "SENT")
-				.get("/calipso/api/rest/friends/my")
-				.then().assertThat()
-				.body("content[0].id", notNullValue())
-				// test assertions
+        // subsscribe to generic state updates and verify user updateof stomsessionCount
+        BlockingQueue<JsonNode> adminStateUpdatesQueueBlockingQueue = new LinkedBlockingDeque<JsonNode>();
+        adminSession.subscribe("/user" + Destinations.USERQUEUE_UPDATES_STATE,
+                new DefaultStompFrameHandler<JsonNode>(adminSession, JsonNode.class, adminStateUpdatesQueueBlockingQueue));
+
+        BlockingQueue<FriendshipDTO> operatorFriendshipsQueueBlockingQueue = new LinkedBlockingDeque<FriendshipDTO>();
+        Subscription operatorFriendshipQueueSubscription = operatorSession.subscribe("/user/queue/friendships",
+                new DefaultStompFrameHandler<FriendshipDTO>(operatorSession, FriendshipDTO.class, operatorFriendshipsQueueBlockingQueue));
+
+        // --------------------------------
+        // Create a friendship request
+        // --------------------------------
+        LOGGER.info("Create a friendship request");
+        Friendship friendship = given().spec(adminRequestSpec)
+                .log().all()
+                .body(new Friendship(new User(adminLoginContext.userId), new User(operatorLoginContext.userId)))
+                .post("/calipso/api/rest/" + Friendship.API_PATH)
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(201)
+                .body("status", notNullValue())
+                // get model
+                .extract().as(Friendship.class);
+
+        LOGGER.info("validate result");
+        validateFriendship(friendship, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.SENT);
+
+        LOGGER.info("Validate admin's outbox (SENT)");
+        JsonNode friendshipsNode = given().spec(adminRequestSpec)
+                .log().all()
+                .param("status", "SENT")
+                .get("/calipso/api/rest/friends/my")
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("content[0].id", notNullValue())
+                // test assertions
 //				.log().all()
-				// get model
-				.extract().as(JsonNode.class);
-		LOGGER.debug("Outbox: \n{}", JacksonUtils.prettyPrint(friendshipsNode));
-	    Assert.assertEquals(operatorLoginContext.userId, friendshipsNode.get("content").get(0).get("id").asText());
-	    
-	    LOGGER.info("Validate inbox (PENDING)");
-	    friendshipsNode =  given().spec(operatorRequestSpec)
-				.log().all()
-				.param("status", "PENDING")
-				.get("/calipso/api/rest/friends/my")
-				.then().assertThat()
-				.body("content[0].id", notNullValue())
-				// test assertions
+                // get model
+                .extract().as(JsonNode.class);
+        LOGGER.debug("Outbox: \n{}", JacksonUtils.prettyPrint(friendshipsNode));
+        Assert.assertEquals(operatorLoginContext.userId, friendshipsNode.get("content").get(0).get("id").asText());
+
+        LOGGER.info("Validate inbox (PENDING)");
+        friendshipsNode = given().spec(operatorRequestSpec)
+                .log().all()
+                .param("status", "PENDING")
+                .get("/calipso/api/rest/friends/my")
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("content[0].id", notNullValue())
+                // test assertions
 //				.log().all()
-				// get model
-				.extract().as(JsonNode.class);
-	    Assert.assertEquals(adminLoginContext.userId, friendshipsNode.get("content").get(0).get("id").asText());
-	    
-	    
-	    // validate oprator/inverse result
-	    FriendshipDTO ioperatorFriendRequestNotification = operatorFriendshipsQueueBlockingQueue.poll(5, SECONDS);
-		validateFriendship(ioperatorFriendRequestNotification, operatorLoginContext.userId, adminLoginContext.userId, FriendshipStatus.PENDING);
+                // get model
+                .extract().as(JsonNode.class);
+        Assert.assertEquals(adminLoginContext.userId, friendshipsNode.get("content").get(0).get("id").asText());
 
-		// test operator user queue
-		LOGGER.info("Accept request");
-		// accept request by sending only the new status to the right URL
-		Friendship friendshipInverse = given().spec(operatorRequestSpec).log().all()
-			.body(new Friendship(FriendshipStatus.CONFIRMED))
-			.put("/calipso/api/rest/" + Friendship.API_PATH + "/" + ioperatorFriendRequestNotification.getId())
-			// get model
-			.then().log().all().extract().as(Friendship.class);
-		
-		// validate result
-		validateFriendship(friendshipInverse, operatorLoginContext.userId, adminLoginContext.userId, FriendshipStatus.CONFIRMED);
 
-	    // validate admin/inverse result
-	    FriendshipDTO adminFriendRequestNotification = adminFriendshipsQueueBlockingQueue.poll(5, SECONDS);
-		validateFriendship(adminFriendRequestNotification, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.CONFIRMED);
+        // validate oprator/inverse result
+        FriendshipDTO ioperatorFriendRequestNotification = operatorFriendshipsQueueBlockingQueue.poll(5, SECONDS);
+        validateFriendship(ioperatorFriendRequestNotification, operatorLoginContext.userId, adminLoginContext.userId, FriendshipStatus.PENDING);
 
-		LOGGER.info("Get friends");
-		// get friends
-		given().spec(adminRequestSpec)
-			.get("/calipso/api/rest/friends/my");
+        // test operator user queue
+        LOGGER.info("Accept request");
+        // accept request by sending only the new status to the right URL
+        Friendship friendshipInverse = given().spec(operatorRequestSpec).log().all()
+                .body(new Friendship(FriendshipStatus.CONFIRMED))
+                .put("/calipso/api/rest/" + Friendship.API_PATH + "/" + ioperatorFriendRequestNotification.getId())
+                // get model
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(200)
+                .extract().as(Friendship.class);
 
-		// --------------------------------
-		// Create bulk friendship requests (invitations
-		// --------------------------------
-		UserInvitationsDTO invitations = new UserInvitationsDTO.Builder()
+        // validate result
+        validateFriendship(friendshipInverse, operatorLoginContext.userId, adminLoginContext.userId, FriendshipStatus.CONFIRMED);
+
+        // validate admin/inverse result
+        FriendshipDTO adminFriendRequestNotification = adminFriendshipsQueueBlockingQueue.poll(5, SECONDS);
+        validateFriendship(adminFriendRequestNotification, adminLoginContext.userId, operatorLoginContext.userId, FriendshipStatus.CONFIRMED);
+
+        LOGGER.info("Get friends");
+        // get friends
+        given().spec(adminRequestSpec)
+                .get("/calipso/api/rest/friends/my");
+
+        // --------------------------------
+        // Create bulk friendship requests (invitations
+        // --------------------------------
+        UserInvitationsDTO invitations = new UserInvitationsDTO.Builder()
                 .addressLines("manos, info@abiss.gr\nabc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@domain.com,abc@xyz.com,asd@dsa.com")
                 .recepient(new UserDTO.Builder().email("test@pick.com").build()).build();
-		
-		UserInvitationResultsDTO userInvitationResults = given().spec(adminRequestSpec)
-				.body(invitations)
-				.post("/calipso/api/rest/invitations")
-				.then()
-				//.assertThat()
-				// test assertions
-				//.body("id", notNullValue())
-				// get model
-				.extract().as(UserInvitationResultsDTO.class);
-		
 
-		// disconnect
-		LOGGER.info("DISCONNECT OPERATOR");
-		operatorSession.disconnect();
+        UserInvitationResultsDTO userInvitationResults = given().spec(adminRequestSpec)
+                .body(invitations)
+                .post("/calipso/api/rest/invitations")
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(201)
+                // test assertions
+                //.body("id", notNullValue())
+                // get model
+                .extract().as(UserInvitationResultsDTO.class);
 
-		JsonNode disconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
 
-		LOGGER.info("disconnectUpdate MESSAGE:\n{}", JacksonUtils.prettyPrint(disconnectUpdate));
-		// TODO
-	    Assert.assertNotNull(disconnectUpdate);
+        // disconnect
+        LOGGER.info("DISCONNECT OPERATOR");
+        operatorSession.disconnect();
 
-		StompSession operatorSession2 = getStompSession(WEBSOCKET_URI, operatorLoginContext);
+        JsonNode disconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
 
-		JsonNode reconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
+        LOGGER.info("disconnectUpdate MESSAGE:\n{}", JacksonUtils.prettyPrint(disconnectUpdate));
+        // TODO
+        Assert.assertNotNull(disconnectUpdate);
 
-		LOGGER.info("reconnectUpdate MESSAGE: \n{}", JacksonUtils.prettyPrint(reconnectUpdate));
-		// TODO
-	    Assert.assertNotNull(reconnectUpdate);
-	}
+        StompSession operatorSession2 = getStompSession(WEBSOCKET_URI, operatorLoginContext);
 
-	protected void validateFriendship(Friendship friendship, String one,  String other, FriendshipStatus status) {
-		this.validateFriendship(new FriendshipDTO(friendship), one, other, status);
-	}
-	protected void validateFriendship(FriendshipDTO friendship, String one,  String other, FriendshipStatus status) {
-		Assert.assertEquals(one, friendship.getOwner().getId());
-	    Assert.assertEquals(other, friendship.getFriend().getId());
-	    Assert.assertEquals(status, friendship.getStatus());
-	}
-	
-	public static class HeartBeatStompSessionHandler extends DefaultStompSessionHandler{
+        JsonNode reconnectUpdate = adminStateUpdatesQueueBlockingQueue.poll(10, SECONDS);
 
-		@Override
-		public void handleFrame(StompHeaders headers, Object payload) {
-			// TODO Auto-generated method stub
-			super.handleFrame(headers, payload);
-		}
-		
-	}
-	
+        LOGGER.info("reconnectUpdate MESSAGE: \n{}", JacksonUtils.prettyPrint(reconnectUpdate));
+        // TODO
+        Assert.assertNotNull(reconnectUpdate);
+    }
 
-	
+    protected void validateFriendship(Friendship friendship, String one, String other, FriendshipStatus status) {
+        this.validateFriendship(new FriendshipDTO(friendship), one, other, status);
+    }
+
+    protected void validateFriendship(FriendshipDTO friendship, String one, String other, FriendshipStatus status) {
+        Assert.assertEquals(one, friendship.getOwner().getId());
+        Assert.assertEquals(other, friendship.getFriend().getId());
+        Assert.assertEquals(status, friendship.getStatus());
+    }
+
+    public static class HeartBeatStompSessionHandler extends DefaultStompSessionHandler {
+
+        @Override
+        public void handleFrame(StompHeaders headers, Object payload) {
+            // TODO Auto-generated method stub
+            super.handleFrame(headers, payload);
+        }
+
+    }
+
+
 }

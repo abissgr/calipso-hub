@@ -73,6 +73,8 @@ public class CsvControllerIT extends AbstractControllerIT {
                     .body(batch)
                     .post("/calipso/api/rest/registrationCodeBatches")
                     .then().assertThat()
+                    .log().all()
+                    .statusCode(201)
                     .body("id", notNullValue())
                     .log().all()
                     .extract().as(UserRegistrationCodeBatch.class);
@@ -108,6 +110,7 @@ public class CsvControllerIT extends AbstractControllerIT {
                         .then()
                         .log().all()
                         .assertThat()
+                        .statusCode(201)
                         // test assertions
                         .body("id", notNullValue())
                         // get model
@@ -129,6 +132,7 @@ public class CsvControllerIT extends AbstractControllerIT {
                 .log().all()
                 .get("/calipso/api/rest/registrationCodeBatches")
                 .then().log().all().assertThat()
+                .statusCode(200)
                 .body("content[0].id", notNullValue())
                 .extract().as(JsonNode.class);
         String id = batches.get("content").get(0).get("id").asText();
