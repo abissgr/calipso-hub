@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title th:remove="all">Account Confirmation</title>
+        <title th:text="#{email.accountconfirmation.expired.title}"></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <style>
         .greetings{color:#333333;}
@@ -12,7 +12,7 @@
            th:unless="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
-        <p class="greetings" th:text="#{email.greeting(${user.getCredentials().getUsername()})}"
+        <p class="greetings" th:text="#{email.greeting(${user.getUsername()})}"
            th:if="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
@@ -21,12 +21,12 @@
             any time by clicking on the link bellow.
         </p>
         <p>
-            <a th:href="@{#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()})}}"
-             th:text="#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getEmail()})}"> </a>
+            <a th:href="@{#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getCredentials().getEmail()})}}"
+               th:text="#{email.accountconfirmation.expired.link(${baseUrl}, ${user.getCredentials().getEmail()})}"> </a>
         </p>
         <p class="greetings">
-        	Regards, <br />
-            <em>The Team</em>
+            &emsp;<span th:text="#{email.regards}"></span><br/>
+            &emsp; <em><span th:text="#{email.signature}"></span></em>
         </p>
     </body>
 </html>

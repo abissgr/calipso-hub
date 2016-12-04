@@ -20,6 +20,7 @@ package gr.abiss.calipso.controller;
 import com.restdude.auth.userAccount.model.UserAccountRegistration;
 import com.restdude.domain.users.model.User;
 import com.restdude.util.Constants;
+import com.restdude.util.HashUtils;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -46,13 +47,16 @@ public class UserControllerIT extends AbstractControllerIT {
 
     @Test(priority = 10, description = "Test registration")
     public void testRegistration() throws Exception {
+
+        String email = "ittestreg@UserControllerIT.com";
+
         RequestSpecification spec = this.getRequestSpec(null);
         User user = given().spec(spec)
                 .log().all()
                 .body(new UserAccountRegistration.Builder()
                         .firstName("Firstname")
                         .lastName("LastName")
-                        .registrationEmail("ittestreg@UserControllerIT.com")
+                        .registrationEmail(email)
                         .build())
                 .post("/calipso/api/auth/account")
                 .then()
@@ -61,6 +65,7 @@ public class UserControllerIT extends AbstractControllerIT {
                 .statusCode(201)
                 // test assertions
                 .body("id", notNullValue())
+                .body("emailHash", equalTo(HashUtils.md5Hex(email)))
                 // get model
                 .extract().as(User.class);
     }

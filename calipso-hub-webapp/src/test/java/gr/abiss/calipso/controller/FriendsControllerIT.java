@@ -23,13 +23,12 @@ import com.restdude.domain.friends.model.Friendship;
 import com.restdude.domain.friends.model.FriendshipDTO;
 import com.restdude.domain.friends.model.FriendshipStatus;
 import com.restdude.domain.users.model.User;
-import com.restdude.domain.users.model.UserDTO;
 import com.restdude.domain.users.model.UserInvitationResultsDTO;
-import com.restdude.domain.users.model.UserInvitationsDTO;
 import com.restdude.websocket.Destinations;
 import com.restdude.websocket.client.DefaultStompSessionHandler;
 import gr.abiss.calipso.test.AbstractControllerIT;
 import io.restassured.specification.RequestSpecification;
+import org.apache.commons.collections.map.HashedMap;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,8 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -45,7 +46,7 @@ import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.notNullValue;
 
-@Test(/*singleThreaded = true, */description = "Test dynamic JPA specifications used in default search stack")
+@Test(/*singleThreaded = true, */description = "Test frienship operations")
 @SuppressWarnings("unused")
 public class FriendsControllerIT extends AbstractControllerIT {
 
@@ -173,12 +174,17 @@ public class FriendsControllerIT extends AbstractControllerIT {
         // --------------------------------
         // Create bulk friendship requests (invitations
         // --------------------------------
-        UserInvitationsDTO invitations = new UserInvitationsDTO.Builder()
-                .addressLines("manos, info@abiss.gr\nabc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@domain.com,abc@xyz.com,asd@dsa.com")
-                .recepient(new UserDTO.Builder().email("test@pick.com").build()).build();
+        LOGGER.info("Invite users");
+        Map invitations = new HashMap();
+        invitations.put("addressLines", "manos, info@abiss.gr\nabc@xyz.com, asd@dsa.com \nqwe@rty.com,yui@gui.com,jih@domain.com,abc@xyz.com,asd@dsa.com");
+        Map recepient = new HashedMap();
+        recepient.put("email", "test@pick.com");
+        recepient.put("@class", ".UserDTO");
+        invitations.put("recepients", new Map[]{recepient});
 
         UserInvitationResultsDTO userInvitationResults = given().spec(adminRequestSpec)
                 .body(invitations)
+                .log().all()
                 .post("/calipso/api/rest/invitations")
                 .then()
                 .log().all()

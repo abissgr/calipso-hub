@@ -9,7 +9,7 @@
        th:unless="${#strings.isEmpty(user.getFirstName())}">
             Hello, Peter Static!
         </p>
-    <p class="greetings" th:text="#{email.greeting(${user.getCredentials().getUsername()})}"
+    <p class="greetings" th:text="#{email.greeting(${user.getUsername()})}"
        th:if="${#strings.isEmpty(user.getFirstName())}">
         Hello, Peter Static!
         </p>
@@ -26,9 +26,9 @@
         <p>
             You can find <b>your uploaded attachment</b> attached to this message.
         </p>
-        <p>
-            Regards, <br />
-            &emsp; <em>The Team</em>
+    <p class="greetings">
+        &emsp;<span th:text="#{email.regards}"></span><br/>
+        &emsp; <em><span th:text="#{email.signature}"></span></em>
         </p>
     </body>
 </html>
