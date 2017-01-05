@@ -5,11 +5,16 @@ description: Simple documentation template for Github pages
 isHome: true
 ---
 <section class="bs-docs-section">
+	<h1 id="overview" class="page-header">
+		Project migrating to https://github.com/manosbatsis/restdude
+	</h1>
+</section>
+<section class="bs-docs-section">
 	<h1 id="overview" class="page-header">Overview</h1>
-	<p>Experiments on a full stack, high level enterprise framework for MVP application hackers and 
+	<p>Experiments on a full stack, high level enterprise framework for MVP application hackers and
 	scalable developer teams.</p>
-	<p>Calipso feeds primarily on your entity models to provide simple and flexible scaffolding for 
-	rapid application development. It also keeps your code base at a minimum and encourages 
+	<p>Calipso feeds primarily on your entity models to provide simple and flexible scaffolding for
+	rapid application development. It also keeps your code base at a minimum and encourages
 	component-based development to improve quality and maintainability.</p>
 </section>
 <section class="bs-docs-section">
@@ -31,8 +36,8 @@ cd calipso-hub-webapp
 mvn jetty:run
 	{% endhighlight %}
 	<p>
-		e) Browse the app client: <a href="http://localhost:8080/calipso/client">http://localhost:8080/calipso/client</a> 
-		or the API reference: <a href="http://localhost:8080/calipso/apidoc">http://localhost:8080/calipso/apidoc</a>. 
+		e) Browse the app client: <a href="http://localhost:8080/calipso/client">http://localhost:8080/calipso/client</a>
+		or the API reference: <a href="http://localhost:8080/calipso/apidoc">http://localhost:8080/calipso/apidoc</a>.
 		See also the <a href="#api-reference">Swagger API Reference</a> section bellow.
 	</p>
 	<p>
@@ -84,8 +89,8 @@ mvn -P ci clean install
 <section class="bs-docs-section">
 	<h1 id="api-reference" class="page-header">Swagger API Reference</h1>
 	<p>
-		The webapp provides automatically-generated API documentation based on 
-		<a href="http://swagger.io/">Swagger</a> and created by <a href="http://springfox.github.io/springfox/">Springfox</a>. To access 
+		The webapp provides automatically-generated API documentation based on
+		<a href="http://swagger.io/">Swagger</a> and created by <a href="http://springfox.github.io/springfox/">Springfox</a>. To access
 		the documentation run the app and point your browser to <a href="http://localhost:8080/calipso/apidoc">http://localhost:8080/calipso/apidoc</a>.
 	</p>
 	<img src="{{ site.baseurl }}/assets/images/swagger-ui.png" class="img-responsive" alt="Responsive image">
